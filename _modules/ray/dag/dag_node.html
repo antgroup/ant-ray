@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,17 +1389,17 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.dag.dag_node</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">from</span> <span class="nn">ray.experimental.channel.auto_transport_type</span> <span class="kn">import</span> <span class="n">AutoTransportType</span>
-<span class="kn">from</span> <span class="nn">ray.experimental.channel.torch_tensor_type</span> <span class="kn">import</span> <span class="n">TorchTensorType</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.dag.base</span> <span class="kn">import</span> <span class="n">DAGNodeBase</span>
-<span class="kn">from</span> <span class="nn">ray.dag.py_obj_scanner</span> <span class="kn">import</span> <span class="n">_PyObjScanner</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.channel.auto_transport_type</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTransportType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.channel.torch_tensor_type</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTensorType</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">DAGNodeBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.py_obj_scanner</span><span class="w"> </span><span class="kn">import</span> <span class="n">_PyObjScanner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Optional</span><span class="p">,</span>
     <span class="n">Union</span><span class="p">,</span>
     <span class="n">List</span><span class="p">,</span>
@@ -1410,19 +1410,19 @@ document.write(`
     <span class="n">Callable</span><span class="p">,</span>
     <span class="n">Literal</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
-<span class="kn">from</span> <span class="nn">ray.dag.compiled_dag_node</span> <span class="kn">import</span> <span class="n">build_compiled_dag_from_ray_dag</span>
-<span class="kn">from</span> <span class="nn">ray.experimental.channel</span> <span class="kn">import</span> <span class="n">ChannelOutputType</span>
-<span class="kn">from</span> <span class="nn">ray.experimental.channel.communicator</span> <span class="kn">import</span> <span class="n">Communicator</span>
-<span class="kn">from</span> <span class="nn">ray.experimental.util.types</span> <span class="kn">import</span> <span class="n">Device</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.compiled_dag_node</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_compiled_dag_from_ray_dag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.channel</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChannelOutputType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.channel.communicator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Communicator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.util.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Device</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">DAGNode</span><span class="p">(</span><span class="n">DAGNodeBase</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DAGNode</span><span class="p">(</span><span class="n">DAGNodeBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for a node in a Ray task graph.</span>
 
 <span class="sd">    A node has a type (e.g., FunctionNode), data (e.g., function options and</span>
@@ -1431,7 +1431,7 @@ document.write(`
 <span class="sd">    or class method)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
@@ -1484,7 +1484,7 @@ document.write(`
         <span class="c1"># Whether this node calls `experimental_compile`.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_cgraph_output_node</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">_collect_upstream_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;DAGNode&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_collect_upstream_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;DAGNode&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve upstream nodes and update their downstream dependencies.</span>
 
@@ -1533,7 +1533,7 @@ document.write(`
 
 <div class="viewcode-block" id="DAGNode.with_tensor_transport">
 <a class="viewcode-back" href="../../../ray-core/compiled-graph/doc/ray.dag.DAGNode.with_tensor_transport.html#ray.dag.input_node.DAGNode.with_tensor_transport">[docs]</a>
-    <span class="k">def</span> <span class="nf">with_tensor_transport</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">with_tensor_transport</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">transport</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Communicator</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
@@ -1596,42 +1596,42 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">type_hint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChannelOutputType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">type_hint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChannelOutputType</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_hint</span>
 
     <span class="nd">@type_hint</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">type_hint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_hint</span><span class="p">:</span> <span class="n">ChannelOutputType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">type_hint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_hint</span><span class="p">:</span> <span class="n">ChannelOutputType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type_hint</span><span class="p">,</span> <span class="n">AutoTransportType</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_original_type_hint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_hint</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_type_hint</span> <span class="o">=</span> <span class="n">type_hint</span>
 
-    <span class="k">def</span> <span class="nf">get_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the tuple of arguments for this node.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound_args</span>
 
-    <span class="k">def</span> <span class="nf">get_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dict of keyword arguments for this node.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound_kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dict of options arguments for this node.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound_options</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">get_other_args_to_resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_other_args_to_resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dict of other args to resolve arguments for this node.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound_other_args_to_resolve</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">get_stable_uuid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_stable_uuid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return stable uuid for this node.</span>
 <span class="sd">        1) Generated only once at first instance creation</span>
 <span class="sd">        2) Stable across pickling, replacement and JSON serialization.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stable_uuid</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_object_refs_from_last_execute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_object_refs_from_last_execute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets cached object refs from the last call to execute().</span>
 
 <span class="sd">        After this DAG is executed through execute(), retrieves a map between node</span>
@@ -1646,12 +1646,12 @@ document.write(`
 
         <span class="k">return</span> <span class="n">cache</span>
 
-    <span class="k">def</span> <span class="nf">clear_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache_from_last_execute</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="DAGNode.experimental_compile">
 <a class="viewcode-back" href="../../../ray-core/compiled-graph/doc/ray.dag.DAGNode.experimental_compile.html#ray.dag.input_node.DAGNode.experimental_compile">[docs]</a>
-    <span class="k">def</span> <span class="nf">experimental_compile</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">experimental_compile</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">_submit_timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">_buffer_size_bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1709,7 +1709,7 @@ document.write(`
 <span class="sd">        Returns:</span>
 <span class="sd">            A compiled DAG.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.dag</span> <span class="kn">import</span> <span class="n">DAGContext</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag</span><span class="w"> </span><span class="kn">import</span> <span class="n">DAGContext</span>
 
         <span class="n">ctx</span> <span class="o">=</span> <span class="n">DAGContext</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">_buffer_size_bytes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1738,7 +1738,7 @@ document.write(`
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">_ray_cache_refs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">,</span> <span class="s2">&quot;ray.actor.ActorHandle&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute this DAG using the Ray default executor _execute_impl().</span>
@@ -1751,7 +1751,7 @@ document.write(`
 <span class="sd">                - resolved values representing user input at runtime</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">def</span> <span class="nf">executor</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">executor</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">_execute_impl</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_recursive</span><span class="p">(</span><span class="n">executor</span><span class="p">)</span>
@@ -1759,7 +1759,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">cache_from_last_execute</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">cache</span>
         <span class="k">return</span> <span class="n">result</span>
 
-    <span class="k">def</span> <span class="nf">_get_toplevel_child_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;DAGNode&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_toplevel_child_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;DAGNode&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the list of nodes specified as top-level args.</span>
 
 <span class="sd">        For example, in `f.remote(a, [b])`, only `a` is a top-level arg.</span>
@@ -1788,7 +1788,7 @@ document.write(`
                     <span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">children</span>
 
-    <span class="k">def</span> <span class="nf">_get_all_child_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;DAGNode&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_all_child_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;DAGNode&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the list of nodes referenced by the args, kwargs, and</span>
 <span class="sd">        args_to_resolve in current node, even they&#39;re deeply nested.</span>
 
@@ -1813,7 +1813,7 @@ document.write(`
         <span class="n">scanner</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">children</span>
 
-    <span class="k">def</span> <span class="nf">_apply_and_replace_all_child_nodes</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_and_replace_all_child_nodes</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">:</span> <span class="s2">&quot;Callable[[DAGNode], T]&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DAGNode&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply and replace all immediate child nodes using a given function.</span>
@@ -1853,7 +1853,7 @@ document.write(`
             <span class="n">new_args</span><span class="p">,</span> <span class="n">new_kwargs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_options</span><span class="p">(),</span> <span class="n">new_other_args_to_resolve</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">apply_recursive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">:</span> <span class="s2">&quot;Callable[[DAGNode], T]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_recursive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">:</span> <span class="s2">&quot;Callable[[DAGNode], T]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply callable on each node in this DAG in a bottom-up tree walk.</span>
 
 <span class="sd">        Args:</span>
@@ -1867,15 +1867,15 @@ document.write(`
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;_CachingFn&quot;</span><span class="p">:</span>
 
-            <span class="k">class</span> <span class="nc">_CachingFn</span><span class="p">:</span>
-                <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
+            <span class="k">class</span><span class="w"> </span><span class="nc">_CachingFn</span><span class="p">:</span>
+                <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">fn</span> <span class="o">=</span> <span class="n">fn</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">input_node_uuid</span> <span class="o">=</span> <span class="kc">None</span>
 
-                <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="s2">&quot;DAGNode&quot;</span><span class="p">):</span>
-                    <span class="kn">from</span> <span class="nn">ray.dag.input_node</span> <span class="kn">import</span> <span class="n">InputNode</span>
+                <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="s2">&quot;DAGNode&quot;</span><span class="p">):</span>
+                    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.input_node</span><span class="w"> </span><span class="kn">import</span> <span class="n">InputNode</span>
 
                     <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">_stable_uuid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">_stable_uuid</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fn</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
@@ -1899,7 +1899,7 @@ document.write(`
             <span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">traverse_and_apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">:</span> <span class="s2">&quot;Callable[[DAGNode], T]&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">traverse_and_apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">:</span> <span class="s2">&quot;Callable[[DAGNode], T]&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Traverse all nodes in the connected component of the DAG that contains</span>
 <span class="sd">        the `self` node, and apply the given function to each node.</span>
@@ -1949,7 +1949,7 @@ document.write(`
                     <span class="k">if</span> <span class="n">neighbor</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
                         <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neighbor</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_raise_nested_dag_node_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_raise_nested_dag_node_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Raise an error for nested DAGNodes in Ray Compiled Graphs.</span>
 
@@ -1976,11 +1976,11 @@ document.write(`
             <span class="s2">&quot;Ray internal error. Please report this issue to the Ray team.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_find_root</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DAGNode&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_root</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DAGNode&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the root node of the DAG. The root node must be an InputNode.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.dag.input_node</span> <span class="kn">import</span> <span class="n">InputNode</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.input_node</span><span class="w"> </span><span class="kn">import</span> <span class="n">InputNode</span>
 
         <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">InputNode</span><span class="p">):</span>
@@ -1992,7 +1992,7 @@ document.write(`
             <span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">_upstream_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">node</span>
 
-    <span class="k">def</span> <span class="nf">apply_functional</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_functional</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">source_input_list</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
         <span class="n">predicate_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
@@ -2029,13 +2029,13 @@ document.write(`
 
         <span class="k">return</span> <span class="n">replaced_inputs</span>
 
-    <span class="k">def</span> <span class="nf">_execute_impl</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_execute_impl</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">,</span> <span class="s2">&quot;ray.actor.ActorHandle&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute this node, assuming args have been transformed already.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-    <span class="k">def</span> <span class="nf">_copy_impl</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_copy_impl</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">new_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">new_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
@@ -2045,7 +2045,7 @@ document.write(`
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a copy of this node with the given new args.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-    <span class="k">def</span> <span class="nf">_copy</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_copy</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">new_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">new_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
@@ -2061,15 +2061,15 @@ document.write(`
         <span class="n">instance</span><span class="o">.</span><span class="n">_original_type_hint</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_original_type_hint</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">instance</span>
 
-    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Required due to overriding `__getattr__` else pickling fails.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span>
 
-    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Required due to overriding `__getattr__` else pickling fails.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="s2">&quot;bind&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;.bind() cannot be used again on </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">attr</span> <span class="o">==</span> <span class="s2">&quot;remote&quot;</span><span class="p">:</span>

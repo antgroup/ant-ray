@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1390,19 +1390,19 @@ document.write(`
                   
   <h1>Source code for ray.rllib.models.distributions</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;This is the next version of action distribution base class.&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">ExperimentalAPI</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">TensorType</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExperimentalAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorType</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
 
 
 <div class="viewcode-block" id="Distribution">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.html#ray.rllib.models.distributions.Distribution">[docs]</a>
 <span class="nd">@ExperimentalAPI</span>
-<span class="k">class</span> <span class="nc">Distribution</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Distribution</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The base class for distribution over a random variable.</span>
 
 <span class="sd">    Examples:</span>
@@ -1432,7 +1432,7 @@ document.write(`
 <div class="viewcode-block" id="Distribution.sample">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.sample.html#ray.rllib.models.distributions.Distribution.sample">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">sample_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1455,7 +1455,7 @@ document.write(`
 <div class="viewcode-block" id="Distribution.rsample">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.rsample.html#ray.rllib.models.distributions.Distribution.rsample">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">rsample</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rsample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">sample_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1481,7 +1481,7 @@ document.write(`
 <div class="viewcode-block" id="Distribution.logp">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.logp.html#ray.rllib.models.distributions.Distribution.logp">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">logp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">TensorType</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">logp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">TensorType</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The log-likelihood of the distribution computed at `value`</span>
 
 <span class="sd">        Args:</span>
@@ -1496,7 +1496,7 @@ document.write(`
 <div class="viewcode-block" id="Distribution.kl">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.kl.html#ray.rllib.models.distributions.Distribution.kl">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">kl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Distribution&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Distribution&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The KL-divergence between two distributions.</span>
 
 <span class="sd">        Args:</span>
@@ -1511,7 +1511,7 @@ document.write(`
 <div class="viewcode-block" id="Distribution.entropy">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.entropy.html#ray.rllib.models.distributions.Distribution.entropy">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">entropy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">entropy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The entropy of the distribution.</span>
 
 <span class="sd">        Args:</span>
@@ -1526,7 +1526,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.required_input_dim.html#ray.rllib.models.distributions.Distribution.required_input_dim">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">required_input_dim</span><span class="p">(</span><span class="n">space</span><span class="p">:</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">required_input_dim</span><span class="p">(</span><span class="n">space</span><span class="p">:</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the required length of an input parameter tensor.</span>
 
 <span class="sd">        Args:</span>
@@ -1543,7 +1543,7 @@ document.write(`
 <div class="viewcode-block" id="Distribution.from_logits">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.from_logits.html#ray.rllib.models.distributions.Distribution.from_logits">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_logits</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">logits</span><span class="p">:</span> <span class="n">TensorType</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Distribution&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_logits</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">logits</span><span class="p">:</span> <span class="n">TensorType</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Distribution&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a Distribution from logits.</span>
 
 <span class="sd">        The caller does not need to have knowledge of the distribution class in order</span>
@@ -1600,7 +1600,7 @@ document.write(`
 <div class="viewcode-block" id="Distribution.get_partial_dist_cls">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.get_partial_dist_cls.html#ray.rllib.models.distributions.Distribution.get_partial_dist_cls">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_partial_dist_cls</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_partial_dist_cls</span><span class="p">(</span>
         <span class="n">parent_cls</span><span class="p">:</span> <span class="s2">&quot;Distribution&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">partial_kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Distribution&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a partial child of TorchMultiActionDistribution.</span>
@@ -1609,12 +1609,12 @@ document.write(`
 <span class="sd">        are available, but the logits are not.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">class</span> <span class="nc">DistributionPartial</span><span class="p">(</span><span class="n">parent_cls</span><span class="p">):</span>
-            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">DistributionPartial</span><span class="p">(</span><span class="n">parent_cls</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
             <span class="nd">@staticmethod</span>
-            <span class="k">def</span> <span class="nf">_merge_kwargs</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_merge_kwargs</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">                </span><span class="sd">&quot;&quot;&quot;Checks if keys in kwargs don&#39;t clash with partial_kwargs.&quot;&quot;&quot;</span>
                 <span class="n">overlap</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">partial_kwargs</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">overlap</span><span class="p">:</span>
@@ -1628,14 +1628,14 @@ document.write(`
 
             <span class="nd">@classmethod</span>
             <span class="nd">@override</span><span class="p">(</span><span class="n">parent_cls</span><span class="p">)</span>
-            <span class="k">def</span> <span class="nf">required_input_dim</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">space</span><span class="p">:</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">required_input_dim</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">space</span><span class="p">:</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
                 <span class="n">merged_kwargs</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_merge_kwargs</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
                 <span class="k">assert</span> <span class="n">space</span> <span class="o">==</span> <span class="n">merged_kwargs</span><span class="p">[</span><span class="s2">&quot;space&quot;</span><span class="p">]</span>
                 <span class="k">return</span> <span class="n">parent_cls</span><span class="o">.</span><span class="n">required_input_dim</span><span class="p">(</span><span class="o">**</span><span class="n">merged_kwargs</span><span class="p">)</span>
 
             <span class="nd">@classmethod</span>
             <span class="nd">@override</span><span class="p">(</span><span class="n">parent_cls</span><span class="p">)</span>
-            <span class="k">def</span> <span class="nf">from_logits</span><span class="p">(</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">from_logits</span><span class="p">(</span>
                 <span class="bp">cls</span><span class="p">,</span>
                 <span class="n">logits</span><span class="p">:</span> <span class="n">TensorType</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
@@ -1656,7 +1656,7 @@ document.write(`
 
 <div class="viewcode-block" id="Distribution.to_deterministic">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.to_deterministic.html#ray.rllib.models.distributions.Distribution.to_deterministic">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_deterministic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Distribution&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_deterministic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Distribution&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a deterministic equivalent for this distribution.</span>
 
 <span class="sd">        Specifically, the deterministic equivalent for a Categorical distribution is a</span>

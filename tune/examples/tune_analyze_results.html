@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1420,11 +1420,11 @@ document.write(`
 <p>Let’s start by performing a hyperparameter search with the MNIST PyTorch example. The training function is defined <a class="reference internal" href="includes/mnist_pytorch.html"><span class="doc">here</span></a>, and we pass it into a <code class="docutils literal notranslate"><span class="pre">Tuner</span></code> to start running the trials in parallel.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">ResultGrid</span>
-<span class="kn">from</span> <span class="nn">ray.tune.examples.mnist_pytorch</span> <span class="kn">import</span> <span class="n">train_mnist</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResultGrid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.examples.mnist_pytorch</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_mnist</span>
 
 <span class="n">storage_path</span> <span class="o">=</span> <span class="s2">&quot;/tmp/ray_results&quot;</span>
 <span class="n">exp_name</span> <span class="o">=</span> <span class="s2">&quot;tune_analyzing_results&quot;</span>
@@ -1719,7 +1719,7 @@ Longest training time: 8.945653676986694
 <p>Let’s take a look at the result that ended with the best <code class="docutils literal notranslate"><span class="pre">mean_accuracy</span></code> metric. By default, <code class="docutils literal notranslate"><span class="pre">get_best_result</span></code> will use the same metric and mode as defined in the <code class="docutils literal notranslate"><span class="pre">TuneConfig</span></code> above. However, it’s also possible to specify a new metric/order in which results should be ranked.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">Result</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">Result</span>
 
 <span class="c1"># Get the result with the maximum test set `mean_accuracy`</span>
 <span class="n">best_result</span><span class="p">:</span> <span class="n">Result</span> <span class="o">=</span> <span class="n">result_grid</span><span class="o">.</span><span class="n">get_best_result</span><span class="p">()</span>
@@ -1953,9 +1953,9 @@ Longest training time: 8.945653676986694
 <p>We saw earlier that <code class="docutils literal notranslate"><span class="pre">Result</span></code> contains the last checkpoint associated with a trial. Let’s see how we can use this checkpoint to load a model for performing inference on some sample MNIST images.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">ray.tune.examples.mnist_pytorch</span> <span class="kn">import</span> <span class="n">ConvNet</span><span class="p">,</span> <span class="n">get_data_loaders</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.examples.mnist_pytorch</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConvNet</span><span class="p">,</span> <span class="n">get_data_loaders</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">ConvNet</span><span class="p">()</span>
 
@@ -1971,7 +1971,7 @@ Longest training time: 8.945653676986694
 <p>Next, let’s test our model with a sample data point and print out the predicted class.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="n">_</span><span class="p">,</span> <span class="n">test_loader</span> <span class="o">=</span> <span class="n">get_data_loaders</span><span class="p">()</span>
 <span class="n">test_img</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">test_loader</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>

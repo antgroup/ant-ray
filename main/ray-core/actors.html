@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1409,18 +1409,18 @@ that specific worker and can access and mutate the state of that worker.</p>
 </input><label class="sd-tab-label" for="sd-tab-item-0">
 Python</label><div class="sd-tab-content docutils">
 <p>The <code class="docutils literal notranslate"><span class="pre">ray.remote</span></code> decorator indicates that instances of the <code class="docutils literal notranslate"><span class="pre">Counter</span></code> class will be actors. Each actor runs in its own Python process.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Counter</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Counter</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">def</span> <span class="nf">increment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">increment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
 
-    <span class="k">def</span> <span class="nf">get_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
 
 <span class="c1"># Create an actor from this class.</span>
@@ -1509,7 +1509,7 @@ Table:
 Python</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Specify required resources for an actor.</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_gpus</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
     <span class="k">pass</span>
 </pre></div>
 </div>
@@ -1666,10 +1666,10 @@ C++</label><div class="sd-tab-content docutils">
 <input checked="checked" id="sd-tab-item-12" name="sd-tab-set-4" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-12">
 Python</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">counter</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">counter</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
         <span class="n">counter</span><span class="o">.</span><span class="n">increment</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
@@ -1782,14 +1782,14 @@ C++</label><div class="sd-tab-content docutils">
 <input checked="checked" id="sd-tab-item-18" name="sd-tab-set-6" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-18">
 Python</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
@@ -1874,11 +1874,11 @@ that Ray Dashboard and <a class="reference internal" href="../ray-observability/
 <p>You can also disable task events for some actor methods by setting the <code class="code docutils literal notranslate"><span class="pre">enable_task_events</span></code> option to <code class="code docutils literal notranslate"><span class="pre">False</span></code> in <a class="reference internal" href="api/doc/ray.remote.html#ray.remote" title="ray.remote"><code class="xref py py-func docutils literal notranslate"><span class="pre">ray.remote()</span></code></a> and <a class="reference internal" href="api/doc/ray.remote_function.RemoteFunction.options.html#ray.remote_function.RemoteFunction.options" title="ray.remote_function.RemoteFunction.options"><code class="xref py py-meth docutils literal notranslate"><span class="pre">.options()</span></code></a> on the actor method.
 Method settings override the actor setting:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">FooActor</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FooActor</span><span class="p">:</span>
 
     <span class="c1"># Disable task events reporting for this method.</span>
     <span class="nd">@ray</span><span class="o">.</span><span class="n">method</span><span class="p">(</span><span class="n">enable_task_events</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
 

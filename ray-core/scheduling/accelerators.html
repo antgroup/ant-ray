@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1549,19 +1549,19 @@ and assign accelerators to the task or actor by setting the corresponding enviro
 <input checked="checked" id="sd-tab-item-7" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Nvidia GPU" for="sd-tab-item-7">
 Nvidia GPU</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">GPUActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GPUActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GPU IDs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()[</span><span class="s2">&quot;GPU&quot;</span><span class="p">]))</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CUDA_VISIBLE_DEVICES: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CUDA_VISIBLE_DEVICES&quot;</span><span class="p">]))</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">gpu_task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gpu_task</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GPU IDs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()[</span><span class="s2">&quot;GPU&quot;</span><span class="p">]))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CUDA_VISIBLE_DEVICES: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CUDA_VISIBLE_DEVICES&quot;</span><span class="p">]))</span>
 
@@ -1581,19 +1581,19 @@ Nvidia GPU</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-8" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" data-sync-id="AMD GPU" for="sd-tab-item-8">
 AMD GPU</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">GPUActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GPUActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GPU IDs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()[</span><span class="s2">&quot;GPU&quot;</span><span class="p">]))</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ROCR_VISIBLE_DEVICES: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ROCR_VISIBLE_DEVICES&quot;</span><span class="p">]))</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">gpu_task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gpu_task</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GPU IDs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()[</span><span class="s2">&quot;GPU&quot;</span><span class="p">]))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ROCR_VISIBLE_DEVICES: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ROCR_VISIBLE_DEVICES&quot;</span><span class="p">]))</span>
 
@@ -1613,19 +1613,19 @@ AMD GPU</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-9" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Intel GPU" for="sd-tab-item-9">
 Intel GPU</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">GPUActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GPUActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GPU IDs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()[</span><span class="s2">&quot;GPU&quot;</span><span class="p">]))</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ONEAPI_DEVICE_SELECTOR: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ONEAPI_DEVICE_SELECTOR&quot;</span><span class="p">]))</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">gpu_task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gpu_task</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GPU IDs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()[</span><span class="s2">&quot;GPU&quot;</span><span class="p">]))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ONEAPI_DEVICE_SELECTOR: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ONEAPI_DEVICE_SELECTOR&quot;</span><span class="p">]))</span>
 
@@ -1645,19 +1645,19 @@ Intel GPU</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-10" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" data-sync-id="AWS Neuron Core" for="sd-tab-item-10">
 AWS Neuron Core</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;neuron_cores&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;neuron_cores&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
-<span class="k">class</span> <span class="nc">NeuronCoreActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NeuronCoreActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Neuron Core IDs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()[</span><span class="s2">&quot;neuron_cores&quot;</span><span class="p">]))</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;NEURON_RT_VISIBLE_CORES: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;NEURON_RT_VISIBLE_CORES&quot;</span><span class="p">]))</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;neuron_cores&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">neuron_core_task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">neuron_core_task</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Neuron Core IDs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()[</span><span class="s2">&quot;neuron_cores&quot;</span><span class="p">]))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;NEURON_RT_VISIBLE_CORES: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;NEURON_RT_VISIBLE_CORES&quot;</span><span class="p">]))</span>
 
@@ -1677,19 +1677,19 @@ AWS Neuron Core</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-11" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Google TPU" for="sd-tab-item-11">
 Google TPU</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;TPU&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;TPU&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
-<span class="k">class</span> <span class="nc">TPUActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TPUActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TPU IDs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()[</span><span class="s2">&quot;TPU&quot;</span><span class="p">]))</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TPU_VISIBLE_CHIPS: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;TPU_VISIBLE_CHIPS&quot;</span><span class="p">]))</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;TPU&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">tpu_task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">tpu_task</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TPU IDs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()[</span><span class="s2">&quot;TPU&quot;</span><span class="p">]))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TPU_VISIBLE_CHIPS: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;TPU_VISIBLE_CHIPS&quot;</span><span class="p">]))</span>
 
@@ -1709,19 +1709,19 @@ Google TPU</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-12" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Intel Gaudi" for="sd-tab-item-12">
 Intel Gaudi</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;HPU&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;HPU&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
-<span class="k">class</span> <span class="nc">HPUActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HPUActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;HPU IDs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()[</span><span class="s2">&quot;HPU&quot;</span><span class="p">]))</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;HABANA_VISIBLE_MODULES: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;HABANA_VISIBLE_MODULES&quot;</span><span class="p">]))</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;HPU&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">hpu_task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hpu_task</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;HPU IDs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()[</span><span class="s2">&quot;HPU&quot;</span><span class="p">]))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;HABANA_VISIBLE_MODULES: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;HABANA_VISIBLE_MODULES&quot;</span><span class="p">]))</span>
 
@@ -1741,19 +1741,19 @@ Intel Gaudi</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-13" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Huawei Ascend" for="sd-tab-item-13">
 Huawei Ascend</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;NPU&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;NPU&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
-<span class="k">class</span> <span class="nc">NPUActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NPUActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;NPU IDs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()[</span><span class="s2">&quot;NPU&quot;</span><span class="p">]))</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ASCEND_RT_VISIBLE_DEVICES: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ASCEND_RT_VISIBLE_DEVICES&quot;</span><span class="p">]))</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;NPU&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">npu_task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">npu_task</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;NPU IDs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()[</span><span class="s2">&quot;NPU&quot;</span><span class="p">]))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ASCEND_RT_VISIBLE_DEVICES: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ASCEND_RT_VISIBLE_DEVICES&quot;</span><span class="p">]))</span>
 
@@ -1784,8 +1784,8 @@ external library like TensorFlow. Here is an example that actually uses accelera
 In order for this example to work, you need to install the GPU version of
 TensorFlow.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">gpu_task</span><span class="p">():</span>
-    <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gpu_task</span><span class="p">():</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
 
     <span class="c1"># Create a TensorFlow session. TensorFlow restricts itself to use the</span>
     <span class="c1"># GPUs specified by the CUDA_VISIBLE_DEVICES environment variable.</span>
@@ -1810,8 +1810,8 @@ Nvidia GPU</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
-    <span class="kn">import</span> <span class="nn">time</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
@@ -1827,8 +1827,8 @@ AMD GPU</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
-    <span class="kn">import</span> <span class="nn">time</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
@@ -1844,8 +1844,8 @@ Intel GPU</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
-    <span class="kn">import</span> <span class="nn">time</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
@@ -1876,8 +1876,8 @@ Huawei Ascend</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;NPU&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;NPU&quot;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
-    <span class="kn">import</span> <span class="nn">time</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
@@ -1896,8 +1896,8 @@ it packs one accelerator before moving on to the next one to avoid fragmentation
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">FractionalGPUActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FractionalGPUActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GPU id: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()[</span><span class="s2">&quot;GPU&quot;</span><span class="p">]))</span>
 
 <span class="n">fractional_gpu_actors</span> <span class="o">=</span> <span class="p">[</span><span class="n">FractionalGPUActor</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
@@ -1924,8 +1924,8 @@ in the <a class="reference internal" href="../api/doc/ray.remote.html#ray.remote
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># By default, ray does not reuse workers for GPU tasks to prevent</span>
 <span class="c1"># GPU resource leakage.</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">leak_gpus</span><span class="p">():</span>
-    <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">leak_gpus</span><span class="p">():</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
 
     <span class="c1"># This task allocates memory on the GPU and then never release it.</span>
     <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
@@ -1938,10 +1938,10 @@ in the <a class="reference internal" href="../api/doc/ray.remote.html#ray.remote
 Under the hood, the accelerator type option is implemented as a <a class="reference internal" href="resources.html#custom-resources"><span class="std std-ref">custom resource requirement</span></a> of <code class="docutils literal notranslate"><span class="pre">&quot;accelerator_type:&lt;type&gt;&quot;:</span> <span class="pre">0.001</span></code>.
 This forces the task or actor to be placed on a node with that particular accelerator type available.
 This also lets the multi-node-type autoscaler know that there is demand for that type of resource, potentially triggering the launch of new nodes providing that accelerator.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.accelerators</span> <span class="kn">import</span> <span class="n">NVIDIA_TESLA_V100</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.accelerators</span><span class="w"> </span><span class="kn">import</span> <span class="n">NVIDIA_TESLA_V100</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">accelerator_type</span><span class="o">=</span><span class="n">NVIDIA_TESLA_V100</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="k">return</span> <span class="s2">&quot;This function was run on a node with a Tesla V100 GPU&quot;</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">train</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>

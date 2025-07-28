@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1422,9 +1422,9 @@ document.write(`
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 </pre></div>
 </div>
 </div>
@@ -1446,7 +1446,7 @@ document.write(`
 <p>We define a <a class="reference internal" href="../../../ray-core/handling-dependencies.html#runtime-environments"><span class="std std-ref">runtime environment</span></a> to ensure that the Ray workers have access to all the necessary packages. You can omit the <code class="docutils literal notranslate"><span class="pre">runtime_env</span></code> argument if you have all of the packages already installed on each node in your cluster.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
     <span class="n">runtime_env</span><span class="o">=</span><span class="p">{</span>
@@ -1478,12 +1478,12 @@ document.write(`
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># THIS SHOULD BE HIDDEN IN DOCS AND ONLY RAN IN CI</span>
 <span class="c1"># Download the model from our S3 mirror as it&#39;s faster</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">ray.util.scheduling_strategies</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.util.scheduling_strategies</span>
 
 
-<span class="k">def</span> <span class="nf">force_on_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">remote_func_or_actor_class</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">force_on_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">remote_func_or_actor_class</span><span class="p">):</span>
     <span class="n">scheduling_strategy</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">scheduling_strategies</span><span class="o">.</span><span class="n">NodeAffinitySchedulingStrategy</span><span class="p">(</span>
         <span class="n">node_id</span><span class="o">=</span><span class="n">node_id</span><span class="p">,</span> <span class="n">soft</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">)</span>
@@ -1491,7 +1491,7 @@ document.write(`
     <span class="k">return</span> <span class="n">remote_func_or_actor_class</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="o">**</span><span class="n">options</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">run_on_every_node</span><span class="p">(</span><span class="n">remote_func_or_actor_class</span><span class="p">,</span> <span class="o">**</span><span class="n">remote_kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_on_every_node</span><span class="p">(</span><span class="n">remote_func_or_actor_class</span><span class="p">,</span> <span class="o">**</span><span class="n">remote_kwargs</span><span class="p">):</span>
     <span class="n">refs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">ray</span><span class="o">.</span><span class="n">nodes</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">node</span><span class="p">[</span><span class="s2">&quot;Alive&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">node</span><span class="p">[</span><span class="s2">&quot;Resources&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GPU&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
@@ -1504,8 +1504,8 @@ document.write(`
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">download_model</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">transformers.utils.hub</span> <span class="kn">import</span> <span class="n">TRANSFORMERS_CACHE</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">download_model</span><span class="p">():</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">transformers.utils.hub</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRANSFORMERS_CACHE</span>
 
     <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span>
         <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">TRANSFORMERS_CACHE</span><span class="p">,</span> <span class="s2">&quot;models--EleutherAI--gpt-j-6B&quot;</span><span class="p">)</span>
@@ -1545,7 +1545,7 @@ document.write(`
 <p>We will be fine-tuning the model on the <a class="reference external" href="https://huggingface.co/datasets/tiny_shakespeare"><code class="docutils literal notranslate"><span class="pre">tiny_shakespeare</span></code> dataset</a>, comprised of 40,000 lines of Shakespeare from a variety of Shakespeare’s plays. The aim will be to make the GPT-J model better at generating text in the style of Shakespeare.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Loading tiny_shakespeare dataset&quot;</span><span class="p">)</span>
 <span class="n">current_dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;tiny_shakespeare&quot;</span><span class="p">)</span>
@@ -1557,7 +1557,7 @@ document.write(`
 <p>We will use <a class="reference internal" href="../../../data/data.html#data"><span class="std std-ref">Ray Data</span></a> for distributed preprocessing and data ingestion. We can easily convert the dataset obtained from Hugging Face Hub to Ray Data by using <a class="reference internal" href="../../../data/api/doc/ray.data.from_huggingface.html#ray.data.from_huggingface" title="ray.data.from_huggingface"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ray.data.from_huggingface()</span></code></a>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray.data</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray.data</span>
 
 <span class="n">ray_datasets</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">from_huggingface</span><span class="p">(</span><span class="n">current_dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]),</span>
@@ -1590,10 +1590,10 @@ document.write(`
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span>
 
 
-<span class="k">def</span> <span class="nf">split_text</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">split_text</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="n">text</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
     <span class="n">flat_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
     <span class="n">split_text</span> <span class="o">=</span> <span class="p">[</span>
@@ -1604,7 +1604,7 @@ document.write(`
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">split_text</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
 
 
-<span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">tokenize</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
     <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">use_fast</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span>
@@ -1666,22 +1666,22 @@ document.write(`
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">evaluate</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">evaluate</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Trainer</span><span class="p">,</span>
     <span class="n">TrainingArguments</span><span class="p">,</span>
     <span class="n">GPTJForCausalLM</span><span class="p">,</span>
     <span class="n">AutoTokenizer</span><span class="p">,</span>
     <span class="n">default_data_collator</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">transformers.utils.logging</span> <span class="kn">import</span> <span class="n">disable_progress_bar</span><span class="p">,</span> <span class="n">enable_progress_bar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers.utils.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">disable_progress_bar</span><span class="p">,</span> <span class="n">enable_progress_bar</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train.huggingface.transformers</span> <span class="kn">import</span> <span class="n">prepare_trainer</span><span class="p">,</span> <span class="n">RayTrainReportCallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.huggingface.transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">prepare_trainer</span><span class="p">,</span> <span class="n">RayTrainReportCallback</span>
 
 
-<span class="k">def</span> <span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="c1"># Use the actual number of CPUs assigned by Ray</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OMP_NUM_THREADS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
         <span class="n">train</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_trial_resources</span><span class="p">()</span><span class="o">.</span><span class="n">bundles</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;CPU&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -1779,7 +1779,7 @@ document.write(`
     <span class="p">)</span>
     <span class="n">eval_ds_iterable</span> <span class="o">=</span> <span class="n">eval_ds</span><span class="o">.</span><span class="n">iter_torch_batches</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">compute_metrics</span><span class="p">(</span><span class="n">eval_pred</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_metrics</span><span class="p">(</span><span class="n">eval_pred</span><span class="p">):</span>
         <span class="n">logits</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">eval_pred</span>
         <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">metric</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">predictions</span><span class="o">=</span><span class="n">predictions</span><span class="p">,</span> <span class="n">references</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
@@ -1829,8 +1829,8 @@ and other outputs to some external storage for access after training has complet
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">ScalingConfig</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">ScalingConfig</span>
 
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">TorchTrainer</span><span class="p">(</span>
     <span class="n">train_loop_per_worker</span><span class="o">=</span><span class="n">train_func</span><span class="p">,</span>
@@ -2490,7 +2490,7 @@ Other temporary workarounds:
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;aws s3 sync s3://</span><span class="si">{</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2"> /mnt/local_storage/&quot;</span><span class="p">)</span>
 </pre></div>
@@ -2500,7 +2500,7 @@ Other temporary workarounds:
 <p>Set the <code class="docutils literal notranslate"><span class="pre">task</span></code> to <code class="docutils literal notranslate"><span class="pre">&quot;text-generation&quot;</span></code>, and also set <code class="docutils literal notranslate"><span class="pre">device_map=&quot;auto&quot;</span></code> for Ray Train to automatically place the model on the right device.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">GPTJForCausalLM</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">GPTJForCausalLM</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">GPTJForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;/mnt/local_storage/checkpoint&quot;</span><span class="p">)</span>
 <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;/mnt/local_storage/checkpoint&quot;</span><span class="p">)</span>

@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1421,12 +1421,12 @@ document.write(`
 </ul>
 </nav>
 <p>Let’s start by defining a simple Trainable function. We’ll be expanding this function with different functionality as we go.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 
-<span class="k">def</span> <span class="nf">training_function</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">training_function</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="c1"># For now, we have nothing here.</span>
     <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">model</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;hyperparameter_a&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;hyperparameter_b&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
@@ -1444,8 +1444,8 @@ document.write(`
 </div>
 <p>Our <code class="docutils literal notranslate"><span class="pre">training_function</span></code> function requires a pandas DataFrame, a model with some hyperparameters and the number of epochs to train the model for as inputs. The hyperparameters of the model impact the metric returned, and in each epoch (iteration of training), the <code class="docutils literal notranslate"><span class="pre">trained_model</span></code> state is changed.</p>
 <p>We will run hyperparameter optimization using the <a class="reference internal" href="../api/execution.html#tune-run-ref"><span class="std std-ref">Tuner API</span></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">Tuner</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 <span class="n">tuner</span> <span class="o">=</span> <span class="n">Tuner</span><span class="p">(</span><span class="n">training_function</span><span class="p">,</span> <span class="n">tune_config</span><span class="o">=</span><span class="n">tune</span><span class="o">.</span><span class="n">TuneConfig</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
@@ -1477,7 +1477,7 @@ document.write(`
 <p><a class="reference internal" href="../../data/quickstart.html#data-quickstart"><span class="std std-ref">Datasets</span></a> can be used as values in the search space directly.</p>
 </div>
 <p>In our example, we want to tune the two model hyperparameters. We also want to set the number of epochs, so that we can easily tweak it later. For the hyperparameters, we will use the <code class="docutils literal notranslate"><span class="pre">tune.uniform</span></code> distribution. We will also modify the <code class="docutils literal notranslate"><span class="pre">training_function</span></code> to obtain those values from the <code class="docutils literal notranslate"><span class="pre">config</span></code> dictionary.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">training_function</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">training_function</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="c1"># For now, we have nothing here.</span>
     <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -1521,7 +1521,7 @@ document.write(`
 </div>
 <p>Note that the serialization (once) and deserialization (for each Trial) of large objects may incur a performance overhead.</p>
 <p>In our example, we will pass the <code class="docutils literal notranslate"><span class="pre">data</span></code> DataFrame using <code class="docutils literal notranslate"><span class="pre">tune.with_parameters</span></code>. In order to do that, we need to modify our function signature to include <code class="docutils literal notranslate"><span class="pre">data</span></code> as an argument.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">training_function</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">training_function</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
     <span class="n">model</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;hyperparameter_a&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;hyperparameter_a&quot;</span><span class="p">],</span>
         <span class="s2">&quot;hyperparameter_b&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;hyperparameter_b&quot;</span><span class="p">],</span>
@@ -1594,10 +1594,10 @@ document.write(`
 <p>Tune will automatically include some metrics, such as the training iteration, timestamp and more. See <a class="reference internal" href="tune-metrics.html#tune-autofilled-metrics"><span class="std std-ref">here</span></a> for the entire list.</p>
 </div>
 <p>In our example, we want to maximize the <code class="docutils literal notranslate"><span class="pre">metric</span></code>. We will report it each epoch to Tune, and set the <code class="docutils literal notranslate"><span class="pre">metric</span></code> and <code class="docutils literal notranslate"><span class="pre">mode</span></code> arguments in <code class="docutils literal notranslate"><span class="pre">tune.TuneConfig</span></code> to let Tune know that it should use it as the optimization objective.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
 
 
-<span class="k">def</span> <span class="nf">training_function</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">training_function</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
     <span class="n">model</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;hyperparameter_a&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;hyperparameter_a&quot;</span><span class="p">],</span>
         <span class="s2">&quot;hyperparameter_b&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;hyperparameter_b&quot;</span><span class="p">],</span>
@@ -1632,11 +1632,11 @@ document.write(`
 <p>Every metric logged using <code class="docutils literal notranslate"><span class="pre">tune.report</span></code> can be accessed during the tuning run through Tune <a class="reference internal" href="tune-output.html#tune-logging"><span class="std std-ref">Callbacks</span></a>. Ray Tune provides <a class="reference internal" href="../api/logging.html#loggers-docstring"><span class="std std-ref">several built-in integrations</span></a> with popular frameworks, such as MLFlow, Weights &amp; Biases, CometML and more. You can also use the <a class="reference internal" href="../api/callbacks.html#tune-callbacks-docs"><span class="std std-ref">Callback API</span></a> to create your own callbacks.</p>
 <p>Callbacks are passed in the <code class="docutils literal notranslate"><span class="pre">callback</span></code> argument of the <code class="docutils literal notranslate"><span class="pre">Tuner</span></code>’s <code class="docutils literal notranslate"><span class="pre">RunConfig</span></code>.</p>
 <p>In our example, we’ll use the MLFlow callback to track the progress of our tuning run and the changing value of the <code class="docutils literal notranslate"><span class="pre">metric</span></code> (requires <code class="docutils literal notranslate"><span class="pre">mlflow</span></code> to be installed).</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray.tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune.logger.mlflow</span> <span class="kn">import</span> <span class="n">MLflowLoggerCallback</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray.tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.logger.mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLflowLoggerCallback</span>
 
 
-<span class="k">def</span> <span class="nf">training_function</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">training_function</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
     <span class="n">model</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;hyperparameter_a&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;hyperparameter_a&quot;</span><span class="p">],</span>
         <span class="s2">&quot;hyperparameter_b&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;hyperparameter_b&quot;</span><span class="p">],</span>
@@ -1680,13 +1680,13 @@ document.write(`
 <p>The experiment state itself is checkpointed separately. See <a class="reference internal" href="tune-trial-checkpoints.html#tune-persisted-experiment-data"><span class="std std-ref">Appendix: Types of data stored by Tune</span></a> for more details.</p>
 </div>
 <p>In our example, we want to be able to resume the training from the latest checkpoint, and to save the <code class="docutils literal notranslate"><span class="pre">trained_model</span></code> in a checkpoint every iteration. To accomplish this, we will use the <code class="docutils literal notranslate"><span class="pre">session</span></code> and <code class="docutils literal notranslate"><span class="pre">Checkpoint</span></code> APIs.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
-<span class="k">def</span> <span class="nf">training_function</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">training_function</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
     <span class="n">model</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;hyperparameter_a&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;hyperparameter_a&quot;</span><span class="p">],</span>
         <span class="s2">&quot;hyperparameter_b&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;hyperparameter_b&quot;</span><span class="p">],</span>

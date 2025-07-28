@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1430,10 +1430,10 @@ For more details on production deployment scenarios, check out the guides for de
 <h2>Submitting a Ray Job<a class="headerlink" href="#submitting-a-ray-job" title="Link to this heading">#</a></h2>
 <p>Let’s start with a sample script that can be run locally. The following script uses Ray APIs to submit a task and print its return value:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># script.py</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">hello_world</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hello_world</span><span class="p">():</span>
     <span class="k">return</span> <span class="s2">&quot;hello world&quot;</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
@@ -1442,7 +1442,7 @@ For more details on production deployment scenarios, check out the guides for de
 </div>
 <p>SDK calls are made via a <code class="docutils literal notranslate"><span class="pre">JobSubmissionClient</span></code> object.  To initialize the client, provide the Ray cluster head node address and the port used by the Ray Dashboard (<code class="docutils literal notranslate"><span class="pre">8265</span></code> by default). For this example, we’ll use a local Ray cluster, but the same example will work for remote Ray cluster addresses; see
 <a class="reference internal" href="quickstart.html#jobs-remote-cluster"><span class="std std-ref">Using a Remote Cluster</span></a> for details on setting up port forwarding.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.job_submission</span> <span class="kn">import</span> <span class="n">JobSubmissionClient</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.job_submission</span><span class="w"> </span><span class="kn">import</span> <span class="n">JobSubmissionClient</span>
 
 <span class="c1"># If using a remote cluster, replace 127.0.0.1 with the head node&#39;s IP address or set up port forwarding.</span>
 <span class="n">client</span> <span class="o">=</span> <span class="n">JobSubmissionClient</span><span class="p">(</span><span class="s2">&quot;http://127.0.0.1:8265&quot;</span><span class="p">)</span>
@@ -1466,8 +1466,8 @@ In this case, the Job will be executed with your given id, and will throw an err
 </div>
 <p>Now we can write a simple polling loop that checks the job status until it reaches a terminal state (namely, <code class="docutils literal notranslate"><span class="pre">JobStatus.SUCCEEDED</span></code>, <code class="docutils literal notranslate"><span class="pre">JobStatus.STOPPED</span></code>, or <code class="docutils literal notranslate"><span class="pre">JobStatus.FAILED</span></code>).
 We can also get the output of the job by calling <code class="docutils literal notranslate"><span class="pre">client.get_job_logs</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.job_submission</span> <span class="kn">import</span> <span class="n">JobSubmissionClient</span><span class="p">,</span> <span class="n">JobStatus</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.job_submission</span><span class="w"> </span><span class="kn">import</span> <span class="n">JobSubmissionClient</span><span class="p">,</span> <span class="n">JobStatus</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 <span class="c1"># If using a remote cluster, replace 127.0.0.1 with the head node&#39;s IP address.</span>
 <span class="n">client</span> <span class="o">=</span> <span class="n">JobSubmissionClient</span><span class="p">(</span><span class="s2">&quot;http://127.0.0.1:8265&quot;</span><span class="p">)</span>
@@ -1479,7 +1479,7 @@ We can also get the output of the job by calling <code class="docutils literal n
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">job_id</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">wait_until_status</span><span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">status_to_wait_for</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">wait_until_status</span><span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">status_to_wait_for</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span> <span class="o">&lt;=</span> <span class="n">timeout_seconds</span><span class="p">:</span>
         <span class="n">status</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_job_status</span><span class="p">(</span><span class="n">job_id</span><span class="p">)</span>

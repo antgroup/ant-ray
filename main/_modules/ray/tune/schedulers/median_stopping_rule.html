@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1397,19 +1397,19 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.schedulers.median_stopping_rule</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">ray.tune.experiment</span> <span class="kn">import</span> <span class="n">Trial</span>
-<span class="kn">from</span> <span class="nn">ray.tune.result</span> <span class="kn">import</span> <span class="n">DEFAULT_METRIC</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers.trial_scheduler</span> <span class="kn">import</span> <span class="n">FIFOScheduler</span><span class="p">,</span> <span class="n">TrialScheduler</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_METRIC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers.trial_scheduler</span><span class="w"> </span><span class="kn">import</span> <span class="n">FIFOScheduler</span><span class="p">,</span> <span class="n">TrialScheduler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.execution.tune_controller</span> <span class="kn">import</span> <span class="n">TuneController</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.tune_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneController</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1417,7 +1417,7 @@ document.write(`
 <div class="viewcode-block" id="MedianStoppingRule">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.MedianStoppingRule.html#ray.tune.schedulers.MedianStoppingRule">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">MedianStoppingRule</span><span class="p">(</span><span class="n">FIFOScheduler</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MedianStoppingRule</span><span class="p">(</span><span class="n">FIFOScheduler</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Implements the median stopping rule as described in the Vizier paper:</span>
 
 <span class="sd">    https://research.google.com/pubs/pub46180.html</span>
@@ -1447,7 +1447,7 @@ document.write(`
 <span class="sd">            resumed and allowed to run FIFO.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">time_attr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;time_total_s&quot;</span><span class="p">,</span>
         <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1478,7 +1478,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_pause</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">set_search_properties</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_search_properties</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">**</span><span class="n">spec</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="ow">and</span> <span class="n">metric</span><span class="p">:</span>
@@ -1500,7 +1500,7 @@ document.write(`
 
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_worst</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compare_op</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> has been instantiated without a valid `metric` (</span><span class="si">{}</span><span class="s2">) or &quot;</span>
@@ -1515,7 +1515,7 @@ document.write(`
 
 <div class="viewcode-block" id="MedianStoppingRule.on_trial_result">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.MedianStoppingRule.on_trial_result.html#ray.tune.schedulers.MedianStoppingRule.on_trial_result">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_trial_result</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_result</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Callback for early stopping.</span>
@@ -1575,17 +1575,17 @@ document.write(`
             <span class="k">return</span> <span class="n">TrialScheduler</span><span class="o">.</span><span class="n">CONTINUE</span></div>
 
 
-    <span class="k">def</span> <span class="nf">on_trial_complete</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_complete</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">debug_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">debug_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;Using MedianStoppingRule: num_stopped=</span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stopped_trials</span><span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_on_insufficient_samples</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_insufficient_samples</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="nb">float</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">pause</span> <span class="o">=</span> <span class="n">time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_pause</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_time_slice</span>
@@ -1596,7 +1596,7 @@ document.write(`
         <span class="p">]</span>
         <span class="k">return</span> <span class="n">TrialScheduler</span><span class="o">.</span><span class="n">PAUSE</span> <span class="k">if</span> <span class="n">pause</span> <span class="k">else</span> <span class="n">TrialScheduler</span><span class="o">.</span><span class="n">CONTINUE</span>
 
-    <span class="k">def</span> <span class="nf">_trials_beyond_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_trials_beyond_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">]:</span>
         <span class="n">trials</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">trial</span>
             <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span>
@@ -1604,10 +1604,10 @@ document.write(`
         <span class="p">]</span>
         <span class="k">return</span> <span class="n">trials</span>
 
-    <span class="k">def</span> <span class="nf">_median_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span> <span class="n">time</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_median_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span> <span class="n">time</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_running_mean</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span> <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">trials</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_running_mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_running_mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
         <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span>
         <span class="c1"># TODO(ekl) we could do interpolation to be more precise, but for now</span>
         <span class="c1"># assume len(results) is large and the time diffs are roughly equal</span>
@@ -1616,7 +1616,7 @@ document.write(`
         <span class="p">]</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_metric</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">scoped_results</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_best_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_best_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">):</span>
         <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compare_op</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_metric</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">])</span></div>
 

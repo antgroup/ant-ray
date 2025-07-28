@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1418,17 +1418,17 @@ pip<span class="w"> </span>install<span class="w"> </span>opentelemetry-exporter
 <h2>Tracing startup hook<a class="headerlink" href="#tracing-startup-hook" title="Link to this heading">#</a></h2>
 <p>To enable tracing, you must provide a tracing startup hook with a function that sets up the <a class="reference internal" href="#tracer-provider"><span class="std std-ref">Tracer Provider</span></a>, <a class="reference internal" href="#remote-span-processors"><span class="std std-ref">Remote Span Processors</span></a>, and <a class="reference internal" href="#additional-instruments"><span class="std std-ref">Additional Instruments</span></a>. The tracing startup hook is expected to be a function that is called with no args or kwargs. This hook needs to be available in the Python environment of all the worker processes.</p>
 <p>Below is an example tracing startup hook that sets up the default tracing provider, exports spans to files in <code class="docutils literal notranslate"><span class="pre">/tmp/spans</span></code>, and does not have any additional instruments.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">opentelemetry</span> <span class="kn">import</span> <span class="n">trace</span>
-<span class="kn">from</span> <span class="nn">opentelemetry.sdk.trace</span> <span class="kn">import</span> <span class="n">TracerProvider</span>
-<span class="kn">from</span> <span class="nn">opentelemetry.sdk.trace.export</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opentelemetry</span><span class="w"> </span><span class="kn">import</span> <span class="n">trace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opentelemetry.sdk.trace</span><span class="w"> </span><span class="kn">import</span> <span class="n">TracerProvider</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">opentelemetry.sdk.trace.export</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ConsoleSpanExporter</span><span class="p">,</span>
     <span class="n">SimpleSpanProcessor</span><span class="p">,</span>
 <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">setup_tracing</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_tracing</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># Creates /tmp/spans folder</span>
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s2">&quot;/tmp/spans&quot;</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1"># Sets the tracer_provider. This is only allowed once per execution</span>
@@ -1465,7 +1465,7 @@ ray.init()</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">_tracing_startup_hook</span><span class="o">=</span><span class="s2">&quot;ray.util.tracing.setup_local_tmp_tracing:setup_tracing&quot;</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">my_function</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_function</span><span class="p">():</span>
     <span class="k">return</span> <span class="mi">1</span>
 
 <span class="n">obj_ref</span> <span class="o">=</span> <span class="n">my_function</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
@@ -1490,10 +1490,10 @@ ray.init()</label><div class="sd-tab-content docutils">
 <h4>Custom traces<a class="headerlink" href="#custom-traces" title="Link to this heading">#</a></h4>
 <p>Add custom tracing in your programs. Within your program, get the tracer object with <code class="docutils literal notranslate"><span class="pre">trace.get_tracer(__name__)</span></code> and start a new span with <code class="docutils literal notranslate"><span class="pre">tracer.start_as_current_span(...)</span></code>.</p>
 <p>See below for a simple example of adding custom tracing.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentelemetry</span> <span class="kn">import</span> <span class="n">trace</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">opentelemetry</span><span class="w"> </span><span class="kn">import</span> <span class="n">trace</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">my_func</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_func</span><span class="p">():</span>
     <span class="n">tracer</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_tracer</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">tracer</span><span class="o">.</span><span class="n">start_as_current_span</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">):</span>

@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,11 +1389,11 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.core.learner.learner_group</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">import</span> <span class="nn">pathlib</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
     <span class="n">Collection</span><span class="p">,</span>
@@ -1406,27 +1406,27 @@ document.write(`
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">COMPONENT_LEARNER</span><span class="p">,</span>
     <span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.learner.learner</span> <span class="kn">import</span> <span class="n">Learner</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.learner.training_data</span> <span class="kn">import</span> <span class="n">TrainingData</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module</span> <span class="kn">import</span> <span class="n">validate_module_id</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.policy</span> <span class="kn">import</span> <span class="n">PolicySpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.sample_batch</span> <span class="kn">import</span> <span class="n">MultiAgentBatch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.actor_manager</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.learner.learner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Learner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.learner.training_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_module_id</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">PolicySpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.sample_batch</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentBatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.actor_manager</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">FaultTolerantActorManager</span><span class="p">,</span>
     <span class="n">RemoteCallResults</span><span class="p">,</span>
     <span class="n">ResultOrError</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">override</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.checkpoints</span> <span class="kn">import</span> <span class="n">Checkpointable</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="n">Deprecated</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.checkpoints</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpointable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">EpisodeType</span><span class="p">,</span>
     <span class="n">ModuleID</span><span class="p">,</span>
     <span class="n">RLModuleSpecType</span><span class="p">,</span>
@@ -1434,20 +1434,20 @@ document.write(`
     <span class="n">StateDict</span><span class="p">,</span>
     <span class="n">T</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.backend_executor</span> <span class="kn">import</span> <span class="n">BackendExecutor</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.backend_executor</span><span class="w"> </span><span class="kn">import</span> <span class="n">BackendExecutor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 
-<span class="k">def</span> <span class="nf">_get_backend_config</span><span class="p">(</span><span class="n">learner_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Learner</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_backend_config</span><span class="p">(</span><span class="n">learner_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Learner</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">learner_class</span><span class="o">.</span><span class="n">framework</span> <span class="o">==</span> <span class="s2">&quot;torch&quot;</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchConfig</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchConfig</span>
 
         <span class="n">backend_config</span> <span class="o">=</span> <span class="n">TorchConfig</span><span class="p">()</span>
     <span class="k">elif</span> <span class="n">learner_class</span><span class="o">.</span><span class="n">framework</span> <span class="o">==</span> <span class="s2">&quot;tf2&quot;</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">ray.train.tensorflow</span> <span class="kn">import</span> <span class="n">TensorflowConfig</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.tensorflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorflowConfig</span>
 
         <span class="n">backend_config</span> <span class="o">=</span> <span class="n">TensorflowConfig</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
@@ -1462,7 +1462,7 @@ document.write(`
 <div class="viewcode-block" id="LearnerGroup">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.html#ray.rllib.core.learner.learner_group.LearnerGroup">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">LearnerGroup</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LearnerGroup</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Coordinator of n (possibly remote) Learner workers.</span>
 
 <span class="sd">    Each Learner worker has a copy of the RLModule, the loss function(s), and</span>
@@ -1471,7 +1471,7 @@ document.write(`
 
 <div class="viewcode-block" id="LearnerGroup.__init__">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.__init__.html#ray.rllib.core.learner.learner_group.LearnerGroup.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="s2">&quot;AlgorithmConfig&quot;</span><span class="p">,</span>
@@ -1570,7 +1570,7 @@ document.write(`
     <span class="c1">#  Currently LearnerGroup does not have a metrics object.</span>
 <div class="viewcode-block" id="LearnerGroup.get_stats">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.get_stats.html#ray.rllib.core.learner.learner_group.LearnerGroup.get_stats">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the current stats for the input queue for this learner group.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;learner_group_ts_dropped_lifetime&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts_dropped</span><span class="p">,</span>
@@ -1583,16 +1583,16 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_remote</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_remote</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">num_learners</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_local</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_local</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_remote</span>
 
 <div class="viewcode-block" id="LearnerGroup.update">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.update.html#ray.rllib.core.learner.learner_group.LearnerGroup.update">[docs]</a>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">batch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MultiAgentBatch</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1757,7 +1757,7 @@ document.write(`
 
 <div class="viewcode-block" id="LearnerGroup.add_module">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.add_module.html#ray.rllib.core.learner.learner_group.LearnerGroup.add_module">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_module</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_module</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">,</span>
@@ -1818,7 +1818,7 @@ document.write(`
 
 <div class="viewcode-block" id="LearnerGroup.remove_module">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.remove_module.html#ray.rllib.core.learner.learner_group.LearnerGroup.remove_module">[docs]</a>
-    <span class="k">def</span> <span class="nf">remove_module</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_module</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1859,7 +1859,7 @@ document.write(`
 
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">components</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1891,7 +1891,7 @@ document.write(`
         <span class="k">return</span> <span class="n">state</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">COMPONENT_LEARNER</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_local</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_learner</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">COMPONENT_LEARNER</span><span class="p">])</span>
@@ -1903,7 +1903,7 @@ document.write(`
 
 <div class="viewcode-block" id="LearnerGroup.get_weights">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.get_weights.html#ray.rllib.core.learner.learner_group.LearnerGroup.get_weights">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_weights</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_weights</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">module_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Collection</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StateDict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convenience method instead of self.get_state(components=...).</span>
@@ -1934,7 +1934,7 @@ document.write(`
 
 <div class="viewcode-block" id="LearnerGroup.set_weights">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.set_weights.html#ray.rllib.core.learner.learner_group.LearnerGroup.set_weights">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convenience method instead of self.set_state({&#39;learner&#39;: {&#39;rl_module&#39;: ..}}).</span>
 
 <span class="sd">        Args:</span>
@@ -1945,7 +1945,7 @@ document.write(`
 
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_ctor_args_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ctor_args_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="p">(),</span>  <span class="c1"># *args</span>
             <span class="p">{</span>
@@ -1955,7 +1955,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_checkpointable_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_checkpointable_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Return the entire ActorManager, if remote. Otherwise, return the</span>
         <span class="c1"># local worker. Also, don&#39;t give the component (Learner) a name (&quot;&quot;)</span>
         <span class="c1"># as it&#39;s the only component in this LearnerGroup to be saved.</span>
@@ -1968,7 +1968,7 @@ document.write(`
 
 <div class="viewcode-block" id="LearnerGroup.foreach_learner">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.foreach_learner.html#ray.rllib.core.learner.learner_group.LearnerGroup.foreach_learner">[docs]</a>
-    <span class="k">def</span> <span class="nf">foreach_learner</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">foreach_learner</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Learner</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">T</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2026,23 +2026,23 @@ document.write(`
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_local</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_workers</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LearnerGroup.shutdown">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.shutdown.html#ray.rllib.core.learner.learner_group.LearnerGroup.shutdown">[docs]</a>
-    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Shuts down the LearnerGroup.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_remote</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_backend_executor&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_backend_executor</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">graceful_termination</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_shut_down</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_shut_down</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_get_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
         <span class="n">processed_results</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
             <span class="n">result_or_error</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
@@ -2053,19 +2053,19 @@ document.write(`
         <span class="k">return</span> <span class="n">processed_results</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;LearnerGroup.update(batch=.., **kwargs)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">update_from_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_from_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">batch</span><span class="o">=</span><span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;LearnerGroup.update(episodes=.., **kwargs)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">update_from_episodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">episodes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_from_episodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">episodes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">episodes</span><span class="o">=</span><span class="n">episodes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;LearnerGroup.update_from_batch(async=True)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">async_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">async_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">pass</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;LearnerGroup.load_from_path(path=..., component=...)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">load_module_state</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_module_state</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">multi_rl_module_ckpt_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

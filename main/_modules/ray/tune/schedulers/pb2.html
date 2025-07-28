@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1397,31 +1397,31 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.schedulers.pb2</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">TuneError</span>
-<span class="kn">from</span> <span class="nn">ray.tune.experiment</span> <span class="kn">import</span> <span class="n">Trial</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers</span> <span class="kn">import</span> <span class="n">PopulationBasedTraining</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers.pbt</span> <span class="kn">import</span> <span class="n">_PBTTrialState</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils.util</span> <span class="kn">import</span> <span class="n">flatten_dict</span><span class="p">,</span> <span class="n">unflatten_dict</span>
-<span class="kn">from</span> <span class="nn">ray.util.debug</span> <span class="kn">import</span> <span class="n">log_once</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers</span><span class="w"> </span><span class="kn">import</span> <span class="n">PopulationBasedTraining</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers.pbt</span><span class="w"> </span><span class="kn">import</span> <span class="n">_PBTTrialState</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten_dict</span><span class="p">,</span> <span class="n">unflatten_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.debug</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_once</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.execution.tune_controller</span> <span class="kn">import</span> <span class="n">TuneController</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.tune_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneController</span>
 
 
-<span class="k">def</span> <span class="nf">import_pb2_dependencies</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">import_pb2_dependencies</span><span class="p">():</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">GPy</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">GPy</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="n">GPy</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">sklearn</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">sklearn</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="n">sklearn</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="n">GPy</span><span class="p">,</span> <span class="n">sklearn</span>
@@ -1430,7 +1430,7 @@ document.write(`
 <span class="n">GPy</span><span class="p">,</span> <span class="n">has_sklearn</span> <span class="o">=</span> <span class="n">import_pb2_dependencies</span><span class="p">()</span>
 
 <span class="k">if</span> <span class="n">GPy</span> <span class="ow">and</span> <span class="n">has_sklearn</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.schedulers.pb2_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers.pb2_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">UCB</span><span class="p">,</span>
         <span class="n">TV_SquaredExp</span><span class="p">,</span>
         <span class="n">normalize</span><span class="p">,</span>
@@ -1442,7 +1442,7 @@ document.write(`
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_fill_config</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fill_config</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">hyperparam_bounds</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Fills missing hyperparameters in config by sampling uniformly from the</span>
@@ -1474,7 +1474,7 @@ document.write(`
     <span class="k">return</span> <span class="n">filled_hyperparams</span>
 
 
-<span class="k">def</span> <span class="nf">_select_config</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_select_config</span><span class="p">(</span>
     <span class="n">Xraw</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
     <span class="n">yraw</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
     <span class="n">current</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
@@ -1574,7 +1574,7 @@ document.write(`
     <span class="k">return</span> <span class="n">xt</span>
 
 
-<span class="k">def</span> <span class="nf">_explore</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_explore</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">bounds</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
     <span class="n">current</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
@@ -1654,7 +1654,7 @@ document.write(`
 
 <div class="viewcode-block" id="PB2">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.pb2.PB2.html#ray.tune.schedulers.pb2.PB2">[docs]</a>
-<span class="k">class</span> <span class="nc">PB2</span><span class="p">(</span><span class="n">PopulationBasedTraining</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PB2</span><span class="p">(</span><span class="n">PopulationBasedTraining</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Implements the Population Based Bandit (PB2) algorithm.</span>
 
 <span class="sd">    PB2 trains a group of models (or agents) in parallel. Periodically, poorly</span>
@@ -1747,7 +1747,7 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">time_attr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;time_total_s&quot;</span><span class="p">,</span>
         <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1803,13 +1803,13 @@ document.write(`
         <span class="c1">#           are already in or scheduled to be in the next round.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
         <span class="n">filled_hyperparams</span> <span class="o">=</span> <span class="n">_fill_config</span><span class="p">(</span><span class="n">trial</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyperparam_bounds</span><span class="p">)</span>
         <span class="c1"># Make sure that the params we sampled show up in the CLI output</span>
         <span class="n">trial</span><span class="o">.</span><span class="n">evaluated_params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">flatten_dict</span><span class="p">(</span><span class="n">filled_hyperparams</span><span class="p">))</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">on_trial_add</span><span class="p">(</span><span class="n">tune_controller</span><span class="p">,</span> <span class="n">trial</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_validate_hyperparam_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperparam_bounds</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_hyperparam_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hyperparam_bounds</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that each hyperparam bound is of the form [low, high].</span>
 
 <span class="sd">        Raises:</span>
@@ -1829,7 +1829,7 @@ document.write(`
                     <span class="sa">f</span><span class="s2">&quot;where low &lt;= high, but got </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> instead for param &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
                 <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_save_trial_state</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save_trial_state</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">_PBTTrialState</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span>
     <span class="p">):</span>
         <span class="n">score</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PB2</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_save_trial_state</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">trial</span><span class="p">)</span>
@@ -1850,7 +1850,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">entry</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Trial</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Trial</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_new_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">trial_to_clone</span><span class="p">:</span> <span class="n">Trial</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_new_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">trial_to_clone</span><span class="p">:</span> <span class="n">Trial</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets new config for trial by exploring trial_to_clone&#39;s config using</span>
 <span class="sd">        Bayesian Optimization (BO) to choose the hyperparameter values to explore.</span>
 

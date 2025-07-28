@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,12 +1389,12 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.serve.metrics</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.serve</span> <span class="kn">import</span> <span class="n">context</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">metrics</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve</span><span class="w"> </span><span class="kn">import</span> <span class="n">context</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">metrics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="n">DEPLOYMENT_TAG</span> <span class="o">=</span> <span class="s2">&quot;deployment&quot;</span>
 <span class="n">REPLICA_TAG</span> <span class="o">=</span> <span class="s2">&quot;replica&quot;</span>
@@ -1402,7 +1402,7 @@ document.write(`
 <span class="n">ROUTE_TAG</span> <span class="o">=</span> <span class="s2">&quot;route&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_add_serve_metric_tags</span><span class="p">(</span><span class="n">tag_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_serve_metric_tags</span><span class="p">(</span><span class="n">tag_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add serve context tags to the tag_keys&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">tag_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">tag_keys</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
@@ -1429,7 +1429,7 @@ document.write(`
     <span class="k">return</span> <span class="n">tag_keys</span>
 
 
-<span class="k">def</span> <span class="nf">_add_serve_metric_default_tags</span><span class="p">(</span><span class="n">default_tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_serve_metric_default_tags</span><span class="p">(</span><span class="n">default_tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add serve context tags and values to the default_tags&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">_get_internal_replica_context</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">default_tags</span>
@@ -1448,7 +1448,7 @@ document.write(`
     <span class="k">return</span> <span class="n">default_tags</span>
 
 
-<span class="k">def</span> <span class="nf">_add_serve_context_tag_values</span><span class="p">(</span><span class="n">tag_keys</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_serve_context_tag_values</span><span class="p">(</span><span class="n">tag_keys</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add serve context tag values to the metric tags&quot;&quot;&quot;</span>
 
     <span class="n">_request_context</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">serve</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">_get_serve_request_context</span><span class="p">()</span>
@@ -1459,7 +1459,7 @@ document.write(`
 <div class="viewcode-block" id="Counter">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.metrics.Counter.html#ray.serve.metrics.Counter">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Counter</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">Counter</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Counter</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">Counter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A serve cumulative metric that is monotonically increasing.</span>
 
 <span class="sd">    This corresponds to Prometheus&#39; counter metric:</span>
@@ -1502,7 +1502,7 @@ document.write(`
 <span class="sd">        tag_keys: Tag keys of the metric.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">tag_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">tag_keys</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tag_keys</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
@@ -1513,12 +1513,12 @@ document.write(`
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">tag_keys</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_default_tags</span><span class="p">({})</span>
 
-    <span class="k">def</span> <span class="nf">set_default_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_default_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_default_tags</span><span class="p">(</span><span class="n">_add_serve_metric_default_tags</span><span class="p">(</span><span class="n">default_tags</span><span class="p">))</span>
 
 <div class="viewcode-block" id="Counter.inc">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.metrics.Counter.inc.html#ray.serve.metrics.Counter.inc">[docs]</a>
-    <span class="k">def</span> <span class="nf">inc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Increment the counter by the given value, add serve context</span>
 <span class="sd">        tag values to the tags</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1531,7 +1531,7 @@ document.write(`
 <div class="viewcode-block" id="Gauge">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.metrics.Gauge.html#ray.serve.metrics.Gauge">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Gauge</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">Gauge</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Gauge</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">Gauge</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gauges keep the last recorded value and drop everything before.</span>
 
 <span class="sd">    This corresponds to Prometheus&#39; gauge metric:</span>
@@ -1563,7 +1563,7 @@ document.write(`
 <span class="sd">        tag_keys: Tag keys of the metric.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">tag_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">tag_keys</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tag_keys</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
@@ -1574,12 +1574,12 @@ document.write(`
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">tag_keys</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_default_tags</span><span class="p">({})</span>
 
-    <span class="k">def</span> <span class="nf">set_default_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_default_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_default_tags</span><span class="p">(</span><span class="n">_add_serve_metric_default_tags</span><span class="p">(</span><span class="n">default_tags</span><span class="p">))</span>
 
 <div class="viewcode-block" id="Gauge.set">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.metrics.Gauge.set.html#ray.serve.metrics.Gauge.set">[docs]</a>
-    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the gauge to the given value, add serve context</span>
 <span class="sd">        tag values to the tags</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1592,7 +1592,7 @@ document.write(`
 <div class="viewcode-block" id="Histogram">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.metrics.Histogram.html#ray.serve.metrics.Histogram">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Histogram</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">Histogram</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Histogram</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">Histogram</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracks the size and number of events in buckets.</span>
 
 <span class="sd">    Histograms allow you to calculate aggregate quantiles</span>
@@ -1628,7 +1628,7 @@ document.write(`
 <span class="sd">        tag_keys: Tag keys of the metric.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -1643,12 +1643,12 @@ document.write(`
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">boundaries</span><span class="p">,</span> <span class="n">tag_keys</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_default_tags</span><span class="p">({})</span>
 
-    <span class="k">def</span> <span class="nf">set_default_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_default_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_default_tags</span><span class="p">(</span><span class="n">_add_serve_metric_default_tags</span><span class="p">(</span><span class="n">default_tags</span><span class="p">))</span>
 
 <div class="viewcode-block" id="Histogram.observe">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.metrics.Histogram.observe.html#ray.serve.metrics.Histogram.observe">[docs]</a>
-    <span class="k">def</span> <span class="nf">observe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">observe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Observe the given value, add serve context</span>
 <span class="sd">        tag values to the tags</span>
 <span class="sd">        &quot;&quot;&quot;</span>

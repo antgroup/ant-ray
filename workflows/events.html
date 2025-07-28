@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1414,9 +1414,9 @@ future version of Ray.</p>
 <section id="using-events">
 <h2>Using events<a class="headerlink" href="#using-events" title="Link to this heading">#</a></h2>
 <p>Workflow events are a special type of workflow task. They “finish” when the event occurs. <code class="code docutils literal notranslate"><span class="pre">workflow.wait_for_event(EventListenerType)</span></code> can be used to create an event task.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">workflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">workflow</span>
 
 <span class="c1"># Create an event which finishes after 2 seconds.</span>
 <span class="n">event1_task</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">wait_for_event</span><span class="p">(</span><span class="n">workflow</span><span class="o">.</span><span class="n">event_listener</span><span class="o">.</span><span class="n">TimerListener</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
@@ -1425,7 +1425,7 @@ future version of Ray.</p>
 <span class="n">event2_task</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">wait_for_event</span><span class="p">(</span><span class="n">workflow</span><span class="o">.</span><span class="n">event_listener</span><span class="o">.</span><span class="n">TimerListener</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">gather</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gather</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">args</span>
 
 <span class="c1"># Gather will run after 2 seconds when both event1 and event2 are done.</span>
@@ -1488,27 +1488,27 @@ below. The <code class="docutils literal notranslate"><span class="pre">event_ke
 <section id="custom-event-listeners">
 <h2>Custom event listeners<a class="headerlink" href="#custom-event-listeners" title="Link to this heading">#</a></h2>
 <p>Custom event listeners can be written by subclassing the EventListener interface.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.workflow.common</span> <span class="kn">import</span> <span class="n">Event</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.workflow.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">Event</span>
 
-<span class="k">class</span> <span class="nc">EventListener</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EventListener</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Optional constructor. Only the constructor with no arguments will be</span>
 <span class="sd">          called.&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">poll_for_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Event</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">poll_for_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Event</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Should return only when the event is received.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">event_checkpointed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">event_checkpointed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Optional. Called after an event has been checkpointed and a transaction can</span>
 <span class="sd">          be safely committed.&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 </pre></div>
 </div>
 <p>The <code class="code docutils literal notranslate"><span class="pre">listener.poll_for_events()</span></code> coroutine should finish when the event is done. Arguments to <code class="code docutils literal notranslate"><span class="pre">workflow.wait_for_event</span></code> are passed to <code class="code docutils literal notranslate"><span class="pre">poll_for_events()</span></code>. For example, an event listener which sleeps until a timestamp can be written as:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">TimerListener</span><span class="p">(</span><span class="n">EventListener</span><span class="p">):</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">poll_for_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TimerListener</span><span class="p">(</span><span class="n">EventListener</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">poll_for_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">timestamp</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -1521,18 +1521,18 @@ below. The <code class="docutils literal notranslate"><span class="pre">event_ke
 <p>After the workflow finishes checkpointing the event, the event listener will be invoked and can free the event. For example, to guarantee that events are consumed from a <code class="code docutils literal notranslate"><span class="pre">kafkaesque&lt;https://docs.confluent.io/clients-confluent-kafka-python/current/overview.html#synchronous-commits&gt;</span></code>  queue:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">KafkaEventType</span> <span class="o">=</span> <span class="o">...</span>
 
-<span class="k">class</span> <span class="nc">QueueEventListener</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">QueueEventListener</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Initialize the poll consumer.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">consumer</span> <span class="o">=</span> <span class="n">Consumer</span><span class="p">({</span><span class="s1">&#39;enable.auto.commit&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">poll_for_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KafkaEventType</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">poll_for_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KafkaEventType</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">consumer</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span>
 
         <span class="n">message</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">consumer</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">message</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">event_checkpointed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">KafkaEventType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">event_checkpointed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">KafkaEventType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
          <span class="bp">self</span><span class="o">.</span><span class="n">consumer</span><span class="o">.</span><span class="n">commit</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">asynchronous</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>

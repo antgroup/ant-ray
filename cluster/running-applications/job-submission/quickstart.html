@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1430,10 +1430,10 @@ For more details on production deployment scenarios, see the guides for deployin
 <h2>Submitting a job<a class="headerlink" href="#submitting-a-job" title="Link to this heading">#</a></h2>
 <p>Start with a sample script that you can run locally. The following script uses Ray APIs to submit a task and print its return value:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># script.py</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">hello_world</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hello_world</span><span class="p">():</span>
     <span class="k">return</span> <span class="s2">&quot;hello world&quot;</span>
 
 <span class="c1"># Automatically connect to the running Ray cluster.</span>
@@ -1506,11 +1506,11 @@ See <a class="reference internal" href="sdk.html#ray-job-cpu-gpu-resources"><spa
 To do this, pass the <code class="docutils literal notranslate"><span class="pre">--no-wait</span></code> flag to <code class="docutils literal notranslate"><span class="pre">ray</span> <span class="pre">job</span> <span class="pre">submit</span></code> and use the other CLI commands to check on the job’s status.
 Try this modified script that submits a task every second in an infinite loop:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># script.py</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">hello_world</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hello_world</span><span class="p">():</span>
     <span class="k">return</span> <span class="s2">&quot;hello world&quot;</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
@@ -1589,11 +1589,11 @@ Also, verify that you set the environment variable <code class="docutils literal
 This configuration can be challenging if multiple applications in the same Ray Cluster have different and conflicting dependencies.</p>
 <p>To avoid dependency conflicts, Ray provides a mechanism called <a class="reference internal" href="../../../ray-core/handling-dependencies.html#runtime-environments"><span class="std std-ref">runtime environments</span></a>. Runtime environments allow an application to override the default environment on the Ray Cluster and run in an isolated environment, similar to virtual environments in single-node Python. Dependencies can include both files and Python packages.</p>
 <p>The Ray Jobs API provides an option to specify the runtime environment when submitting a job. On the Ray Cluster, Ray installs the runtime environment across the workers and ensures that tasks in that job run in the same environment. To demonstrate this feature, this Python script prints the current version of the <code class="docutils literal notranslate"><span class="pre">requests</span></code> module in a Ray task.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">requests</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">get_requests_version</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_requests_version</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">__version__</span>
 
 <span class="c1"># Note: No need to specify the runtime_env in ray.init() in the driver script.</span>

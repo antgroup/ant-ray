@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1411,20 +1411,20 @@ future version of Ray.</p>
 Here is a single three-node DAG (note the use of <code class="docutils literal notranslate"><span class="pre">.bind(...)</span></code> instead of
 <code class="docutils literal notranslate"><span class="pre">.remote(...)</span></code>). The DAG will not be executed until further actions are
 taken on it:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="c1"># Define Ray remote functions.</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="n">num</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_data</span><span class="p">(</span><span class="n">num</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num</span><span class="p">)]</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">preprocessing</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">preprocessing</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">d</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">aggregate</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">aggregate</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 <span class="c1"># Build the DAG:</span>
@@ -1438,7 +1438,7 @@ taken on it:</p>
 <a class="reference internal image-reference" href="../_images/basic.png"><img alt="../_images/basic.png" class="align-center" src="../_images/basic.png" style="width: 500px;" /></a>
 <p>Next, let’s execute the DAG we defined and inspect the result:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># &lt;follow the previous code&gt;</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">workflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">workflow</span>
 
 <span class="c1"># Execute the workflow and print the result.</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">workflow</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
@@ -1463,12 +1463,12 @@ always resume from the last successful task on failure.</p>
 <p>You can directly set Ray options to a workflow task just like a normal
 Ray remote function. To set workflow-specific options, use <code class="docutils literal notranslate"><span class="pre">workflow.options</span></code>
 either as a decorator or as kwargs to <code class="docutils literal notranslate"><span class="pre">&lt;task&gt;.options</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">workflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">workflow</span>
 
 <span class="nd">@workflow</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">checkpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_gpus</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_retries</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="n">num</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_data</span><span class="p">(</span><span class="n">num</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num</span><span class="p">)]</span>
 
 <span class="n">read_data_with_options</span> <span class="o">=</span> <span class="n">read_data</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
@@ -1479,8 +1479,8 @@ either as a decorator or as kwargs to <code class="docutils literal notranslate"
 <section id="retrieving-workflow-results">
 <h2>Retrieving Workflow Results<a class="headerlink" href="#retrieving-workflow-results" title="Link to this heading">#</a></h2>
 <p>To retrieve a workflow result, assign <code class="docutils literal notranslate"><span class="pre">workflow_id</span></code> when running a workflow:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">workflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">workflow</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="c1"># Cleanup previous workflows</span>
@@ -1490,11 +1490,11 @@ either as a decorator or as kwargs to <code class="docutils literal notranslate"
     <span class="k">pass</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">left</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">left</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">left</span> <span class="o">+</span> <span class="n">right</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">get_val</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_val</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="k">return</span> <span class="mi">10</span>
 
 <span class="n">ret</span> <span class="o">=</span> <span class="n">add</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">get_val</span><span class="o">.</span><span class="n">bind</span><span class="p">(),</span> <span class="mi">20</span><span class="p">)</span>
@@ -1529,8 +1529,8 @@ workflow ids, call <code class="docutils literal notranslate"><span class="pre">
 If there are multiple tasks with the same id, a suffix with a counter <code class="docutils literal notranslate"><span class="pre">_n</span></code> will be added.</p>
 <p>Once a task id is given, the result of the task will be retrievable via <code class="docutils literal notranslate"><span class="pre">workflow.get_output(workflow_id,</span> <span class="pre">task_id=&quot;task_id&quot;)</span></code>.
 If the task with the given <code class="docutils literal notranslate"><span class="pre">task_id</span></code> hasn’t been executed before the workflow completes, an exception will be thrown. Here are some examples:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">workflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">workflow</span>
 
 <span class="n">workflow_id</span> <span class="o">=</span> <span class="s2">&quot;double&quot;</span>
 <span class="k">try</span><span class="p">:</span>
@@ -1540,7 +1540,7 @@ If the task with the given <code class="docutils literal notranslate"><span clas
     <span class="k">pass</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">double</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">double</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
     <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">v</span>
 
 <span class="n">inner_task</span> <span class="o">=</span> <span class="n">double</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="o">**</span><span class="n">workflow</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">task_id</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -1572,7 +1572,7 @@ so they should be used inside the Ray remote decorator. Here is how you could us
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># specify in decorator</span>
 <span class="nd">@workflow</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">catch_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">max_retries</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">retry_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">faulty_function</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">faulty_function</span><span class="p">():</span>
     <span class="k">pass</span>
 
 <span class="c1"># specify in .options()</span>
@@ -1585,14 +1585,14 @@ so they should be used inside the Ray remote decorator. Here is how you could us
 <p>By default <code class="docutils literal notranslate"><span class="pre">retry_exceptions</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>, and <code class="docutils literal notranslate"><span class="pre">max_retries</span></code> is <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p>
 </div>
 <p>Here is one example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
-<span class="kn">import</span> <span class="nn">random</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">workflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">workflow</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">faulty_function</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">faulty_function</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;oops&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="s2">&quot;OK&quot;</span>
@@ -1605,7 +1605,7 @@ so they should be used inside the Ray remote decorator. Here is how you could us
     <span class="k">pass</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">handle_errors</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">handle_errors</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">]):</span>
     <span class="c1"># The exception field will be None on success.</span>
     <span class="n">err</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
@@ -1635,7 +1635,7 @@ re-executed.</p>
 <p>Note that tasks that have side effects still need to be idempotent. This is because the task could always fail before its result is logged.</p>
 <p>Non-idempotent workflow:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">book_flight_unsafe</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FlightTicket</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">book_flight_unsafe</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FlightTicket</span><span class="p">:</span>
     <span class="n">ticket</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">book_flight</span><span class="p">()</span>
     <span class="c1"># Uh oh, what if we failed here?</span>
     <span class="k">return</span> <span class="n">ticket</span>
@@ -1646,12 +1646,12 @@ re-executed.</p>
 </div>
 <p>Idempotent workflow:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">generate_id</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_id</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
    <span class="c1"># Generate a unique idempotency token.</span>
    <span class="k">return</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">book_flight_idempotent</span><span class="p">(</span><span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FlightTicket</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">book_flight_idempotent</span><span class="p">(</span><span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FlightTicket</span><span class="p">:</span>
    <span class="k">if</span> <span class="n">service</span><span class="o">.</span><span class="n">has_ticket</span><span class="p">(</span><span class="n">request_id</span><span class="p">):</span>
        <span class="c1"># Retrieve the previously created ticket.</span>
        <span class="k">return</span> <span class="n">service</span><span class="o">.</span><span class="n">get_ticket</span><span class="p">(</span><span class="n">request_id</span><span class="p">)</span>
@@ -1670,11 +1670,11 @@ re-executed.</p>
 construct a graph. For example, the following code prints a DAG
 node, not the output of <code class="code docutils literal notranslate"><span class="pre">bar</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">bar</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bar</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello from bar!&quot;</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">foo</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">():</span>
     <span class="c1"># This is evaluated at runtime, not in DAG construction.</span>
     <span class="k">return</span> <span class="n">bar</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span>
 
@@ -1688,11 +1688,11 @@ node, not the output of <code class="code docutils literal notranslate"><span cl
 <p>To enable dynamically executing DAG nodes at runtime, workflows introduces a utility
 function called <code class="docutils literal notranslate"><span class="pre">workflow.continuation</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">bar</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bar</span><span class="p">():</span>
     <span class="k">return</span> <span class="mi">10</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">foo</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">():</span>
     <span class="c1"># This will return a DAG to be executed</span>
     <span class="c1"># after this function is finished.</span>
     <span class="k">return</span> <span class="n">workflow</span><span class="o">.</span><span class="n">continuation</span><span class="p">(</span><span class="n">bar</span><span class="o">.</span><span class="n">bind</span><span class="p">())</span>
@@ -1705,7 +1705,7 @@ function called <code class="docutils literal notranslate"><span class="pre">wor
 <p>The following example shows how to implement the recursive <code class="docutils literal notranslate"><span class="pre">factorial</span></code> program
 using dynamically workflow:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">factorial</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">factorial</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">1</span>
     <span class="k">else</span><span class="p">:</span>
@@ -1714,7 +1714,7 @@ using dynamically workflow:</p>
         <span class="k">return</span> <span class="n">workflow</span><span class="o">.</span><span class="n">continuation</span><span class="p">(</span><span class="n">multiply</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">factorial</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">multiply</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span>
 
 <span class="k">assert</span> <span class="n">workflow</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">factorial</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span> <span class="o">==</span> <span class="mi">3628800</span>
@@ -1727,18 +1727,18 @@ using dynamically workflow:</p>
 substituted for the task’s return.</p>
 <p>To better understand dynamic workflows, let’s look at a more realistic example of booking a trip:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">book_flight</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Flight</span><span class="p">:</span> <span class="o">...</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">book_flight</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Flight</span><span class="p">:</span> <span class="o">...</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">book_hotel</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Hotel</span><span class="p">:</span> <span class="o">...</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">book_hotel</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Hotel</span><span class="p">:</span> <span class="o">...</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">finalize_or_cancel</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">finalize_or_cancel</span><span class="p">(</span>
     <span class="n">flights</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Flight</span><span class="p">],</span>
     <span class="n">hotels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hotel</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Receipt</span><span class="p">:</span> <span class="o">...</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">book_trip</span><span class="p">(</span><span class="n">origin</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dest</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dates</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Receipt</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">book_trip</span><span class="p">(</span><span class="n">origin</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dest</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dates</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Receipt</span><span class="p">:</span>
     <span class="c1"># Note that the workflow engine will not begin executing</span>
     <span class="c1"># child workflows until the parent task returns.</span>
     <span class="c1"># This avoids task overlap and ensures recoverability.</span>
@@ -1778,14 +1778,14 @@ not resolved. But we ensure that all ancestors of a task are fully executed
 before the task starts which is different from passing them into a Ray remote
 function whether they have been executed or not is not defined.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="c1"># although those values are not resolved, they have been</span>
     <span class="c1"># *fully executed and checkpointed*. This guarantees exactly-once</span>
     <span class="c1"># execution semantics.</span>
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">values</span><span class="p">))</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">get_val</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_val</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="k">return</span> <span class="mi">10</span>
 
 <span class="n">ret</span> <span class="o">=</span> <span class="n">add</span><span class="o">.</span><span class="n">bind</span><span class="p">([</span><span class="n">get_val</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
@@ -1801,11 +1801,11 @@ recoverability, their contents will be logged to durable storage before
 executing. However, an object will not be checkpointed more than once, even if
 it is passed to many different tasks.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">do_add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">do_add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">do_add</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
 
 <span class="n">workflow</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">add</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">20</span><span class="p">)))</span> <span class="o">==</span> <span class="mi">30</span>
@@ -1817,7 +1817,7 @@ it is passed to many different tasks.</p>
 <h3>Setting custom resources for tasks<a class="headerlink" href="#setting-custom-resources-for-tasks" title="Link to this heading">#</a></h3>
 <p>You can assign resources (e.g., CPUs, GPUs to tasks via the same <code class="docutils literal notranslate"><span class="pre">num_cpus</span></code>, <code class="docutils literal notranslate"><span class="pre">num_gpus</span></code>, and <code class="docutils literal notranslate"><span class="pre">resources</span></code> arguments that Ray tasks take):</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">train_model</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_model</span><span class="p">():</span>
     <span class="k">pass</span>  <span class="c1"># This task is assigned to a GPU by Ray.</span>
 
 <span class="n">workflow</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">train_model</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">bind</span><span class="p">())</span>

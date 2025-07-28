@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1412,7 +1412,7 @@ document.write(`
 <span id="id2"></span><h2>Describing datasets<a class="headerlink" href="#describing-datasets" title="Link to this heading">#</a></h2>
 <p><a class="reference internal" href="api/dataset.html#ray.data.Dataset" title="ray.data.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Datasets</span></code></a> are tabular. To view a dataset’s column names and
 types, call <a class="reference internal" href="api/doc/ray.data.Dataset.schema.html#ray.data.Dataset.schema" title="ray.data.Dataset.schema"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.schema()</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@air-example-data/iris.csv&quot;</span><span class="p">)</span>
 
@@ -1429,7 +1429,7 @@ target             int64
 </pre></div>
 </div>
 <p>For more information like the number of rows, print the Dataset.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@air-example-data/iris.csv&quot;</span><span class="p">)</span>
 
@@ -1454,7 +1454,7 @@ target             int64
 <p>To get a list of rows, call <a class="reference internal" href="api/doc/ray.data.Dataset.take.html#ray.data.Dataset.take" title="ray.data.Dataset.take"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.take()</span></code></a> or
 <a class="reference internal" href="api/doc/ray.data.Dataset.take_all.html#ray.data.Dataset.take_all" title="ray.data.Dataset.take_all"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.take_all()</span></code></a>. Ray Data represents each row as
 a dictionary.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@air-example-data/iris.csv&quot;</span><span class="p">)</span>
 
@@ -1479,7 +1479,7 @@ of the returned batch, set <code class="docutils literal notranslate"><span clas
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-0">
 NumPy</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_images</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/image-datasets/simple&quot;</span><span class="p">)</span>
 
@@ -1496,7 +1496,7 @@ Image shape: (2, 32, 32, 3)
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-1">
 pandas</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@air-example-data/iris.csv&quot;</span><span class="p">)</span>
 
@@ -1522,13 +1522,13 @@ pandas</label><div class="sd-tab-content docutils">
 <p>Ray Data calculates statistics during execution for each operator, such as wall clock time and memory usage.</p>
 <p>To view stats about your <a class="reference internal" href="api/dataset.html#ray.data.Dataset" title="ray.data.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Datasets</span></code></a>, call <a class="reference internal" href="api/doc/ray.data.Dataset.stats.html#ray.data.Dataset.stats" title="ray.data.Dataset.stats"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.stats()</span></code></a> on an executed dataset. The stats are also persisted under <code class="code docutils literal notranslate"><span class="pre">/tmp/ray/session_*/logs/ray-data/ray-data.log</span></code>.
 For more on how to read this output, see <a class="reference internal" href="monitoring-your-workload.html#monitoring-your-workload"><span class="std std-ref">Monitoring Your Workload with the Ray Data Dashboard</span></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">datasets</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datasets</span>
 
-<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">batch</span>
 
-<span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
     <span class="k">return</span> <span class="kc">True</span>
 
 <span class="n">hf_ds</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;mnist&quot;</span><span class="p">,</span> <span class="s2">&quot;mnist&quot;</span><span class="p">)</span>

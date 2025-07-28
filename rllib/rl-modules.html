@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1438,7 +1438,7 @@ arbitrarily complex multi-network or multi-agent architectures and algorithms.</
 new API stack, see the <a class="reference internal" href="new-api-stack-migration-guide.html#rllib-new-api-stack-migration-guide"><span class="std std-ref">new API stack migration guide</span></a> for more information.</p>
 <p>If you configured the <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> to the old API stack, use the
 <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.api_stack.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.api_stack" title="ray.rllib.algorithms.algorithm_config.AlgorithmConfig.api_stack"><code class="xref py py-meth docutils literal notranslate"><span class="pre">api_stack()</span></code></a> method to switch:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -1461,8 +1461,8 @@ image observations (<code class="docutils literal notranslate"><span class="pre"
 <p>For discrete or more complex input observation spaces like dictionaries, use the
 <code class="xref py py-class docutils literal notranslate"><span class="pre">FlattenObservations</span></code> connector
 piece as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.connectors.env_to_module</span> <span class="kn">import</span> <span class="n">FlattenObservations</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.env_to_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlattenObservations</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">PPOConfig</span><span class="p">()</span>
@@ -1484,8 +1484,8 @@ For how to write and configure your custom RLModules, see <a class="reference in
 <h3>Configuring default MLP nets<a class="headerlink" href="#configuring-default-mlp-nets" title="Link to this heading">#</a></h3>
 <p>To train a simple multi layer perceptron (MLP) policy, which only contains dense layers,
 with PPO and the default RLModule, configure your experiment as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.default_model_config</span> <span class="kn">import</span> <span class="n">DefaultModelConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.default_model_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultModelConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">PPOConfig</span><span class="p">()</span>
@@ -1544,12 +1544,12 @@ dimensions. For example, for an <a class="reference external" href="https://ale.
 use RLlib’s Atari wrapper utility, which performs resizing (default 64x64) and gray scaling (default True),
 frame stacking (default None), frame skipping (default 4), normalization (from uint8 to float32), and
 applies up to 30 “noop” actions after a reset, which aren’t part of the episode:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>  <span class="c1"># `pip install gymnasium[atari,accept-rom-license]`</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>  <span class="c1"># `pip install gymnasium[atari,accept-rom-license]`</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.wrappers.atari_wrappers</span> <span class="kn">import</span> <span class="n">wrap_atari_for_new_api_stack</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.default_model_config</span> <span class="kn">import</span> <span class="n">DefaultModelConfig</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">register_env</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.wrappers.atari_wrappers</span><span class="w"> </span><span class="kn">import</span> <span class="n">wrap_atari_for_new_api_stack</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.default_model_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultModelConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_env</span>
 
 <span class="n">register_env</span><span class="p">(</span>
     <span class="s2">&quot;image_env&quot;</span><span class="p">,</span>
@@ -1636,8 +1636,8 @@ multi-agent learning or other multi-NN setups.</p>
 <section id="construction-through-the-class-constructor">
 <span id="rllib-constructing-rlmodule-w-class-constructor"></span><h3>Construction through the class constructor<a class="headerlink" href="#construction-through-the-class-constructor" title="Link to this heading">#</a></h3>
 <p>The most direct way to construct your <a class="reference internal" href="package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.html#ray.rllib.core.rl_module.rl_module.RLModule" title="ray.rllib.core.rl_module.rl_module.RLModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">RLModule</span></code></a> is through its constructor:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.bc.torch.default_bc_torch_rl_module</span> <span class="kn">import</span> <span class="n">DefaultBCTorchRLModule</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.bc.torch.default_bc_torch_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultBCTorchRLModule</span>
 
 <span class="c1"># Create an env object to know the spaces.</span>
 <span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;CartPole-v1&quot;</span><span class="p">)</span>
@@ -1672,9 +1672,9 @@ and analogous to the <a class="reference internal" href="package_ref/doc/ray.rll
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-0">
 RLModuleSpec (single model)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.bc.torch.default_bc_torch_rl_module</span> <span class="kn">import</span> <span class="n">DefaultBCTorchRLModule</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModuleSpec</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.bc.torch.default_bc_torch_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultBCTorchRLModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span>
 
 <span class="c1"># Create an env object to know the spaces.</span>
 <span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;CartPole-v1&quot;</span><span class="p">)</span>
@@ -1696,10 +1696,10 @@ RLModuleSpec (single model)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-1">
 MultiRLModuleSpec (multi model)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.bc.torch.default_bc_torch_rl_module</span> <span class="kn">import</span> <span class="n">DefaultBCTorchRLModule</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.bc.torch.default_bc_torch_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultBCTorchRLModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
 
 <span class="c1"># First construct the MultiRLModuleSpec.</span>
 <span class="n">spec</span> <span class="o">=</span> <span class="n">MultiRLModuleSpec</span><span class="p">(</span>
@@ -1742,8 +1742,8 @@ tell RLlib to use the particular module class and constructor arguments:</p>
 <input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-2">
 Single-Module (like single-agent)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModuleSpec</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">PPOConfig</span><span class="p">()</span>
@@ -1770,10 +1770,10 @@ environment or other configuration parameters.</p>
 <input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-3">
 Multi-Agent (shared policy net)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.examples.envs.classes.multi_agent</span> <span class="kn">import</span> <span class="n">MultiAgentCartPole</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.examples.envs.classes.multi_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentCartPole</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">PPOConfig</span><span class="p">()</span>
@@ -1796,10 +1796,10 @@ Multi-Agent (shared policy net)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-4" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-4">
 Multi-Agent (two or more policy nets)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.examples.envs.classes.multi_agent</span> <span class="kn">import</span> <span class="n">MultiAgentCartPole</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.examples.envs.classes.multi_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentCartPole</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">PPOConfig</span><span class="p">()</span>
@@ -1865,11 +1865,11 @@ in which you add needed NN subcomponents and assign these to class attributes of
 <li><p><code class="docutils literal notranslate"><span class="pre">self.inference_only</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">self.model_config</span></code> (a dict with any custom config settings)</p></li>
 </ol>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.torch.torch_rl_module</span> <span class="kn">import</span> <span class="n">TorchRLModule</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.torch.torch_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchRLModule</span>
 
-<span class="k">class</span> <span class="nc">MyTorchPolicy</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyTorchPolicy</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># You have access here to the following already set attributes:</span>
         <span class="c1"># self.observation_space</span>
         <span class="c1"># self.action_space</span>
@@ -1939,18 +1939,18 @@ If you return the “actions” key, RLlib skips that sampling step.</p>
 <input checked="checked" id="sd-tab-item-5" name="sd-tab-set-2" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-5">
 Returning “actions” key</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.core</span> <span class="kn">import</span> <span class="n">Columns</span><span class="p">,</span> <span class="n">TorchRLModule</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Columns</span><span class="p">,</span> <span class="n">TorchRLModule</span>
 
-<span class="k">class</span> <span class="nc">MyTorchPolicy</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyTorchPolicy</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
     <span class="o">...</span>
 
-    <span class="k">def</span> <span class="nf">_forward_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="o">...</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="n">Columns</span><span class="o">.</span><span class="n">ACTIONS</span><span class="p">:</span> <span class="o">...</span>  <span class="c1"># RLlib uses these actions as-is</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">_forward_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="o">...</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="n">Columns</span><span class="o">.</span><span class="n">ACTIONS</span><span class="p">:</span> <span class="o">...</span>  <span class="c1"># RLlib uses these actions as-is (no sampling step!)</span>
@@ -1962,12 +1962,12 @@ Returning “actions” key</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-6" name="sd-tab-set-2" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-6">
 Not returning “actions” key</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.core</span> <span class="kn">import</span> <span class="n">Columns</span><span class="p">,</span> <span class="n">TorchRLModule</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Columns</span><span class="p">,</span> <span class="n">TorchRLModule</span>
 
-<span class="k">class</span> <span class="nc">MyTorchPolicy</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyTorchPolicy</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
     <span class="o">...</span>
 
-    <span class="k">def</span> <span class="nf">_forward_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="o">...</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="c1"># RLlib:</span>
@@ -1977,7 +1977,7 @@ Not returning “actions” key</label><div class="sd-tab-content docutils">
             <span class="n">Columns</span><span class="o">.</span><span class="n">ACTION_DIST_INPUTS</span><span class="p">:</span> <span class="o">...</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">_forward_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="o">...</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="c1"># RLlib:</span>
@@ -2010,7 +2010,7 @@ Each Algorithm class has a fixed set of APIs that all RLModules trained
 by that algorithm, need to implement.</p>
 <p>To find out, what APIs your Algorithms require, do the following:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import the config of the algorithm of your choice.</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.sac</span> <span class="kn">import</span> <span class="n">SACConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.sac</span><span class="w"> </span><span class="kn">import</span> <span class="n">SACConfig</span>
 
 <span class="c1"># Print out the abstract APIs, you need to subclass from and whose</span>
 <span class="c1"># abstract methods you need to implement, besides the ``setup()`` and ``_forward_..()``</span>
@@ -2047,19 +2047,19 @@ Note that you may want to set the <a class="reference internal" href="package_re
 <h3>End-to-end example<a class="headerlink" href="#end-to-end-example" title="Link to this heading">#</a></h3>
 <p>Putting together the elements of your custom <a class="reference internal" href="package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.html#ray.rllib.core.rl_module.rl_module.RLModule" title="ray.rllib.core.rl_module.rl_module.RLModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">RLModule</span></code></a> that you implemented,
 a working end-to-end example is as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.core.columns</span> <span class="kn">import</span> <span class="n">Columns</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.torch</span> <span class="kn">import</span> <span class="n">TorchRLModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.columns</span><span class="w"> </span><span class="kn">import</span> <span class="n">Columns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchRLModule</span>
 
 
-<span class="k">class</span> <span class="nc">VPGTorchRLModule</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">VPGTorchRLModule</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A simple VPG (vanilla policy gradient)-style RLModule for testing purposes.</span>
 
 <span class="sd">    Use this as a minimum, bare-bones example implementation of a custom TorchRLModule.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># You have access here to the following already set attributes:</span>
         <span class="c1"># self.observation_space</span>
         <span class="c1"># self.action_space</span>
@@ -2075,7 +2075,7 @@ a working end-to-end example is as follows:</p>
             <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">),</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Push the observations from the batch through our `self._policy_net`.</span>
         <span class="n">action_logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_policy_net</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="n">Columns</span><span class="o">.</span><span class="n">OBS</span><span class="p">])</span>
         <span class="c1"># Return parameters for the (default) action distribution, which is</span>
@@ -2132,7 +2132,7 @@ See an <a class="reference external" href="https://github.com/ray-project/ray/bl
 action components as previously described, you need to carefully implement its forward logic.</p>
 <p>Find an <a class="reference external" href="https://github.com/ray-project/ray/blob/master/rllib/examples/rl_modules/classes/autoregressive_actions_rlm.py">example of such a autoregressive action model</a> here.</p>
 <p>You implement the main action sampling logic in the <code class="docutils literal notranslate"><span class="pre">_forward_...()</span></code> methods:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">_pi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">inference</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_pi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">inference</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
     <span class="c1"># Prior forward pass and sample a1.</span>
     <span class="n">prior_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prior_net</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
     <span class="n">dist_a1</span> <span class="o">=</span> <span class="n">TorchCategorical</span><span class="o">.</span><span class="n">from_logits</span><span class="p">(</span><span class="n">prior_out</span><span class="p">)</span>
@@ -2180,7 +2180,7 @@ and outputs embedding vectors that then serve as input for the two policy heads 
 <input checked="checked" id="sd-tab-item-7" name="sd-tab-set-3" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-7">
 MultiRLModule (w/ two policy nets and one encoder)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">VPGMultiRLModuleWithSharedEncoder</span><span class="p">(</span><span class="n">MultiRLModule</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">VPGMultiRLModuleWithSharedEncoder</span><span class="p">(</span><span class="n">MultiRLModule</span><span class="p">):</span>
     <span class="s2">&quot;&quot;&quot;VPG (vanilla pol. gradient)-style MultiRLModule handling a shared encoder.</span>
 </pre></div>
 </div>
@@ -2225,7 +2225,7 @@ MultiRLModule (w/ two policy nets and one encoder)</label><div class="sd-tab-con
 Policy RLModule</label><div class="sd-tab-content docutils">
 <p>Within the MultiRLModule, you need to have two policy sub-RLModules. They may be of the same
 class, which you can implement as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">VPGPolicyAfterSharedEncoder</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">VPGPolicyAfterSharedEncoder</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
     <span class="s2">&quot;&quot;&quot;A VPG (vanilla pol. gradient)-style RLModule using a shared encoder.</span>
 </pre></div>
 </div>
@@ -2258,10 +2258,10 @@ class, which you can implement as follows:</p>
 </input><label class="sd-tab-label" for="sd-tab-item-9">
 Shared encoder RLModule</label><div class="sd-tab-content docutils">
 <p>Finally, the shared encoder RLModule should look similar to this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SharedEncoder</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">SharedEncoder</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A shared encoder that can be used with `VPGMultiRLModuleWithSharedEncoder`.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
 
         <span class="n">input_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -2272,7 +2272,7 @@ Shared encoder RLModule</label><div class="sd-tab-content docutils">
             <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">),</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Pass observations through the net and return outputs.</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;encoder_embeddings&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_net</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="n">Columns</span><span class="o">.</span><span class="n">OBS</span><span class="p">])}</span>
 
@@ -2286,10 +2286,10 @@ into your algorithm’s config, create a <a class="reference internal" href="pac
 with the new class and its constructor settings. Also, create one <a class="reference internal" href="package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.html#ray.rllib.core.rl_module.rl_module.RLModuleSpec" title="ray.rllib.core.rl_module.rl_module.RLModuleSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">RLModuleSpec</span></code></a>
 for each agent and the shared encoder RLModule, because RLlib requires their observation and action spaces and their
 model hyper-parameters:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>            <span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.core</span> <span class="kn">import</span> <span class="n">MultiRLModuleSpec</span><span class="p">,</span> <span class="n">RLModuleSpec</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.examples.envs.classes.multi_agent</span> <span class="kn">import</span> <span class="n">MultiAgentCartPole</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>            <span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiRLModuleSpec</span><span class="p">,</span> <span class="n">RLModuleSpec</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.examples.envs.classes.multi_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentCartPole</span>
 
             <span class="n">single_agent_env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;CartPole-v1&quot;</span><span class="p">)</span>
 
@@ -2357,12 +2357,12 @@ checkpoint, use the <a class="reference internal" href="package_ref/doc/ray.rlli
 <p>The following examples show how you can use these methods outside of, or in conjunction with, an RLlib Algorithm.</p>
 <section id="creating-an-rlmodule-checkpoint">
 <h3>Creating an RLModule checkpoint<a class="headerlink" href="#creating-an-rlmodule-checkpoint" title="Link to this heading">#</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tempfile</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo.torch.default_ppo_torch_rl_module</span> <span class="kn">import</span> <span class="n">DefaultPPOTorchRLModule</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.default_model_config</span> <span class="kn">import</span> <span class="n">DefaultModelConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo.torch.default_ppo_torch_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultPPOTorchRLModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.default_model_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultModelConfig</span>
 
 <span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;CartPole-v1&quot;</span><span class="p">)</span>
 
@@ -2383,7 +2383,7 @@ checkpoint, use the <a class="reference internal" href="package_ref/doc/ray.rlli
 <h3>Creating an RLModule from an (RLModule) checkpoint<a class="headerlink" href="#creating-an-rlmodule-from-an-rlmodule-checkpoint" title="Link to this heading">#</a></h3>
 <p>If you have an RLModule checkpoint saved and would like to create a new RLModule directly from it,
 use the <a class="reference internal" href="package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.from_checkpoint.html#ray.rllib.core.rl_module.rl_module.RLModule.from_checkpoint" title="ray.rllib.core.rl_module.rl_module.RLModule.from_checkpoint"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_checkpoint()</span></code></a> method:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModule</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModule</span>
 
 <span class="c1"># Create a new RLModule from the checkpoint.</span>
 <span class="n">new_module</span> <span class="o">=</span> <span class="n">RLModule</span><span class="o">.</span><span class="n">from_checkpoint</span><span class="p">(</span><span class="n">module_ckpt_path</span><span class="p">)</span>
@@ -2392,7 +2392,7 @@ use the <a class="reference internal" href="package_ref/doc/ray.rllib.core.rl_mo
 </section>
 <section id="loading-an-rlmodule-checkpoint-into-a-running-algorithm">
 <h3>Loading an RLModule checkpoint into a running Algorithm<a class="headerlink" href="#loading-an-rlmodule-checkpoint-into-a-running-algorithm" title="Link to this heading">#</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
 
 <span class="c1"># Create a new Algorithm (with the changed module config: 32 units instead of the</span>
 <span class="c1"># default 256; otherwise loading the state of ``module`` fails due to a shape</span>

@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1392,65 +1392,65 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.search</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">ray._private.utils</span> <span class="kn">import</span> <span class="n">get_function_args</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.basic_variant</span> <span class="kn">import</span> <span class="n">BasicVariantGenerator</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.concurrency_limiter</span> <span class="kn">import</span> <span class="n">ConcurrencyLimiter</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.repeater</span> <span class="kn">import</span> <span class="n">Repeater</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.search_algorithm</span> <span class="kn">import</span> <span class="n">SearchAlgorithm</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.search_generator</span> <span class="kn">import</span> <span class="n">SearchGenerator</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.searcher</span> <span class="kn">import</span> <span class="n">Searcher</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.variant_generator</span> <span class="kn">import</span> <span class="n">grid_search</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_function_args</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.basic_variant</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasicVariantGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.concurrency_limiter</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConcurrencyLimiter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.repeater</span><span class="w"> </span><span class="kn">import</span> <span class="n">Repeater</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.search_algorithm</span><span class="w"> </span><span class="kn">import</span> <span class="n">SearchAlgorithm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.search_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">SearchGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.searcher</span><span class="w"> </span><span class="kn">import</span> <span class="n">Searcher</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.variant_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">grid_search</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 
-<span class="k">def</span> <span class="nf">_import_variant_generator</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_import_variant_generator</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">BasicVariantGenerator</span>
 
 
-<span class="k">def</span> <span class="nf">_import_ax_search</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.search.ax.ax_search</span> <span class="kn">import</span> <span class="n">AxSearch</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_import_ax_search</span><span class="p">():</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.ax.ax_search</span><span class="w"> </span><span class="kn">import</span> <span class="n">AxSearch</span>
 
     <span class="k">return</span> <span class="n">AxSearch</span>
 
 
-<span class="k">def</span> <span class="nf">_import_hyperopt_search</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.search.hyperopt.hyperopt_search</span> <span class="kn">import</span> <span class="n">HyperOptSearch</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_import_hyperopt_search</span><span class="p">():</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.hyperopt.hyperopt_search</span><span class="w"> </span><span class="kn">import</span> <span class="n">HyperOptSearch</span>
 
     <span class="k">return</span> <span class="n">HyperOptSearch</span>
 
 
-<span class="k">def</span> <span class="nf">_import_bayesopt_search</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.search.bayesopt.bayesopt_search</span> <span class="kn">import</span> <span class="n">BayesOptSearch</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_import_bayesopt_search</span><span class="p">():</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.bayesopt.bayesopt_search</span><span class="w"> </span><span class="kn">import</span> <span class="n">BayesOptSearch</span>
 
     <span class="k">return</span> <span class="n">BayesOptSearch</span>
 
 
-<span class="k">def</span> <span class="nf">_import_bohb_search</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.search.bohb.bohb_search</span> <span class="kn">import</span> <span class="n">TuneBOHB</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_import_bohb_search</span><span class="p">():</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.bohb.bohb_search</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneBOHB</span>
 
     <span class="k">return</span> <span class="n">TuneBOHB</span>
 
 
-<span class="k">def</span> <span class="nf">_import_nevergrad_search</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.search.nevergrad.nevergrad_search</span> <span class="kn">import</span> <span class="n">NevergradSearch</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_import_nevergrad_search</span><span class="p">():</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.nevergrad.nevergrad_search</span><span class="w"> </span><span class="kn">import</span> <span class="n">NevergradSearch</span>
 
     <span class="k">return</span> <span class="n">NevergradSearch</span>
 
 
-<span class="k">def</span> <span class="nf">_import_optuna_search</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.search.optuna.optuna_search</span> <span class="kn">import</span> <span class="n">OptunaSearch</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_import_optuna_search</span><span class="p">():</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.optuna.optuna_search</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptunaSearch</span>
 
     <span class="k">return</span> <span class="n">OptunaSearch</span>
 
 
-<span class="k">def</span> <span class="nf">_import_zoopt_search</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.search.zoopt.zoopt_search</span> <span class="kn">import</span> <span class="n">ZOOptSearch</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_import_zoopt_search</span><span class="p">():</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.zoopt.zoopt_search</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZOOptSearch</span>
 
     <span class="k">return</span> <span class="n">ZOOptSearch</span>
 
 
-<span class="k">def</span> <span class="nf">_import_hebo_search</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.search.hebo.hebo_search</span> <span class="kn">import</span> <span class="n">HEBOSearch</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_import_hebo_search</span><span class="p">():</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.hebo.hebo_search</span><span class="w"> </span><span class="kn">import</span> <span class="n">HEBOSearch</span>
 
     <span class="k">return</span> <span class="n">HEBOSearch</span>
 
@@ -1472,7 +1472,7 @@ document.write(`
 <div class="viewcode-block" id="create_searcher">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.search.create_searcher.html#ray.tune.search.create_searcher">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">create_searcher</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_searcher</span><span class="p">(</span>
     <span class="n">search_alg</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>

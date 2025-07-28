@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1470,10 +1470,10 @@ Plasma memory usage 0 MiB, 4 objects, 0.0% full
 <p><code class="docutils literal notranslate"><span class="pre">ray</span> <span class="pre">memory</span></code> comes with features to make the memory debugging experience more effective. For example, you can add arguments <code class="docutils literal notranslate"><span class="pre">sort-by=OBJECT_SIZE</span></code> and <code class="docutils literal notranslate"><span class="pre">group-by=STACK_TRACE</span></code>, which may be particularly helpful for tracking down the line of code where a memory leak occurs. You can see the full suite of options by running <code class="docutils literal notranslate"><span class="pre">ray</span> <span class="pre">memory</span> <span class="pre">--help</span></code>.</p>
 <p>There are five types of references that can keep an object pinned:</p>
 <p><strong>1. Local ObjectRef references</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">arg</span>
 
 <span class="n">a</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
@@ -1498,7 +1498,7 @@ IP Address    PID    Type    Object Ref                                         
 </div>
 <p>In the output from <code class="docutils literal notranslate"><span class="pre">ray</span> <span class="pre">memory</span></code>, we can see that each of these is marked as a <code class="docutils literal notranslate"><span class="pre">LOCAL_REFERENCE</span></code> in the driver process, but the annotation in the “Reference Creation Site” indicates that the first was created as a “put object” and the second from a “task call.”</p>
 <p><strong>2. Objects pinned in memory</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="n">a</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
 <span class="n">b</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -1519,7 +1519,7 @@ IP Address    PID    Type    Object Ref                                         
 <p>The output from <code class="docutils literal notranslate"><span class="pre">ray</span> <span class="pre">memory</span></code> displays this as the object being <code class="docutils literal notranslate"><span class="pre">PINNED_IN_MEMORY</span></code>. If we <code class="docutils literal notranslate"><span class="pre">del</span> <span class="pre">b</span></code>, the reference can be freed.</p>
 <p><strong>3. Pending task references</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="k">pass</span>
 
@@ -1549,7 +1549,7 @@ IP Address    PID    Type    Object Ref                                         
 <p>While the task is running, we see that <code class="docutils literal notranslate"><span class="pre">ray</span> <span class="pre">memory</span></code> shows both a <code class="docutils literal notranslate"><span class="pre">LOCAL_REFERENCE</span></code> and a <code class="docutils literal notranslate"><span class="pre">USED_BY_PENDING_TASK</span></code> reference for the object in the driver process. The worker process also holds a reference to the object because the Python <code class="docutils literal notranslate"><span class="pre">arg</span></code> is directly referencing the memory in the plasma, so it can’t be evicted; therefore it is <code class="docutils literal notranslate"><span class="pre">PINNED_IN_MEMORY</span></code>.</p>
 <p><strong>4. Serialized ObjectRef references</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="k">pass</span>
 
@@ -1611,13 +1611,13 @@ IP Address    PID    Type    Object Ref                                         
 <p>To tell the Ray scheduler a task or actor requires a certain amount of available memory to run, set the <code class="docutils literal notranslate"><span class="pre">memory</span></code> argument. The Ray scheduler will then reserve the specified amount of available memory during scheduling, similar to how it handles CPU and GPU resources:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># reserve 500MiB of available memory to place this task</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">memory</span><span class="o">=</span><span class="mi">500</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">some_function</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">some_function</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">pass</span>
 
 <span class="c1"># reserve 2.5GiB of available memory to place this actor</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">memory</span><span class="o">=</span><span class="mi">2500</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">SomeActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SomeActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
         <span class="k">pass</span>
 </pre></div>
 </div>

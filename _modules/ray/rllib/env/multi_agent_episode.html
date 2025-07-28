@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,10 +1389,10 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.env.multi_agent_episode</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
     <span class="n">Collection</span><span class="p">,</span>
@@ -1403,19 +1403,19 @@ document.write(`
     <span class="n">Set</span><span class="p">,</span>
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.env.single_agent_episode</span> <span class="kn">import</span> <span class="n">SingleAgentEpisode</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.utils.infinite_lookback_buffer</span> <span class="kn">import</span> <span class="n">InfiniteLookbackBuffer</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.sample_batch</span> <span class="kn">import</span> <span class="n">MultiAgentBatch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils</span> <span class="kn">import</span> <span class="n">force_list</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="n">Deprecated</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.error</span> <span class="kn">import</span> <span class="n">MultiAgentEnvError</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.spaces.space_utils</span> <span class="kn">import</span> <span class="n">batch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">AgentID</span><span class="p">,</span> <span class="n">ModuleID</span><span class="p">,</span> <span class="n">MultiAgentDict</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.single_agent_episode</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleAgentEpisode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.utils.infinite_lookback_buffer</span><span class="w"> </span><span class="kn">import</span> <span class="n">InfiniteLookbackBuffer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.sample_batch</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentBatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">force_list</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.error</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentEnvError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.spaces.space_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">batch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentID</span><span class="p">,</span> <span class="n">ModuleID</span><span class="p">,</span> <span class="n">MultiAgentDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 
 <span class="c1"># TODO (simon): Include cases in which the number of agents in an</span>
@@ -1423,7 +1423,7 @@ document.write(`
 <div class="viewcode-block" id="MultiAgentEpisode">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">MultiAgentEpisode</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiAgentEpisode</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Stores multi-agent episode data.</span>
 
 <span class="sd">    The central attribute of the class is the timestep mapping</span>
@@ -1479,7 +1479,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.__init__">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.__init__.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">id_</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1587,7 +1587,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id_</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">id_</span> <span class="ow">or</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
         <span class="k">if</span> <span class="n">agent_to_module_mapping_fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
             <span class="n">agent_to_module_mapping_fn</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">AlgorithmConfig</span><span class="o">.</span><span class="n">DEFAULT_AGENT_TO_MODULE_MAPPING_FN</span>
@@ -1694,7 +1694,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.add_env_reset">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.add_env_reset.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.add_env_reset">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_env_reset</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_env_reset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">observations</span><span class="p">:</span> <span class="n">MultiAgentDict</span><span class="p">,</span>
@@ -1747,7 +1747,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.add_env_step">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.add_env_step.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.add_env_step">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_env_step</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_env_step</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">observations</span><span class="p">:</span> <span class="n">MultiAgentDict</span><span class="p">,</span>
         <span class="n">actions</span><span class="p">:</span> <span class="n">MultiAgentDict</span><span class="p">,</span>
@@ -2049,7 +2049,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.validate">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.validate.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.validate">[docs]</a>
-    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates the episode&#39;s data.</span>
 
 <span class="sd">        This function ensures that the data stored to a `MultiAgentEpisode` is</span>
@@ -2064,7 +2064,7 @@ document.write(`
         <span class="c1">#  action/reward caches, etc..</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True if `self.add_env_reset()` has already been called.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">any</span><span class="p">(</span>
             <span class="nb">len</span><span class="p">(</span><span class="n">sa_episode</span><span class="o">.</span><span class="n">observations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
@@ -2072,7 +2072,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;True, if the data in this episode is already stored as numpy arrays.&quot;&quot;&quot;</span>
         <span class="n">is_numpy</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_episodes</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span><span class="o">.</span><span class="n">is_numpy</span>
         <span class="c1"># Make sure that all single agent&#39;s episodes&#39; `is_numpy` flags are the same.</span>
@@ -2084,7 +2084,7 @@ document.write(`
         <span class="k">return</span> <span class="n">is_numpy</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_done</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_done</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether the episode is actually done (terminated or truncated).</span>
 
 <span class="sd">        A done episode cannot be continued via `self.add_env_step()` or being</span>
@@ -2114,7 +2114,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.to_numpy">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.to_numpy.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.to_numpy">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiAgentEpisode&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiAgentEpisode&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts this Episode&#39;s list attributes to numpy arrays.</span>
 
 <span class="sd">        This means in particular that this episodes&#39; lists (per single agent) of</span>
@@ -2201,7 +2201,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.concat_episode">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.concat_episode.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.concat_episode">[docs]</a>
-    <span class="k">def</span> <span class="nf">concat_episode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;MultiAgentEpisode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">concat_episode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;MultiAgentEpisode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds the given `other` MultiAgentEpisode to the right side of self.</span>
 
 <span class="sd">        In order for this to work, both chunks (`self` and `other`) must fit</span>
@@ -2307,7 +2307,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.cut">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.cut.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.cut">[docs]</a>
-    <span class="k">def</span> <span class="nf">cut</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">len_lookback_buffer</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiAgentEpisode&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cut</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">len_lookback_buffer</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiAgentEpisode&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a successor episode chunk (of len=0) continuing from this Episode.</span>
 
 <span class="sd">        The successor will have the same ID as `self`.</span>
@@ -2419,12 +2419,12 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">agent_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">AgentID</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">agent_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">AgentID</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the agent ids.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_episodes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">agent_episode_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiAgentDict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">agent_episode_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiAgentDict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns ids from each agent&#39;s `SingleAgentEpisode`.&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="p">{</span>
@@ -2434,7 +2434,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.module_for">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.module_for.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.module_for">[docs]</a>
-    <span class="k">def</span> <span class="nf">module_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">module_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the ModuleID for a given AgentID.</span>
 
 <span class="sd">        Forces the agent-to-module mapping to be performed (via</span>
@@ -2459,7 +2459,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.get_observations">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_observations.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_observations">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_observations</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_observations</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">slice</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">agent_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Collection</span><span class="p">[</span><span class="n">AgentID</span><span class="p">],</span> <span class="n">AgentID</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2540,7 +2540,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.get_infos">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_infos.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_infos">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_infos</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_infos</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">slice</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">agent_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Collection</span><span class="p">[</span><span class="n">AgentID</span><span class="p">],</span> <span class="n">AgentID</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2615,7 +2615,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.get_actions">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_actions.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_actions">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_actions</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_actions</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">slice</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">agent_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Collection</span><span class="p">[</span><span class="n">AgentID</span><span class="p">],</span> <span class="n">AgentID</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2695,7 +2695,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.get_rewards">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_rewards.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_rewards">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_rewards</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_rewards</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">slice</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">agent_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Collection</span><span class="p">[</span><span class="n">AgentID</span><span class="p">],</span> <span class="n">AgentID</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2768,7 +2768,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.get_extra_model_outputs">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_extra_model_outputs.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_extra_model_outputs">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_extra_model_outputs</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_extra_model_outputs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">slice</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2851,7 +2851,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.get_terminateds">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_terminateds.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_terminateds">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_terminateds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiAgentDict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_terminateds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiAgentDict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the terminateds at given indices.&quot;&quot;&quot;</span>
         <span class="n">terminateds</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">agent_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_episodes</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span><span class="o">.</span><span class="n">is_terminated</span>
@@ -2863,7 +2863,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.get_truncateds">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_truncateds.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_truncateds">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_truncateds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiAgentDict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_truncateds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiAgentDict</span><span class="p">:</span>
         <span class="n">truncateds</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">agent_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_episodes</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span><span class="o">.</span><span class="n">is_truncated</span>
             <span class="k">for</span> <span class="n">agent_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_ids</span>
@@ -2874,7 +2874,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.add_temporary_timestep_data">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.add_temporary_timestep_data.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.add_temporary_timestep_data">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_temporary_timestep_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_temporary_timestep_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Temporarily adds (until `to_numpy()` called) per-timestep data to self.</span>
 
 <span class="sd">        The given `data` is appended to a list (`self._temporary_timestep_data`), which</span>
@@ -2899,7 +2899,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.get_temporary_timestep_data">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_temporary_timestep_data.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_temporary_timestep_data">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_temporary_timestep_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_temporary_timestep_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns all temporarily stored data items (list) under the given key.</span>
 
 <span class="sd">        Note that all temporary timestep data is erased/cleared when calling</span>
@@ -2922,7 +2922,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.slice">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.slice.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.slice">[docs]</a>
-    <span class="k">def</span> <span class="nf">slice</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">slice</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">slice_</span><span class="p">:</span> <span class="nb">slice</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3137,7 +3137,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.__len__">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.__len__.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.__len__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the length of an `MultiAgentEpisode`.</span>
 
 <span class="sd">        Note that the length of an episode is defined by the difference</span>
@@ -3149,7 +3149,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_t</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_t_started</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">sa_eps_returns</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">aid</span><span class="p">:</span> <span class="n">sa_eps</span><span class="o">.</span><span class="n">get_return</span><span class="p">()</span> <span class="k">for</span> <span class="n">aid</span><span class="p">,</span> <span class="n">sa_eps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_episodes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="p">}</span>
@@ -3160,7 +3160,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.print">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.print.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.print">[docs]</a>
-    <span class="k">def</span> <span class="nf">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prints this MultiAgentEpisode as a table of observations for the agents.&quot;&quot;&quot;</span>
 
         <span class="c1"># Find the maximum timestep across all agents to determine the grid width.</span>
@@ -3194,7 +3194,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.get_state">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_state.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_state">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the state of a multi-agent episode.</span>
 
 <span class="sd">        Note that from an episode&#39;s state the episode itself can</span>
@@ -3234,7 +3234,7 @@ document.write(`
 <div class="viewcode-block" id="MultiAgentEpisode.from_state">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.from_state.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.from_state">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_state</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiAgentEpisode&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_state</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiAgentEpisode&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a multi-agent episode from a state dictionary.</span>
 
 <span class="sd">        See `MultiAgentEpisode.get_state()` for creating a state for</span>
@@ -3283,7 +3283,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.get_sample_batch">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_sample_batch.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_sample_batch">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_sample_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiAgentBatch</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sample_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiAgentBatch</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts this `MultiAgentEpisode` into a `MultiAgentBatch`.</span>
 
 <span class="sd">        Each `SingleAgentEpisode` instances in `MultiAgentEpisode.agent_epiosdes`</span>
@@ -3308,7 +3308,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.get_return">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_return.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_return">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_return</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_return</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">include_hanging_rewards</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -3340,7 +3340,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.get_agents_to_act">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_agents_to_act.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_agents_to_act">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_agents_to_act</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">AgentID</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_agents_to_act</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">AgentID</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a set of agent IDs required to send an action to `env.step()` next.</span>
 
 <span class="sd">        Those are generally the agents that received an observation in the most recent</span>
@@ -3359,7 +3359,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.get_agents_that_stepped">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_agents_that_stepped.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_agents_that_stepped">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_agents_that_stepped</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">AgentID</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_agents_that_stepped</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">AgentID</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a set of agent IDs of those agents that just finished stepping.</span>
 
 <span class="sd">        These are all the agents that have an observation logged at the last env</span>
@@ -3376,7 +3376,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.get_duration_s">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_duration_s.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_duration_s">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_duration_s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_duration_s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the duration of this Episode (chunk) in seconds.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_step_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="mf">0.0</span>
@@ -3385,7 +3385,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.env_steps">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.env_steps.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.env_steps">[docs]</a>
-    <span class="k">def</span> <span class="nf">env_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">env_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of environment steps.</span>
 
 <span class="sd">        Note, this episode instance could be a chunk of an actual episode.</span>
@@ -3399,7 +3399,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEpisode.agent_steps">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.agent_steps.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.agent_steps">[docs]</a>
-    <span class="k">def</span> <span class="nf">agent_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">agent_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of agent steps.</span>
 
 <span class="sd">        Note, there are &gt;= 1 agent steps per environment step.</span>
@@ -3411,7 +3411,7 @@ document.write(`
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span> <span class="k">for</span> <span class="n">eps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_episodes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">slice</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiAgentEpisode&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">slice</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiAgentEpisode&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Enable squared bracket indexing- and slicing syntax, e.g. episode[-4:].&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">slice_</span><span class="o">=</span><span class="n">item</span><span class="p">)</span>
@@ -3421,7 +3421,7 @@ document.write(`
                 <span class="s2">&quot;Only slice objects allowed with the syntax: `episode[a:b]`.&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_init_single_agent_episodes</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_single_agent_episodes</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">agent_module_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">AgentID</span><span class="p">,</span> <span class="n">ModuleID</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3605,7 +3605,7 @@ document.write(`
             <span class="c1"># .. and store it.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">agent_episodes</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">sa_episode</span>
 
-    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">what</span><span class="p">,</span>
@@ -3651,7 +3651,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_by_env_steps</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_data_by_agent_steps</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_data_by_agent_steps</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">what</span><span class="p">,</span>
@@ -3687,7 +3687,7 @@ document.write(`
             <span class="n">ret</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">agent_value</span>
         <span class="k">return</span> <span class="n">ret</span>
 
-    <span class="k">def</span> <span class="nf">_get_data_by_env_steps_as_list</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_data_by_env_steps_as_list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -3751,7 +3751,7 @@ document.write(`
             <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ret2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span>
 
-    <span class="k">def</span> <span class="nf">_get_data_by_env_steps</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_data_by_env_steps</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -3811,7 +3811,7 @@ document.write(`
                     <span class="n">ret</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">agent_values</span>
         <span class="k">return</span> <span class="n">ret</span>
 
-    <span class="k">def</span> <span class="nf">_get_single_agent_data_by_index</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_single_agent_data_by_index</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -3883,7 +3883,7 @@ document.write(`
                 <span class="o">**</span><span class="n">one_hot_discrete</span><span class="p">,</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_single_agent_data_by_env_step_indices</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_single_agent_data_by_env_step_indices</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -3988,7 +3988,7 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span>
 
-    <span class="k">def</span> <span class="nf">_get_hanging_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_hanging_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the hanging action/reward/extra_model_outputs for given agent.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">what</span> <span class="o">==</span> <span class="s2">&quot;actions&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hanging_actions_end</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">agent_id</span><span class="p">)</span>
@@ -3997,7 +3997,7 @@ document.write(`
         <span class="k">elif</span> <span class="n">what</span> <span class="o">==</span> <span class="s2">&quot;rewards&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hanging_rewards_end</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">agent_id</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_copy_hanging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentID</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;MultiAgentEpisode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_copy_hanging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentID</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;MultiAgentEpisode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Copies hanging action, reward, extra_model_outputs from `other` to `self.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">agent_id</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">_hanging_rewards_begin</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_hanging_rewards_begin</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">_hanging_rewards_begin</span><span class="p">[</span>
@@ -4012,7 +4012,7 @@ document.write(`
                 <span class="n">other</span><span class="o">.</span><span class="n">_hanging_extra_model_outputs_end</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_del_hanging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_del_hanging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Deletes all hanging action, reward, extra_model_outputs of given agent.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hanging_rewards_begin</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">agent_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
@@ -4020,7 +4020,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_hanging_extra_model_outputs_end</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">agent_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hanging_rewards_end</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">agent_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_del_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_del_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Deletes all data of given agent from this episode.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_del_hanging</span><span class="p">(</span><span class="n">agent_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">agent_episodes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">agent_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -4029,7 +4029,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_agent_to_module_mapping</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">agent_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">agent_t_started</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">agent_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_inf_lookback_buffer_or_dict</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_inf_lookback_buffer_or_dict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentID</span><span class="p">,</span>
         <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -4077,11 +4077,11 @@ document.write(`
             <span class="k">return</span> <span class="n">inf_lookback_buffer_or_dict</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;MultiAgentEpisode.is_numpy()&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">is_finalized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_finalized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;MultiAgentEpisode.to_numpy()&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
 </pre></div>

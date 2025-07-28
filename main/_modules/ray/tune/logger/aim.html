@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,22 +1392,22 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.logger.aim</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">ray.air.constants</span> <span class="kn">import</span> <span class="n">TRAINING_ITERATION</span>
-<span class="kn">from</span> <span class="nn">ray.tune.logger.logger</span> <span class="kn">import</span> <span class="n">LoggerCallback</span>
-<span class="kn">from</span> <span class="nn">ray.tune.result</span> <span class="kn">import</span> <span class="n">TIME_TOTAL_S</span><span class="p">,</span> <span class="n">TIMESTEPS_TOTAL</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils</span> <span class="kn">import</span> <span class="n">flatten_dict</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRAINING_ITERATION</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.logger.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggerCallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result</span><span class="w"> </span><span class="kn">import</span> <span class="n">TIME_TOTAL_S</span><span class="p">,</span> <span class="n">TIMESTEPS_TOTAL</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.experiment.trial</span> <span class="kn">import</span> <span class="n">Trial</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment.trial</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trial</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">aim.sdk</span> <span class="kn">import</span> <span class="n">Repo</span><span class="p">,</span> <span class="n">Run</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">aim.sdk</span><span class="w"> </span><span class="kn">import</span> <span class="n">Repo</span><span class="p">,</span> <span class="n">Run</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">Repo</span><span class="p">,</span> <span class="n">Run</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
 
@@ -1419,7 +1419,7 @@ document.write(`
 <div class="viewcode-block" id="AimLoggerCallback">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.logger.aim.AimLoggerCallback.html#ray.tune.logger.aim.AimLoggerCallback">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">AimLoggerCallback</span><span class="p">(</span><span class="n">LoggerCallback</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AimLoggerCallback</span><span class="p">(</span><span class="n">LoggerCallback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Aim Logger: logs metrics in Aim format.</span>
 
 <span class="sd">    Aim is an open-source, self-hosted ML experiment tracking tool.</span>
@@ -1451,7 +1451,7 @@ document.write(`
 
 <div class="viewcode-block" id="AimLoggerCallback.__init__">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.logger.aim.AimLoggerCallback.__init__.html#ray.tune.logger.aim.AimLoggerCallback.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">repo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Repo&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">experiment_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1477,7 +1477,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_trial_to_run</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">Run</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_create_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Run</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Run</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes an Aim Run object for a given trial.</span>
 
 <span class="sd">        Args:</span>
@@ -1500,7 +1500,7 @@ document.write(`
             <span class="n">run</span><span class="p">[</span><span class="s2">&quot;trial_ip&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trial_ip</span>
         <span class="k">return</span> <span class="n">run</span>
 
-    <span class="k">def</span> <span class="nf">log_trial_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">trial</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial_to_run</span><span class="p">:</span>
             <span class="c1"># Cleanup an existing run if the trial has been restarted</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_trial_to_run</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -1511,7 +1511,7 @@ document.write(`
         <span class="k">if</span> <span class="n">trial</span><span class="o">.</span><span class="n">evaluated_params</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log_trial_hparams</span><span class="p">(</span><span class="n">trial</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">log_trial_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="n">tmp_result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="n">step</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">TIMESTEPS_TOTAL</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">result</span><span class="p">[</span><span class="n">TRAINING_ITERATION</span><span class="p">]</span>
@@ -1551,11 +1551,11 @@ document.write(`
             <span class="p">):</span>
                 <span class="n">valid_result</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-    <span class="k">def</span> <span class="nf">log_trial_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">failed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">failed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="n">trial_run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial_to_run</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">trial</span><span class="p">)</span>
         <span class="n">trial_run</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_log_trial_hparams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_trial_hparams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">flatten_dict</span><span class="p">(</span><span class="n">trial</span><span class="o">.</span><span class="n">evaluated_params</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
         <span class="n">flat_params</span> <span class="o">=</span> <span class="n">flatten_dict</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 

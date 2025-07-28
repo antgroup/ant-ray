@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1389,18 +1389,18 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.exceptions</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">traceback</span> <span class="kn">import</span> <span class="n">format_exception</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">traceback</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_exception</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">colorama</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">colorama</span>
 
-<span class="kn">import</span> <span class="nn">ray._private.ray_constants</span> <span class="k">as</span> <span class="nn">ray_constants</span>
-<span class="kn">import</span> <span class="nn">ray.cloudpickle</span> <span class="k">as</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">ray._raylet</span> <span class="kn">import</span> <span class="n">ActorID</span><span class="p">,</span> <span class="n">TaskID</span><span class="p">,</span> <span class="n">WorkerID</span>
-<span class="kn">from</span> <span class="nn">ray.core.generated.common_pb2</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray._private.ray_constants</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ray_constants</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.cloudpickle</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._raylet</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActorID</span><span class="p">,</span> <span class="n">TaskID</span><span class="p">,</span> <span class="n">WorkerID</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.core.generated.common_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PYTHON</span><span class="p">,</span>
     <span class="n">ActorDiedErrorContext</span><span class="p">,</span>
     <span class="n">Address</span><span class="p">,</span>
@@ -1408,9 +1408,9 @@ document.write(`
     <span class="n">NodeDeathInfo</span><span class="p">,</span>
     <span class="n">RayException</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
-<span class="kn">import</span> <span class="nn">setproctitle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">setproctitle</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1418,10 +1418,10 @@ document.write(`
 <div class="viewcode-block" id="RayError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.RayError.html#ray.exceptions.RayError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">RayError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Super class of all ray exception types.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Extract exc_info from exception object.</span>
         <span class="n">exc_info</span> <span class="o">=</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__traceback__</span><span class="p">)</span>
         <span class="n">formatted_exception_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">format_exception</span><span class="p">(</span><span class="o">*</span><span class="n">exc_info</span><span class="p">))</span>
@@ -1432,19 +1432,19 @@ document.write(`
         <span class="p">)</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">()</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_bytes</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_bytes</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
         <span class="n">ray_exception</span> <span class="o">=</span> <span class="n">RayException</span><span class="p">()</span>
         <span class="n">ray_exception</span><span class="o">.</span><span class="n">ParseFromString</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">RayError</span><span class="o">.</span><span class="n">from_ray_exception</span><span class="p">(</span><span class="n">ray_exception</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_ray_exception</span><span class="p">(</span><span class="n">ray_exception</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_ray_exception</span><span class="p">(</span><span class="n">ray_exception</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">ray_exception</span><span class="o">.</span><span class="n">language</span> <span class="o">==</span> <span class="n">PYTHON</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">ray_exception</span><span class="o">.</span><span class="n">serialized_exception</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Failed to unpickle serialized exception&quot;</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">CrossLanguageError</span><span class="p">(</span><span class="n">ray_exception</span><span class="p">)</span></div>
 
@@ -1453,10 +1453,10 @@ document.write(`
 <div class="viewcode-block" id="CrossLanguageError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.CrossLanguageError.html#ray.exceptions.CrossLanguageError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">CrossLanguageError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CrossLanguageError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised from another language.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ray_exception</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ray_exception</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="s2">&quot;An exception raised from </span><span class="si">{}</span><span class="s2">:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">Language</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="n">ray_exception</span><span class="o">.</span><span class="n">language</span><span class="p">),</span>
@@ -1469,7 +1469,7 @@ document.write(`
 <div class="viewcode-block" id="TaskCancelledError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.TaskCancelledError.html#ray.exceptions.TaskCancelledError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">TaskCancelledError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TaskCancelledError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when this task is cancelled.</span>
 
 <span class="sd">    Args:</span>
@@ -1477,13 +1477,13 @@ document.write(`
 <span class="sd">            cancelled.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskID</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">error_message</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span> <span class="o">=</span> <span class="n">task_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">error_message</span> <span class="o">=</span> <span class="n">error_message</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Task: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_id</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; was cancelled. &quot;</span>
@@ -1496,7 +1496,7 @@ document.write(`
 <div class="viewcode-block" id="RayTaskError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.RayTaskError.html#ray.exceptions.RayTaskError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">RayTaskError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayTaskError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that a task threw an exception during execution.</span>
 
 <span class="sd">    If a task throws an exception during execution, a RayTaskError is stored in</span>
@@ -1506,7 +1506,7 @@ document.write(`
 <span class="sd">    thrown propagating the error message.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">function_name</span><span class="p">,</span>
         <span class="n">traceback_str</span><span class="p">,</span>
@@ -1518,7 +1518,7 @@ document.write(`
         <span class="n">actor_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a RayTaskError.&quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">ray</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
         <span class="k">if</span> <span class="n">proctitle</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">proctitle</span> <span class="o">=</span> <span class="n">proctitle</span>
@@ -1550,7 +1550,7 @@ document.write(`
 
         <span class="k">assert</span> <span class="n">traceback_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">make_dual_exception_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RayTaskError&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_dual_exception_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RayTaskError&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Makes a object instance that inherits from both RayTaskError and the type of</span>
 <span class="sd">        `self.cause`. Raises TypeError if the cause class can&#39;t be subclassed&quot;&quot;&quot;</span>
         <span class="c1"># For normal user Exceptions, we subclass from both</span>
@@ -1564,22 +1564,22 @@ document.write(`
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_exceptiongroup_dual_exception_instance</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_normal_dual_exception_instance</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_make_normal_dual_exception_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RayTaskError&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_normal_dual_exception_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RayTaskError&quot;</span><span class="p">:</span>
         <span class="n">cause_cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cause</span><span class="o">.</span><span class="vm">__class__</span>
         <span class="n">error_msg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="k">class</span> <span class="nc">cls</span><span class="p">(</span><span class="n">RayTaskError</span><span class="p">,</span> <span class="n">cause_cls</span><span class="p">):</span>
-            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cause</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">cls</span><span class="p">(</span><span class="n">RayTaskError</span><span class="p">,</span> <span class="n">cause_cls</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cause</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cause</span> <span class="o">=</span> <span class="n">cause</span>
                 <span class="c1"># BaseException implements a __reduce__ method that returns</span>
                 <span class="c1"># a tuple with the type and the value of self.args.</span>
                 <span class="c1"># https://stackoverflow.com/a/49715949/2213289</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">cause</span><span class="p">,)</span>
 
-            <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
                 <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cause</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">error_msg</span>
 
         <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;RayTaskError(</span><span class="si">{</span><span class="n">cause_cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">)&quot;</span>
@@ -1588,26 +1588,26 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cause</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_make_exceptiongroup_dual_exception_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RayTaskError&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_exceptiongroup_dual_exception_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RayTaskError&quot;</span><span class="p">:</span>
         <span class="n">cause_cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cause</span><span class="o">.</span><span class="vm">__class__</span>
         <span class="n">error_msg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="k">class</span> <span class="nc">cls</span><span class="p">(</span><span class="n">RayTaskError</span><span class="p">,</span> <span class="n">cause_cls</span><span class="p">):</span>
-            <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cause</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">cls</span><span class="p">(</span><span class="n">RayTaskError</span><span class="p">,</span> <span class="n">cause_cls</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cause</span><span class="p">):</span>
                 <span class="bp">self</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cause</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">cause</span><span class="o">.</span><span class="n">exceptions</span><span class="p">)</span>
                 <span class="k">return</span> <span class="bp">self</span>
 
-            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cause</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cause</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cause</span> <span class="o">=</span> <span class="n">cause</span>
                 <span class="c1"># BaseException implements a __reduce__ method that returns</span>
                 <span class="c1"># a tuple with the type and the value of self.args.</span>
                 <span class="c1"># https://stackoverflow.com/a/49715949/2213289</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">cause</span><span class="p">,)</span>
 
-            <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
                 <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cause</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">error_msg</span>
 
         <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;RayTaskError(</span><span class="si">{</span><span class="n">cause_cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">)&quot;</span>
@@ -1616,7 +1616,7 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cause</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">as_instanceof_cause</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_instanceof_cause</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an exception that&#39;s an instance of the cause&#39;s class.</span>
 
 <span class="sd">        The returned exception inherits from both RayTaskError and the</span>
@@ -1640,7 +1640,7 @@ document.write(`
             <span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Format a RayTaskError as a string.&quot;&quot;&quot;</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">traceback_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1710,10 +1710,10 @@ document.write(`
 <div class="viewcode-block" id="LocalRayletDiedError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.LocalRayletDiedError.html#ray.exceptions.LocalRayletDiedError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">LocalRayletDiedError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LocalRayletDiedError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that the task&#39;s local raylet died.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;The task&#39;s local raylet died. Check raylet.out for more information.&quot;</span></div>
 
 
@@ -1721,10 +1721,10 @@ document.write(`
 <div class="viewcode-block" id="WorkerCrashedError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.WorkerCrashedError.html#ray.exceptions.WorkerCrashedError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">WorkerCrashedError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WorkerCrashedError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that the worker died unexpectedly while executing a task.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="s2">&quot;The worker died unexpectedly while executing this task. &quot;</span>
             <span class="s2">&quot;Check python-core-worker-*.log files for more information.&quot;</span>
@@ -1735,7 +1735,7 @@ document.write(`
 <div class="viewcode-block" id="RayActorError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.RayActorError.html#ray.exceptions.RayActorError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">RayActorError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayActorError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that the actor has outages unexpectedly before finishing a task.</span>
 
 <span class="sd">    This exception could happen because the actor process is dead, or is unavailable for</span>
@@ -1745,7 +1745,7 @@ document.write(`
 
     <span class="n">BASE_ERROR_MSG</span> <span class="o">=</span> <span class="s2">&quot;The actor experienced an error before finishing this task.&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">actor_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">error_msg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">BASE_ERROR_MSG</span><span class="p">,</span>
@@ -1761,15 +1761,15 @@ document.write(`
         <span class="c1">#: Whether the actor died because the node was preempted.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_preempted</span> <span class="o">=</span> <span class="n">preempted</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">preempted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">preempted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preempted</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">actor_init_failed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">actor_init_failed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actor_init_failed</span></div>
 
 
@@ -1777,7 +1777,7 @@ document.write(`
 <div class="viewcode-block" id="ActorDiedError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.ActorDiedError.html#ray.exceptions.ActorDiedError">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">ActorDiedError</span><span class="p">(</span><span class="n">RayActorError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ActorDiedError</span><span class="p">(</span><span class="n">RayActorError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that the actor died unexpectedly before finishing a task.</span>
 
 <span class="sd">    This exception could happen either because the actor process dies while</span>
@@ -1794,7 +1794,7 @@ document.write(`
 
     <span class="n">BASE_ERROR_MSG</span> <span class="o">=</span> <span class="s2">&quot;The actor died unexpectedly before finishing this task.&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">cause</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">RayTaskError</span><span class="p">,</span> <span class="n">ActorDiedErrorContext</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1848,7 +1848,7 @@ document.write(`
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">actor_id</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">,</span> <span class="n">actor_init_failed</span><span class="p">,</span> <span class="n">preempted</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_task_error</span><span class="p">(</span><span class="n">task_error</span><span class="p">:</span> <span class="n">RayTaskError</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_task_error</span><span class="p">(</span><span class="n">task_error</span><span class="p">:</span> <span class="n">RayTaskError</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ActorDiedError</span><span class="p">(</span><span class="n">task_error</span><span class="p">)</span></div>
 
 
@@ -1856,10 +1856,10 @@ document.write(`
 <div class="viewcode-block" id="ActorUnavailableError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.ActorUnavailableError.html#ray.exceptions.ActorUnavailableError">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">ActorUnavailableError</span><span class="p">(</span><span class="n">RayActorError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ActorUnavailableError</span><span class="p">(</span><span class="n">RayActorError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when the actor is temporarily unavailable but may be available later.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">actor_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">actor_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]):</span>
         <span class="n">actor_id</span> <span class="o">=</span> <span class="n">ActorID</span><span class="p">(</span><span class="n">actor_id</span><span class="p">)</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span> <span class="k">if</span> <span class="n">actor_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="n">error_msg</span> <span class="o">=</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;The actor </span><span class="si">{</span><span class="n">actor_id</span><span class="si">}</span><span class="s2"> is unavailable: </span><span class="si">{</span><span class="n">error_message</span><span class="si">}</span><span class="s2">. The task may or may&quot;</span>
@@ -1875,17 +1875,17 @@ document.write(`
 <div class="viewcode-block" id="RaySystemError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.RaySystemError.html#ray.exceptions.RaySystemError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">RaySystemError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RaySystemError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that Ray encountered a system error.</span>
 
 <span class="sd">    This exception can be thrown when the raylet is killed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_exc</span><span class="p">,</span> <span class="n">traceback_str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_exc</span><span class="p">,</span> <span class="n">traceback_str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client_exc</span> <span class="o">=</span> <span class="n">client_exc</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">traceback_str</span> <span class="o">=</span> <span class="n">traceback_str</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;System error: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">client_exc</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">traceback_str</span><span class="p">:</span>
             <span class="n">error_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">traceback: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">traceback_str</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -1894,7 +1894,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">UserCodeException</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserCodeException</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that an exception occurred while executing user code.</span>
 <span class="sd">    For example, this exception can be used to wrap user code exceptions</span>
 <span class="sd">    from a remote task or actor. The `retry_exceptions` parameter will</span>
@@ -1906,14 +1906,14 @@ document.write(`
 <div class="viewcode-block" id="ObjectStoreFullError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.ObjectStoreFullError.html#ray.exceptions.ObjectStoreFullError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">ObjectStoreFullError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectStoreFullError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that the object store is full.</span>
 
 <span class="sd">    This is raised if the attempt to store the object fails</span>
 <span class="sd">    because the object store is full even after multiple retries.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ObjectStoreFullError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span>
             <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="s2">&quot;The local object store is full of objects that are still in &quot;</span>
@@ -1926,14 +1926,14 @@ document.write(`
 <div class="viewcode-block" id="OutOfDiskError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.OutOfDiskError.html#ray.exceptions.OutOfDiskError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">OutOfDiskError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OutOfDiskError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that the local disk is full.</span>
 
 <span class="sd">    This is raised if the attempt to store the object fails</span>
 <span class="sd">    because both the object store and disk are full.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># TODO(scv119): expose more disk usage information and link to a doc.</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">OutOfDiskError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span>
             <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -1949,7 +1949,7 @@ document.write(`
 <div class="viewcode-block" id="OutOfMemoryError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.OutOfMemoryError.html#ray.exceptions.OutOfMemoryError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">OutOfMemoryError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OutOfMemoryError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that the node is running out of memory and is close to full.</span>
 
 <span class="sd">    This is raised if the node is low on memory and tasks or actors are being</span>
@@ -1957,10 +1957,10 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># TODO: (clarng) expose the error message string here and format it with proto</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span></div>
 
 
@@ -1968,14 +1968,14 @@ document.write(`
 <div class="viewcode-block" id="NodeDiedError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.NodeDiedError.html#ray.exceptions.NodeDiedError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">NodeDiedError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NodeDiedError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that the node is either dead or unreachable.&quot;&quot;&quot;</span>
 
     <span class="c1"># TODO: (clarng) expose the error message string here and format it with proto</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span></div>
 
 
@@ -1983,7 +1983,7 @@ document.write(`
 <div class="viewcode-block" id="ObjectLostError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.ObjectLostError.html#ray.exceptions.ObjectLostError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">ObjectLostError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectLostError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that the object is lost from distributed memory, due to</span>
 <span class="sd">    node failure or system error.</span>
 
@@ -1991,14 +1991,14 @@ document.write(`
 <span class="sd">        object_ref_hex: Hex ID of the object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_ref_hex</span><span class="p">,</span> <span class="n">owner_address</span><span class="p">,</span> <span class="n">call_site</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_ref_hex</span><span class="p">,</span> <span class="n">owner_address</span><span class="p">,</span> <span class="n">call_site</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">object_ref_hex</span> <span class="o">=</span> <span class="n">object_ref_hex</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">owner_address</span> <span class="o">=</span> <span class="n">owner_address</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">call_site</span> <span class="o">=</span> <span class="n">call_site</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
             <span class="n">ray_constants</span><span class="o">.</span><span class="n">CALL_STACK_LINE_DELIMITER</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  &quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_base_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_base_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to retrieve object </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">object_ref_hex</span><span class="si">}</span><span class="s2">. &quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">call_site</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;The ObjectRef was created at: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">call_site</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -2011,7 +2011,7 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">msg</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_base_str</span><span class="p">()</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
@@ -2027,14 +2027,14 @@ document.write(`
 <div class="viewcode-block" id="ObjectFetchTimedOutError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.ObjectFetchTimedOutError.html#ray.exceptions.ObjectFetchTimedOutError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">ObjectFetchTimedOutError</span><span class="p">(</span><span class="n">ObjectLostError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectFetchTimedOutError</span><span class="p">(</span><span class="n">ObjectLostError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that an object fetch timed out.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        object_ref_hex: Hex ID of the object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_base_str</span><span class="p">()</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
@@ -2048,19 +2048,19 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">RpcError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RpcError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates an error in the underlying RPC system.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">rpc_code</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">rpc_code</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rpc_code</span> <span class="o">=</span> <span class="n">rpc_code</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">ReferenceCountingAssertionError</span><span class="p">(</span><span class="n">ObjectLostError</span><span class="p">,</span> <span class="ne">AssertionError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ReferenceCountingAssertionError</span><span class="p">(</span><span class="n">ObjectLostError</span><span class="p">,</span> <span class="ne">AssertionError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that an object has been deleted while there was still a</span>
 <span class="sd">    reference to it.</span>
 
@@ -2068,7 +2068,7 @@ document.write(`
 <span class="sd">        object_ref_hex: Hex ID of the object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_base_str</span><span class="p">()</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
@@ -2080,14 +2080,14 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">ObjectFreedError</span><span class="p">(</span><span class="n">ObjectLostError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectFreedError</span><span class="p">(</span><span class="n">ObjectLostError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that an object was manually freed by the application.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        object_ref_hex: Hex ID of the object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_base_str</span><span class="p">()</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
@@ -2102,7 +2102,7 @@ document.write(`
 <div class="viewcode-block" id="OwnerDiedError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.OwnerDiedError.html#ray.exceptions.OwnerDiedError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">OwnerDiedError</span><span class="p">(</span><span class="n">ObjectLostError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OwnerDiedError</span><span class="p">(</span><span class="n">ObjectLostError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that the owner of the object has died while there is still a</span>
 <span class="sd">    reference to the object.</span>
 
@@ -2110,7 +2110,7 @@ document.write(`
 <span class="sd">        object_ref_hex: Hex ID of the object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">log_loc</span> <span class="o">=</span> <span class="s2">&quot;`/tmp/ray/session_latest/logs`&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">owner_address</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -2144,14 +2144,14 @@ document.write(`
 <div class="viewcode-block" id="ObjectReconstructionFailedError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.ObjectReconstructionFailedError.html#ray.exceptions.ObjectReconstructionFailedError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">ObjectReconstructionFailedError</span><span class="p">(</span><span class="n">ObjectLostError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectReconstructionFailedError</span><span class="p">(</span><span class="n">ObjectLostError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that the object cannot be reconstructed.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        object_ref_hex: Hex ID of the object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_base_str</span><span class="p">()</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
@@ -2167,7 +2167,7 @@ document.write(`
 <div class="viewcode-block" id="ObjectReconstructionFailedMaxAttemptsExceededError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.ObjectReconstructionFailedMaxAttemptsExceededError.html#ray.exceptions.ObjectReconstructionFailedMaxAttemptsExceededError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">ObjectReconstructionFailedMaxAttemptsExceededError</span><span class="p">(</span><span class="n">ObjectLostError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectReconstructionFailedMaxAttemptsExceededError</span><span class="p">(</span><span class="n">ObjectLostError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that the object cannot be reconstructed because the maximum</span>
 <span class="sd">    number of task retries has been exceeded.</span>
 
@@ -2175,7 +2175,7 @@ document.write(`
 <span class="sd">        object_ref_hex: Hex ID of the object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_base_str</span><span class="p">()</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
@@ -2192,7 +2192,7 @@ document.write(`
 <div class="viewcode-block" id="ObjectReconstructionFailedLineageEvictedError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.ObjectReconstructionFailedLineageEvictedError.html#ray.exceptions.ObjectReconstructionFailedLineageEvictedError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">ObjectReconstructionFailedLineageEvictedError</span><span class="p">(</span><span class="n">ObjectLostError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectReconstructionFailedLineageEvictedError</span><span class="p">(</span><span class="n">ObjectLostError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that the object cannot be reconstructed because its lineage</span>
 <span class="sd">    was evicted due to memory pressure.</span>
 
@@ -2200,7 +2200,7 @@ document.write(`
 <span class="sd">        object_ref_hex: Hex ID of the object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_base_str</span><span class="p">()</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
@@ -2217,7 +2217,7 @@ document.write(`
 <div class="viewcode-block" id="GetTimeoutError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.GetTimeoutError.html#ray.exceptions.GetTimeoutError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">GetTimeoutError</span><span class="p">(</span><span class="n">RayError</span><span class="p">,</span> <span class="ne">TimeoutError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GetTimeoutError</span><span class="p">(</span><span class="n">RayError</span><span class="p">,</span> <span class="ne">TimeoutError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that a call to the worker timed out.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
@@ -2227,7 +2227,7 @@ document.write(`
 <div class="viewcode-block" id="PlasmaObjectNotAvailable">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.PlasmaObjectNotAvailable.html#ray.exceptions.PlasmaObjectNotAvailable">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">PlasmaObjectNotAvailable</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlasmaObjectNotAvailable</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Called when an object was not available within the given timeout.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
@@ -2237,7 +2237,7 @@ document.write(`
 <div class="viewcode-block" id="AsyncioActorExit">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.AsyncioActorExit.html#ray.exceptions.AsyncioActorExit">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">AsyncioActorExit</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AsyncioActorExit</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an asyncio actor intentionally exits via exit_actor().&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
@@ -2247,7 +2247,7 @@ document.write(`
 <div class="viewcode-block" id="RuntimeEnvSetupError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.RuntimeEnvSetupError.html#ray.exceptions.RuntimeEnvSetupError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">RuntimeEnvSetupError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RuntimeEnvSetupError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a runtime environment fails to be set up.</span>
 
 <span class="sd">    Args:</span>
@@ -2255,10 +2255,10 @@ document.write(`
 <span class="sd">            why runtime env setup has failed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">error_message</span> <span class="o">=</span> <span class="n">error_message</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">msgs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Failed to set up runtime environment.&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_message</span><span class="p">:</span>
             <span class="n">msgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_message</span><span class="p">)</span>
@@ -2269,10 +2269,10 @@ document.write(`
 <div class="viewcode-block" id="TaskPlacementGroupRemoved">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.TaskPlacementGroupRemoved.html#ray.exceptions.TaskPlacementGroupRemoved">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">TaskPlacementGroupRemoved</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TaskPlacementGroupRemoved</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when the corresponding placement group was removed.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;The placement group corresponding to this task has been removed.&quot;</span></div>
 
 
@@ -2280,10 +2280,10 @@ document.write(`
 <div class="viewcode-block" id="ActorPlacementGroupRemoved">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.ActorPlacementGroupRemoved.html#ray.exceptions.ActorPlacementGroupRemoved">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">ActorPlacementGroupRemoved</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ActorPlacementGroupRemoved</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when the corresponding placement group was removed.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;The placement group corresponding to this Actor has been removed.&quot;</span></div>
 
 
@@ -2291,7 +2291,7 @@ document.write(`
 <div class="viewcode-block" id="PendingCallsLimitExceeded">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.PendingCallsLimitExceeded.html#ray.exceptions.PendingCallsLimitExceeded">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">PendingCallsLimitExceeded</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PendingCallsLimitExceeded</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when the pending actor calls exceeds `max_pending_calls` option.</span>
 
 <span class="sd">    This exception could happen probably because the caller calls the callee</span>
@@ -2305,17 +2305,17 @@ document.write(`
 <div class="viewcode-block" id="TaskUnschedulableError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.TaskUnschedulableError.html#ray.exceptions.TaskUnschedulableError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">TaskUnschedulableError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TaskUnschedulableError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when the task cannot be scheduled.</span>
 
 <span class="sd">    One example is that the node specified through</span>
 <span class="sd">    NodeAffinitySchedulingStrategy is dead.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">error_message</span> <span class="o">=</span> <span class="n">error_message</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;The task is not schedulable: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">error_message</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
 
@@ -2323,23 +2323,23 @@ document.write(`
 <div class="viewcode-block" id="ActorUnschedulableError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.ActorUnschedulableError.html#ray.exceptions.ActorUnschedulableError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">ActorUnschedulableError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ActorUnschedulableError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when the actor cannot be scheduled.</span>
 
 <span class="sd">    One example is that the node specified through</span>
 <span class="sd">    NodeAffinitySchedulingStrategy is dead.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">error_message</span> <span class="o">=</span> <span class="n">error_message</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;The actor is not schedulable: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">error_message</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">ObjectRefStreamEndOfStreamError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectRefStreamEndOfStreamError</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised by streaming generator tasks when there are no more ObjectRefs to</span>
 <span class="sd">    read.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2348,7 +2348,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">OufOfBandObjectRefSerializationException</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OufOfBandObjectRefSerializationException</span><span class="p">(</span><span class="n">RayError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an `ray.ObjectRef` is out of band serialized by</span>
 <span class="sd">    `ray.cloudpickle`. It is an anti pattern.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2359,7 +2359,7 @@ document.write(`
 <div class="viewcode-block" id="RayChannelError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.RayChannelError.html#ray.exceptions.RayChannelError">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RayChannelError</span><span class="p">(</span><span class="n">RaySystemError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayChannelError</span><span class="p">(</span><span class="n">RaySystemError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates that Ray encountered a system error related</span>
 <span class="sd">    to ray.experimental.channel.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2371,7 +2371,7 @@ document.write(`
 <div class="viewcode-block" id="RayChannelTimeoutError">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.RayChannelTimeoutError.html#ray.exceptions.RayChannelTimeoutError">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RayChannelTimeoutError</span><span class="p">(</span><span class="n">RayChannelError</span><span class="p">,</span> <span class="ne">TimeoutError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayChannelTimeoutError</span><span class="p">(</span><span class="n">RayChannelError</span><span class="p">,</span> <span class="ne">TimeoutError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when the Compiled Graph channel operation times out.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
@@ -2381,7 +2381,7 @@ document.write(`
 <div class="viewcode-block" id="RayCgraphCapacityExceeded">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.exceptions.RayCgraphCapacityExceeded.html#ray.exceptions.RayCgraphCapacityExceeded">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RayCgraphCapacityExceeded</span><span class="p">(</span><span class="n">RaySystemError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayCgraphCapacityExceeded</span><span class="p">(</span><span class="n">RaySystemError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when the Compiled Graph channel&#39;s buffer is at max capacity&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>

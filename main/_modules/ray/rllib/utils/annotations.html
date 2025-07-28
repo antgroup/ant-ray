@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,11 +1389,11 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.utils.annotations</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="n">Deprecated</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">_mark_annotated</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">_mark_annotated</span>
 
 
-<span class="k">def</span> <span class="nf">override</span><span class="p">(</span><span class="n">parent_cls</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">override</span><span class="p">(</span><span class="n">parent_cls</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator for documenting method overrides.</span>
 
 <span class="sd">    Args:</span>
@@ -1417,12 +1417,12 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">class</span> <span class="nc">OverrideCheck</span><span class="p">:</span>
-        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">expected_parent_cls</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">OverrideCheck</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">expected_parent_cls</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">expected_parent_cls</span> <span class="o">=</span> <span class="n">expected_parent_cls</span>
 
-        <span class="k">def</span> <span class="nf">__set_name__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">__set_name__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
             <span class="c1"># Check if the owner (the class) is a subclass of the expected base class</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_parent_cls</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -1432,7 +1432,7 @@ document.write(`
             <span class="c1"># Set the function as a regular method on the class.</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
         <span class="c1"># Check, whether `method` is actually defined by the parent class.</span>
         <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">parent_cls</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span>
@@ -1447,7 +1447,7 @@ document.write(`
     <span class="k">return</span> <span class="n">decorator</span>
 
 
-<span class="k">def</span> <span class="nf">PublicAPI</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">PublicAPI</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator for documenting public APIs.</span>
 
 <span class="sd">    Public APIs are classes and methods exposed to end users of RLlib. You</span>
@@ -1475,7 +1475,7 @@ document.write(`
     <span class="k">return</span> <span class="n">obj</span>
 
 
-<span class="k">def</span> <span class="nf">DeveloperAPI</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">DeveloperAPI</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator for documenting developer APIs.</span>
 
 <span class="sd">    Developer APIs are classes and methods explicitly exposed to developers</span>
@@ -1502,7 +1502,7 @@ document.write(`
     <span class="k">return</span> <span class="n">obj</span>
 
 
-<span class="k">def</span> <span class="nf">ExperimentalAPI</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ExperimentalAPI</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator for documenting experimental APIs.</span>
 
 <span class="sd">    Experimental APIs are classes and methods that are in development and may</span>
@@ -1533,7 +1533,7 @@ document.write(`
 
 <div class="viewcode-block" id="OldAPIStack">
 <a class="viewcode-back" href="../../../../rllib/rllib-dev.html#ray.rllib.utils.annotations.OldAPIStack">[docs]</a>
-<span class="k">def</span> <span class="nf">OldAPIStack</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">OldAPIStack</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator for classes/methods/functions belonging to the old API stack.</span>
 
 <span class="sd">    These should be deprecated at some point after Ray 3.0 (RLlib GA).</span>
@@ -1547,7 +1547,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">OverrideToImplementCustomLogic</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">OverrideToImplementCustomLogic</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Users should override this in their sub-classes to implement custom logic.</span>
 
 <span class="sd">    Used in Algorithm and Policy to tag methods that need overriding, e.g.</span>
@@ -1569,7 +1569,7 @@ document.write(`
     <span class="k">return</span> <span class="n">obj</span>
 
 
-<span class="k">def</span> <span class="nf">OverrideToImplementCustomLogic_CallToSuperRecommended</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">OverrideToImplementCustomLogic_CallToSuperRecommended</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Users should override this in their sub-classes to implement custom logic.</span>
 
 <span class="sd">    Thereby, it is recommended (but not required) to call the super-class&#39;</span>
@@ -1594,7 +1594,7 @@ document.write(`
     <span class="k">return</span> <span class="n">obj</span>
 
 
-<span class="k">def</span> <span class="nf">is_overridden</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_overridden</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether a function has been overridden.</span>
 
 <span class="sd">    Note, this only works for API calls decorated with OverrideToImplementCustomLogic</span>

@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,29 +1389,29 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data.preprocessor</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">abc</span>
-<span class="kn">import</span> <span class="nn">base64</span>
-<span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">ray.air.util.data_batch_conversion</span> <span class="kn">import</span> <span class="n">BatchFormat</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.util.data_batch_conversion</span><span class="w"> </span><span class="kn">import</span> <span class="n">BatchFormat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-    <span class="kn">from</span> <span class="nn">ray.air.data_batch_type</span> <span class="kn">import</span> <span class="n">DataBatchType</span>
-    <span class="kn">from</span> <span class="nn">ray.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.data_batch_type</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataBatchType</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 
 <div class="viewcode-block" id="PreprocessorNotFittedException">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.PreprocessorNotFittedException.html#ray.data.preprocessors.PreprocessorNotFittedException">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">PreprocessorNotFittedException</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PreprocessorNotFittedException</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Error raised when the preprocessor needs to be fitted first.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
@@ -1421,7 +1421,7 @@ document.write(`
 <div class="viewcode-block" id="Preprocessor">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.html#ray.data.preprocessors.Preprocessor">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Preprocessor</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Preprocessor</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Implements an ML preprocessing operation.</span>
 
 <span class="sd">    Preprocessors are stateful objects that can be fitted against a Dataset and used</span>
@@ -1443,7 +1443,7 @@ document.write(`
 <span class="sd">      implemented method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">class</span> <span class="nc">FitStatus</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">FitStatus</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The fit status of preprocessor.&quot;&quot;&quot;</span>
 
         <span class="n">NOT_FITTABLE</span> <span class="o">=</span> <span class="s2">&quot;NOT_FITTABLE&quot;</span>
@@ -1459,7 +1459,7 @@ document.write(`
     <span class="c1"># Preprocessors that do not need to be fitted must override this.</span>
     <span class="n">_is_fittable</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_check_has_fitted_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_has_fitted_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks if the Preprocessor has fitted state.</span>
 
 <span class="sd">        This is also used as an indiciation if the Preprocessor has been fit, following</span>
@@ -1471,7 +1471,7 @@ document.write(`
         <span class="n">fitted_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)]</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">fitted_vars</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">fit_status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Preprocessor.FitStatus&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Preprocessor.FitStatus&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_fittable</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Preprocessor</span><span class="o">.</span><span class="n">FitStatus</span><span class="o">.</span><span class="n">NOT_FITTABLE</span>
         <span class="k">elif</span> <span class="p">(</span>
@@ -1483,7 +1483,7 @@ document.write(`
 
 <div class="viewcode-block" id="Preprocessor.fit">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.fit.html#ray.data.preprocessors.Preprocessor.fit">[docs]</a>
-    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Preprocessor&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Preprocessor&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fit this Preprocessor to the Dataset.</span>
 
 <span class="sd">        Fitted state attributes will be directly set in the Preprocessor.</span>
@@ -1519,7 +1519,7 @@ document.write(`
 
 <div class="viewcode-block" id="Preprocessor.fit_transform">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.fit_transform.html#ray.data.preprocessors.Preprocessor.fit_transform">[docs]</a>
-    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fit this Preprocessor to the Dataset and then transform the Dataset.</span>
 
 <span class="sd">        Calling it more than once will overwrite all previously fitted state:</span>
@@ -1538,7 +1538,7 @@ document.write(`
 
 <div class="viewcode-block" id="Preprocessor.transform">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.transform.html#ray.data.preprocessors.Preprocessor.transform">[docs]</a>
-    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform the given dataset.</span>
 
 <span class="sd">        Args:</span>
@@ -1565,7 +1565,7 @@ document.write(`
 
 <div class="viewcode-block" id="Preprocessor.transform_batch">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.transform_batch.html#ray.data.preprocessors.Preprocessor.transform_batch">[docs]</a>
-    <span class="k">def</span> <span class="nf">transform_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="s2">&quot;DataBatchType&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataBatchType&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transform_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="s2">&quot;DataBatchType&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataBatchType&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform a single batch of data.</span>
 
 <span class="sd">        The data will be converted to the format supported by the Preprocessor,</span>
@@ -1592,11 +1592,11 @@ document.write(`
 
 
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Preprocessor&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Preprocessor&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sub-classes should override this instead of fit().&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_determine_transform_to_use</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BatchFormat</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_determine_transform_to_use</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BatchFormat</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine which batch format to use based on Preprocessor implementation.</span>
 
 <span class="sd">        * If only `_transform_pandas` is implemented, then use ``pandas`` batch format.</span>
@@ -1625,7 +1625,7 @@ document.write(`
                 <span class="s2">&quot;for Preprocessor transforms.&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
         <span class="c1"># TODO(matt): Expose `batch_size` or similar configurability.</span>
         <span class="c1"># The default may be too small for some datasets and too large for others.</span>
         <span class="n">transform_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_determine_transform_to_use</span><span class="p">()</span>
@@ -1647,25 +1647,25 @@ document.write(`
                 <span class="sa">f</span><span class="s1">&#39;&quot;pandas&quot; and &quot;numpy&quot; allowed, but got: </span><span class="si">{</span><span class="n">transform_type</span><span class="si">}</span><span class="s1">&#39;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_transform_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_transform_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns kwargs to be passed to :meth:`ray.data.Dataset.map_batches`.</span>
 
 <span class="sd">        This can be implemented by subclassing preprocessors.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">_transform_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="s2">&quot;DataBatchType&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataBatchType&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_transform_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="s2">&quot;DataBatchType&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataBatchType&quot;</span><span class="p">:</span>
         <span class="c1"># For minimal install to locally import air modules</span>
-        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-        <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-        <span class="kn">from</span> <span class="nn">ray.air.util.data_batch_conversion</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.util.data_batch_conversion</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">_convert_batch_type_to_numpy</span><span class="p">,</span>
             <span class="n">_convert_batch_type_to_pandas</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">pyarrow</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="n">pyarrow</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -1686,7 +1686,7 @@ document.write(`
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform_numpy</span><span class="p">(</span><span class="n">_convert_batch_type_to_numpy</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_derive_and_validate_output_columns</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_derive_and_validate_output_columns</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">output_columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the output columns after validation.</span>
@@ -1707,12 +1707,12 @@ document.write(`
         <span class="k">return</span> <span class="n">output_columns</span> <span class="ow">or</span> <span class="n">columns</span>
 
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">_transform_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_transform_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the transformation on a data batch in a Pandas DataFrame format.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">_transform_numpy</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_transform_numpy</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">np_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;np.ndarray&quot;</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;np.ndarray&quot;</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;np.ndarray&quot;</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;np.ndarray&quot;</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the transformation on a data batch in a NumPy ndarray format.&quot;&quot;&quot;</span>
@@ -1722,7 +1722,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.preferred_batch_format.html#ray.data.preprocessors.Preprocessor.preferred_batch_format">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">preferred_batch_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BatchFormat</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">preferred_batch_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BatchFormat</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Batch format hint for upstream producers to try yielding best block format.</span>
 
 <span class="sd">        The preferred batch format to use if both `_transform_pandas` and</span>
@@ -1737,7 +1737,7 @@ document.write(`
 <div class="viewcode-block" id="Preprocessor.serialize">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.serialize.html#ray.data.preprocessors.Preprocessor.serialize">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return this preprocessor serialized as a string.</span>
 <span class="sd">        Note: this is not a stable serialization format as it uses `pickle`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1750,7 +1750,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.deserialize.html#ray.data.preprocessors.Preprocessor.deserialize">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="n">serialized</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Preprocessor&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">deserialize</span><span class="p">(</span><span class="n">serialized</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Preprocessor&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the original preprocessor serialized via `self.serialize()`.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">serialized</span><span class="p">))</span></div>
 </div>

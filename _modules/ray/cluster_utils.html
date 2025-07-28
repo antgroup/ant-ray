@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1389,24 +1389,24 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.cluster_utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray._private.services</span>
-<span class="kn">from</span> <span class="nn">ray._private</span> <span class="kn">import</span> <span class="n">ray_constants</span>
-<span class="kn">from</span> <span class="nn">ray._private.client_mode_hook</span> <span class="kn">import</span> <span class="n">disable_client_hook</span>
-<span class="kn">from</span> <span class="nn">ray._raylet</span> <span class="kn">import</span> <span class="n">GcsClientOptions</span>
-<span class="kn">from</span> <span class="nn">ray.autoscaler._private.fake_multi_node.node_provider</span> <span class="kn">import</span> <span class="n">FAKE_HEAD_NODE_ID</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray._private.services</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private</span><span class="w"> </span><span class="kn">import</span> <span class="n">ray_constants</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.client_mode_hook</span><span class="w"> </span><span class="kn">import</span> <span class="n">disable_client_hook</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._raylet</span><span class="w"> </span><span class="kn">import</span> <span class="n">GcsClientOptions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.autoscaler._private.fake_multi_node.node_provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">FAKE_HEAD_NODE_ID</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1416,13 +1416,13 @@ document.write(`
 <div class="viewcode-block" id="AutoscalingCluster">
 <a class="viewcode-back" href="../../ray-contribute/fake-autoscaler.html#ray.cluster_utils.AutoscalingCluster">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">AutoscalingCluster</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AutoscalingCluster</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a local autoscaling cluster for testing.</span>
 
 <span class="sd">    See test_autoscaler_fake_multinode.py for an end-to-end example.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">head_resources</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
         <span class="n">worker_node_types</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
@@ -1444,7 +1444,7 @@ document.write(`
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_autoscaler_v2</span> <span class="o">=</span> <span class="n">autoscaler_v2</span>
 
-    <span class="k">def</span> <span class="nf">_generate_config</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_config</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">head_resources</span><span class="p">,</span> <span class="n">worker_node_types</span><span class="p">,</span> <span class="n">autoscaler_v2</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">config_kwargs</span>
     <span class="p">):</span>
         <span class="n">base_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span>
@@ -1472,7 +1472,7 @@ document.write(`
 
 <div class="viewcode-block" id="AutoscalingCluster.start">
 <a class="viewcode-back" href="../../ray-contribute/fake-autoscaler.html#ray.cluster_utils.AutoscalingCluster.start">[docs]</a>
-    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_system_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">override_env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_system_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">override_env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Start the cluster.</span>
 
 <span class="sd">        After this call returns, you can connect to the cluster with</span>
@@ -1524,7 +1524,7 @@ document.write(`
 
 <div class="viewcode-block" id="AutoscalingCluster.shutdown">
 <a class="viewcode-back" href="../../ray-contribute/fake-autoscaler.html#ray.cluster_utils.AutoscalingCluster.shutdown">[docs]</a>
-    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Terminate the cluster.&quot;&quot;&quot;</span>
         <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">([</span><span class="s2">&quot;ray&quot;</span><span class="p">,</span> <span class="s2">&quot;stop&quot;</span><span class="p">,</span> <span class="s2">&quot;--force&quot;</span><span class="p">])</span></div>
 </div>
@@ -1532,8 +1532,8 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Cluster</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Cluster</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">initialize_head</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">connect</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1576,16 +1576,16 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">gcs_address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gcs_address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_node</span><span class="o">.</span><span class="n">gcs_address</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gcs_address</span>
 
-    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Connect the driver to the cluster.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span>
@@ -1599,7 +1599,7 @@ document.write(`
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">output_info</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wait</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">node_args</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wait</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">node_args</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a node to the local Ray Cluster.</span>
 
 <span class="sd">        All nodes are by default started with the following settings:</span>
@@ -1683,7 +1683,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">node</span>
 
-    <span class="k">def</span> <span class="nf">remove_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">allow_graceful</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">allow_graceful</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Kills all processes associated with worker node.</span>
 
 <span class="sd">        Args:</span>
@@ -1722,7 +1722,7 @@ document.write(`
             <span class="ow">not</span> <span class="n">node</span><span class="o">.</span><span class="n">any_processes_alive</span><span class="p">()</span>
         <span class="p">),</span> <span class="s2">&quot;There are zombie processes left over after killing.&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_wait_for_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_wait_for_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Wait until this node has appeared in the client table.</span>
 
 <span class="sd">        Args:</span>
@@ -1740,7 +1740,7 @@ document.write(`
             <span class="n">timeout</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">wait_for_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Waits for correct number of nodes to be registered.</span>
 
 <span class="sd">        This will wait until the number of live nodes in the client table</span>
@@ -1773,7 +1773,7 @@ document.write(`
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="s2">&quot;Timed out while waiting for nodes to join.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">list_all_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_all_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Lists all nodes.</span>
 
 <span class="sd">        TODO(rliaw): What is the desired behavior if a head node</span>
@@ -1787,7 +1787,7 @@ document.write(`
             <span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">head_node</span><span class="p">]</span> <span class="o">+</span> <span class="n">nodes</span>
         <span class="k">return</span> <span class="n">nodes</span>
 
-    <span class="k">def</span> <span class="nf">remaining_processes_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remaining_processes_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a bool indicating whether all processes are alive or not.</span>
 
 <span class="sd">        Note that this ignores processes that have been explicitly killed,</span>
@@ -1798,7 +1798,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">remaining_processes_alive</span><span class="p">()</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_all_nodes</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Removes all nodes.&quot;&quot;&quot;</span>
 
         <span class="c1"># We create a list here as a copy because `remove_node`</span>

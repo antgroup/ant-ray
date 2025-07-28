@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,26 +1389,26 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data.aggregate</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">abc</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">ray.data._internal.planner.exchange.sort_task_spec</span> <span class="kn">import</span> <span class="n">SortKey</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.util</span> <span class="kn">import</span> <span class="n">is_nan</span>
-<span class="kn">from</span> <span class="nn">ray.data.block</span> <span class="kn">import</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">Block</span><span class="p">,</span> <span class="n">BlockAccessor</span><span class="p">,</span> <span class="n">KeyType</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">U</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span><span class="p">,</span> <span class="n">Deprecated</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.planner.exchange.sort_task_spec</span><span class="w"> </span><span class="kn">import</span> <span class="n">SortKey</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_nan</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">Block</span><span class="p">,</span> <span class="n">BlockAccessor</span><span class="p">,</span> <span class="n">KeyType</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">U</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span><span class="p">,</span> <span class="n">Deprecated</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.data</span> <span class="kn">import</span> <span class="n">Schema</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Schema</span>
 
 
 <div class="viewcode-block" id="AggregateFn">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.aggregate.AggregateFn.html#ray.data.aggregate.AggregateFn">[docs]</a>
 <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;AggregateFn is deprecated, please use AggregateFnV2&quot;</span><span class="p">)</span>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">AggregateFn</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AggregateFn</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;NOTE: THIS IS DEPRECATED, PLEASE USE AggregateFnV2 INSTEAD</span>
 
 <span class="sd">    Defines how to perform a custom aggregation in Ray Data.</span>
@@ -1456,7 +1456,7 @@ document.write(`
 <span class="sd">            # result: [{&#39;group&#39;: &#39;A&#39;, &#39;custom_count&#39;: 2}, {&#39;group&#39;: &#39;B&#39;, &#39;custom_count&#39;: 1}]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">KeyType</span><span class="p">],</span> <span class="n">AggType</span><span class="p">],</span>
         <span class="n">merge</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">AggType</span><span class="p">,</span> <span class="n">AggType</span><span class="p">],</span> <span class="n">AggType</span><span class="p">],</span>
@@ -1474,7 +1474,7 @@ document.write(`
 
         <span class="k">if</span> <span class="n">accumulate_block</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 
-            <span class="k">def</span> <span class="nf">accumulate_block</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">accumulate_block</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
                 <span class="n">block_acc</span> <span class="o">=</span> <span class="n">BlockAccessor</span><span class="o">.</span><span class="n">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">block_acc</span><span class="o">.</span><span class="n">iter_rows</span><span class="p">(</span><span class="n">public_row_format</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
                     <span class="n">a</span> <span class="o">=</span> <span class="n">accumulate_row</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
@@ -1492,7 +1492,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">accumulate_block</span> <span class="o">=</span> <span class="n">accumulate_block</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">finalize</span> <span class="o">=</span> <span class="n">finalize</span>
 
-    <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Schema&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Schema&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Raise an error if this cannot be applied to the given schema.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
@@ -1501,7 +1501,7 @@ document.write(`
 <div class="viewcode-block" id="AggregateFnV2">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.aggregate.AggregateFnV2.html#ray.data.aggregate.AggregateFnV2">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">AggregateFnV2</span><span class="p">(</span><span class="n">AggregateFn</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AggregateFnV2</span><span class="p">(</span><span class="n">AggregateFn</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Provides an interface to implement efficient aggregations to be applied</span>
 <span class="sd">    to the dataset.</span>
 
@@ -1518,7 +1518,7 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">zero_factory</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">AggType</span><span class="p">],</span>
@@ -1550,13 +1550,13 @@ document.write(`
             <span class="n">finalize</span><span class="o">=</span><span class="n">_safe_finalize</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_target_column</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_target_column</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_col_name</span>
 
 <div class="viewcode-block" id="AggregateFnV2.combine">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.aggregate.AggregateFnV2.combine.html#ray.data.aggregate.AggregateFnV2.combine">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Combines new partially aggregated value (previously returned</span>
 <span class="sd">        from `aggregate_block` partial aggregations into a singular partial</span>
 <span class="sd">        aggregation) with the previously stored accumulator&quot;&quot;&quot;</span>
@@ -1566,18 +1566,18 @@ document.write(`
 <div class="viewcode-block" id="AggregateFnV2.aggregate_block">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.aggregate.AggregateFnV2.aggregate_block.html#ray.data.aggregate.AggregateFnV2.aggregate_block">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies aggregations to individual block (producing</span>
 <span class="sd">        partial aggregation results)&quot;&quot;&quot;</span>
         <span class="o">...</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms partial aggregation into its final state (by default</span>
 <span class="sd">        this is an identity transformation, ie no-op)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">accumulator</span>
 
-    <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Schema&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Schema&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_col_name</span><span class="p">:</span>
             <span class="n">SortKey</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target_col_name</span><span class="p">)</span><span class="o">.</span><span class="n">validate_schema</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span></div>
 
@@ -1586,10 +1586,10 @@ document.write(`
 <div class="viewcode-block" id="Count">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.aggregate.Count.html#ray.data.aggregate.Count">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">Count</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Count</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines count aggregation.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1602,7 +1602,7 @@ document.write(`
             <span class="n">zero_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="n">block_accessor</span> <span class="o">=</span> <span class="n">BlockAccessor</span><span class="o">.</span><span class="n">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_col_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1613,7 +1613,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_target_col_name</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_ignore_nulls</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">current_accumulator</span> <span class="o">+</span> <span class="n">new</span></div>
 
 
@@ -1621,10 +1621,10 @@ document.write(`
 <div class="viewcode-block" id="Sum">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.aggregate.Sum.html#ray.data.aggregate.Sum">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">Sum</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Sum</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines sum aggregation.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -1637,12 +1637,12 @@ document.write(`
             <span class="n">zero_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BlockAccessor</span><span class="o">.</span><span class="n">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_target_col_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ignore_nulls</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">current_accumulator</span> <span class="o">+</span> <span class="n">new</span></div>
 
 
@@ -1650,10 +1650,10 @@ document.write(`
 <div class="viewcode-block" id="Min">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.aggregate.Min.html#ray.data.aggregate.Min">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">Min</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Min</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines min aggregation.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -1666,12 +1666,12 @@ document.write(`
             <span class="n">zero_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;+inf&quot;</span><span class="p">),</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BlockAccessor</span><span class="o">.</span><span class="n">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_target_col_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ignore_nulls</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">current_accumulator</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span></div>
 
 
@@ -1679,10 +1679,10 @@ document.write(`
 <div class="viewcode-block" id="Max">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.aggregate.Max.html#ray.data.aggregate.Max">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">Max</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Max</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines max aggregation.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -1696,12 +1696,12 @@ document.write(`
             <span class="n">zero_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">),</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BlockAccessor</span><span class="o">.</span><span class="n">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_target_col_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ignore_nulls</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">current_accumulator</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span></div>
 
 
@@ -1709,10 +1709,10 @@ document.write(`
 <div class="viewcode-block" id="Mean">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.aggregate.Mean.html#ray.data.aggregate.Mean">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">Mean</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Mean</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines mean aggregation.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -1727,7 +1727,7 @@ document.write(`
             <span class="n">zero_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">list</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>  <span class="c1"># noqa: C410</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="n">block_acc</span> <span class="o">=</span> <span class="n">BlockAccessor</span><span class="o">.</span><span class="n">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
         <span class="n">count</span> <span class="o">=</span> <span class="n">block_acc</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target_col_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ignore_nulls</span><span class="p">)</span>
 
@@ -1745,10 +1745,10 @@ document.write(`
 
         <span class="k">return</span> <span class="p">[</span><span class="n">sum_</span><span class="p">,</span> <span class="n">count</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">current_accumulator</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">current_accumulator</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">new</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
 
-    <span class="k">def</span> <span class="nf">_finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">accumulator</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
@@ -1759,7 +1759,7 @@ document.write(`
 <div class="viewcode-block" id="Std">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.aggregate.Std.html#ray.data.aggregate.Std">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">Std</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Std</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines standard deviation aggregation.</span>
 
 <span class="sd">    Uses Welford&#39;s online method for an accumulator-style computation of the</span>
@@ -1771,7 +1771,7 @@ document.write(`
 <span class="sd">    https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford&#39;s_online_algorithm</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ddof</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -1789,7 +1789,7 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_ddof</span> <span class="o">=</span> <span class="n">ddof</span>
 
-    <span class="k">def</span> <span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="n">block_acc</span> <span class="o">=</span> <span class="n">BlockAccessor</span><span class="o">.</span><span class="n">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
         <span class="n">count</span> <span class="o">=</span> <span class="n">block_acc</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target_col_name</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_ignore_nulls</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">count</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1807,7 +1807,7 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">M2</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">count</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">new</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">new</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="c1"># Merges two accumulations into one.</span>
         <span class="c1"># See</span>
         <span class="c1"># https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm</span>
@@ -1824,7 +1824,7 @@ document.write(`
         <span class="n">M2</span> <span class="o">=</span> <span class="n">M2_a</span> <span class="o">+</span> <span class="n">M2_b</span> <span class="o">+</span> <span class="p">(</span><span class="n">delta</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">count_a</span> <span class="o">*</span> <span class="n">count_b</span> <span class="o">/</span> <span class="n">count</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">M2</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">count</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accumulator</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accumulator</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
         <span class="c1"># Compute the final standard deviation from the accumulated</span>
         <span class="c1"># sum of squared differences from current mean and the count.</span>
         <span class="n">M2</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="n">accumulator</span>
@@ -1837,10 +1837,10 @@ document.write(`
 <div class="viewcode-block" id="AbsMax">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.aggregate.AbsMax.html#ray.data.aggregate.AbsMax">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">AbsMax</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AbsMax</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines absolute max aggregation.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -1856,10 +1856,10 @@ document.write(`
             <span class="n">zero_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">current_accumulator</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="n">block_accessor</span> <span class="o">=</span> <span class="n">BlockAccessor</span><span class="o">.</span><span class="n">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
 
         <span class="n">max_</span> <span class="o">=</span> <span class="n">block_accessor</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target_col_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ignore_nulls</span><span class="p">)</span>
@@ -1878,10 +1878,10 @@ document.write(`
 <div class="viewcode-block" id="Quantile">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.aggregate.Quantile.html#ray.data.aggregate.Quantile">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">Quantile</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Quantile</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines Quantile aggregation.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
@@ -1897,7 +1897,7 @@ document.write(`
             <span class="n">zero_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">new</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">new</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_accumulator</span><span class="p">,</span> <span class="n">List</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="n">List</span><span class="p">):</span>
             <span class="n">current_accumulator</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">current_accumulator</span>
@@ -1922,7 +1922,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">ls</span>
 
-    <span class="k">def</span> <span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="n">block_acc</span> <span class="o">=</span> <span class="n">BlockAccessor</span><span class="o">.</span><span class="n">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
         <span class="n">ls</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -1931,7 +1931,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">ls</span>
 
-    <span class="k">def</span> <span class="nf">_finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accumulator</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accumulator</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ignore_nulls</span><span class="p">:</span>
             <span class="n">accumulator</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">accumulator</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_null</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1963,10 +1963,10 @@ document.write(`
 <div class="viewcode-block" id="Unique">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.aggregate.Unique.html#ray.data.aggregate.Unique">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">Unique</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Unique</span><span class="p">(</span><span class="n">AggregateFnV2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines unique aggregation.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">alias_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1978,17 +1978,17 @@ document.write(`
             <span class="n">zero_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_accumulator</span><span class="p">:</span> <span class="n">AggType</span><span class="p">,</span> <span class="n">new</span><span class="p">:</span> <span class="n">AggType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_set</span><span class="p">(</span><span class="n">current_accumulator</span><span class="p">)</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_set</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">pyarrow.compute</span> <span class="k">as</span> <span class="nn">pac</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">aggregate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.compute</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pac</span>
 
         <span class="n">col</span> <span class="o">=</span> <span class="n">BlockAccessor</span><span class="o">.</span><span class="n">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">)</span><span class="o">.</span><span class="n">to_arrow</span><span class="p">()</span><span class="o">.</span><span class="n">column</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target_col_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pac</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">to_pylist</span><span class="p">()</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_to_set</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_to_set</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">set</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">x</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -1998,11 +1998,11 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_is_null</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_null</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">a</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">is_nan</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_null_safe_zero_factory</span><span class="p">(</span><span class="n">zero_factory</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_null_safe_zero_factory</span><span class="p">(</span><span class="n">zero_factory</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;NOTE: PLEASE READ CAREFULLY BEFORE CHANGING</span>
 
 <span class="sd">    Null-safe zero factory is crucial for implementing proper aggregation</span>
@@ -2036,22 +2036,22 @@ document.write(`
 
     <span class="k">if</span> <span class="n">ignore_nulls</span><span class="p">:</span>
 
-        <span class="k">def</span> <span class="nf">_safe_zero_factory</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_safe_zero_factory</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">else</span><span class="p">:</span>
 
-        <span class="k">def</span> <span class="nf">_safe_zero_factory</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_safe_zero_factory</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">zero_factory</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">_safe_zero_factory</span>
 
 
-<span class="k">def</span> <span class="nf">_null_safe_aggregate</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_null_safe_aggregate</span><span class="p">(</span>
     <span class="n">aggregate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Block</span><span class="p">],</span> <span class="n">AggType</span><span class="p">],</span>
     <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Block</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">]]:</span>
-    <span class="k">def</span> <span class="nf">_safe_aggregate</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_safe_aggregate</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">]:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">aggregate</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
         <span class="c1"># NOTE: If `ignore_nulls=True`, aggregation will only be returning</span>
         <span class="c1">#       null if the block does NOT contain any non-null elements</span>
@@ -2063,10 +2063,10 @@ document.write(`
     <span class="k">return</span> <span class="n">_safe_aggregate</span>
 
 
-<span class="k">def</span> <span class="nf">_null_safe_finalize</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_null_safe_finalize</span><span class="p">(</span>
     <span class="n">finalize</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">AggType</span><span class="p">],</span> <span class="n">AggType</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">]],</span> <span class="n">AggType</span><span class="p">]:</span>
-    <span class="k">def</span> <span class="nf">_safe_finalize</span><span class="p">(</span><span class="n">acc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_safe_finalize</span><span class="p">(</span><span class="n">acc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AggType</span><span class="p">:</span>
         <span class="c1"># If accumulator container is not null, finalize.</span>
         <span class="c1"># Otherwise, return as is.</span>
         <span class="k">return</span> <span class="n">acc</span> <span class="k">if</span> <span class="n">_is_null</span><span class="p">(</span><span class="n">acc</span><span class="p">)</span> <span class="k">else</span> <span class="n">finalize</span><span class="p">(</span><span class="n">acc</span><span class="p">)</span>
@@ -2074,7 +2074,7 @@ document.write(`
     <span class="k">return</span> <span class="n">_safe_finalize</span>
 
 
-<span class="k">def</span> <span class="nf">_null_safe_combine</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_null_safe_combine</span><span class="p">(</span>
     <span class="n">combine</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">AggType</span><span class="p">,</span> <span class="n">AggType</span><span class="p">],</span> <span class="n">AggType</span><span class="p">],</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">]],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Null-safe combination have to be an associative operation</span>
@@ -2098,7 +2098,7 @@ document.write(`
 
     <span class="k">if</span> <span class="n">ignore_nulls</span><span class="p">:</span>
 
-        <span class="k">def</span> <span class="nf">_safe_combine</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_safe_combine</span><span class="p">(</span>
             <span class="n">cur</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">],</span> <span class="n">new</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">]</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">]:</span>
 
@@ -2111,7 +2111,7 @@ document.write(`
 
     <span class="k">else</span><span class="p">:</span>
 
-        <span class="k">def</span> <span class="nf">_safe_combine</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_safe_combine</span><span class="p">(</span>
             <span class="n">cur</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">],</span> <span class="n">new</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">]</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AggType</span><span class="p">]:</span>
 

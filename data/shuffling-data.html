@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1416,7 +1416,7 @@ input files to workers for reading.</p>
 <p>This is the fastest option for shuffle, and is a purely metadata operation. This
 option doesn’t shuffle the actual rows inside files, so the randomness might be
 poor if each file has many rows.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_images</span><span class="p">(</span>
     <span class="s2">&quot;s3://anonymous@ray-example-data/image-datasets/simple&quot;</span><span class="p">,</span>
@@ -1435,7 +1435,7 @@ size during iteration. See more details in
 <p>This is slower than shuffling ordering of files, and shuffles rows locally without
 network transfer. This local shuffle buffer can be used together with shuffling
 ordering of files; see <a class="reference internal" href="#shuffling-file-order"><span class="std std-ref">Shuffle the ordering of files</span></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_images</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/image-datasets/simple&quot;</span><span class="p">)</span>
 
@@ -1475,7 +1475,7 @@ shuffle buffer altogether and only <a class="reference internal" href="#shufflin
 <p>To randomly shuffle all rows globally, call <a class="reference internal" href="api/doc/ray.data.Dataset.random_shuffle.html#ray.data.Dataset.random_shuffle" title="ray.data.Dataset.random_shuffle"><code class="xref py py-meth docutils literal notranslate"><span class="pre">random_shuffle()</span></code></a>.
 This is the slowest option for shuffle, and requires transferring data across
 network between workers. This option achieves the best randomness among all options.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_images</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/image-datasets/simple&quot;</span><span class="p">)</span>
@@ -1541,7 +1541,7 @@ $<span class="w"> </span><span class="nv">RAY_DATA_PUSH_BASED_SHUFFLE</span><spa
 </div>
 <p>You can also specify the shuffle implementation during program execution by
 setting the <code class="docutils literal notranslate"><span class="pre">DataContext.use_push_based_shuffle</span></code> flag:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ctx</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataContext</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span>
 <span class="n">ctx</span><span class="o">.</span><span class="n">use_push_based_shuffle</span> <span class="o">=</span> <span class="kc">True</span>
@@ -1555,7 +1555,7 @@ setting the <code class="docutils literal notranslate"><span class="pre">DataCon
 <p>Large-scale shuffles can take a while to finish.
 For debugging purposes, shuffle operations support executing only part of the shuffle, so that you can collect an execution profile more quickly.
 Here is an example that shows how to limit a random shuffle operation to two output blocks:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ctx</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataContext</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span>
 <span class="n">ctx</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span>

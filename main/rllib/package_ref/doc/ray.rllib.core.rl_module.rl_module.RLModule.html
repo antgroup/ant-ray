@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1414,12 +1414,12 @@ document.write(`
 <span class="pre">inference_only=..,</span> <span class="pre">learner_only=..,</span> <span class="pre">model_config={..})</span></code> in their __init__ methods.</p>
 <p>Here is the pseudocode for how the forward methods are called:</p>
 <p>Example for creating a (inference-only) sampling loop:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo.torch.default_ppo_torch_rl_module</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo.torch.default_ppo_torch_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DefaultPPOTorchRLModule</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo.ppo_catalog</span> <span class="kn">import</span> <span class="n">PPOCatalog</span>
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo.ppo_catalog</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOCatalog</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
 <span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;CartPole-v1&quot;</span><span class="p">)</span>
 
@@ -1446,13 +1446,13 @@ document.write(`
 </pre></div>
 </div>
 <p>Example for training:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">torch</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo.torch.default_ppo_torch_rl_module</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo.torch.default_ppo_torch_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DefaultPPOTorchRLModule</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo.ppo_catalog</span> <span class="kn">import</span> <span class="n">PPOCatalog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo.ppo_catalog</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOCatalog</span>
 
 <span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;CartPole-v1&quot;</span><span class="p">)</span>
 
@@ -1471,13 +1471,13 @@ document.write(`
 </pre></div>
 </div>
 <p>Example for inference:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">torch</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo.torch.default_ppo_torch_rl_module</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo.torch.default_ppo_torch_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DefaultPPOTorchRLModule</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo.ppo_catalog</span> <span class="kn">import</span> <span class="n">PPOCatalog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo.ppo_catalog</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOCatalog</span>
 
 <span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;CartPole-v1&quot;</span><span class="p">)</span>
 

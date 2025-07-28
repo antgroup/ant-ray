@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1392,23 +1392,23 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.train.v2.api.context</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span><span class="p">,</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span>
-<span class="kn">from</span> <span class="nn">ray.train.v2._internal.execution.context</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span><span class="p">,</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2._internal.execution.context</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_train_context</span> <span class="k">as</span> <span class="n">get_internal_train_context</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
 
 <div class="viewcode-block" id="TrainContext">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.context.TrainContext.html#ray.train.v2.api.context.TrainContext">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TrainContext</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrainContext</span><span class="p">:</span>
 <div class="viewcode-block" id="TrainContext.get_metadata">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.context.TrainContext.get_metadata.html#ray.train.v2.api.context.TrainContext.get_metadata">[docs]</a>
     <span class="nd">@Deprecated</span>
-    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;[Deprecated] User metadata dict passed to the Trainer constructor.&quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.train.context</span> <span class="kn">import</span> <span class="n">_GET_METADATA_DEPRECATION_MESSAGE</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">_GET_METADATA_DEPRECATION_MESSAGE</span>
 
         <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span><span class="n">_GET_METADATA_DEPRECATION_MESSAGE</span><span class="p">)</span></div>
 
@@ -1416,9 +1416,9 @@ document.write(`
 <div class="viewcode-block" id="TrainContext.get_trial_name">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.context.TrainContext.get_trial_name.html#ray.train.v2.api.context.TrainContext.get_trial_name">[docs]</a>
     <span class="nd">@Deprecated</span>
-    <span class="k">def</span> <span class="nf">get_trial_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_trial_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;[Deprecated] Trial name for the corresponding trial.&quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.train.context</span> <span class="kn">import</span> <span class="n">_TUNE_SPECIFIC_CONTEXT_DEPRECATION_MESSAGE</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">_TUNE_SPECIFIC_CONTEXT_DEPRECATION_MESSAGE</span>
 
         <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span>
             <span class="n">_TUNE_SPECIFIC_CONTEXT_DEPRECATION_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;get_trial_name&quot;</span><span class="p">)</span>
@@ -1428,9 +1428,9 @@ document.write(`
 <div class="viewcode-block" id="TrainContext.get_trial_id">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.context.TrainContext.get_trial_id.html#ray.train.v2.api.context.TrainContext.get_trial_id">[docs]</a>
     <span class="nd">@Deprecated</span>
-    <span class="k">def</span> <span class="nf">get_trial_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_trial_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;[Deprecated] Trial id for the corresponding trial.&quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.train.context</span> <span class="kn">import</span> <span class="n">_TUNE_SPECIFIC_CONTEXT_DEPRECATION_MESSAGE</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">_TUNE_SPECIFIC_CONTEXT_DEPRECATION_MESSAGE</span>
 
         <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span>
             <span class="n">_TUNE_SPECIFIC_CONTEXT_DEPRECATION_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;get_trial_id&quot;</span><span class="p">)</span>
@@ -1440,9 +1440,9 @@ document.write(`
 <div class="viewcode-block" id="TrainContext.get_trial_resources">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.context.TrainContext.get_trial_resources.html#ray.train.v2.api.context.TrainContext.get_trial_resources">[docs]</a>
     <span class="nd">@Deprecated</span>
-    <span class="k">def</span> <span class="nf">get_trial_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_trial_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;[Deprecated] Trial resources for the corresponding trial.&quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.train.context</span> <span class="kn">import</span> <span class="n">_TUNE_SPECIFIC_CONTEXT_DEPRECATION_MESSAGE</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">_TUNE_SPECIFIC_CONTEXT_DEPRECATION_MESSAGE</span>
 
         <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span>
             <span class="n">_TUNE_SPECIFIC_CONTEXT_DEPRECATION_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;get_trial_resources&quot;</span><span class="p">)</span>
@@ -1452,13 +1452,13 @@ document.write(`
 <div class="viewcode-block" id="TrainContext.get_trial_dir">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.context.TrainContext.get_trial_dir.html#ray.train.v2.api.context.TrainContext.get_trial_dir">[docs]</a>
     <span class="nd">@Deprecated</span>
-    <span class="k">def</span> <span class="nf">get_trial_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_trial_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;[Deprecated] Log directory corresponding to the trial directory for a Tune session.</span>
 <span class="sd">        This is deprecated for Ray Train and should no longer be called in Ray Train workers.</span>
 
 <span class="sd">        If this directory is needed, please pass it into the `train_loop_config` directly.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.train.context</span> <span class="kn">import</span> <span class="n">_TUNE_SPECIFIC_CONTEXT_DEPRECATION_MESSAGE</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">_TUNE_SPECIFIC_CONTEXT_DEPRECATION_MESSAGE</span>
 
         <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span>
             <span class="n">_TUNE_SPECIFIC_CONTEXT_DEPRECATION_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;get_trial_dir&quot;</span><span class="p">)</span>
@@ -1467,14 +1467,14 @@ document.write(`
 
 <div class="viewcode-block" id="TrainContext.get_experiment_name">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.context.TrainContext.get_experiment_name.html#ray.train.v2.api.context.TrainContext.get_experiment_name">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_experiment_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_experiment_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Experiment name for the corresponding trial.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">get_internal_train_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_experiment_name</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="TrainContext.get_world_size">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.context.TrainContext.get_world_size.html#ray.train.v2.api.context.TrainContext.get_world_size">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_world_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_world_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current world size (i.e. total number of workers) for this run.</span>
 
 <span class="sd">        .. testcode::</span>
@@ -1505,7 +1505,7 @@ document.write(`
 
 <div class="viewcode-block" id="TrainContext.get_world_rank">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.context.TrainContext.get_world_rank.html#ray.train.v2.api.context.TrainContext.get_world_rank">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_world_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_world_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the world rank of this worker.</span>
 
 <span class="sd">        .. testcode::</span>
@@ -1535,7 +1535,7 @@ document.write(`
 
 <div class="viewcode-block" id="TrainContext.get_local_rank">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.context.TrainContext.get_local_rank.html#ray.train.v2.api.context.TrainContext.get_local_rank">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_local_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_local_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the local rank of this worker (rank of the worker on its node).</span>
 
 <span class="sd">        .. testcode::</span>
@@ -1568,7 +1568,7 @@ document.write(`
 
 <div class="viewcode-block" id="TrainContext.get_local_world_size">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.context.TrainContext.get_local_world_size.html#ray.train.v2.api.context.TrainContext.get_local_world_size">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_local_world_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_local_world_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the local world size of this node (i.e. number of workers on this node).</span>
 
 <span class="sd">        Example:</span>
@@ -1599,7 +1599,7 @@ document.write(`
 
 <div class="viewcode-block" id="TrainContext.get_node_rank">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.context.TrainContext.get_node_rank.html#ray.train.v2.api.context.TrainContext.get_node_rank">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_node_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_node_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the rank of this node.</span>
 
 <span class="sd">        Example:</span>
@@ -1631,7 +1631,7 @@ document.write(`
 <div class="viewcode-block" id="TrainContext.get_storage">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.context.TrainContext.get_storage.html#ray.train.v2.api.context.TrainContext.get_storage">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">get_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the :class:`~ray.train._internal.storage.StorageContext` storage</span>
 <span class="sd">        context which gives advanced access to the filesystem and paths</span>
 <span class="sd">        configured through `RunConfig`.</span>

@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1397,16 +1397,16 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.search.sample</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
-<span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">signature</span>
-<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">isclose</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">signature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">isclose</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># Backwards compatibility</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="c1"># Added in numpy&gt;=1.17 but we require numpy&gt;=1.16</span>
@@ -1414,7 +1414,7 @@ document.write(`
     <span class="n">LEGACY_RNG</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
 
-    <span class="k">class</span> <span class="nc">np_random_generator</span><span class="p">:</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">np_random_generator</span><span class="p">:</span>
         <span class="k">pass</span>
 
     <span class="n">LEGACY_RNG</span> <span class="o">=</span> <span class="kc">True</span>
@@ -1422,14 +1422,14 @@ document.write(`
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_BackwardsCompatibleNumpyRng</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_BackwardsCompatibleNumpyRng</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Thin wrapper to ensure backwards compatibility between</span>
 <span class="sd">    new and old numpy randomness generators.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_rng</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">generator_or_seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
             <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;np_random_generator&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
@@ -1445,15 +1445,15 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">generator_or_seed</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">legacy_rng</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">legacy_rng</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rng</span><span class="p">,</span> <span class="n">np_random_generator</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">rng</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rng</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># don&#39;t set self._rng to np.random to avoid picking issues</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span>
 
-    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="c1"># https://numpy.org/doc/stable/reference/random/new-or-different.html</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">legacy_rng</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;integers&quot;</span><span class="p">:</span>
@@ -1469,7 +1469,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Domain</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Domain</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class to specify a type and valid range to sample parameters from.</span>
 
 <span class="sd">    This base class is implemented by parameter spaces, like float ranges</span>
@@ -1484,11 +1484,11 @@ document.write(`
     <span class="n">sampler</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">default_sampler_cls</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">cast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Cast value to domain type&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">value</span>
 
-    <span class="k">def</span> <span class="nf">set_sampler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampler</span><span class="p">,</span> <span class="n">allow_override</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_sampler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampler</span><span class="p">,</span> <span class="n">allow_override</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">allow_override</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;You can only choose one sampler for parameter &quot;</span>
@@ -1499,13 +1499,13 @@ document.write(`
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span> <span class="o">=</span> <span class="n">sampler</span>
 
-    <span class="k">def</span> <span class="nf">get_sampler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sampler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">sampler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">sampler</span><span class="p">:</span>
             <span class="n">sampler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_sampler_cls</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">sampler</span>
 
-    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -1516,24 +1516,24 @@ document.write(`
         <span class="n">sampler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sampler</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">sampler</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">is_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="p">,</span> <span class="n">Grid</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">is_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True if `value` is a valid value in this domain.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">domain_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">domain_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;(unknown)&quot;</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Sampler</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Sampler</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">domain</span><span class="p">:</span> <span class="n">Domain</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1544,44 +1544,44 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">BaseSampler</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseSampler</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Base&quot;</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Uniform</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Uniform</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Uniform&quot;</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">LogUniform</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogUniform</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="n">base</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Base has to be strictly greater than 0&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;LogUniform&quot;</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Normal</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mean</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">sd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Normal</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mean</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">sd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="n">mean</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sd</span> <span class="o">=</span> <span class="n">sd</span>
 
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">sd</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;SD has to be strictly greater than 0&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Normal&quot;</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Grid</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Grid</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Dummy sampler used for grid search&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">domain</span><span class="p">:</span> <span class="n">Domain</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1592,9 +1592,9 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Float</span><span class="p">(</span><span class="n">Domain</span><span class="p">):</span>
-    <span class="k">class</span> <span class="nc">_Uniform</span><span class="p">(</span><span class="n">Uniform</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Float</span><span class="p">(</span><span class="n">Domain</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">_Uniform</span><span class="p">(</span><span class="n">Uniform</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">domain</span><span class="p">:</span> <span class="s2">&quot;Float&quot;</span><span class="p">,</span>
             <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1608,8 +1608,8 @@ document.write(`
             <span class="n">items</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">domain</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="n">domain</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">items</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">domain</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-    <span class="k">class</span> <span class="nc">_LogUniform</span><span class="p">(</span><span class="n">LogUniform</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">_LogUniform</span><span class="p">(</span><span class="n">LogUniform</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">domain</span><span class="p">:</span> <span class="s2">&quot;Float&quot;</span><span class="p">,</span>
             <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1628,8 +1628,8 @@ document.write(`
             <span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">**</span> <span class="p">(</span><span class="n">random_state</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">logmin</span><span class="p">,</span> <span class="n">logmax</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">items</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">domain</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-    <span class="k">class</span> <span class="nc">_Normal</span><span class="p">(</span><span class="n">Normal</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">_Normal</span><span class="p">(</span><span class="n">Normal</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">domain</span><span class="p">:</span> <span class="s2">&quot;Float&quot;</span><span class="p">,</span>
             <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1649,15 +1649,15 @@ document.write(`
 
     <span class="n">default_sampler_cls</span> <span class="o">=</span> <span class="n">_Uniform</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">upper</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">upper</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
         <span class="c1"># Need to explicitly check for None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lower</span> <span class="o">=</span> <span class="n">lower</span> <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">upper</span> <span class="o">=</span> <span class="n">upper</span> <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">cast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">uniform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">uniform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower</span> <span class="o">&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Uniform requires a lower bound. Make sure to set the &quot;</span>
@@ -1672,7 +1672,7 @@ document.write(`
         <span class="n">new</span><span class="o">.</span><span class="n">set_sampler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Uniform</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">new</span>
 
-    <span class="k">def</span> <span class="nf">loguniform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">loguniform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;LogUniform requires a lower bound greater than 0.&quot;</span>
@@ -1691,12 +1691,12 @@ document.write(`
         <span class="n">new</span><span class="o">.</span><span class="n">set_sampler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_LogUniform</span><span class="p">(</span><span class="n">base</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">new</span>
 
-    <span class="k">def</span> <span class="nf">normal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">normal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
         <span class="n">new</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">new</span><span class="o">.</span><span class="n">set_sampler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Normal</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">sd</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">new</span>
 
-    <span class="k">def</span> <span class="nf">quantized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">quantized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower</span> <span class="o">&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">isclose</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lower</span> <span class="o">/</span> <span class="n">q</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lower</span> <span class="o">/</span> <span class="n">q</span><span class="p">)</span>
         <span class="p">):</span>
@@ -1716,18 +1716,18 @@ document.write(`
         <span class="n">new</span><span class="o">.</span><span class="n">set_sampler</span><span class="p">(</span><span class="n">Quantized</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">get_sampler</span><span class="p">(),</span> <span class="n">q</span><span class="p">),</span> <span class="n">allow_override</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new</span>
 
-    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower</span> <span class="o">&lt;=</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">domain_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">domain_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lower</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">upper</span><span class="si">}</span><span class="s2">)&quot;</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Integer</span><span class="p">(</span><span class="n">Domain</span><span class="p">):</span>
-    <span class="k">class</span> <span class="nc">_Uniform</span><span class="p">(</span><span class="n">Uniform</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Integer</span><span class="p">(</span><span class="n">Domain</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">_Uniform</span><span class="p">(</span><span class="n">Uniform</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">domain</span><span class="p">:</span> <span class="s2">&quot;Integer&quot;</span><span class="p">,</span>
             <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1739,8 +1739,8 @@ document.write(`
             <span class="n">items</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="n">domain</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="n">domain</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">items</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">domain</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-    <span class="k">class</span> <span class="nc">_LogUniform</span><span class="p">(</span><span class="n">LogUniform</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">_LogUniform</span><span class="p">(</span><span class="n">LogUniform</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">domain</span><span class="p">:</span> <span class="s2">&quot;Integer&quot;</span><span class="p">,</span>
             <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1762,24 +1762,24 @@ document.write(`
 
     <span class="n">default_sampler_cls</span> <span class="o">=</span> <span class="n">_Uniform</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lower</span> <span class="o">=</span> <span class="n">lower</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">upper</span> <span class="o">=</span> <span class="n">upper</span>
 
-    <span class="k">def</span> <span class="nf">cast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">quantized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">quantized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="n">new</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">new</span><span class="o">.</span><span class="n">set_sampler</span><span class="p">(</span><span class="n">Quantized</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">get_sampler</span><span class="p">(),</span> <span class="n">q</span><span class="p">),</span> <span class="n">allow_override</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new</span>
 
-    <span class="k">def</span> <span class="nf">uniform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">uniform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">new</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">new</span><span class="o">.</span><span class="n">set_sampler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Uniform</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">new</span>
 
-    <span class="k">def</span> <span class="nf">loguniform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">loguniform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;LogUniform requires a lower bound greater than 0.&quot;</span>
@@ -1798,18 +1798,18 @@ document.write(`
         <span class="n">new</span><span class="o">.</span><span class="n">set_sampler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_LogUniform</span><span class="p">(</span><span class="n">base</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">new</span>
 
-    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lower</span> <span class="o">&lt;=</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">domain_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">domain_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lower</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">upper</span><span class="si">}</span><span class="s2">)&quot;</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Categorical</span><span class="p">(</span><span class="n">Domain</span><span class="p">):</span>
-    <span class="k">class</span> <span class="nc">_Uniform</span><span class="p">(</span><span class="n">Uniform</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Categorical</span><span class="p">(</span><span class="n">Domain</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">_Uniform</span><span class="p">(</span><span class="n">Uniform</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">domain</span><span class="p">:</span> <span class="s2">&quot;Categorical&quot;</span><span class="p">,</span>
             <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1828,41 +1828,41 @@ document.write(`
 
     <span class="n">default_sampler_cls</span> <span class="o">=</span> <span class="n">_Uniform</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">categories</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">categories</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">categories</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">uniform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">uniform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">new</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">new</span><span class="o">.</span><span class="n">set_sampler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Uniform</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">new</span>
 
-    <span class="k">def</span> <span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">new</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">new</span><span class="o">.</span><span class="n">set_sampler</span><span class="p">(</span><span class="n">Grid</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">new</span>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categories</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">domain_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">domain_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="si">}</span><span class="s2">&quot;</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Function</span><span class="p">(</span><span class="n">Domain</span><span class="p">):</span>
-    <span class="k">class</span> <span class="nc">_CallSampler</span><span class="p">(</span><span class="n">BaseSampler</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">__try_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="s2">&quot;Function&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Function</span><span class="p">(</span><span class="n">Domain</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">_CallSampler</span><span class="p">(</span><span class="n">BaseSampler</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">__try_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="s2">&quot;Function&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">domain</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
             <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
-                <span class="kn">from</span> <span class="nn">ray.tune.search.variant_generator</span> <span class="kn">import</span> <span class="n">_UnresolvedAccessGuard</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.variant_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">_UnresolvedAccessGuard</span>
 
                 <span class="n">r</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">_UnresolvedAccessGuard</span><span class="p">({</span><span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">}))</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
@@ -1872,7 +1872,7 @@ document.write(`
                 <span class="p">)</span>
                 <span class="k">return</span> <span class="n">r</span>
 
-        <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">domain</span><span class="p">:</span> <span class="s2">&quot;Function&quot;</span><span class="p">,</span>
             <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1895,7 +1895,7 @@ document.write(`
 
     <span class="n">default_sampler_cls</span> <span class="o">=</span> <span class="n">_CallSampler</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
         <span class="n">sig</span> <span class="o">=</span> <span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
 
         <span class="n">pass_config</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># whether we should pass `config` when calling `func`</span>
@@ -1911,34 +1911,34 @@ document.write(`
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;The function passed to a `Function` parameter must be &quot;</span>
                     <span class="s2">&quot;callable with either 0 or 1 parameters.&quot;</span>
-                <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pass_config</span> <span class="o">=</span> <span class="n">pass_config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
 
-    <span class="k">def</span> <span class="nf">is_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># This is user-defined, so lets not assume anything</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">domain_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">domain_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="si">}</span><span class="s2">()&quot;</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Quantized</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampler</span><span class="p">:</span> <span class="n">Sampler</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Quantized</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampler</span><span class="p">:</span> <span class="n">Sampler</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span> <span class="o">=</span> <span class="n">sampler</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">q</span>
 
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="p">,</span> <span class="s2">&quot;Quantized() expects a sampler instance&quot;</span>
 
-    <span class="k">def</span> <span class="nf">get_sampler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sampler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span>
 
-    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">domain</span><span class="p">:</span> <span class="n">Domain</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1967,7 +1967,7 @@ document.write(`
 <div class="viewcode-block" id="sample_from">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.sample_from.html#ray.tune.sample_from">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">sample_from</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">Any</span><span class="p">]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sample_from</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">Any</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Specify that tune should sample configuration values from this function.</span>
 
 <span class="sd">    Arguments:</span>
@@ -1980,7 +1980,7 @@ document.write(`
 <div class="viewcode-block" id="uniform">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.uniform.html#ray.tune.uniform">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">uniform</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">uniform</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample a float value uniformly between ``lower`` and ``upper``.</span>
 
 <span class="sd">    Sampling from ``tune.uniform(1, 10)`` is equivalent to sampling from</span>
@@ -1994,7 +1994,7 @@ document.write(`
 <div class="viewcode-block" id="quniform">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.quniform.html#ray.tune.quniform">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">quniform</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">quniform</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample a quantized float value uniformly between ``lower`` and ``upper``.</span>
 
 <span class="sd">    Sampling from ``tune.uniform(1, 10)`` is equivalent to sampling from</span>
@@ -2011,7 +2011,7 @@ document.write(`
 <div class="viewcode-block" id="loguniform">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.loguniform.html#ray.tune.loguniform">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">loguniform</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">loguniform</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sugar for sampling in different orders of magnitude.</span>
 
 <span class="sd">    Args:</span>
@@ -2027,7 +2027,7 @@ document.write(`
 <div class="viewcode-block" id="qloguniform">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.qloguniform.html#ray.tune.qloguniform">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">qloguniform</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">qloguniform</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sugar for sampling in different orders of magnitude.</span>
 
 <span class="sd">    The value will be quantized, i.e. rounded to an integer increment of ``q``.</span>
@@ -2049,7 +2049,7 @@ document.write(`
 <div class="viewcode-block" id="choice">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.choice.html#ray.tune.choice">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">choice</span><span class="p">(</span><span class="n">categories</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">choice</span><span class="p">(</span><span class="n">categories</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample a categorical value.</span>
 
 <span class="sd">    Sampling from ``tune.choice([1, 2])`` is equivalent to sampling from</span>
@@ -2063,7 +2063,7 @@ document.write(`
 <div class="viewcode-block" id="randint">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.randint.html#ray.tune.randint">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">randint</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">randint</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample an integer value uniformly between ``lower`` and ``upper``.</span>
 
 <span class="sd">    ``lower`` is inclusive, ``upper`` is exclusive.</span>
@@ -2084,7 +2084,7 @@ document.write(`
 <div class="viewcode-block" id="lograndint">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.lograndint.html#ray.tune.lograndint">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">lograndint</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">lograndint</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample an integer value log-uniformly between ``lower`` and ``upper``,</span>
 <span class="sd">    with ``base`` being the base of logarithm.</span>
 
@@ -2103,7 +2103,7 @@ document.write(`
 <div class="viewcode-block" id="qrandint">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.qrandint.html#ray.tune.qrandint">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">qrandint</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">qrandint</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample an integer value uniformly between ``lower`` and ``upper``.</span>
 
 <span class="sd">    ``lower`` is inclusive, ``upper`` is also inclusive (!).</span>
@@ -2124,7 +2124,7 @@ document.write(`
 <div class="viewcode-block" id="qlograndint">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.qlograndint.html#ray.tune.qlograndint">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">qlograndint</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">qlograndint</span><span class="p">(</span><span class="n">lower</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">upper</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample an integer value log-uniformly between ``lower`` and ``upper``,</span>
 <span class="sd">    with ``base`` being the base of logarithm.</span>
 
@@ -2146,7 +2146,7 @@ document.write(`
 <div class="viewcode-block" id="randn">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.randn.html#ray.tune.randn">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">randn</span><span class="p">(</span><span class="n">mean</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">sd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">randn</span><span class="p">(</span><span class="n">mean</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">sd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample a float value normally with ``mean`` and ``sd``.</span>
 
 <span class="sd">    Args:</span>
@@ -2161,7 +2161,7 @@ document.write(`
 <div class="viewcode-block" id="qrandn">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.qrandn.html#ray.tune.qrandn">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">qrandn</span><span class="p">(</span><span class="n">mean</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sd</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">qrandn</span><span class="p">(</span><span class="n">mean</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sd</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample a float value normally with ``mean`` and ``sd``.</span>
 
 <span class="sd">    The value will be quantized, i.e. rounded to an integer increment of ``q``.</span>

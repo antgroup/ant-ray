@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,11 +1389,11 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data.read_api</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -1406,98 +1406,98 @@ document.write(`
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray._private.auto_init_hook</span> <span class="kn">import</span> <span class="n">wrap_auto_init</span>
-<span class="kn">from</span> <span class="nn">ray.air.util.tensor_extensions.utils</span> <span class="kn">import</span> <span class="n">_create_possibly_ragged_ndarray</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.audio_datasource</span> <span class="kn">import</span> <span class="n">AudioDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.avro_datasource</span> <span class="kn">import</span> <span class="n">AvroDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.bigquery_datasource</span> <span class="kn">import</span> <span class="n">BigQueryDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.binary_datasource</span> <span class="kn">import</span> <span class="n">BinaryDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.clickhouse_datasource</span> <span class="kn">import</span> <span class="n">ClickHouseDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.csv_datasource</span> <span class="kn">import</span> <span class="n">CSVDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.delta_sharing_datasource</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.auto_init_hook</span><span class="w"> </span><span class="kn">import</span> <span class="n">wrap_auto_init</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.util.tensor_extensions.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_create_possibly_ragged_ndarray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.audio_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">AudioDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.avro_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">AvroDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.bigquery_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">BigQueryDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.binary_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">BinaryDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.clickhouse_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClickHouseDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.csv_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">CSVDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.delta_sharing_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DeltaSharingDatasource</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.hudi_datasource</span> <span class="kn">import</span> <span class="n">HudiDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.iceberg_datasource</span> <span class="kn">import</span> <span class="n">IcebergDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.image_datasource</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.hudi_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">HudiDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.iceberg_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">IcebergDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.image_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ImageDatasource</span><span class="p">,</span>
     <span class="n">ImageFileMetadataProvider</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.json_datasource</span> <span class="kn">import</span> <span class="n">JSONDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.lance_datasource</span> <span class="kn">import</span> <span class="n">LanceDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.mongo_datasource</span> <span class="kn">import</span> <span class="n">MongoDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.numpy_datasource</span> <span class="kn">import</span> <span class="n">NumpyDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.parquet_bulk_datasource</span> <span class="kn">import</span> <span class="n">ParquetBulkDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.parquet_datasource</span> <span class="kn">import</span> <span class="n">ParquetDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.range_datasource</span> <span class="kn">import</span> <span class="n">RangeDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.sql_datasource</span> <span class="kn">import</span> <span class="n">SQLDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.text_datasource</span> <span class="kn">import</span> <span class="n">TextDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.tfrecords_datasource</span> <span class="kn">import</span> <span class="n">TFRecordDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.torch_datasource</span> <span class="kn">import</span> <span class="n">TorchDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.video_datasource</span> <span class="kn">import</span> <span class="n">VideoDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.webdataset_datasource</span> <span class="kn">import</span> <span class="n">WebDatasetDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.delegating_block_builder</span> <span class="kn">import</span> <span class="n">DelegatingBlockBuilder</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.logical.operators.from_operators</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.json_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.lance_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">LanceDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.mongo_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">MongoDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.numpy_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">NumpyDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.parquet_bulk_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParquetBulkDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.parquet_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParquetDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.range_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">RangeDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.sql_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">SQLDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.text_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">TextDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.tfrecords_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">TFRecordDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.torch_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.video_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">VideoDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.webdataset_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebDatasetDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.delegating_block_builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">DelegatingBlockBuilder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.logical.operators.from_operators</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">FromArrow</span><span class="p">,</span>
     <span class="n">FromBlocks</span><span class="p">,</span>
     <span class="n">FromItems</span><span class="p">,</span>
     <span class="n">FromNumpy</span><span class="p">,</span>
     <span class="n">FromPandas</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.logical.operators.read_operator</span> <span class="kn">import</span> <span class="n">Read</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.logical.optimizers</span> <span class="kn">import</span> <span class="n">LogicalPlan</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.plan</span> <span class="kn">import</span> <span class="n">ExecutionPlan</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.remote_fn</span> <span class="kn">import</span> <span class="n">cached_remote_fn</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.stats</span> <span class="kn">import</span> <span class="n">DatasetStats</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.util</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.logical.operators.read_operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Read</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.logical.optimizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogicalPlan</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.plan</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExecutionPlan</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.remote_fn</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_remote_fn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetStats</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_autodetect_parallelism</span><span class="p">,</span>
     <span class="n">get_table_block_metadata</span><span class="p">,</span>
     <span class="n">ndarray_to_block</span><span class="p">,</span>
     <span class="n">pandas_df_to_arrow_block</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data.block</span> <span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">BlockAccessor</span><span class="p">,</span> <span class="n">BlockExecStats</span><span class="p">,</span> <span class="n">BlockMetadata</span>
-<span class="kn">from</span> <span class="nn">ray.data.context</span> <span class="kn">import</span> <span class="n">DataContext</span>
-<span class="kn">from</span> <span class="nn">ray.data.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">MaterializedDataset</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">BlockAccessor</span><span class="p">,</span> <span class="n">BlockExecStats</span><span class="p">,</span> <span class="n">BlockMetadata</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">MaterializedDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BaseFileMetadataProvider</span><span class="p">,</span>
     <span class="n">Connection</span><span class="p">,</span>
     <span class="n">Datasource</span><span class="p">,</span>
     <span class="n">PathPartitionFilter</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource.datasource</span> <span class="kn">import</span> <span class="n">Reader</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource.file_based_datasource</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">Reader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.file_based_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">FileShuffleConfig</span><span class="p">,</span>
     <span class="n">_unwrap_arrow_serialization_workaround</span><span class="p">,</span>
     <span class="n">_validate_shuffle_arg</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource.file_meta_provider</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.file_meta_provider</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DefaultFileMetadataProvider</span><span class="p">,</span>
     <span class="n">FastFileMetadataProvider</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource.parquet_meta_provider</span> <span class="kn">import</span> <span class="n">ParquetMetadataProvider</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource.partitioning</span> <span class="kn">import</span> <span class="n">Partitioning</span>
-<span class="kn">from</span> <span class="nn">ray.types</span> <span class="kn">import</span> <span class="n">ObjectRef</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
-<span class="kn">from</span> <span class="nn">ray.util.scheduling_strategies</span> <span class="kn">import</span> <span class="n">NodeAffinitySchedulingStrategy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.parquet_meta_provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParquetMetadataProvider</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.partitioning</span><span class="w"> </span><span class="kn">import</span> <span class="n">Partitioning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObjectRef</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.scheduling_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">NodeAffinitySchedulingStrategy</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">dask</span>
-    <span class="kn">import</span> <span class="nn">datasets</span>
-    <span class="kn">import</span> <span class="nn">mars</span>
-    <span class="kn">import</span> <span class="nn">modin</span>
-    <span class="kn">import</span> <span class="nn">pandas</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span>
-    <span class="kn">import</span> <span class="nn">pymongoarrow.api</span>
-    <span class="kn">import</span> <span class="nn">pyspark</span>
-    <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
-    <span class="kn">import</span> <span class="nn">torch</span>
-    <span class="kn">from</span> <span class="nn">pyiceberg.expressions</span> <span class="kn">import</span> <span class="n">BooleanExpression</span>
-    <span class="kn">from</span> <span class="nn">tensorflow_metadata.proto.v0</span> <span class="kn">import</span> <span class="n">schema_pb2</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">datasets</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">mars</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">modin</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pymongoarrow.api</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyspark</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyiceberg.expressions</span><span class="w"> </span><span class="kn">import</span> <span class="n">BooleanExpression</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow_metadata.proto.v0</span><span class="w"> </span><span class="kn">import</span> <span class="n">schema_pb2</span>
 
-    <span class="kn">from</span> <span class="nn">ray.data._internal.datasource.tfrecords_datasource</span> <span class="kn">import</span> <span class="n">TFXReadOptions</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.tfrecords_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">TFXReadOptions</span>
 
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
@@ -1506,7 +1506,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">from_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_blocks</span><span class="p">(</span><span class="n">blocks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a :class:`~ray.data.Dataset` from a list of blocks.</span>
 
 <span class="sd">    This method is primarily used for testing. Unlike other methods like</span>
@@ -1535,7 +1535,7 @@ document.write(`
 <div class="viewcode-block" id="from_items">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.from_items.html#ray.data.from_items">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">from_items</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_items</span><span class="p">(</span>
     <span class="n">items</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
@@ -1567,7 +1567,7 @@ document.write(`
 <span class="sd">    Returns:</span>
 <span class="sd">        A :class:`~ray.data.Dataset` holding the items.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">builtins</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">builtins</span>
 
     <span class="n">parallelism</span> <span class="o">=</span> <span class="n">_get_num_output_blocks</span><span class="p">(</span><span class="n">parallelism</span><span class="p">,</span> <span class="n">override_num_blocks</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">parallelism</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -1621,7 +1621,7 @@ document.write(`
 <div class="viewcode-block" id="range">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.range.html#ray.data.range">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">range</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">range</span><span class="p">(</span>
     <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
@@ -1676,7 +1676,7 @@ document.write(`
 <div class="viewcode-block" id="range_tensor">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.range_tensor.html#ray.data.range_tensor">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">range_tensor</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">range_tensor</span><span class="p">(</span>
     <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">shape</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,),</span>
@@ -1739,7 +1739,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_datasource.html#ray.data.read_datasource">[docs]</a>
 <span class="nd">@PublicAPI</span>
 <span class="nd">@wrap_auto_init</span>
-<span class="k">def</span> <span class="nf">read_datasource</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_datasource</span><span class="p">(</span>
     <span class="n">datasource</span><span class="p">:</span> <span class="n">Datasource</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
@@ -1803,7 +1803,7 @@ document.write(`
     <span class="c1"># removing LazyBlockList code path.</span>
     <span class="n">read_tasks</span> <span class="o">=</span> <span class="n">datasource_or_legacy_reader</span><span class="o">.</span><span class="n">get_read_tasks</span><span class="p">(</span><span class="n">requested_parallelism</span><span class="p">)</span>
 
-    <span class="kn">import</span> <span class="nn">uuid</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 
     <span class="n">stats</span> <span class="o">=</span> <span class="n">DatasetStats</span><span class="p">(</span>
         <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Read&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">read_task</span><span class="o">.</span><span class="n">metadata</span> <span class="k">for</span> <span class="n">read_task</span> <span class="ow">in</span> <span class="n">read_tasks</span><span class="p">]},</span>
@@ -1832,7 +1832,7 @@ document.write(`
 <div class="viewcode-block" id="read_audio">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_audio.html#ray.data.read_audio">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">read_audio</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_audio</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1922,7 +1922,7 @@ document.write(`
 <div class="viewcode-block" id="read_videos">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_videos.html#ray.data.read_videos">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">read_videos</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_videos</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2009,7 +2009,7 @@ document.write(`
 <div class="viewcode-block" id="read_mongo">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_mongo.html#ray.data.read_mongo">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">read_mongo</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_mongo</span><span class="p">(</span>
     <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">database</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">collection</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -2112,7 +2112,7 @@ document.write(`
 <div class="viewcode-block" id="read_bigquery">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_bigquery.html#ray.data.read_bigquery">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">read_bigquery</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_bigquery</span><span class="p">(</span>
     <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">query</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2190,7 +2190,7 @@ document.write(`
 <div class="viewcode-block" id="read_parquet">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_parquet.html#ray.data.read_parquet">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">read_parquet</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_parquet</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2372,7 +2372,7 @@ document.write(`
 <div class="viewcode-block" id="read_images">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_images.html#ray.data.read_images">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">read_images</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_images</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2530,7 +2530,7 @@ document.write(`
 <div class="viewcode-block" id="read_parquet_bulk">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_parquet_bulk.html#ray.data.read_parquet_bulk">[docs]</a>
 <span class="nd">@Deprecated</span>
-<span class="k">def</span> <span class="nf">read_parquet_bulk</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_parquet_bulk</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2671,7 +2671,7 @@ document.write(`
 <div class="viewcode-block" id="read_json">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_json.html#ray.data.read_json">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_json</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2819,7 +2819,7 @@ document.write(`
 <div class="viewcode-block" id="read_csv">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_csv.html#ray.data.read_csv">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">read_csv</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_csv</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2991,7 +2991,7 @@ document.write(`
 <div class="viewcode-block" id="read_text">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_text.html#ray.data.read_text">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">read_text</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_text</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
@@ -3109,7 +3109,7 @@ document.write(`
 <div class="viewcode-block" id="read_avro">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_avro.html#ray.data.read_avro">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">read_avro</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_avro</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3221,7 +3221,7 @@ document.write(`
 <div class="viewcode-block" id="read_numpy">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_numpy.html#ray.data.read_numpy">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">read_numpy</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_numpy</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3323,7 +3323,7 @@ document.write(`
 <div class="viewcode-block" id="read_tfrecords">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_tfrecords.html#ray.data.read_tfrecords">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">read_tfrecords</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_tfrecords</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3432,7 +3432,7 @@ document.write(`
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If a file contains a message that isn&#39;t a ``tf.train.Example``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">platform</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
 
     <span class="n">_emit_meta_provider_deprecation_warning</span><span class="p">(</span><span class="n">meta_provider</span><span class="p">)</span>
 
@@ -3440,7 +3440,7 @@ document.write(`
 
     <span class="k">if</span> <span class="n">tfx_read_options</span> <span class="ow">and</span> <span class="n">platform</span><span class="o">.</span><span class="n">processor</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;arm&quot;</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">tfx_bsl</span>  <span class="c1"># noqa: F401</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">tfx_bsl</span>  <span class="c1"># noqa: F401</span>
 
             <span class="n">tfx_read</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
@@ -3480,7 +3480,7 @@ document.write(`
         <span class="ow">and</span> <span class="n">tfx_read</span>
         <span class="ow">and</span> <span class="ow">not</span> <span class="n">tf_schema</span>
     <span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">ray.data._internal.datasource.tfrecords_datasource</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.tfrecords_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">_infer_schema_and_transform</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -3493,7 +3493,7 @@ document.write(`
 <div class="viewcode-block" id="read_webdataset">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_webdataset.html#ray.data.read_webdataset">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">read_webdataset</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_webdataset</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3595,7 +3595,7 @@ document.write(`
 <div class="viewcode-block" id="read_binary_files">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_binary_files.html#ray.data.read_binary_files">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">read_binary_files</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_binary_files</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">include_paths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -3715,7 +3715,7 @@ document.write(`
 <div class="viewcode-block" id="read_sql">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_sql.html#ray.data.read_sql">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">read_sql</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_sql</span><span class="p">(</span>
     <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">connection_factory</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Connection</span><span class="p">],</span>
     <span class="o">*</span><span class="p">,</span>
@@ -3840,7 +3840,7 @@ document.write(`
 <div class="viewcode-block" id="read_databricks_tables">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_databricks_tables.html#ray.data.read_databricks_tables">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">read_databricks_tables</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_databricks_tables</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">warehouse_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">table</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3911,15 +3911,15 @@ document.write(`
 <span class="sd">    Returns:</span>
 <span class="sd">        A :class:`Dataset` containing the queried data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
-    <span class="kn">from</span> <span class="nn">ray.data._internal.datasource.databricks_uc_datasource</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.databricks_uc_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">DatabricksUCDatasource</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="kn">from</span> <span class="nn">ray.util.spark.utils</span> <span class="kn">import</span> <span class="n">get_spark_session</span><span class="p">,</span> <span class="n">is_in_databricks_runtime</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.spark.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_spark_session</span><span class="p">,</span> <span class="n">is_in_databricks_runtime</span>
 
-    <span class="k">def</span> <span class="nf">get_dbutils</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_dbutils</span><span class="p">():</span>
         <span class="n">no_dbutils_error</span> <span class="o">=</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No dbutils module found.&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">IPython</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">IPython</span>
 
             <span class="n">ip_shell</span> <span class="o">=</span> <span class="n">IPython</span><span class="o">.</span><span class="n">get_ipython</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">ip_shell</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -3988,7 +3988,7 @@ document.write(`
 <div class="viewcode-block" id="read_hudi">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_hudi.html#ray.data.read_hudi">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">read_hudi</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_hudi</span><span class="p">(</span>
     <span class="n">table_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">storage_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4043,7 +4043,7 @@ document.write(`
 <div class="viewcode-block" id="from_dask">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.from_dask.html#ray.data.from_dask">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">from_dask</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="s2">&quot;dask.dataframe.DataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MaterializedDataset</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_dask</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="s2">&quot;dask.dataframe.DataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MaterializedDataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a :class:`~ray.data.Dataset` from a</span>
 <span class="sd">    `Dask DataFrame &lt;https://docs.dask.org/en/stable/generated/dask.dataframe.DataFrame.html#dask.dataframe.DataFrame&gt;`_.</span>
 
@@ -4053,16 +4053,16 @@ document.write(`
 <span class="sd">    Returns:</span>
 <span class="sd">        A :class:`~ray.data.MaterializedDataset` holding rows read from the DataFrame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
-    <span class="kn">import</span> <span class="nn">dask</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
 
-    <span class="kn">from</span> <span class="nn">ray.util.dask</span> <span class="kn">import</span> <span class="n">ray_dask_get</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.dask</span><span class="w"> </span><span class="kn">import</span> <span class="n">ray_dask_get</span>
 
     <span class="n">partitions</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_delayed</span><span class="p">()</span>
     <span class="n">persisted_partitions</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">persist</span><span class="p">(</span><span class="o">*</span><span class="n">partitions</span><span class="p">,</span> <span class="n">scheduler</span><span class="o">=</span><span class="n">ray_dask_get</span><span class="p">)</span>
 
-    <span class="kn">import</span> <span class="nn">pandas</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
 
-    <span class="k">def</span> <span class="nf">to_ref</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_ref</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">):</span>
@@ -4082,7 +4082,7 @@ document.write(`
 <div class="viewcode-block" id="from_mars">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.from_mars.html#ray.data.from_mars">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">from_mars</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="s2">&quot;mars.dataframe.DataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MaterializedDataset</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_mars</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="s2">&quot;mars.dataframe.DataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MaterializedDataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a :class:`~ray.data.Dataset` from a</span>
 <span class="sd">    `Mars DataFrame &lt;https://mars-project.readthedocs.io/en/latest/reference/dataframe/index.html&gt;`_.</span>
 
@@ -4092,7 +4092,7 @@ document.write(`
 <span class="sd">    Returns:</span>
 <span class="sd">        A :class:`~ray.data.MaterializedDataset` holding rows read from the DataFrame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
-    <span class="kn">import</span> <span class="nn">mars.dataframe</span> <span class="k">as</span> <span class="nn">md</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">mars.dataframe</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
 
     <span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">to_ray_dataset</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ds</span></div>
@@ -4102,7 +4102,7 @@ document.write(`
 <div class="viewcode-block" id="from_modin">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.from_modin.html#ray.data.from_modin">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">from_modin</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="s2">&quot;modin.pandas.dataframe.DataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MaterializedDataset</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_modin</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="s2">&quot;modin.pandas.dataframe.DataFrame&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MaterializedDataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a :class:`~ray.data.Dataset` from a</span>
 <span class="sd">    `Modin DataFrame &lt;https://modin.readthedocs.io/en/stable/flow/modin/pandas/dataframe.html&gt;`_.</span>
 
@@ -4112,7 +4112,7 @@ document.write(`
 <span class="sd">    Returns:</span>
 <span class="sd">        A :class:`~ray.data.MaterializedDataset` rows read from the DataFrame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
-    <span class="kn">from</span> <span class="nn">modin.distributed.dataframe.pandas.partitions</span> <span class="kn">import</span> <span class="n">unwrap_partitions</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">modin.distributed.dataframe.pandas.partitions</span><span class="w"> </span><span class="kn">import</span> <span class="n">unwrap_partitions</span>
 
     <span class="n">parts</span> <span class="o">=</span> <span class="n">unwrap_partitions</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">from_pandas_refs</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
@@ -4123,7 +4123,7 @@ document.write(`
 <div class="viewcode-block" id="from_pandas">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.from_pandas.html#ray.data.from_pandas">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">from_pandas</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_pandas</span><span class="p">(</span>
     <span class="n">dfs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pandas.DataFrame&quot;</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;pandas.DataFrame&quot;</span><span class="p">]],</span>
     <span class="n">override_num_blocks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MaterializedDataset</span><span class="p">:</span>
@@ -4151,7 +4151,7 @@ document.write(`
 <span class="sd">    Returns:</span>
 <span class="sd">        :class:`~ray.data.Dataset` holding data read from the dataframes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
         <span class="n">dfs</span> <span class="o">=</span> <span class="p">[</span><span class="n">dfs</span><span class="p">]</span>
@@ -4165,7 +4165,7 @@ document.write(`
             <span class="n">ary</span> <span class="o">=</span> <span class="n">dfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">dfs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">ary</span><span class="p">,</span> <span class="n">override_num_blocks</span><span class="p">)</span>
 
-    <span class="kn">from</span> <span class="nn">ray.air.util.data_batch_conversion</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.util.data_batch_conversion</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">_cast_ndarray_columns_to_tensor_extension</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -4180,7 +4180,7 @@ document.write(`
 <div class="viewcode-block" id="from_pandas_refs">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.from_pandas_refs.html#ray.data.from_pandas_refs">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">from_pandas_refs</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_pandas_refs</span><span class="p">(</span>
     <span class="n">dfs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">[</span><span class="s2">&quot;pandas.DataFrame&quot;</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">[</span><span class="s2">&quot;pandas.DataFrame&quot;</span><span class="p">]]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MaterializedDataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a :class:`~ray.data.Dataset` from a list of Ray object references to</span>
@@ -4251,7 +4251,7 @@ document.write(`
 <div class="viewcode-block" id="from_numpy">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.from_numpy.html#ray.data.from_numpy">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">from_numpy</span><span class="p">(</span><span class="n">ndarrays</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">MaterializedDataset</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_numpy</span><span class="p">(</span><span class="n">ndarrays</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">MaterializedDataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a :class:`~ray.data.Dataset` from a list of NumPy ndarrays.</span>
 
 <span class="sd">    Examples:</span>
@@ -4282,7 +4282,7 @@ document.write(`
 <div class="viewcode-block" id="from_numpy_refs">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.from_numpy_refs.html#ray.data.from_numpy_refs">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">from_numpy_refs</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_numpy_refs</span><span class="p">(</span>
     <span class="n">ndarrays</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MaterializedDataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a :class:`~ray.data.Dataset` from a list of Ray object references to</span>
@@ -4343,7 +4343,7 @@ document.write(`
 <div class="viewcode-block" id="from_arrow">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.from_arrow.html#ray.data.from_arrow">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">from_arrow</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_arrow</span><span class="p">(</span>
     <span class="n">tables</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MaterializedDataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a :class:`~ray.data.Dataset` from a list of PyArrow tables.</span>
@@ -4368,7 +4368,7 @@ document.write(`
 <span class="sd">    Returns:</span>
 <span class="sd">        :class:`~ray.data.Dataset` holding data from the PyArrow tables.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tables</span><span class="p">,</span> <span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
         <span class="n">tables</span> <span class="o">=</span> <span class="p">[</span><span class="n">tables</span><span class="p">]</span>
@@ -4379,7 +4379,7 @@ document.write(`
 <div class="viewcode-block" id="from_arrow_refs">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.from_arrow_refs.html#ray.data.from_arrow_refs">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">from_arrow_refs</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_arrow_refs</span><span class="p">(</span>
     <span class="n">tables</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
         <span class="n">ObjectRef</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]],</span>
         <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]]],</span>
@@ -4428,7 +4428,7 @@ document.write(`
 <div class="viewcode-block" id="read_delta_sharing_tables">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_delta_sharing_tables.html#ray.data.read_delta_sharing_tables">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">read_delta_sharing_tables</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_delta_sharing_tables</span><span class="p">(</span>
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4517,7 +4517,7 @@ document.write(`
 <div class="viewcode-block" id="from_spark">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.from_spark.html#ray.data.from_spark">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">from_spark</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_spark</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="s2">&quot;pyspark.sql.DataFrame&quot;</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">parallelism</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4537,7 +4537,7 @@ document.write(`
 <span class="sd">    Returns:</span>
 <span class="sd">        A :class:`~ray.data.MaterializedDataset` holding rows read from the DataFrame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
-    <span class="kn">import</span> <span class="nn">raydp</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">raydp</span>
 
     <span class="n">parallelism</span> <span class="o">=</span> <span class="n">_get_num_output_blocks</span><span class="p">(</span><span class="n">parallelism</span><span class="p">,</span> <span class="n">override_num_blocks</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">raydp</span><span class="o">.</span><span class="n">spark</span><span class="o">.</span><span class="n">spark_dataframe_to_ray_dataset</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">parallelism</span><span class="p">)</span></div>
@@ -4547,7 +4547,7 @@ document.write(`
 <div class="viewcode-block" id="from_huggingface">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.from_huggingface.html#ray.data.from_huggingface">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">from_huggingface</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_huggingface</span><span class="p">(</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;datasets.Dataset&quot;</span><span class="p">,</span> <span class="s2">&quot;datasets.IterableDataset&quot;</span><span class="p">],</span>
     <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">concurrency</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4613,10 +4613,10 @@ document.write(`
 <span class="sd">    Returns:</span>
 <span class="sd">        A :class:`~ray.data.Dataset` holding rows from the `Hugging Face Datasets Dataset`_.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
-    <span class="kn">import</span> <span class="nn">datasets</span>
-    <span class="kn">from</span> <span class="nn">aiohttp.client_exceptions</span> <span class="kn">import</span> <span class="n">ClientResponseError</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">datasets</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">aiohttp.client_exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClientResponseError</span>
 
-    <span class="kn">from</span> <span class="nn">ray.data._internal.datasource.huggingface_datasource</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.huggingface_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">HuggingFaceDatasource</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -4630,7 +4630,7 @@ document.write(`
                 <span class="c1"># TODO: Add support for reading from http filesystem in</span>
                 <span class="c1"># FileBasedDatasource. GH Issue:</span>
                 <span class="c1"># https://github.com/ray-project/ray/issues/42706</span>
-                <span class="kn">import</span> <span class="nn">fsspec.implementations.http</span>
+                <span class="kn">import</span><span class="w"> </span><span class="nn">fsspec.implementations.http</span>
 
                 <span class="n">http</span> <span class="o">=</span> <span class="n">fsspec</span><span class="o">.</span><span class="n">implementations</span><span class="o">.</span><span class="n">http</span><span class="o">.</span><span class="n">HTTPFileSystem</span><span class="p">()</span>
                 <span class="k">return</span> <span class="n">read_parquet</span><span class="p">(</span>
@@ -4694,7 +4694,7 @@ document.write(`
 <div class="viewcode-block" id="from_tf">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.from_tf.html#ray.data.from_tf">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">from_tf</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_tf</span><span class="p">(</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="s2">&quot;tf.data.Dataset&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MaterializedDataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a :class:`~ray.data.Dataset` from a</span>
@@ -4757,7 +4757,7 @@ document.write(`
 <div class="viewcode-block" id="from_torch">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.from_torch.html#ray.data.from_torch">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">from_torch</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_torch</span><span class="p">(</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="s2">&quot;torch.utils.data.Dataset&quot;</span><span class="p">,</span>
     <span class="n">local_read</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
@@ -4812,7 +4812,7 @@ document.write(`
 <div class="viewcode-block" id="read_iceberg">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_iceberg.html#ray.data.read_iceberg">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">read_iceberg</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_iceberg</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">table_identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">row_filter</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;BooleanExpression&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4900,7 +4900,7 @@ document.write(`
 <div class="viewcode-block" id="read_lance">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_lance.html#ray.data.read_lance">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">read_lance</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_lance</span><span class="p">(</span>
     <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4970,7 +4970,7 @@ document.write(`
 <div class="viewcode-block" id="read_clickhouse">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.read_clickhouse.html#ray.data.read_clickhouse">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">read_clickhouse</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_clickhouse</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">dsn</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -5052,7 +5052,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_get_datasource_or_legacy_reader</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_datasource_or_legacy_reader</span><span class="p">(</span>
     <span class="n">ds</span><span class="p">:</span> <span class="n">Datasource</span><span class="p">,</span>
     <span class="n">ctx</span><span class="p">:</span> <span class="n">DataContext</span><span class="p">,</span>
     <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
@@ -5086,15 +5086,15 @@ document.write(`
     <span class="k">return</span> <span class="n">datasource_or_legacy_reader</span>
 
 
-<span class="k">def</span> <span class="nf">_resolve_parquet_args</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_parquet_args</span><span class="p">(</span>
     <span class="n">tensor_column_schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">arrow_parquet_args</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="k">if</span> <span class="n">tensor_column_schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">existing_block_udf</span> <span class="o">=</span> <span class="n">arrow_parquet_args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;_block_udf&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_block_udf</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.data.extensions</span> <span class="kn">import</span> <span class="n">ArrowTensorArray</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_block_udf</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrowTensorArray</span>
 
             <span class="k">for</span> <span class="n">tensor_col_name</span><span class="p">,</span> <span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tensor_column_schema</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="c1"># NOTE(Clark): We use NumPy to consolidate these potentially</span>
@@ -5121,7 +5121,7 @@ document.write(`
     <span class="k">return</span> <span class="n">arrow_parquet_args</span>
 
 
-<span class="k">def</span> <span class="nf">_get_num_output_blocks</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_num_output_blocks</span><span class="p">(</span>
     <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">override_num_blocks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -5135,7 +5135,7 @@ document.write(`
     <span class="k">return</span> <span class="n">parallelism</span>
 
 
-<span class="k">def</span> <span class="nf">_emit_meta_provider_deprecation_warning</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_emit_meta_provider_deprecation_warning</span><span class="p">(</span>
     <span class="n">meta_provider</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BaseFileMetadataProvider</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">meta_provider</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

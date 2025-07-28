@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1401,22 +1401,22 @@ document.write(`
 <span class="sd">https://arxiv.org/pdf/1912.00167</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span><span class="p">,</span> <span class="n">NotProvided</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.impala.impala</span> <span class="kn">import</span> <span class="n">IMPALA</span><span class="p">,</span> <span class="n">IMPALAConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.policy</span> <span class="kn">import</span> <span class="n">Policy</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">override</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="n">DEPRECATED_VALUE</span><span class="p">,</span> <span class="n">deprecation_warning</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span><span class="p">,</span> <span class="n">NotProvided</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.impala.impala</span><span class="w"> </span><span class="kn">import</span> <span class="n">IMPALA</span><span class="p">,</span> <span class="n">IMPALAConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Policy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEPRECATED_VALUE</span><span class="p">,</span> <span class="n">deprecation_warning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LAST_TARGET_UPDATE_TS</span><span class="p">,</span>
     <span class="n">NUM_AGENT_STEPS_SAMPLED</span><span class="p">,</span>
     <span class="n">NUM_ENV_STEPS_SAMPLED</span><span class="p">,</span>
     <span class="n">NUM_TARGET_UPDATES</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics</span> <span class="kn">import</span> <span class="n">LEARNER_STATS_KEY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">LEARNER_STATS_KEY</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1428,7 +1428,7 @@ document.write(`
 
 <div class="viewcode-block" id="APPOConfig">
 <a class="viewcode-back" href="../../../../../rllib/rllib-algorithms.html#ray.rllib.algorithms.appo.appo.APPOConfig">[docs]</a>
-<span class="k">class</span> <span class="nc">APPOConfig</span><span class="p">(</span><span class="n">IMPALAConfig</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">APPOConfig</span><span class="p">(</span><span class="n">IMPALAConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a configuration class from which an APPO Algorithm can be built.</span>
 
 <span class="sd">    .. testcode::</span>
@@ -1474,7 +1474,7 @@ document.write(`
 <span class="sd">        ...</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_class</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_class</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes a APPOConfig instance.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exploration_config</span> <span class="o">=</span> <span class="p">{</span>
             <span class="c1"># The Exploration class to use. In the simplest case, this is the name</span>
@@ -1546,7 +1546,7 @@ document.write(`
 <div class="viewcode-block" id="APPOConfig.training">
 <a class="viewcode-back" href="../../../../../rllib/rllib-algorithms.html#ray.rllib.algorithms.appo.appo.APPOConfig.training">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">IMPALAConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">training</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">training</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">vtrace</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
@@ -1665,7 +1665,7 @@ document.write(`
 
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">IMPALAConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 
         <span class="c1"># On new API stack, circular buffer should be used, not `minibatch_buffer_size`.</span>
@@ -1700,9 +1700,9 @@ document.write(`
                 <span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">IMPALAConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_default_learner_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_learner_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">framework_str</span> <span class="o">==</span> <span class="s2">&quot;torch&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.appo.torch.appo_torch_learner</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.appo.torch.appo_torch_learner</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
                 <span class="n">APPOTorchLearner</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -1719,9 +1719,9 @@ document.write(`
             <span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">IMPALAConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_default_rl_module_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RLModuleSpec</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_rl_module_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RLModuleSpec</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">framework_str</span> <span class="o">==</span> <span class="s2">&quot;torch&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.appo.torch.appo_torch_rl_module</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.appo.torch.appo_torch_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
                 <span class="n">APPOTorchRLModule</span> <span class="k">as</span> <span class="n">RLModule</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1734,13 +1734,13 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_model_config_auto_includes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_model_config_auto_includes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_model_config_auto_includes</span> <span class="o">|</span> <span class="p">{</span><span class="s2">&quot;vf_share_layers&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span></div>
 
 
 
-<span class="k">class</span> <span class="nc">APPO</span><span class="p">(</span><span class="n">IMPALA</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">APPO</span><span class="p">(</span><span class="n">IMPALA</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes an APPO instance.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -1752,7 +1752,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span><span class="o">.</span><span class="n">foreach_policy_to_train</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">update_target</span><span class="p">())</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">IMPALA</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_rl_module_and_learner</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">training_step</span><span class="p">()</span>
 
@@ -1779,7 +1779,7 @@ document.write(`
             <span class="c1"># Also update the KL-coefficient for the APPO loss, if necessary.</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">use_kl_loss</span><span class="p">:</span>
 
-                <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">pi</span><span class="p">,</span> <span class="n">pi_id</span><span class="p">):</span>
+                <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">pi</span><span class="p">,</span> <span class="n">pi_id</span><span class="p">):</span>
                     <span class="k">assert</span> <span class="n">LEARNER_STATS_KEY</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">train_results</span><span class="p">,</span> <span class="p">(</span>
                         <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> should be nested under policy id key&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                             <span class="n">LEARNER_STATS_KEY</span>
@@ -1802,16 +1802,16 @@ document.write(`
 
     <span class="nd">@classmethod</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">IMPALA</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_default_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfig</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfig</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">APPOConfig</span><span class="p">()</span>
 
     <span class="nd">@classmethod</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">IMPALA</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_default_policy_class</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_policy_class</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AlgorithmConfig</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Policy</span><span class="p">]]:</span>
         <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;framework&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;torch&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.appo.appo_torch_policy</span> <span class="kn">import</span> <span class="n">APPOTorchPolicy</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.appo.appo_torch_policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">APPOTorchPolicy</span>
 
             <span class="k">return</span> <span class="n">APPOTorchPolicy</span>
         <span class="k">elif</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;framework&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;tf&quot;</span><span class="p">:</span>
@@ -1821,11 +1821,11 @@ document.write(`
                     <span class="s2">&quot; tf1. Use &quot;</span>
                     <span class="s2">&quot;framework=&#39;tf2&#39; instead.&quot;</span>
                 <span class="p">)</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.appo.appo_tf_policy</span> <span class="kn">import</span> <span class="n">APPOTF1Policy</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.appo.appo_tf_policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">APPOTF1Policy</span>
 
             <span class="k">return</span> <span class="n">APPOTF1Policy</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.appo.appo_tf_policy</span> <span class="kn">import</span> <span class="n">APPOTF2Policy</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.appo.appo_tf_policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">APPOTF2Policy</span>
 
             <span class="k">return</span> <span class="n">APPOTF2Policy</span>
 </pre></div>

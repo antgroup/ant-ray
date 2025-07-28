@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1397,21 +1397,21 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.schedulers.trial_scheduler</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">ray.air._internal.usage</span> <span class="kn">import</span> <span class="n">tag_scheduler</span>
-<span class="kn">from</span> <span class="nn">ray.tune.experiment</span> <span class="kn">import</span> <span class="n">Trial</span>
-<span class="kn">from</span> <span class="nn">ray.tune.result</span> <span class="kn">import</span> <span class="n">DEFAULT_METRIC</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.usage</span><span class="w"> </span><span class="kn">import</span> <span class="n">tag_scheduler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_METRIC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.execution.tune_controller</span> <span class="kn">import</span> <span class="n">TuneController</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.tune_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneController</span>
 
 
 <div class="viewcode-block" id="TrialScheduler">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.TrialScheduler.html#ray.tune.schedulers.TrialScheduler">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">TrialScheduler</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrialScheduler</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Interface for implementing a Trial Scheduler class.</span>
 
 <span class="sd">    Note to Tune developers: If a new scheduler is added, please update</span>
@@ -1431,20 +1431,20 @@ document.write(`
 
     <span class="n">_supports_buffered_results</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">tag_scheduler</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">supports_buffered_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">supports_buffered_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supports_buffered_results</span>
 
 <div class="viewcode-block" id="TrialScheduler.set_search_properties">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.TrialScheduler.set_search_properties.html#ray.tune.schedulers.TrialScheduler.set_search_properties">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_search_properties</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_search_properties</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">**</span><span class="n">spec</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Pass search properties to scheduler.</span>
@@ -1472,7 +1472,7 @@ document.write(`
 
 <div class="viewcode-block" id="TrialScheduler.on_trial_add">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.TrialScheduler.on_trial_add.html#ray.tune.schedulers.TrialScheduler.on_trial_add">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Called when a new trial is added to the trial runner.&quot;&quot;&quot;</span>
 
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
@@ -1480,7 +1480,7 @@ document.write(`
 
 <div class="viewcode-block" id="TrialScheduler.on_trial_error">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.TrialScheduler.on_trial_error.html#ray.tune.schedulers.TrialScheduler.on_trial_error">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_trial_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Notification for the error of trial.</span>
 
 <span class="sd">        This will only be called when the trial is in the RUNNING state.&quot;&quot;&quot;</span>
@@ -1490,7 +1490,7 @@ document.write(`
 
 <div class="viewcode-block" id="TrialScheduler.on_trial_result">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.TrialScheduler.on_trial_result.html#ray.tune.schedulers.TrialScheduler.on_trial_result">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_trial_result</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_result</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Called on each intermediate result returned by a trial.</span>
@@ -1504,7 +1504,7 @@ document.write(`
 
 <div class="viewcode-block" id="TrialScheduler.on_trial_complete">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.TrialScheduler.on_trial_complete.html#ray.tune.schedulers.TrialScheduler.on_trial_complete">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_trial_complete</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_complete</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Notification for the completion of trial.</span>
@@ -1517,7 +1517,7 @@ document.write(`
 
 <div class="viewcode-block" id="TrialScheduler.on_trial_remove">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.TrialScheduler.on_trial_remove.html#ray.tune.schedulers.TrialScheduler.on_trial_remove">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_trial_remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Called to remove trial.</span>
 
 <span class="sd">        This is called when the trial is in PAUSED or PENDING state. Otherwise,</span>
@@ -1528,7 +1528,7 @@ document.write(`
 
 <div class="viewcode-block" id="TrialScheduler.choose_trial_to_run">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.TrialScheduler.choose_trial_to_run.html#ray.tune.schedulers.TrialScheduler.choose_trial_to_run">[docs]</a>
-    <span class="k">def</span> <span class="nf">choose_trial_to_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Trial</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">choose_trial_to_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Trial</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Called to choose a new trial to run.</span>
 
 <span class="sd">        This should return one of the trials in tune_controller that is in</span>
@@ -1541,7 +1541,7 @@ document.write(`
 
 <div class="viewcode-block" id="TrialScheduler.debug_string">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.TrialScheduler.debug_string.html#ray.tune.schedulers.TrialScheduler.debug_string">[docs]</a>
-    <span class="k">def</span> <span class="nf">debug_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">debug_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a human readable message for printing to the console.&quot;&quot;&quot;</span>
 
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
@@ -1549,14 +1549,14 @@ document.write(`
 
 <div class="viewcode-block" id="TrialScheduler.save">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.TrialScheduler.save.html#ray.tune.schedulers.TrialScheduler.save">[docs]</a>
-    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Save trial scheduler to a checkpoint&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="TrialScheduler.restore">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.TrialScheduler.restore.html#ray.tune.schedulers.TrialScheduler.restore">[docs]</a>
-    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Restore trial scheduler from checkpoint.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 </div>
@@ -1566,32 +1566,32 @@ document.write(`
 <div class="viewcode-block" id="FIFOScheduler">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.FIFOScheduler.html#ray.tune.schedulers.FIFOScheduler">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">FIFOScheduler</span><span class="p">(</span><span class="n">TrialScheduler</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FIFOScheduler</span><span class="p">(</span><span class="n">TrialScheduler</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple scheduler that just runs trials in submission order.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_result</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_result</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">TrialScheduler</span><span class="o">.</span><span class="n">CONTINUE</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_complete</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_complete</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span>
     <span class="p">):</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">choose_trial_to_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Trial</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">choose_trial_to_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Trial</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">tune_controller</span><span class="o">.</span><span class="n">get_trials</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">trial</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">Trial</span><span class="o">.</span><span class="n">PENDING</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">trial</span>
@@ -1600,7 +1600,7 @@ document.write(`
                 <span class="k">return</span> <span class="n">trial</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">debug_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">debug_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;Using FIFO scheduling algorithm.&quot;</span></div>
 
 </pre></div>

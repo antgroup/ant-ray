@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,25 +1389,25 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.env.env_runner</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">abc</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
 
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">tree</span>  <span class="c1"># pip install dm_tree</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tree</span>  <span class="c1"># pip install dm_tree</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core</span> <span class="kn">import</span> <span class="n">COMPONENT_RL_MODULE</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.actor_manager</span> <span class="kn">import</span> <span class="n">FaultAwareApply</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.framework</span> <span class="kn">import</span> <span class="n">try_import_tf</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics</span> <span class="kn">import</span> <span class="n">ENV_RESET_TIMER</span><span class="p">,</span> <span class="n">ENV_STEP_TIMER</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics.metrics_logger</span> <span class="kn">import</span> <span class="n">MetricsLogger</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.torch_utils</span> <span class="kn">import</span> <span class="n">convert_to_torch_tensor</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">StateDict</span><span class="p">,</span> <span class="n">TensorType</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span><span class="p">,</span> <span class="n">DeveloperAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">COMPONENT_RL_MODULE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.actor_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">FaultAwareApply</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">try_import_tf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">ENV_RESET_TIMER</span><span class="p">,</span> <span class="n">ENV_STEP_TIMER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.metrics_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsLogger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.torch_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert_to_torch_tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">StateDict</span><span class="p">,</span> <span class="n">TensorType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span><span class="p">,</span> <span class="n">DeveloperAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;ray.rllib&quot;</span><span class="p">)</span>
 
@@ -1422,7 +1422,7 @@ document.write(`
 <div class="viewcode-block" id="EnvRunner">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.html#ray.rllib.env.env_runner.EnvRunner">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">EnvRunner</span><span class="p">(</span><span class="n">FaultAwareApply</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnvRunner</span><span class="p">(</span><span class="n">FaultAwareApply</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for distributed RL-style data collection from an environment.</span>
 
 <span class="sd">    The EnvRunner API&#39;s core functionalities can be summarized as:</span>
@@ -1441,7 +1441,7 @@ document.write(`
 
 <div class="viewcode-block" id="EnvRunner.__init__">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.__init__.html#ray.rllib.env.env_runner.EnvRunner.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="s2">&quot;AlgorithmConfig&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="s2">&quot;AlgorithmConfig&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes an EnvRunner instance.</span>
 
 <span class="sd">        Args:</span>
@@ -1468,7 +1468,7 @@ document.write(`
 <div class="viewcode-block" id="EnvRunner.assert_healthy">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.assert_healthy.html#ray.rllib.env.env_runner.EnvRunner.assert_healthy">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">assert_healthy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">assert_healthy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks that self.__init__() has been completed properly.</span>
 
 <span class="sd">        Useful in case an `EnvRunner` is run as @ray.remote (Actor) and the owner</span>
@@ -1482,7 +1482,7 @@ document.write(`
     <span class="c1"># TODO: Make this an abstract method that must be implemented.</span>
 <div class="viewcode-block" id="EnvRunner.make_env">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.make_env.html#ray.rllib.env.env_runner.EnvRunner.make_env">[docs]</a>
-    <span class="k">def</span> <span class="nf">make_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates the RL environment for this EnvRunner and assigns it to `self.env`.</span>
 
 <span class="sd">        Note that users should be able to change the EnvRunner&#39;s config (e.g. change</span>
@@ -1498,7 +1498,7 @@ document.write(`
     <span class="c1"># TODO: Make this an abstract method that must be implemented.</span>
 <div class="viewcode-block" id="EnvRunner.make_module">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.make_module.html#ray.rllib.env.env_runner.EnvRunner.make_module">[docs]</a>
-    <span class="k">def</span> <span class="nf">make_module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates the RLModule for this EnvRunner and assigns it to `self.module`.</span>
 
 <span class="sd">        Note that users should be able to change the EnvRunner&#39;s config (e.g. change</span>
@@ -1511,7 +1511,7 @@ document.write(`
 <div class="viewcode-block" id="EnvRunner.sample">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.sample.html#ray.rllib.env.env_runner.EnvRunner.sample">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns experiences (of any form) sampled from this EnvRunner.</span>
 
 <span class="sd">        The exact nature and size of collected data are defined via the EnvRunner&#39;s</span>
@@ -1528,7 +1528,7 @@ document.write(`
     <span class="c1"># TODO (sven): Make this an abstract method that must be overridden.</span>
 <div class="viewcode-block" id="EnvRunner.get_metrics">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.get_metrics.html#ray.rllib.env.env_runner.EnvRunner.get_metrics">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns metrics (in any form) of the thus far collected, completed episodes.</span>
 
 <span class="sd">        Returns:</span>
@@ -1540,7 +1540,7 @@ document.write(`
 <div class="viewcode-block" id="EnvRunner.sample_get_state_and_metrics">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.sample_get_state_and_metrics.html#ray.rllib.env.env_runner.EnvRunner.sample_get_state_and_metrics">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">sample_get_state_and_metrics</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample_get_state_and_metrics</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">,</span> <span class="n">StateDict</span><span class="p">,</span> <span class="n">StateDict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convenience method for fast, async algorithms.</span>
@@ -1561,13 +1561,13 @@ document.write(`
 <div class="viewcode-block" id="EnvRunner.get_spaces">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.get_spaces.html#ray.rllib.env.env_runner.EnvRunner.get_spaces">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_spaces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">,</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_spaces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">,</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a dict mapping ModuleIDs to 2-tuples of obs- and action space.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="EnvRunner.stop">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.stop.html#ray.rllib.env.env_runner.EnvRunner.stop">[docs]</a>
-    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Releases all resources used by this EnvRunner.</span>
 
 <span class="sd">        For example, when using a gym.Env in this EnvRunner, you should make sure</span>
@@ -1576,11 +1576,11 @@ document.write(`
         <span class="k">pass</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;If this Actor is deleted, clears all resources used by it.&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">_try_env_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_try_env_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Tries resetting the env and - if an error orrurs - handles it gracefully.&quot;&quot;&quot;</span>
         <span class="c1"># Try to reset.</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1606,7 +1606,7 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">e</span>
 
-    <span class="k">def</span> <span class="nf">_try_env_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_try_env_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Tries stepping the env and - if an error orrurs - handles it gracefully.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_time</span><span class="p">(</span><span class="n">ENV_STEP_TIMER</span><span class="p">):</span>
@@ -1627,7 +1627,7 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">e</span>
 
-    <span class="k">def</span> <span class="nf">_convert_to_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_to_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts structs to a framework-specific tensor.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">framework_str</span> <span class="o">==</span> <span class="s2">&quot;torch&quot;</span><span class="p">:</span>

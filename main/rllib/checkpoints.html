@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1472,7 +1472,7 @@ how to create checkpoints:</p>
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-0">
 Single-agent setup</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
 
 <span class="c1"># Configure and build an initial algorithm.</span>
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
@@ -1491,9 +1491,9 @@ Single-agent setup</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-1">
 Multi-agent setup</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.examples.envs.classes.multi_agent</span> <span class="kn">import</span> <span class="n">MultiAgentPendulum</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">register_env</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.examples.envs.classes.multi_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentPendulum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_env</span>
 
 <span class="n">register_env</span><span class="p">(</span><span class="s2">&quot;multi-pendulum&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">MultiAgentPendulum</span><span class="p">({</span><span class="s2">&quot;num_agents&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}))</span>
 
@@ -1646,7 +1646,7 @@ Create a new Algorithm from a checkpoint</label><div class="sd-tab-content docut
 <p>To recreate an entire <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>
 instance from a checkpoint, you can do the following:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import the correct class to create from scratch using the checkpoint.</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm</span> <span class="kn">import</span> <span class="n">Algorithm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm</span><span class="w"> </span><span class="kn">import</span> <span class="n">Algorithm</span>
 
 <span class="c1"># Use the already existing checkpoint in `checkpoint_dir`.</span>
 <span class="n">new_ppo</span> <span class="o">=</span> <span class="n">Algorithm</span><span class="o">.</span><span class="n">from_checkpoint</span><span class="p">(</span><span class="n">checkpoint_dir</span><span class="p">)</span>
@@ -1665,11 +1665,11 @@ Create a new RLModule from an Algorithm checkpoint</label><div class="sd-tab-con
 into production or evaluating them in a separate process while training is ongoing.
 To recreate only the <a class="reference internal" href="package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.html#ray.rllib.core.rl_module.rl_module.RLModule" title="ray.rllib.core.rl_module.rl_module.RLModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">RLModule</span></code></a> from
 the algorithm’s checkpoint, you can do the following.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span> <span class="nn">torch</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
 <span class="c1"># Import the correct class to create from scratch using the checkpoint.</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModule</span>
 
 <span class="c1"># Use the already existing checkpoint in `checkpoint_dir`, but go further down</span>
 <span class="c1"># into its subdirectory for the single RLModule.</span>
@@ -1738,7 +1738,7 @@ Algorithm object or any of its subcomponents.
 You can use <a class="reference internal" href="rllib-callback.html#rllib-callback-docs"><span class="std std-ref">RLlib’s callbacks APIs</span></a> to inject custom code and solve for this.</p>
 <p>Also, see here for an
 <a class="reference external" href="https://github.com/ray-project/ray/blob/master/rllib/examples/checkpoints/change_config_during_training.py">example on how to continue training with a different config</a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 <span class="c1"># Reuse the preceding PPOConfig (`config`).</span>
 <span class="c1"># Inject custom callback code that runs right after algorithm&#39;s initialization.</span>
@@ -1776,7 +1776,7 @@ code into a Ray Tune experiment:</p>
 
 <span class="c1"># Inject custom callback code that runs right after algorithm&#39;s initialization.</span>
 
-<span class="k">def</span> <span class="nf">_on_algo_init</span><span class="p">(</span><span class="n">algorithm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_on_algo_init</span><span class="p">(</span><span class="n">algorithm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">algorithm</span><span class="o">.</span><span class="n">restore_from_path</span><span class="p">(</span>
         <span class="c1"># Checkpoint was single-agent (has &quot;default_policy&quot; subdir).</span>
         <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">checkpoint_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">multi_rl_module_component_tree</span> <span class="o">/</span> <span class="s2">&quot;default_policy&quot;</span><span class="p">,</span>

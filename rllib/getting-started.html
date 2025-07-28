@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1443,7 +1443,7 @@ and change some default settings through the config object’s various methods.<
 <p>For example, you can set the <a class="reference internal" href="key-concepts.html#rllib-key-concepts-environments"><span class="std std-ref">RL environment</span></a>
 you want to use by calling the config’s <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.environment.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.environment" title="ray.rllib.algorithms.algorithm_config.AlgorithmConfig.environment"><code class="xref py py-meth docutils literal notranslate"><span class="pre">environment()</span></code></a>
 method:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
 
 <span class="c1"># Create a config instance for the PPO algorithm.</span>
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
@@ -1484,7 +1484,7 @@ method.</p>
 <p>After you built your <a class="reference internal" href="rllib-algorithms.html#ppo"><span class="std std-ref">PPO</span></a> from its configuration, you can <code class="docutils literal notranslate"><span class="pre">train</span></code> it for a number of
 iterations through calling the <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.train.html#ray.rllib.algorithms.algorithm.Algorithm.train" title="ray.rllib.algorithms.algorithm.Algorithm.train"><code class="xref py py-meth docutils literal notranslate"><span class="pre">train()</span></code></a> method,
 which returns a result dictionary that you can pretty-print for debugging purposes:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
 
 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
     <span class="n">pprint</span><span class="p">(</span><span class="n">ppo</span><span class="o">.</span><span class="n">train</span><span class="p">())</span>
@@ -1547,8 +1547,8 @@ to add Ray Tune support.</p>
 <a class="reference internal" href="../tune/index.html#tune-main"><span class="std std-ref">Ray Tune</span></a> experiments.</p>
 <p>For example, the following code performs a hyper-parameter sweep of your <a class="reference internal" href="rllib-algorithms.html#ppo"><span class="std std-ref">PPO</span></a>, creating three <code class="docutils literal notranslate"><span class="pre">Trials</span></code>,
 one for each of the configured learning rates:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span><span class="p">,</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span><span class="p">,</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">PPOConfig</span><span class="p">()</span>
@@ -1612,11 +1612,11 @@ a single episode of your RL environment. Note in particular the use of the
 the model and the
 <a class="reference internal" href="package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.forward_inference.html#ray.rllib.core.rl_module.rl_module.RLModule.forward_inference" title="ray.rllib.core.rl_module.rl_module.RLModule.forward_inference"><code class="xref py py-meth docutils literal notranslate"><span class="pre">forward_inference()</span></code></a>
 method to compute actions:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module</span> <span class="kn">import</span> <span class="n">RLModule</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModule</span>
 
 <span class="c1"># Create only the neural network (RLModule) from our algorithm checkpoint.</span>
 <span class="c1"># See here (https://docs.ray.io/en/master/rllib/checkpoints.html)</span>
@@ -1691,12 +1691,12 @@ Quickstart: Custom RL environment<div class="sd-summary-down docutils">
 <div class="sd-summary-up docutils">
 <svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
 </summary><div class="sd-summary-content sd-card-body docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
 
 <span class="c1"># Define your custom env class by subclassing gymnasium.Env:</span>
 
-<span class="k">class</span> <span class="nc">ParrotEnv</span><span class="p">(</span><span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParrotEnv</span><span class="p">(</span><span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Environment in which the agent learns to repeat the seen observations.</span>
 
 <span class="sd">    Observations are float numbers indicating the to-be-repeated values,</span>
@@ -1704,7 +1704,7 @@ Quickstart: Custom RL environment<div class="sd-summary-down docutils">
 <span class="sd">    The action space is the same as the observation space.</span>
 <span class="sd">    Rewards are `r=-abs([observation] - [action])`, for all steps.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># Since actions should repeat observations, their spaces must be the same.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s2">&quot;obs_act_space&quot;</span><span class="p">,</span>
@@ -1714,7 +1714,7 @@ Quickstart: Custom RL environment<div class="sd-summary-down docutils">
         <span class="bp">self</span><span class="o">.</span><span class="n">_cur_obs</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_episode_len</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets the environment, starting a new episode.&quot;&quot;&quot;</span>
         <span class="c1"># Reset the episode len.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_episode_len</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1723,7 +1723,7 @@ Quickstart: Custom RL environment<div class="sd-summary-down docutils">
         <span class="c1"># Return initial observation.</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cur_obs</span><span class="p">,</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Takes a single step in the episode given `action`.&quot;&quot;&quot;</span>
         <span class="c1"># Set `terminated` and `truncated` flags to True after 10 steps.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_episode_len</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -1766,14 +1766,14 @@ Quickstart: Custom RLModule<div class="sd-summary-down docutils">
 <div class="sd-summary-up docutils">
 <svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
 </summary><div class="sd-summary-content sd-card-body docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.core.columns</span> <span class="kn">import</span> <span class="n">Columns</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.torch</span> <span class="kn">import</span> <span class="n">TorchRLModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.columns</span><span class="w"> </span><span class="kn">import</span> <span class="n">Columns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchRLModule</span>
 
 <span class="c1"># Define your custom env class by subclassing `TorchRLModule`:</span>
-<span class="k">class</span> <span class="nc">CustomTorchRLModule</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomTorchRLModule</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># You have access here to the following already set attributes:</span>
         <span class="c1"># self.observation_space</span>
         <span class="c1"># self.action_space</span>
@@ -1790,7 +1790,7 @@ Quickstart: Custom RLModule<div class="sd-summary-down docutils">
             <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">),</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Push the observations from the batch through our `self._policy_net`.</span>
         <span class="n">action_logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_policy_net</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="n">Columns</span><span class="o">.</span><span class="n">OBS</span><span class="p">])</span>
         <span class="c1"># Return parameters for the default action distribution, which is</span>

@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1399,22 +1399,22 @@ document.write(`
   <h1>Source code for ray.tune.search.bohb.bohb_search</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;BOHB (Bayesian Optimization with HyperBand)&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="c1"># use cloudpickle instead of pickle to make BOHB obj</span>
 <span class="c1"># pickleable</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">cloudpickle</span>
-<span class="kn">from</span> <span class="nn">ray.tune.result</span> <span class="kn">import</span> <span class="n">DEFAULT_METRIC</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">cloudpickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_METRIC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">UNDEFINED_METRIC_MODE</span><span class="p">,</span>
     <span class="n">UNDEFINED_SEARCH_SPACE</span><span class="p">,</span>
     <span class="n">UNRESOLVED_SEARCH_SPACE</span><span class="p">,</span>
     <span class="n">Searcher</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.sample</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.sample</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Categorical</span><span class="p">,</span>
     <span class="n">Domain</span><span class="p">,</span>
     <span class="n">Float</span><span class="p">,</span>
@@ -1424,22 +1424,22 @@ document.write(`
     <span class="n">Quantized</span><span class="p">,</span>
     <span class="n">Uniform</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.variant_generator</span> <span class="kn">import</span> <span class="n">parse_spec_vars</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils.util</span> <span class="kn">import</span> <span class="n">flatten_dict</span><span class="p">,</span> <span class="n">unflatten_list_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.variant_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_spec_vars</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten_dict</span><span class="p">,</span> <span class="n">unflatten_list_dict</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">ConfigSpace</span>
-    <span class="kn">from</span> <span class="nn">hpbandster.optimizers.config_generators.bohb</span> <span class="kn">import</span> <span class="n">BOHB</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">ConfigSpace</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">hpbandster.optimizers.config_generators.bohb</span><span class="w"> </span><span class="kn">import</span> <span class="n">BOHB</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">BOHB</span> <span class="o">=</span> <span class="n">ConfigSpace</span> <span class="o">=</span> <span class="kc">None</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_BOHBJobWrapper</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_BOHBJobWrapper</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mock object for HpBandSter to process.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">budget</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">budget</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">loss</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;budget&quot;</span><span class="p">:</span> <span class="n">budget</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">copy</span><span class="p">()}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exception</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1447,7 +1447,7 @@ document.write(`
 
 <div class="viewcode-block" id="TuneBOHB">
 <a class="viewcode-back" href="../../../../../tune/api/doc/ray.tune.search.bohb.TuneBOHB.html#ray.tune.search.bohb.TuneBOHB">[docs]</a>
-<span class="k">class</span> <span class="nc">TuneBOHB</span><span class="p">(</span><span class="n">Searcher</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TuneBOHB</span><span class="p">(</span><span class="n">Searcher</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;BOHB suggestion component.</span>
 
 
@@ -1524,7 +1524,7 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="s2">&quot;ConfigSpace.ConfigurationSpace&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">bohb_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1571,12 +1571,12 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_space</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup_bohb</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">set_max_concurrency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_concurrent</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_max_concurrency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_concurrent</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_max_concurrent</span> <span class="o">=</span> <span class="n">max_concurrent</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_setup_bohb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">hpbandster.optimizers.config_generators.bohb</span> <span class="kn">import</span> <span class="n">BOHB</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_bohb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">hpbandster.optimizers.config_generators.bohb</span><span class="w"> </span><span class="kn">import</span> <span class="n">BOHB</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="p">:</span>
             <span class="c1"># If only a mode was passed, use anonymous metric</span>
@@ -1596,7 +1596,7 @@ document.write(`
         <span class="n">bohb_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bohb_config</span> <span class="ow">or</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bohber</span> <span class="o">=</span> <span class="n">BOHB</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_space</span><span class="p">,</span> <span class="o">**</span><span class="n">bohb_config</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">set_search_properties</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_search_properties</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="o">**</span><span class="n">spec</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_space</span><span class="p">:</span>
@@ -1612,7 +1612,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_bohb</span><span class="p">()</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_space</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="n">UNDEFINED_SEARCH_SPACE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -1642,7 +1642,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">running</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">trial_id</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">unflatten_list_dict</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">trial_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">paused</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">running</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">trial_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="s2">&quot;hyperband_info&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
@@ -1654,14 +1654,14 @@ document.write(`
             <span class="n">hbs_wrapper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_wrapper</span><span class="p">(</span><span class="n">trial_id</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bohber</span><span class="o">.</span><span class="n">new_result</span><span class="p">(</span><span class="n">hbs_wrapper</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_complete</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_complete</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">):</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_to_params</span><span class="p">[</span><span class="n">trial_id</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">paused</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">trial_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">running</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">trial_id</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_BOHBJobWrapper</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_BOHBJobWrapper</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_BOHBJobWrapper</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_metric_op</span> <span class="o">*</span> <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="p">],</span>
             <span class="n">result</span><span class="p">[</span><span class="s2">&quot;hyperband_info&quot;</span><span class="p">][</span><span class="s2">&quot;budget&quot;</span><span class="p">],</span>
@@ -1670,16 +1670,16 @@ document.write(`
 
     <span class="c1"># BOHB Specific.</span>
     <span class="c1"># TODO(team-ml): Refactor alongside HyperBandForBOHB</span>
-    <span class="k">def</span> <span class="nf">on_pause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_pause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">paused</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">trial_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">running</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">trial_id</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_unpause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_unpause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">paused</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">trial_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">running</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">trial_id</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">convert_search_space</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ConfigSpace.ConfigurationSpace&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert_search_space</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ConfigSpace.ConfigurationSpace&quot;</span><span class="p">:</span>
         <span class="n">resolved_vars</span><span class="p">,</span> <span class="n">domain_vars</span><span class="p">,</span> <span class="n">grid_vars</span> <span class="o">=</span> <span class="n">parse_spec_vars</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">grid_vars</span><span class="p">:</span>
@@ -1692,7 +1692,7 @@ document.write(`
         <span class="n">spec</span> <span class="o">=</span> <span class="n">flatten_dict</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">prevent_delimiter</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">resolved_vars</span><span class="p">,</span> <span class="n">domain_vars</span><span class="p">,</span> <span class="n">grid_vars</span> <span class="o">=</span> <span class="n">parse_spec_vars</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">resolve_value</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">resolve_value</span><span class="p">(</span>
             <span class="n">par</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="n">Domain</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigSpace</span><span class="o">.</span><span class="n">hyperparameters</span><span class="o">.</span><span class="n">Hyperparameter</span><span class="p">:</span>
             <span class="n">quantize</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1773,12 +1773,12 @@ document.write(`
 
         <span class="k">return</span> <span class="n">cs</span>
 
-    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">save_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outputFile</span><span class="p">:</span>
             <span class="n">cloudpickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">save_object</span><span class="p">,</span> <span class="n">outputFile</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">inputFile</span><span class="p">:</span>
             <span class="n">save_object</span> <span class="o">=</span> <span class="n">cloudpickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">inputFile</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">save_object</span><span class="p">)</span></div>

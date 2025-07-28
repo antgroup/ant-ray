@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,35 +1392,35 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.train.torch.config</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.distributed</span> <span class="k">as</span> <span class="nn">dist</span>
-<span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.distributed</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dist</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">packaging.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">Version</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.air._internal.device_manager</span> <span class="kn">import</span> <span class="n">register_custom_torch_dist_backend</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.utils</span> <span class="kn">import</span> <span class="n">get_address_and_port</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.worker_group</span> <span class="kn">import</span> <span class="n">WorkerGroup</span>
-<span class="kn">from</span> <span class="nn">ray.train.backend</span> <span class="kn">import</span> <span class="n">Backend</span><span class="p">,</span> <span class="n">BackendConfig</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.device_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_custom_torch_dist_backend</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_address_and_port</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.worker_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">WorkerGroup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">Backend</span><span class="p">,</span> <span class="n">BackendConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">TorchConfigContextManager</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TorchConfigContextManager</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Set default cuda device</span>
         <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
             <span class="n">device</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">get_device</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span><span class="p">:</span>
                 <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">set_device</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
         <span class="c1"># Propagate exceptions if any</span>
         <span class="k">return</span> <span class="kc">False</span>
 
@@ -1429,7 +1429,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.torch.TorchConfig.html#ray.train.torch.TorchConfig">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">TorchConfig</span><span class="p">(</span><span class="n">BackendConfig</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TorchConfig</span><span class="p">(</span><span class="n">BackendConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for torch process group setup.</span>
 
 <span class="sd">    See https://pytorch.org/docs/stable/distributed.html for more info.</span>
@@ -1451,16 +1451,16 @@ document.write(`
     <span class="n">timeout_s</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1800</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">backend_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">backend_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_TorchBackend</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">train_func_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">train_func_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">TorchConfigContextManager</span></div>
 
 
 
-<span class="k">def</span> <span class="nf">_setup_torch_process_group</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_setup_torch_process_group</span><span class="p">(</span>
     <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">world_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">world_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1518,8 +1518,8 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_shutdown_torch</span><span class="p">(</span><span class="n">destroy_process_group</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">ray.air._internal.torch_utils</span> <span class="kn">import</span> <span class="n">get_devices</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_shutdown_torch</span><span class="p">(</span><span class="n">destroy_process_group</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.torch_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_devices</span>
 
     <span class="n">devices</span> <span class="o">=</span> <span class="n">get_devices</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">destroy_process_group</span><span class="p">:</span>
@@ -1530,10 +1530,10 @@ document.write(`
                 <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_set_torch_distributed_env_vars</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_torch_distributed_env_vars</span><span class="p">():</span>
     <span class="c1"># Same env vars as in</span>
     <span class="c1"># https://pytorch.org/docs/stable/elastic/run.html#environment-variables</span>
-    <span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">get_device</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_device</span>
 
     <span class="n">context</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;LOCAL_RANK&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">get_local_rank</span><span class="p">())</span>
@@ -1547,10 +1547,10 @@ document.write(`
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;ACCELERATE_TORCH_DEVICE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_TorchBackend</span><span class="p">(</span><span class="n">Backend</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_TorchBackend</span><span class="p">(</span><span class="n">Backend</span><span class="p">):</span>
     <span class="n">share_cuda_visible_devices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">on_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_group</span><span class="p">:</span> <span class="n">WorkerGroup</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">:</span> <span class="n">TorchConfig</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_group</span><span class="p">:</span> <span class="n">WorkerGroup</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">:</span> <span class="n">TorchConfig</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">dist</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
             <span class="c1"># Set the appropriate training backend.</span>
             <span class="k">if</span> <span class="n">backend_config</span><span class="o">.</span><span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1566,7 +1566,7 @@ document.write(`
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">backend_config</span><span class="o">.</span><span class="n">init_method</span> <span class="o">==</span> <span class="s2">&quot;env&quot;</span><span class="p">:</span>
 
-                <span class="k">def</span> <span class="nf">set_env_vars</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+                <span class="k">def</span><span class="w"> </span><span class="nf">set_env_vars</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MASTER_ADDR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">addr</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MASTER_PORT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
 
@@ -1598,13 +1598,13 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Distributed torch is not available.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_group</span><span class="p">:</span> <span class="n">WorkerGroup</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">:</span> <span class="n">TorchConfig</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_group</span><span class="p">:</span> <span class="n">WorkerGroup</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">:</span> <span class="n">TorchConfig</span><span class="p">):</span>
         <span class="n">worker_group</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
             <span class="n">_shutdown_torch</span><span class="p">,</span>
             <span class="n">destroy_process_group</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">worker_group</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_training_start</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_training_start</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">worker_group</span><span class="p">:</span> <span class="n">WorkerGroup</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">:</span> <span class="n">BackendConfig</span>
     <span class="p">):</span>
         <span class="n">worker_group</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">_set_torch_distributed_env_vars</span><span class="p">)</span>

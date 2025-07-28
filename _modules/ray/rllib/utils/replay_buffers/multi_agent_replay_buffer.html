@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,37 +1389,37 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.utils.replay_buffers.multi_agent_replay_buffer</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">ray.util.timer</span> <span class="kn">import</span> <span class="n">_Timer</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.rnn_sequencing</span> <span class="kn">import</span> <span class="n">timeslice_along_seq_lens_with_overlap</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.sample_batch</span> <span class="kn">import</span> <span class="n">MultiAgentBatch</span><span class="p">,</span> <span class="n">SampleBatch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">override</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="n">Deprecated</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.from_config</span> <span class="kn">import</span> <span class="n">from_config</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.replay_buffers.replay_buffer</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.timer</span><span class="w"> </span><span class="kn">import</span> <span class="n">_Timer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.rnn_sequencing</span><span class="w"> </span><span class="kn">import</span> <span class="n">timeslice_along_seq_lens_with_overlap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.sample_batch</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentBatch</span><span class="p">,</span> <span class="n">SampleBatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.from_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.replay_buffers.replay_buffer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_ALL_POLICIES</span><span class="p">,</span>
     <span class="n">ReplayBuffer</span><span class="p">,</span>
     <span class="n">StorageUnit</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">PolicyID</span><span class="p">,</span> <span class="n">SampleBatchType</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
-<span class="kn">from</span> <span class="nn">ray.util.debug</span> <span class="kn">import</span> <span class="n">log_once</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">PolicyID</span><span class="p">,</span> <span class="n">SampleBatchType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.debug</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_once</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">ReplayMode</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ReplayMode</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">LOCKSTEP</span> <span class="o">=</span> <span class="s2">&quot;lockstep&quot;</span>
     <span class="n">INDEPENDENT</span> <span class="o">=</span> <span class="s2">&quot;independent&quot;</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">merge_dicts_with_warning</span><span class="p">(</span><span class="n">args_on_init</span><span class="p">,</span> <span class="n">args_on_call</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_dicts_with_warning</span><span class="p">(</span><span class="n">args_on_init</span><span class="p">,</span> <span class="n">args_on_call</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge argument dicts, overwriting args_on_call with warning.</span>
 
 <span class="sd">    The MultiAgentReplayBuffer supports setting standard arguments for calls</span>
@@ -1446,7 +1446,7 @@ document.write(`
 <div class="viewcode-block" id="MultiAgentReplayBuffer">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer.html#ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">MultiAgentReplayBuffer</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiAgentReplayBuffer</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A replay buffer shard for multiagent setups.</span>
 
 <span class="sd">    This buffer is meant to be run in parallel to distribute experiences</span>
@@ -1456,7 +1456,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentReplayBuffer.__init__">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer.__init__.html#ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">capacity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span>
         <span class="n">storage_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;timesteps&quot;</span><span class="p">,</span>
@@ -1559,12 +1559,12 @@ document.write(`
                 <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">underlying_buffer_config</span><span class="p">,</span>
             <span class="p">}</span>
 
-            <span class="k">def</span> <span class="nf">new_buffer</span><span class="p">():</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">new_buffer</span><span class="p">():</span>
                 <span class="k">return</span> <span class="n">from_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">underlying_buffer_config</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">ctor_args</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Default case</span>
-            <span class="k">def</span> <span class="nf">new_buffer</span><span class="p">():</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">new_buffer</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">underlying_buffer_call_args</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">return</span> <span class="n">ReplayBuffer</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="p">,</span>
@@ -1579,7 +1579,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_added</span> <span class="o">=</span> <span class="mi">0</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of items currently stored in this buffer.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">buffer</span><span class="o">.</span><span class="n">_storage</span><span class="p">)</span> <span class="k">for</span> <span class="n">buffer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">replay_buffers</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
@@ -1589,7 +1589,7 @@ document.write(`
         <span class="n">new</span><span class="o">=</span><span class="s2">&quot;ReplayBuffer.sample(num_items)&quot;</span><span class="p">,</span>
         <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">replay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_items</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SampleBatchType</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">replay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_items</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SampleBatchType</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Deprecated in favor of new ReplayBuffer API.&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
@@ -1597,7 +1597,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer.add.html#ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer.add">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">SampleBatchType</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">SampleBatchType</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a batch to the appropriate policy&#39;s replay buffer.</span>
 
 <span class="sd">        Turns the batch into a MultiAgentBatch of the DEFAULT_POLICY_ID if</span>
@@ -1630,7 +1630,7 @@ document.write(`
 
 
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">_add_to_underlying_buffer</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_to_underlying_buffer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">policy_id</span><span class="p">:</span> <span class="n">PolicyID</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">SampleBatchType</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a batch of experiences to the underlying buffer of a policy.</span>
@@ -1692,7 +1692,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer.sample.html#ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer.sample">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">num_items</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">policy_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PolicyID</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SampleBatchType</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Samples a MultiAgentBatch of `num_items` per one policy&#39;s buffer.</span>
@@ -1737,7 +1737,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer.stats.html#ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer.stats">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the stats of this buffer and all underlying buffers.</span>
 
 <span class="sd">        Args:</span>
@@ -1762,7 +1762,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer.get_state.html#ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer.get_state">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns all local state.</span>
 
 <span class="sd">        Returns:</span>
@@ -1778,7 +1778,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer.set_state.html#ray.rllib.utils.replay_buffers.multi_agent_replay_buffer.MultiAgentReplayBuffer.set_state">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Restores all local state to the provided `state`.</span>
 
 <span class="sd">        Args:</span>
@@ -1791,7 +1791,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">replay_buffers</span><span class="p">[</span><span class="n">policy_id</span><span class="p">]</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">buffer_states</span><span class="p">[</span><span class="n">policy_id</span><span class="p">])</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_maybe_split_into_policy_batches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">SampleBatchType</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_maybe_split_into_policy_batches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">SampleBatchType</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a dict of policy IDs and batches, depending on our replay mode.</span>
 
 <span class="sd">        This method helps with splitting up MultiAgentBatches only if the</span>

@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1418,7 +1418,7 @@ Markdown, use MyST syntax. To learn more, read the
 <p><em>doctest-style</em> examples mimic interactive Python sessions.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">doctest</span><span class="p">::</span>
 
-    <span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="o">...</span>     <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
     <span class="o">&gt;&gt;&gt;</span> <span class="n">is_even</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="kc">True</span>
@@ -1427,7 +1427,7 @@ Markdown, use MyST syntax. To learn more, read the
 </pre></div>
 </div>
 <p>They’re rendered like this:</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">is_even</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="go">True</span>
@@ -1439,7 +1439,7 @@ Markdown, use MyST syntax. To learn more, read the
 <p class="admonition-title">Tip</p>
 <p>If you’re writing docstrings, exclude <code class="code docutils literal notranslate"><span class="pre">..</span> <span class="pre">doctest::</span></code> to simplify your code.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Example</span><span class="p">:</span>
-    <span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="k">def</span><span class="w"> </span><span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="o">...</span>     <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
     <span class="o">&gt;&gt;&gt;</span> <span class="n">is_even</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="kc">True</span>
@@ -1454,7 +1454,7 @@ Markdown, use MyST syntax. To learn more, read the
 <p><em>code-output-style</em> examples contain ordinary Python code.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">testcode</span><span class="p">::</span>
 
-    <span class="k">def</span> <span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="n">is_even</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
@@ -1467,7 +1467,7 @@ Markdown, use MyST syntax. To learn more, read the
 </pre></div>
 </div>
 <p>They’re rendered like this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">is_even</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
@@ -1492,14 +1492,14 @@ False
 
 <span class="c1"># fmt: off</span>
 <span class="c1"># __is_even_begin__</span>
-<span class="k">def</span> <span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
 <span class="c1"># __is_even_end__</span>
 <span class="c1"># fmt: on</span>
 </pre></div>
 </div>
 <p>They’re rendered like this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
 </pre></div>
 </div>
@@ -1519,7 +1519,7 @@ illustrates your API.</p>
 want to print intermediate objects, use <em>doctest-style</em>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">doctest</span><span class="p">::</span>
 
-    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">ray</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
     <span class="o">&gt;&gt;&gt;</span> <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
     <span class="o">&gt;&gt;&gt;</span> <span class="n">ds</span><span class="o">.</span><span class="n">schema</span><span class="p">()</span>
     <span class="n">Column</span>  <span class="n">Type</span>
@@ -1535,14 +1535,14 @@ want to print intermediate objects, use <em>doctest-style</em>.</p>
 <p>If you’re writing a longer example, or if object representations aren’t relevant to your example, use <em>code-block-style</em>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">testcode</span><span class="p">::</span>
 
-    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-    <span class="kn">import</span> <span class="nn">ray</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
     <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@air-example-data/iris.csv&quot;</span><span class="p">)</span>
 
     <span class="c1"># Compute a &quot;petal area&quot; attribute.</span>
-    <span class="k">def</span> <span class="nf">transform_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transform_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
         <span class="n">vec_a</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;petal length (cm)&quot;</span><span class="p">]</span>
         <span class="n">vec_b</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;petal width (cm)&quot;</span><span class="p">]</span>
         <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;petal area (cm^2)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vec_a</span> <span class="o">*</span> <span class="n">vec_b</span>
@@ -1585,7 +1585,7 @@ want to print intermediate objects, use <em>doctest-style</em>.</p>
 <p>To skip a <em>doctest-style</em> example, append <code class="code docutils literal notranslate"><span class="pre">#</span> <span class="pre">doctest:</span> <span class="pre">+SKIP</span></code> to your Python code.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">doctest</span><span class="p">::</span>
 
-    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">ray</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
     <span class="o">&gt;&gt;&gt;</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_images</span><span class="p">(</span><span class="s2">&quot;s3://private-bucket&quot;</span><span class="p">)</span>  <span class="c1"># doctest: +SKIP</span>
 </pre></div>
 </div>
@@ -1596,7 +1596,7 @@ want to print intermediate objects, use <em>doctest-style</em>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">testcode</span><span class="p">::</span>
     <span class="p">:</span><span class="n">skipif</span><span class="p">:</span> <span class="kc">True</span>
 
-    <span class="kn">from</span> <span class="nn">ray.air.integrations.wandb</span> <span class="kn">import</span> <span class="n">WandbLoggerCallback</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.integrations.wandb</span><span class="w"> </span><span class="kn">import</span> <span class="n">WandbLoggerCallback</span>
     <span class="n">callback</span> <span class="o">=</span> <span class="n">WandbLoggerCallback</span><span class="p">(</span>
         <span class="n">project</span><span class="o">=</span><span class="s2">&quot;Optimization_Project&quot;</span><span class="p">,</span>
         <span class="n">api_key_file</span><span class="o">=...</span><span class="p">,</span>
@@ -1612,7 +1612,7 @@ want to print intermediate objects, use <em>doctest-style</em>.</p>
 <section id="ignoring-doctest-style-outputs">
 <h3>Ignoring <em>doctest-style</em> outputs<a class="headerlink" href="#ignoring-doctest-style-outputs" title="Link to this heading">#</a></h3>
 <p>To ignore parts of a <em>doctest-style</em> output, replace problematic sections with ellipses.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_images</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/image-datasets/simple&quot;</span><span class="p">)</span>
 <span class="go">Dataset(</span>
 <span class="go">   num_rows=...,</span>
@@ -1628,7 +1628,7 @@ want to print intermediate objects, use <em>doctest-style</em>.</p>
 with ellipses.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">testcode</span><span class="p">::</span>
 
-    <span class="kn">import</span> <span class="nn">ray</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_images</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/image-datasets/simple&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 
@@ -1644,7 +1644,7 @@ with ellipses.</p>
 <code class="code docutils literal notranslate"><span class="pre">:options:</span> <span class="pre">+MOCK</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">testcode</span><span class="p">::</span>
 
-    <span class="kn">import</span> <span class="nn">random</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">())</span>
 
 <span class="o">..</span> <span class="n">testoutput</span><span class="p">::</span>

@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,49 +1392,49 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.experiment.trial</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">platform</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numbers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Number</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray.cloudpickle</span> <span class="k">as</span> <span class="nn">cloudpickle</span>
-<span class="kn">from</span> <span class="nn">ray._private.utils</span> <span class="kn">import</span> <span class="n">binary_to_hex</span><span class="p">,</span> <span class="n">hex_to_binary</span>
-<span class="kn">from</span> <span class="nn">ray.air.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.cloudpickle</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cloudpickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">binary_to_hex</span><span class="p">,</span> <span class="n">hex_to_binary</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">EXPR_ERROR_FILE</span><span class="p">,</span>
     <span class="n">EXPR_ERROR_PICKLE_FILE</span><span class="p">,</span>
     <span class="n">TRAINING_ITERATION</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.exceptions</span> <span class="kn">import</span> <span class="n">RayActorError</span><span class="p">,</span> <span class="n">RayTaskError</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">CheckpointConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.checkpoint_manager</span> <span class="kn">import</span> <span class="n">_CheckpointManager</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.session</span> <span class="kn">import</span> <span class="n">_FutureTrainingResult</span><span class="p">,</span> <span class="n">_TrainingResult</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.storage</span> <span class="kn">import</span> <span class="n">StorageContext</span><span class="p">,</span> <span class="n">_exists_at_fs_path</span>
-<span class="kn">from</span> <span class="nn">ray.train.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">RayActorError</span><span class="p">,</span> <span class="n">RayTaskError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">CheckpointConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.checkpoint_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">_CheckpointManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">_FutureTrainingResult</span><span class="p">,</span> <span class="n">_TrainingResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">StorageContext</span><span class="p">,</span> <span class="n">_exists_at_fs_path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">RAY_CHDIR_TO_TRIAL_DIR</span><span class="p">,</span>
     <span class="n">RAY_TRAIN_COUNT_PREEMPTION_AS_FAILURE</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.error</span> <span class="kn">import</span> <span class="n">TuneError</span>
-<span class="kn">from</span> <span class="nn">ray.tune.execution.placement_groups</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.error</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.placement_groups</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PlacementGroupFactory</span><span class="p">,</span>
     <span class="n">resource_dict_to_pg_factory</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.logger</span> <span class="kn">import</span> <span class="n">NoopLogger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">NoopLogger</span>
 
 <span class="c1"># NOTE(rkn): We import ray.tune.registry here instead of importing the names we</span>
 <span class="c1"># need because there are cyclic imports that may cause specific names to not</span>
 <span class="c1"># have been defined yet. See https://github.com/ray-project/ray/issues/1716.</span>
-<span class="kn">from</span> <span class="nn">ray.tune.registry</span> <span class="kn">import</span> <span class="n">get_trainable_cls</span><span class="p">,</span> <span class="n">validate_trainable</span>
-<span class="kn">from</span> <span class="nn">ray.tune.result</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_trainable_cls</span><span class="p">,</span> <span class="n">validate_trainable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEBUG_METRICS</span><span class="p">,</span>
     <span class="n">DONE</span><span class="p">,</span>
     <span class="n">NODE_IP</span><span class="p">,</span>
@@ -1444,11 +1444,11 @@ document.write(`
     <span class="n">TRIAL_ID</span><span class="p">,</span>
     <span class="n">TRIAL_INFO</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.trainable.metadata</span> <span class="kn">import</span> <span class="n">_TrainingRunMetadata</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils</span> <span class="kn">import</span> <span class="n">date_str</span><span class="p">,</span> <span class="n">flatten_dict</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils.serialization</span> <span class="kn">import</span> <span class="n">TuneFunctionDecoder</span><span class="p">,</span> <span class="n">TuneFunctionEncoder</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">log_once</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">_TrainingRunMetadata</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">date_str</span><span class="p">,</span> <span class="n">flatten_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils.serialization</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneFunctionDecoder</span><span class="p">,</span> <span class="n">TuneFunctionEncoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_once</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span>
 
 <span class="n">DEBUG_PRINT_INTERVAL</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="n">_DEFAULT_WIN_MAX_PATH_LENGTH</span> <span class="o">=</span> <span class="mi">260</span>
@@ -1458,14 +1458,14 @@ document.write(`
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_Location</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Location</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Describes the location at which Trial is placed to run.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="n">hostname</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="n">pid</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;&quot;</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">==</span> <span class="n">platform</span><span class="o">.</span><span class="n">node</span><span class="p">():</span>
@@ -1475,7 +1475,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">ExportFormat</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExportFormat</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Describes the format to import/export the trial Trainable.</span>
 
 <span class="sd">    This may correspond to different file formats based on the</span>
@@ -1488,7 +1488,7 @@ document.write(`
     <span class="n">H5</span> <span class="o">=</span> <span class="s2">&quot;h5&quot;</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">formats</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="n">formats</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates formats.</span>
 
 <span class="sd">        Raises:</span>
@@ -1505,7 +1505,7 @@ document.write(`
                 <span class="k">raise</span> <span class="n">TuneError</span><span class="p">(</span><span class="s2">&quot;Unsupported import/export format: &quot;</span> <span class="o">+</span> <span class="n">formats</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
 
-<span class="k">class</span> <span class="nc">_TrialInfo</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_TrialInfo</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Serializable struct for holding information for a Trial.</span>
 
 <span class="sd">    Attributes:</span>
@@ -1514,40 +1514,40 @@ document.write(`
 <span class="sd">        trial_resources: resources used by trial.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_trial_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">trial</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_trial_id</span> <span class="o">=</span> <span class="n">trial</span><span class="o">.</span><span class="n">trial_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_trial_resources</span> <span class="o">=</span> <span class="n">trial</span><span class="o">.</span><span class="n">placement_group_factory</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_name</span> <span class="o">=</span> <span class="n">trial</span><span class="o">.</span><span class="n">experiment_dir_name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">experiment_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">experiment_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trial_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trial_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial_name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trial_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trial_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial_id</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trial_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlacementGroupFactory</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trial_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlacementGroupFactory</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial_resources</span>
 
     <span class="nd">@trial_resources</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">trial_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_resources</span><span class="p">:</span> <span class="n">PlacementGroupFactory</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trial_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_resources</span><span class="p">:</span> <span class="n">PlacementGroupFactory</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_trial_resources</span> <span class="o">=</span> <span class="n">new_resources</span>
 
 
-<span class="k">class</span> <span class="nc">_TemporaryTrialState</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_TemporaryTrialState</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Temporary trial state.</span>
 
 <span class="sd">    Values saved here should not be restored on resume.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">_Location</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">ray_actor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ray</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">ActorHandle</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1557,18 +1557,18 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">num_restore_failures</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{}</span>
 
 
-<span class="k">def</span> <span class="nf">_get_max_path_length</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_max_path_length</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">os</span><span class="p">,</span> <span class="s2">&quot;pathconf&quot;</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">pathconf</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;PC_PATH_MAX&quot;</span><span class="p">)</span>
     <span class="c1"># Windows</span>
     <span class="k">return</span> <span class="n">_DEFAULT_WIN_MAX_PATH_LENGTH</span>
 
 
-<span class="k">def</span> <span class="nf">_create_unique_logdir_name</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">relative_logdir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_unique_logdir_name</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">relative_logdir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="n">candidate</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">relative_logdir</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">candidate</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="n">relative_logdir_old</span> <span class="o">=</span> <span class="n">relative_logdir</span>
@@ -1580,7 +1580,7 @@ document.write(`
     <span class="k">return</span> <span class="n">relative_logdir</span>
 
 
-<span class="k">def</span> <span class="nf">_noop_logger_creator</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">logdir</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_noop_logger_creator</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">logdir</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="c1"># Upon remote process setup, record the actor&#39;s original working dir before</span>
     <span class="c1"># changing to the Tune logdir</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;TUNE_ORIG_WORKING_DIR&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
@@ -1596,7 +1596,7 @@ document.write(`
     <span class="k">return</span> <span class="n">NoopLogger</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">logdir</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_trainable_kwargs</span><span class="p">(</span><span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_trainable_kwargs</span><span class="p">(</span><span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="n">trial</span><span class="o">.</span><span class="n">init_local_path</span><span class="p">()</span>
 
     <span class="n">logger_creator</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
@@ -1621,7 +1621,7 @@ document.write(`
 
 
 <span class="nd">@contextmanager</span>
-<span class="k">def</span> <span class="nf">_change_working_directory</span><span class="p">(</span><span class="n">trial</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_change_working_directory</span><span class="p">(</span><span class="n">trial</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Context manager changing working directory to trial logdir.</span>
 <span class="sd">    Used in local mode.</span>
 
@@ -1641,7 +1641,7 @@ document.write(`
 <div class="viewcode-block" id="Trial">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experiment.trial.Trial">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Trial</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Trial</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A trial object holds the state for one model training run.</span>
 
 <span class="sd">    Trials are themselves managed by the TrialRunner class, which implements</span>
@@ -1685,7 +1685,7 @@ document.write(`
     <span class="n">TERMINATED</span> <span class="o">=</span> <span class="s2">&quot;TERMINATED&quot;</span>
     <span class="n">ERROR</span> <span class="o">=</span> <span class="s2">&quot;ERROR&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">trainable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1811,7 +1811,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trial.create_placement_group_factory">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experiment.trial.Trial.create_placement_group_factory">[docs]</a>
-    <span class="k">def</span> <span class="nf">create_placement_group_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_placement_group_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute placement group factory if needed.</span>
 
 <span class="sd">        Note: this must be called after all the placeholders in</span>
@@ -1853,7 +1853,7 @@ document.write(`
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_get_default_result_or_future</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_default_result_or_future</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls ray.get on self._default_result_or_future and assigns back.</span>
 
 <span class="sd">        Returns None in case of exceptions.</span>
@@ -1875,15 +1875,15 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_result_or_future</span>
 
-    <span class="k">def</span> <span class="nf">resolve_config_placeholders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placeholder_resolvers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
-        <span class="kn">from</span> <span class="nn">ray.tune.impl.placeholder</span> <span class="kn">import</span> <span class="n">resolve_placeholders</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_config_placeholders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placeholder_resolvers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.impl.placeholder</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_placeholders</span>
 
         <span class="c1"># Make a copy of the unresolved config before resolve it.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__unresolved_config</span><span class="p">)</span>
         <span class="n">resolve_placeholders</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">placeholder_resolvers</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">last_result</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">last_result</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="c1"># The logic in here is as follows:</span>
         <span class="c1"># 1. If the trial has reported at least once, last_result would have</span>
         <span class="c1">#    been set and therefore would not be empty. We can just return it.</span>
@@ -1901,14 +1901,14 @@ document.write(`
         <span class="k">return</span> <span class="n">result</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">metric_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">metric_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_metadata</span><span class="o">.</span><span class="n">metric_analysis</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">metric_n_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">metric_n_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_metadata</span><span class="o">.</span><span class="n">metric_n_steps</span>
 
-    <span class="k">def</span> <span class="nf">get_ray_actor_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ray_actor_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">temporary_state</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">hostname</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">temporary_state</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">hostname</span>
 
@@ -1923,55 +1923,55 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="s2">&quot;Replaced by `local_experiment_path`&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">local_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">local_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_experiment_path</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">experiment_dir_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">experiment_dir_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">experiment_dir_name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">remote_experiment_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remote_experiment_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">experiment_fs_path</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">local_experiment_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">local_experiment_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">experiment_driver_staging_path</span>
 
     <span class="nd">@property</span>
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="s2">&quot;Replaced by `local_path`&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">logdir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">logdir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="c1"># TODO(justinvyu): [Deprecated] Remove in 2.11.</span>
         <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s2">&quot;Use `local_path` instead of `logdir`.&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">local_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">local_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">trial_driver_staging_path</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">trial_fs_path</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">has_reported_at_least_once</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_reported_at_least_once</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_metadata</span><span class="o">.</span><span class="n">last_result</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">node_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">node_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">temporary_state</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">hostname</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">checkpoint_at_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint_at_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_metadata</span><span class="o">.</span><span class="n">checkpoint_manager</span><span class="o">.</span><span class="n">checkpoint_config</span>
         <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">checkpoint_at_end</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">checkpoint_freq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint_freq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_metadata</span><span class="o">.</span><span class="n">checkpoint_manager</span><span class="o">.</span><span class="n">checkpoint_config</span>
         <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">checkpoint_frequency</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">latest_checkpoint_result</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_TrainingResult</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">latest_checkpoint_result</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_TrainingResult</span><span class="p">]:</span>
         <span class="c1"># NOTE: Fallback to the checkpoint passed in from `tune.run(restore)`</span>
         <span class="c1"># if the trial hasn&#39;t saved any checkpoints itself yet.</span>
         <span class="k">return</span> <span class="p">(</span>
@@ -1980,7 +1980,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Checkpoint</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Checkpoint</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the most recent checkpoint if one has been saved.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">latest_checkpoint_result</span><span class="o">.</span><span class="n">checkpoint</span>
@@ -1989,10 +1989,10 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">generate_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">)[:</span><span class="mi">8</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Trial&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Trial&quot;</span><span class="p">:</span>
         <span class="c1"># If there is `default_resource_request` associated with the trainable,</span>
         <span class="c1"># clear `resources` and `placement_group_factory`.</span>
         <span class="c1"># This is mainly relevant for RLlib tuning jobs, where we save users</span>
@@ -2028,14 +2028,14 @@ document.write(`
 <div class="viewcode-block" id="Trial.init_logdir">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experiment.trial.Trial.init_logdir">[docs]</a>
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="s2">&quot;Replaced by `init_local_path()`&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">init_logdir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_logdir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># TODO(justinvyu): [Deprecated] Remove in 2.11.</span>
         <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s2">&quot;Use `init_local_path` instead of `init_logdir`.&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Trial.init_local_path">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experiment.trial.Trial.init_local_path">[docs]</a>
-    <span class="k">def</span> <span class="nf">init_local_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_local_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Init logdir.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative_logdir</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">relative_logdir</span> <span class="o">=</span> <span class="n">_create_unique_logdir_name</span><span class="p">(</span>
@@ -2061,7 +2061,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trial.update_resources">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experiment.trial.Trial.update_resources">[docs]</a>
-    <span class="k">def</span> <span class="nf">update_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">PlacementGroupFactory</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">PlacementGroupFactory</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;EXPERIMENTAL: Updates the resource requirements.</span>
 
 <span class="sd">        Should only be called when the trial is not running.</span>
@@ -2081,7 +2081,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">invalidate_json_state</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span> <span class="nf">set_ray_actor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ray_actor</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_ray_actor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ray_actor</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">temporary_state</span><span class="o">.</span><span class="n">ray_actor</span> <span class="o">=</span> <span class="n">ray_actor</span>
         <span class="k">if</span> <span class="n">ray_actor</span><span class="p">:</span>
             <span class="c1"># Do not block here, the result will be gotten when last_result</span>
@@ -2092,14 +2092,14 @@ document.write(`
 
 <div class="viewcode-block" id="Trial.set_location">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experiment.trial.Trial.set_location">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_location</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_location</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the location of the trial.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">temporary_state</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">location</span></div>
 
 
 <div class="viewcode-block" id="Trial.set_status">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experiment.trial.Trial.set_status">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the status of the trial.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
         <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="n">Trial</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">:</span>
@@ -2108,17 +2108,17 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">invalidate_json_state</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span> <span class="nf">set_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">invalidate_json_state</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">set_experiment_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_tag</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_experiment_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_tag</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">experiment_tag</span> <span class="o">=</span> <span class="n">experiment_tag</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">invalidate_json_state</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Trial.set_storage">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experiment.trial.Trial.set_storage">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_storage</span><span class="p">:</span> <span class="n">StorageContext</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_storage</span><span class="p">:</span> <span class="n">StorageContext</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the storage context of the trial.</span>
 
 <span class="sd">        If the `storage_path` or `experiment_dir_name` has changed, then this setter</span>
@@ -2150,21 +2150,21 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">num_failures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_failures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_metadata</span><span class="o">.</span><span class="n">num_failures</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">num_failures_after_restore</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_failures_after_restore</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_metadata</span><span class="o">.</span><span class="n">num_failures_after_restore</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">error_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">error_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_path</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_metadata</span><span class="o">.</span><span class="n">error_filename</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_metadata</span><span class="o">.</span><span class="n">error_filename</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">pickled_error_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pickled_error_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_path</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_metadata</span><span class="o">.</span><span class="n">pickled_error_filename</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">Path</span><span class="p">(</span>
@@ -2173,7 +2173,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trial.get_pickled_error">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experiment.trial.Trial.get_pickled_error">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_pickled_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="ne">Exception</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_pickled_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="ne">Exception</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the pickled error object if it exists in storage.</span>
 
 <span class="sd">        This is a pickled version of the latest error that the trial encountered.</span>
@@ -2195,7 +2195,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trial.get_error">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experiment.trial.Trial.get_error">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TuneError</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TuneError</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the error text file trace as a TuneError object</span>
 <span class="sd">        if it exists in storage.</span>
 
@@ -2215,7 +2215,7 @@ document.write(`
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_handle_restore_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_restore_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">):</span>
         <span class="c1"># For Restoration errors, we only increment the restore failure count</span>
         <span class="c1"># if the number of failures exceeds the restore retry limit.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">temporary_state</span><span class="o">.</span><span class="n">num_restore_failures</span> <span class="o">&gt;=</span> <span class="nb">int</span><span class="p">(</span>
@@ -2225,7 +2225,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">temporary_state</span><span class="o">.</span><span class="n">num_restore_failures</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="k">def</span> <span class="nf">_handle_ray_actor_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">RayActorError</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_ray_actor_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">RayActorError</span><span class="p">):</span>
         <span class="n">count_preemption_errors</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span>
             <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RAY_TRAIN_COUNT_PREEMPTION_AS_FAILURE</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">))</span>
         <span class="p">)</span>
@@ -2233,7 +2233,7 @@ document.write(`
             <span class="c1"># Only count non-preempted actor errors as failures.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">run_metadata</span><span class="o">.</span><span class="n">num_failures</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="k">def</span> <span class="nf">_handle_ray_task_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">RayTaskError</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_ray_task_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">RayTaskError</span><span class="p">):</span>
         <span class="n">cause</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">as_instanceof_cause</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cause</span><span class="p">,</span> <span class="n">RayActorError</span><span class="p">):</span>
             <span class="c1"># Handle the RayActorError directly (ex: Ray Train worker actor errors)</span>
@@ -2242,7 +2242,7 @@ document.write(`
         <span class="c1"># Increment failures for all user errors (which get raised as RayTaskError)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run_metadata</span><span class="o">.</span><span class="n">num_failures</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="k">def</span> <span class="nf">handle_error</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_error</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">TuneError</span><span class="p">,</span> <span class="n">RayTaskError</span><span class="p">,</span> <span class="n">RayActorError</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_restoring</span><span class="p">:</span>
@@ -2272,7 +2272,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trial.should_stop">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experiment.trial.Trial.should_stop">[docs]</a>
-    <span class="k">def</span> <span class="nf">should_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">should_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether the given result meets this trial&#39;s stopping criteria.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DONE</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span>
@@ -2298,7 +2298,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trial.should_checkpoint">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experiment.trial.Trial.should_checkpoint">[docs]</a>
-    <span class="k">def</span> <span class="nf">should_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">should_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether this trial is due for checkpointing.&quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_result</span> <span class="ow">or</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DONE</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_at_end</span><span class="p">:</span>
@@ -2309,12 +2309,12 @@ document.write(`
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">has_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="Trial.on_checkpoint">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experiment.trial.Trial.on_checkpoint">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_result</span><span class="p">:</span> <span class="n">_TrainingResult</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_result</span><span class="p">:</span> <span class="n">_TrainingResult</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Hook for handling checkpoints taken by the Trainable.</span>
 
 <span class="sd">        Args:</span>
@@ -2332,7 +2332,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trial.on_restore">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experiment.trial.Trial.on_restore">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_restore</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_restore</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Handles restoration completion.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_restoring</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run_metadata</span><span class="o">.</span><span class="n">last_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temporary_state</span><span class="o">.</span><span class="n">restoring_from</span><span class="o">.</span><span class="n">metrics</span>
@@ -2343,7 +2343,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trial.should_recover">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experiment.trial.Trial.should_recover">[docs]</a>
-    <span class="k">def</span> <span class="nf">should_recover</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">should_recover</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns whether the trial qualifies for retrying.</span>
 
 <span class="sd">        `num_failures` should represent the number of times the trial has</span>
@@ -2360,7 +2360,7 @@ document.write(`
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">update_last_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_last_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_tag</span><span class="p">:</span>
             <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">experiment_tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">experiment_tag</span><span class="p">)</span>
 
@@ -2378,29 +2378,29 @@ document.write(`
                     <span class="n">metric</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;training_iteration&quot;</span><span class="p">)</span>
                 <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_trainable_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_trainable_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">get_trainable_cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trainable_name</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">is_finished</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_finished</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Trial</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">Trial</span><span class="o">.</span><span class="n">TERMINATED</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_restoring</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_restoring</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">temporary_state</span><span class="o">.</span><span class="n">restoring_from</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_saving</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_saving</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">temporary_state</span><span class="o">.</span><span class="n">saving_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trainable_name</span><span class="p">(</span><span class="n">include_trial_id</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trainable_name</span><span class="p">(</span><span class="n">include_trial_id</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_trainable_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_trial_id</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_trainable_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_trial_id</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Combines ``env`` with ``trainable_name`` and ``trial_id``.</span>
 
 <span class="sd">        Can be overridden with a custom string creator.</span>
@@ -2419,7 +2419,7 @@ document.write(`
             <span class="n">identifier</span> <span class="o">+=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_id</span>
         <span class="k">return</span> <span class="n">identifier</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_generate_dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_dirname</span><span class="p">:</span>
             <span class="n">generated_dirname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_dirname</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2430,10 +2430,10 @@ document.write(`
         <span class="c1"># This is the file path used by rsync. [&#39;/&#39;, &#39;(&#39;, &#39;)&#39;] are not allowed.</span>
         <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;[/()]&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">generated_dirname</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">invalidate_json_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">invalidate_json_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_state_json</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">get_json_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_json_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_json</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">()</span>
             <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;run_metadata&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -2444,7 +2444,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_json</span><span class="p">,</span> <span class="n">runtime_metadata_json</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_json_state</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">json_state</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stub</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Trial&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_json_state</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">json_state</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stub</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Trial&quot;</span><span class="p">:</span>
         <span class="n">state</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_state</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">TuneFunctionDecoder</span><span class="p">)</span>
 
         <span class="n">new_trial</span> <span class="o">=</span> <span class="n">Trial</span><span class="p">(</span>
@@ -2457,11 +2457,11 @@ document.write(`
 
         <span class="k">return</span> <span class="n">new_trial</span>
 
-    <span class="k">def</span> <span class="nf">restore_run_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_metadata</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore_run_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_metadata</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run_metadata</span> <span class="o">=</span> <span class="n">_TrainingRunMetadata</span><span class="o">.</span><span class="n">from_json_state</span><span class="p">(</span><span class="n">run_metadata</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_directory</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_directory</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span> <span class="n">stub</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Trial&quot;</span><span class="p">:</span>
         <span class="n">metadata_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">TRIAL_STATE_FILENAME</span><span class="p">)</span>
@@ -2473,7 +2473,7 @@ document.write(`
         <span class="n">json_state</span> <span class="o">=</span> <span class="n">metadata_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_json_state</span><span class="p">(</span><span class="n">json_state</span><span class="p">,</span> <span class="n">stub</span><span class="o">=</span><span class="n">stub</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Memento generator for Trial.</span>
 
 <span class="sd">        Sets RUNNING trials to PENDING.</span>
@@ -2491,7 +2491,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">state</span>
 
-    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">Trial</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">:</span>
             <span class="n">state</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Trial</span><span class="o">.</span><span class="n">PENDING</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nonjson_fields</span><span class="p">:</span>

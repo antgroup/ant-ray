@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,16 +1392,16 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.stopper.experiment_plateau</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">ray.tune.stopper.stopper</span> <span class="kn">import</span> <span class="n">Stopper</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.stopper.stopper</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stopper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 
 <div class="viewcode-block" id="ExperimentPlateauStopper">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.stopper.ExperimentPlateauStopper.html#ray.tune.stopper.ExperimentPlateauStopper">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">ExperimentPlateauStopper</span><span class="p">(</span><span class="n">Stopper</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExperimentPlateauStopper</span><span class="p">(</span><span class="n">Stopper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Early stop the experiment when a metric plateaued across trials.</span>
 
 <span class="sd">    Stops the entire experiment when the metric has plateaued</span>
@@ -1428,7 +1428,7 @@ document.write(`
 <span class="sd">            a strictly positive integer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span>
@@ -1457,7 +1457,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_top</span> <span class="o">=</span> <span class="n">top</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_top_values</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a boolean representing if the tuning has to stop.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_top_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_metric</span><span class="p">])</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">==</span> <span class="s2">&quot;min&quot;</span><span class="p">:</span>
@@ -1477,14 +1477,14 @@ document.write(`
         <span class="c1"># the checks, including the iterations.</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_all</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">has_plateaued</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_plateaued</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_top_values</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_top_values</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_std</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="ExperimentPlateauStopper.stop_all">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.stopper.ExperimentPlateauStopper.stop_all.html#ray.tune.stopper.ExperimentPlateauStopper.stop_all">[docs]</a>
-    <span class="k">def</span> <span class="nf">stop_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether to stop and prevent trials from starting.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_plateaued</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterations</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_patience</span></div>
 </div>

@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1437,8 +1437,8 @@ documentation to the new code base.</p>
 <dd class="field-even"><p>New observations for each ready agent.</p>
 </dd>
 </dl>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.env.multi_agent_env</span> <span class="kn">import</span> <span class="n">MultiAgentEnv</span>
-<span class="k">class</span> <span class="nc">MyMultiAgentEnv</span><span class="p">(</span><span class="n">MultiAgentEnv</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.multi_agent_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentEnv</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyMultiAgentEnv</span><span class="p">(</span><span class="n">MultiAgentEnv</span><span class="p">):</span>
     <span class="c1"># Define your env here.</span>
 <span class="n">env</span> <span class="o">=</span> <span class="n">MyMultiAgentEnv</span><span class="p">()</span>
 <span class="n">obs</span><span class="p">,</span> <span class="n">infos</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{})</span>
@@ -1539,8 +1539,8 @@ of n individual agents spaces (n=num agents in a group).</p></li>
 </ul>
 </dd>
 </dl>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.env.multi_agent_env</span> <span class="kn">import</span> <span class="n">MultiAgentEnv</span>
-<span class="k">class</span> <span class="nc">MyMultiAgentEnv</span><span class="p">(</span><span class="n">MultiAgentEnv</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.multi_agent_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentEnv</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyMultiAgentEnv</span><span class="p">(</span><span class="n">MultiAgentEnv</span><span class="p">):</span>
     <span class="c1"># define your env here</span>
     <span class="o">...</span>
 <span class="n">env</span> <span class="o">=</span> <span class="n">MyMultiAgentEnv</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
@@ -1587,7 +1587,7 @@ The constructor takes a config dict with <code class="code docutils literal notr
 underlying single-agent env’s constructor.</p>
 </dd>
 </dl>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.env.multi_agent_env</span> <span class="kn">import</span> <span class="n">make_multi_agent</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.multi_agent_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_multi_agent</span>
 <span class="c1"># By gym string:</span>
 <span class="n">ma_cartpole_cls</span> <span class="o">=</span> <span class="n">make_multi_agent</span><span class="p">(</span><span class="s2">&quot;CartPole-v1&quot;</span><span class="p">)</span>
 <span class="c1"># Create a 2 agent multi-agent cartpole.</span>
@@ -1596,7 +1596,7 @@ underlying single-agent env’s constructor.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
 
 <span class="c1"># By env-maker callable:</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.examples.envs.classes.stateless_cartpole</span> <span class="kn">import</span> <span class="n">StatelessCartPole</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.examples.envs.classes.stateless_cartpole</span><span class="w"> </span><span class="kn">import</span> <span class="n">StatelessCartPole</span>
 <span class="n">ma_stateless_cartpole_cls</span> <span class="o">=</span> <span class="n">make_multi_agent</span><span class="p">(</span>
    <span class="k">lambda</span> <span class="n">config</span><span class="p">:</span> <span class="n">StatelessCartPole</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
 <span class="c1"># Create a 3 agent multi-agent stateless cartpole.</span>

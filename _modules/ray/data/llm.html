@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,21 +1389,21 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data.llm</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
-<span class="kn">from</span> <span class="nn">ray.data.block</span> <span class="kn">import</span> <span class="n">UserDefinedFunction</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.batch.processor</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserDefinedFunction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.batch.processor</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ProcessorConfig</span> <span class="k">as</span> <span class="n">_ProcessorConfig</span><span class="p">,</span>
     <span class="n">Processor</span><span class="p">,</span>
     <span class="n">HttpRequestProcessorConfig</span> <span class="k">as</span> <span class="n">_HttpRequestProcessorConfig</span><span class="p">,</span>
     <span class="n">vLLMEngineProcessorConfig</span> <span class="k">as</span> <span class="n">_vLLMEngineProcessorConfig</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 
 <div class="viewcode-block" id="ProcessorConfig">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.llm.ProcessorConfig.html#ray.data.llm.ProcessorConfig">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ProcessorConfig</span><span class="p">(</span><span class="n">_ProcessorConfig</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProcessorConfig</span><span class="p">(</span><span class="n">_ProcessorConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The processor configuration.</span>
 
 <span class="sd">    Args:</span>
@@ -1424,7 +1424,7 @@ document.write(`
 <div class="viewcode-block" id="HttpRequestProcessorConfig">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.llm.HttpRequestProcessorConfig.html#ray.data.llm.HttpRequestProcessorConfig">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">HttpRequestProcessorConfig</span><span class="p">(</span><span class="n">_HttpRequestProcessorConfig</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HttpRequestProcessorConfig</span><span class="p">(</span><span class="n">_HttpRequestProcessorConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The configuration for the HTTP request processor.</span>
 
 <span class="sd">    Args:</span>
@@ -1476,7 +1476,7 @@ document.write(`
 <div class="viewcode-block" id="vLLMEngineProcessorConfig">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.llm.vLLMEngineProcessorConfig.html#ray.data.llm.vLLMEngineProcessorConfig">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">vLLMEngineProcessorConfig</span><span class="p">(</span><span class="n">_vLLMEngineProcessorConfig</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">vLLMEngineProcessorConfig</span><span class="p">(</span><span class="n">_vLLMEngineProcessorConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The configuration for the vLLM engine processor.</span>
 
 <span class="sd">    Args:</span>
@@ -1559,7 +1559,7 @@ document.write(`
 <div class="viewcode-block" id="build_llm_processor">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.llm.build_llm_processor.html#ray.data.llm.build_llm_processor">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">build_llm_processor</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_llm_processor</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">ProcessorConfig</span><span class="p">,</span>
     <span class="n">preprocess</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UserDefinedFunction</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">postprocess</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UserDefinedFunction</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1623,7 +1623,7 @@ document.write(`
 <span class="sd">            for row in ds.take_all():</span>
 <span class="sd">                print(row)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">ray.llm._internal.batch.processor</span> <span class="kn">import</span> <span class="n">ProcessorBuilder</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.batch.processor</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProcessorBuilder</span>
 
     <span class="k">return</span> <span class="n">ProcessorBuilder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span>
         <span class="n">config</span><span class="p">,</span>

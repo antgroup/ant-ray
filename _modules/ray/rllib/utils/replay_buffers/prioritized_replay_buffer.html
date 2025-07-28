@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,27 +1389,27 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.utils.replay_buffers.prioritized_replay_buffer</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># Import ray before psutil will make sure we use psutil&#39;s bundled version</span>
-<span class="kn">import</span> <span class="nn">ray</span>  <span class="c1"># noqa F401</span>
-<span class="kn">import</span> <span class="nn">psutil</span>  <span class="c1"># noqa E402</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>  <span class="c1"># noqa F401</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>  <span class="c1"># noqa E402</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.execution.segment_tree</span> <span class="kn">import</span> <span class="n">SumSegmentTree</span><span class="p">,</span> <span class="n">MinSegmentTree</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.sample_batch</span> <span class="kn">import</span> <span class="n">SampleBatch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">override</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics.window_stat</span> <span class="kn">import</span> <span class="n">WindowStat</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.replay_buffers.replay_buffer</span> <span class="kn">import</span> <span class="n">ReplayBuffer</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">SampleBatchType</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.execution.segment_tree</span><span class="w"> </span><span class="kn">import</span> <span class="n">SumSegmentTree</span><span class="p">,</span> <span class="n">MinSegmentTree</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.sample_batch</span><span class="w"> </span><span class="kn">import</span> <span class="n">SampleBatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.window_stat</span><span class="w"> </span><span class="kn">import</span> <span class="n">WindowStat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.replay_buffers.replay_buffer</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReplayBuffer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">SampleBatchType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 
 <div class="viewcode-block" id="PrioritizedReplayBuffer">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.html#ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">PrioritizedReplayBuffer</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PrioritizedReplayBuffer</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This buffer implements Prioritized Experience Replay.</span>
 
 <span class="sd">    The algorithm has been described by Tom Schaul et. al. in &quot;Prioritized</span>
@@ -1419,7 +1419,7 @@ document.write(`
 
 <div class="viewcode-block" id="PrioritizedReplayBuffer.__init__">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.__init__.html#ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">capacity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span>
         <span class="n">storage_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;timesteps&quot;</span><span class="p">,</span>
@@ -1456,7 +1456,7 @@ document.write(`
 
     <span class="nd">@DeveloperAPI</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_add_single_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">SampleBatchType</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_single_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">SampleBatchType</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a batch of experiences to self._storage with weight.</span>
 
 <span class="sd">        An item consists of either one or more timesteps, a sequence or an</span>
@@ -1477,7 +1477,7 @@ document.write(`
 
         <span class="n">ReplayBuffer</span><span class="o">.</span><span class="n">_add_single_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_sample_proportional</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_items</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sample_proportional</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_items</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
         <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_items</span><span class="p">):</span>
             <span class="c1"># TODO(szymon): should we ensure no repeats?</span>
@@ -1490,7 +1490,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.sample.html#ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.sample">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">num_items</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SampleBatchType</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sample `num_items` items from this buffer, including prio. weights.</span>
@@ -1562,7 +1562,7 @@ document.write(`
 <div class="viewcode-block" id="PrioritizedReplayBuffer.update_priorities">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.update_priorities.html#ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.update_priorities">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">update_priorities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idxes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">priorities</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_priorities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idxes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">priorities</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update priorities of items at given indices.</span>
 
 <span class="sd">        Sets priority of item at index idxes[i] in buffer</span>
@@ -1595,7 +1595,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.stats.html#ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.stats">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the stats of this buffer.</span>
 
 <span class="sd">        Args:</span>
@@ -1614,7 +1614,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.get_state.html#ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.get_state">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns all local state.</span>
 
 <span class="sd">        Returns:</span>
@@ -1637,7 +1637,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.set_state.html#ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.set_state">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Restores all local state to the provided `state`.</span>
 
 <span class="sd">        Args:</span>

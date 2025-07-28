@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1429,10 +1429,10 @@ pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </s
 <p>Originally, this script will be started by MPI if multiple workers are used. But with Ray, we should setup TorchTrainer and supply a main function, which is <code class="docutils literal notranslate"><span class="pre">main()</span></code> in this example.</p>
 <p>Therefore, it becomes straight-forward to make these changes:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">ray</span>
-    <span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-    <span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span><span class="p">,</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">CheckpointConfig</span><span class="p">,</span> <span class="n">RunConfig</span>
-    <span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span><span class="p">,</span> <span class="n">TorchConfig</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span><span class="p">,</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">CheckpointConfig</span><span class="p">,</span> <span class="n">RunConfig</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span><span class="p">,</span> <span class="n">TorchConfig</span>
 
     <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
@@ -1459,7 +1459,7 @@ pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </s
 <span class="c1"># def main():</span>
 <span class="c1">#     args = parse_args()</span>
 <span class="c1"># with these lines:</span>
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -1472,10 +1472,10 @@ pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </s
 <span class="c1">#     main()</span>
 <span class="c1"># with these lines:</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">ray</span>
-    <span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-    <span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span><span class="p">,</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">CheckpointConfig</span><span class="p">,</span> <span class="n">RunConfig</span>
-    <span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span><span class="p">,</span> <span class="n">TorchConfig</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span><span class="p">,</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">CheckpointConfig</span><span class="p">,</span> <span class="n">RunConfig</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span><span class="p">,</span> <span class="n">TorchConfig</span>
 
     <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
@@ -1664,8 +1664,8 @@ Training completed after 0 iterations at 2025-03-03 05:18:57. Total running time
 <p>Now that we have fine-tuned a Stable Diffusion model, we can serve it for image generation. The code below loads the fine-tuned model and generates an image.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">optimum.habana.diffusers</span> <span class="kn">import</span> <span class="n">GaudiStableDiffusionPipeline</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimum.habana.diffusers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GaudiStableDiffusionPipeline</span>
 <span class="n">model_id</span> <span class="o">=</span> <span class="s2">&quot;/tmp/textual_inversion_cat/&quot;</span>
 <span class="n">pipe</span> <span class="o">=</span> <span class="n">GaudiStableDiffusionPipeline</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
   <span class="n">model_id</span><span class="p">,</span>
@@ -1684,14 +1684,14 @@ Training completed after 0 iterations at 2025-03-03 05:18:57. Total running time
 <p>We can easily use Ray Serve to deploy it as an HTTP service. The code below is modified from this <a class="reference external" href="https://docs.ray.io/en/master/serve/tutorials/stable-diffusion.html">example</a>. Save it to <code class="docutils literal notranslate"><span class="pre">gaudi_sd_deploy.py</span></code>, and use <code class="docutils literal notranslate"><span class="pre">serve</span> <span class="pre">run</span> <span class="pre">gaudi_sd_deploy:entrypoint</span></code> to start the Serve application.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">optimum.habana.diffusers</span> <span class="kn">import</span> <span class="n">GaudiStableDiffusionPipeline</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
-<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">FastAPI</span>
-<span class="kn">from</span> <span class="nn">fastapi.responses</span> <span class="kn">import</span> <span class="n">Response</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimum.habana.diffusers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GaudiStableDiffusionPipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">Response</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray.serve.handle</span> <span class="kn">import</span> <span class="n">DeploymentHandle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.handle</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentHandle</span>
 
 
 <span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">()</span>
@@ -1699,8 +1699,8 @@ Training completed after 0 iterations at 2025-03-03 05:18:57. Total running time
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span><span class="p">(</span><span class="n">num_replicas</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="nd">@serve</span><span class="o">.</span><span class="n">ingress</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">APIIngress</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diffusion_model_handle</span><span class="p">:</span> <span class="n">DeploymentHandle</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">APIIngress</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diffusion_model_handle</span><span class="p">:</span> <span class="n">DeploymentHandle</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">handle</span> <span class="o">=</span> <span class="n">diffusion_model_handle</span>
 
     <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
@@ -1708,7 +1708,7 @@ Training completed after 0 iterations at 2025-03-03 05:18:57. Total running time
         <span class="n">responses</span><span class="o">=</span><span class="p">{</span><span class="mi">200</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;image/png&quot;</span><span class="p">:</span> <span class="p">{}}}},</span>
         <span class="n">response_class</span><span class="o">=</span><span class="n">Response</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">img_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">img_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">prompt</span><span class="p">),</span> <span class="s2">&quot;prompt parameter cannot be empty&quot;</span>
 
         <span class="n">image</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="o">.</span><span class="n">generate</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">img_size</span><span class="o">=</span><span class="n">img_size</span><span class="p">)</span>
@@ -1720,8 +1720,8 @@ Training completed after 0 iterations at 2025-03-03 05:18:57. Total running time
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span><span class="p">(</span>
     <span class="n">ray_actor_options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;HPU&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}</span>
 <span class="p">)</span>
-<span class="k">class</span> <span class="nc">GaudiStableDiffusion</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GaudiStableDiffusion</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pipe</span> <span class="o">=</span> <span class="n">GaudiStableDiffusionPipeline</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
             <span class="n">model_id</span><span class="p">,</span>
             <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">,</span>
@@ -1730,7 +1730,7 @@ Training completed after 0 iterations at 2025-03-03 05:18:57. Total running time
             <span class="n">gaudi_config</span><span class="o">=</span><span class="s2">&quot;Habana/stable-diffusion&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">img_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">img_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">prompt</span><span class="p">),</span> <span class="s2">&quot;prompt parameter cannot be empty&quot;</span>
 
         <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">num_inference_steps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">guidance_scale</span><span class="o">=</span><span class="mf">7.5</span><span class="p">)</span><span class="o">.</span><span class="n">images</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1745,7 +1745,7 @@ Training completed after 0 iterations at 2025-03-03 05:18:57. Total running time
 <p>After you successfully deployed this Serve application, run the code below to generate an image.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 
 <span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;a &lt;cat-toy&gt; is dancing on the grass.&quot;</span>
 <span class="nb">input</span> <span class="o">=</span> <span class="s2">&quot;%20&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prompt</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">))</span>
@@ -1759,7 +1759,7 @@ Training completed after 0 iterations at 2025-03-03 05:18:57. Total running time
 <p>Here is an example image:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 <span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;ouput.png&#39;</span><span class="p">)</span>
 </pre></div>
 </div>

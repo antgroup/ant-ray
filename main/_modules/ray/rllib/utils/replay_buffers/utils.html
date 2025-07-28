@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,41 +1389,41 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.utils.replay_buffers.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">psutil</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.utils</span> <span class="kn">import</span> <span class="n">deprecation_warning</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">OldAPIStack</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="n">DEPRECATED_VALUE</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.from_config</span> <span class="kn">import</span> <span class="n">from_config</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics</span> <span class="kn">import</span> <span class="n">ALL_MODULES</span><span class="p">,</span> <span class="n">TD_ERROR_KEY</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics.learner_info</span> <span class="kn">import</span> <span class="n">LEARNER_STATS_KEY</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.replay_buffers</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">deprecation_warning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">OldAPIStack</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEPRECATED_VALUE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.from_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">ALL_MODULES</span><span class="p">,</span> <span class="n">TD_ERROR_KEY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.learner_info</span><span class="w"> </span><span class="kn">import</span> <span class="n">LEARNER_STATS_KEY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.replay_buffers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">EpisodeReplayBuffer</span><span class="p">,</span>
     <span class="n">MultiAgentPrioritizedReplayBuffer</span><span class="p">,</span>
     <span class="n">PrioritizedEpisodeReplayBuffer</span><span class="p">,</span>
     <span class="n">ReplayBuffer</span><span class="p">,</span>
     <span class="n">MultiAgentReplayBuffer</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.sample_batch</span> <span class="kn">import</span> <span class="n">concat_samples</span><span class="p">,</span> <span class="n">MultiAgentBatch</span><span class="p">,</span> <span class="n">SampleBatch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.sample_batch</span><span class="w"> </span><span class="kn">import</span> <span class="n">concat_samples</span><span class="p">,</span> <span class="n">MultiAgentBatch</span><span class="p">,</span> <span class="n">SampleBatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AlgorithmConfigDict</span><span class="p">,</span>
     <span class="n">ModuleID</span><span class="p">,</span>
     <span class="n">ResultDict</span><span class="p">,</span>
     <span class="n">SampleBatchType</span><span class="p">,</span>
     <span class="n">TensorType</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">log_once</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_once</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">update_priorities_in_episode_replay_buffer</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_priorities_in_episode_replay_buffer</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">replay_buffer</span><span class="p">:</span> <span class="n">EpisodeReplayBuffer</span><span class="p">,</span>
     <span class="n">td_errors</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">TensorType</span><span class="p">],</span>
@@ -1461,7 +1461,7 @@ document.write(`
 <div class="viewcode-block" id="update_priorities_in_replay_buffer">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.utils.update_priorities_in_replay_buffer.html#ray.rllib.utils.replay_buffers.utils.update_priorities_in_replay_buffer">[docs]</a>
 <span class="nd">@OldAPIStack</span>
-<span class="k">def</span> <span class="nf">update_priorities_in_replay_buffer</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_priorities_in_replay_buffer</span><span class="p">(</span>
     <span class="n">replay_buffer</span><span class="p">:</span> <span class="n">ReplayBuffer</span><span class="p">,</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">AlgorithmConfigDict</span><span class="p">,</span>
     <span class="n">train_batch</span><span class="p">:</span> <span class="n">SampleBatchType</span><span class="p">,</span>
@@ -1564,7 +1564,7 @@ document.write(`
 <div class="viewcode-block" id="sample_min_n_steps_from_buffer">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer.html#ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">sample_min_n_steps_from_buffer</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sample_min_n_steps_from_buffer</span><span class="p">(</span>
     <span class="n">replay_buffer</span><span class="p">:</span> <span class="n">ReplayBuffer</span><span class="p">,</span> <span class="n">min_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">count_by_agent_steps</span><span class="p">:</span> <span class="nb">bool</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SampleBatchType</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Samples a minimum of n timesteps from a given replay buffer.</span>
@@ -1600,7 +1600,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">validate_buffer_config</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_buffer_config</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks and fixes values in the replay buffer config.</span>
 
 <span class="sd">    Checks the replay buffer config for common misconfigurations, warns or raises</span>
@@ -1766,7 +1766,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">warn_replay_buffer_capacity</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">SampleBatchType</span><span class="p">,</span> <span class="n">capacity</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">warn_replay_buffer_capacity</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">SampleBatchType</span><span class="p">,</span> <span class="n">capacity</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Warn if the configured replay buffer capacity is too large for machine&#39;s memory.</span>
 
 <span class="sd">    Args:</span>
@@ -1801,7 +1801,7 @@ document.write(`
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">patch_buffer_with_fake_sampling_method</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">patch_buffer_with_fake_sampling_method</span><span class="p">(</span>
     <span class="n">buffer</span><span class="p">:</span> <span class="n">ReplayBuffer</span><span class="p">,</span> <span class="n">fake_sample_output</span><span class="p">:</span> <span class="n">SampleBatchType</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Patch a ReplayBuffer such that we always sample fake_sample_output.</span>
@@ -1820,7 +1820,7 @@ document.write(`
     <span class="p">):</span>
         <span class="n">fake_sample_output</span> <span class="o">=</span> <span class="n">SampleBatch</span><span class="p">(</span><span class="n">fake_sample_output</span><span class="p">)</span><span class="o">.</span><span class="n">as_multi_agent</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">fake_sample</span><span class="p">(</span><span class="n">_</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SampleBatchType</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fake_sample</span><span class="p">(</span><span class="n">_</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SampleBatchType</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Always returns a predefined batch.</span>
 
 <span class="sd">        Args:</span>

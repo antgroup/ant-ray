@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,21 +1392,21 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.trainable.util</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">types</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.tune.execution.placement_groups</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.placement_groups</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PlacementGroupFactory</span><span class="p">,</span>
     <span class="n">resource_dict_to_pg_factory</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.registry</span> <span class="kn">import</span> <span class="n">_ParameterRegistry</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ParameterRegistry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.trainable</span> <span class="kn">import</span> <span class="n">Trainable</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trainable</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1414,7 +1414,7 @@ document.write(`
 <div class="viewcode-block" id="with_parameters">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.with_parameters.html#ray.tune.with_parameters">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">with_parameters</span><span class="p">(</span><span class="n">trainable</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="s2">&quot;Trainable&quot;</span><span class="p">],</span> <span class="n">Callable</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">with_parameters</span><span class="p">(</span><span class="n">trainable</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="s2">&quot;Trainable&quot;</span><span class="p">],</span> <span class="n">Callable</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper for trainables to pass arbitrary large data objects.</span>
 
 <span class="sd">    This wrapper function will store all passed parameters in the Ray</span>
@@ -1483,7 +1483,7 @@ document.write(`
 <span class="sd">            # ...</span>
 <span class="sd">        )</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.trainable</span> <span class="kn">import</span> <span class="n">Trainable</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trainable</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">trainable</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
         <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">trainable</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">trainable</span><span class="p">,</span> <span class="n">Trainable</span><span class="p">)</span>
@@ -1508,8 +1508,8 @@ document.write(`
     <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">trainable</span><span class="p">):</span>
         <span class="c1"># Class trainable</span>
 
-        <span class="k">class</span> <span class="nc">_Inner</span><span class="p">(</span><span class="n">trainable</span><span class="p">):</span>
-            <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">_Inner</span><span class="p">(</span><span class="n">trainable</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
                 <span class="n">setup_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
                     <span class="n">setup_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">parameter_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">k</span><span class="p">)</span>
@@ -1519,7 +1519,7 @@ document.write(`
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Function trainable</span>
 
-        <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">inner</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
             <span class="n">fn_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
                 <span class="n">fn_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">parameter_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">k</span><span class="p">)</span>
@@ -1543,7 +1543,7 @@ document.write(`
 <div class="viewcode-block" id="with_resources">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.with_resources.html#ray.tune.with_resources">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">with_resources</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">with_resources</span><span class="p">(</span>
     <span class="n">trainable</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="s2">&quot;Trainable&quot;</span><span class="p">],</span> <span class="n">Callable</span><span class="p">],</span>
     <span class="n">resources</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
         <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
@@ -1585,7 +1585,7 @@ document.write(`
 <span class="sd">        results = tuner.fit()</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.trainable</span> <span class="kn">import</span> <span class="n">Trainable</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trainable</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">trainable</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
         <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">trainable</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">trainable</span><span class="p">,</span> <span class="n">Trainable</span><span class="p">)</span>
@@ -1610,7 +1610,7 @@ document.write(`
     <span class="k">if</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">trainable</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trainable</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">):</span>
             <span class="c1"># Methods cannot set arbitrary attributes, so we have to wrap them</span>
-            <span class="k">def</span> <span class="nf">_trainable</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_trainable</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">trainable</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
             <span class="n">_trainable</span><span class="o">.</span><span class="n">_resources</span> <span class="o">=</span> <span class="n">pgf</span>
@@ -1624,12 +1624,12 @@ document.write(`
                 <span class="s2">&quot;Could not use `tune.with_resources()` on the supplied trainable. &quot;</span>
                 <span class="s2">&quot;Wrap your trainable in a regular function before passing it &quot;</span>
                 <span class="s2">&quot;to Ray Tune.&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
     <span class="k">else</span><span class="p">:</span>
 
-        <span class="k">class</span> <span class="nc">ResourceTrainable</span><span class="p">(</span><span class="n">trainable</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">ResourceTrainable</span><span class="p">(</span><span class="n">trainable</span><span class="p">):</span>
             <span class="nd">@classmethod</span>
-            <span class="k">def</span> <span class="nf">default_resource_request</span><span class="p">(</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">default_resource_request</span><span class="p">(</span>
                 <span class="bp">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
             <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PlacementGroupFactory</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pgf</span><span class="p">,</span> <span class="n">PlacementGroupFactory</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="n">pgf</span><span class="p">):</span>

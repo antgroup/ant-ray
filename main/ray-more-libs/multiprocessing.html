@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1408,9 +1408,9 @@ to a cluster.</p>
 This will start a local Ray cluster the first time you create a <code class="docutils literal notranslate"><span class="pre">Pool</span></code> and
 distribute your tasks across it. See the <a class="reference internal" href="#run-on-a-cluster">Run on a Cluster</a> section below for
 instructions to run on a multi-node Ray cluster instead.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.multiprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pool</span>
 
-<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">index</span>
 
 <span class="n">pool</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">()</span>
@@ -1435,7 +1435,7 @@ head node in one of two ways:</p>
 <li><p>By setting the <code class="docutils literal notranslate"><span class="pre">RAY_ADDRESS</span></code> environment variable.</p></li>
 <li><p>By passing the <code class="docutils literal notranslate"><span class="pre">ray_address</span></code> keyword argument to the <code class="docutils literal notranslate"><span class="pre">Pool</span></code> constructor.</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.multiprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pool</span>
 
 <span class="c1"># Starts a new local Ray cluster.</span>
 <span class="n">pool</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">()</span>

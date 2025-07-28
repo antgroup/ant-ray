@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1415,7 +1415,7 @@ similar.</p>
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-0">
 Python</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="c1"># Put an object in Ray&#39;s object store.</span>
 <span class="n">y</span> <span class="o">=</span> <span class="mi">1</span>
@@ -1459,8 +1459,8 @@ Python</label><div class="sd-tab-content docutils">
 <p>If the object is a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.array.html">numpy array</a>
 or a collection of numpy arrays, the <code class="docutils literal notranslate"><span class="pre">get</span></code> call is zero-copy and returns arrays backed by shared object store memory.
 Otherwise, we deserialize the object data into a Python object.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 <span class="c1"># Get the value of one object ref.</span>
 <span class="n">obj_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -1471,11 +1471,11 @@ Otherwise, we deserialize the object data into a Python object.</p>
 
 <span class="c1"># You can also set a timeout to return early from a ``get``</span>
 <span class="c1"># that&#39;s blocking for too long.</span>
-<span class="kn">from</span> <span class="nn">ray.exceptions</span> <span class="kn">import</span> <span class="n">GetTimeoutError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">GetTimeoutError</span>
 <span class="c1"># ``GetTimeoutError`` is a subclass of ``TimeoutError``.</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">long_running_function</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">long_running_function</span><span class="p">():</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
 
 <span class="n">obj_ref</span> <span class="o">=</span> <span class="n">long_running_function</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
@@ -1545,11 +1545,11 @@ C++</label><div class="sd-tab-content docutils">
 <p>Ray object references can be freely passed around a Ray application. This means that they can be passed as arguments to tasks, actor methods, and even stored in other objects. Objects are tracked via <em>distributed reference counting</em>, and their data is automatically freed once all references to the object are deleted.</p>
 <p>There are two different ways one can pass an object to a Ray task or method. Depending on the way an object is passed, Ray will decide whether to <em>de-reference</em> the object prior to task execution.</p>
 <p><strong>Passing an object as a top-level argument</strong>: When an object is passed directly as a top-level argument to a task, Ray will de-reference the object. This means that Ray will fetch the underlying data for all top-level object reference arguments, not executing the task until the object data becomes fully available.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">echo</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">echo</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This function prints its input values to stdout.&quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
 
@@ -1568,11 +1568,11 @@ C++</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 <p><strong>Passing an object as a nested argument</strong>: When an object is passed within a nested object, for example, within a Python list, Ray will <em>not</em> de-reference it. This means that the task will need to call <code class="docutils literal notranslate"><span class="pre">ray.get()</span></code> on the reference to fetch the concrete value. However, if the task never calls <code class="docutils literal notranslate"><span class="pre">ray.get()</span></code>, then the object value never needs to be transferred to the machine the task is running on. We recommend passing objects as top-level arguments where possible, but nested arguments can be useful for passing objects on to other tasks without needing to see the data.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">echo_and_get</span><span class="p">(</span><span class="n">x_list</span><span class="p">):</span>  <span class="c1"># List[ObjectRef]</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">echo_and_get</span><span class="p">(</span><span class="n">x_list</span><span class="p">):</span>  <span class="c1"># List[ObjectRef]</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This function prints its input values to stdout.&quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;args:&quot;</span><span class="p">,</span> <span class="n">x_list</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;values:&quot;</span><span class="p">,</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x_list</span><span class="p">))</span>
@@ -1590,11 +1590,11 @@ C++</label><div class="sd-tab-content docutils">
 </div>
 <p>The top-level vs not top-level passing convention also applies to actor constructors and actor method calls:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
     <span class="k">pass</span>
 
-  <span class="k">def</span> <span class="nf">method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
     <span class="k">pass</span>
 
 <span class="n">obj</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -1612,14 +1612,14 @@ C++</label><div class="sd-tab-content docutils">
 <section id="closure-capture-of-objects">
 <h2>Closure Capture of Objects<a class="headerlink" href="#closure-capture-of-objects" title="Link to this heading">#</a></h2>
 <p>You can also pass objects to tasks via <em>closure-capture</em>. This can be convenient when you have a large object that you want to share verbatim between many tasks or actors, and don’t want to pass it repeatedly as an argument. Be aware however that defining a task that closes over an object ref will pin the object via reference-counting, so the object will not be evicted until the job completes.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="c1"># Put the values (1, 2, 3) into Ray&#39;s object store.</span>
 <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">print_via_capture</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_via_capture</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This function prints the values of (a, b, c) to stdout.&quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">]))</span>
 

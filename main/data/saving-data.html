@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1419,7 +1419,7 @@ directory with the <code class="code docutils literal notranslate"><span class="
 <p>If your cluster contains multiple nodes and you don’t use <code class="code docutils literal notranslate"><span class="pre">local://</span></code>, Ray Data
 writes different partitions of data to different nodes.</p>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/iris.csv&quot;</span><span class="p">)</span>
 
@@ -1441,7 +1441,7 @@ the appropriate scheme. URI can point to buckets or folders.</p>
 </input><label class="sd-tab-label" for="sd-tab-item-0">
 S3</label><div class="sd-tab-content docutils">
 <p>To save data to Amazon S3, specify a URI with the <code class="docutils literal notranslate"><span class="pre">s3://</span></code> scheme.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/iris.csv&quot;</span><span class="p">)</span>
 
@@ -1461,7 +1461,7 @@ GCS</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 <p>Then, create a <code class="docutils literal notranslate"><span class="pre">GCSFileSystem</span></code> and specify a URI with the <code class="docutils literal notranslate"><span class="pre">gcs://</span></code> scheme.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/iris.csv&quot;</span><span class="p">)</span>
 
@@ -1482,7 +1482,7 @@ ABS</label><div class="sd-tab-content docutils">
 </pre></div>
 </div>
 <p>Then, create a <code class="docutils literal notranslate"><span class="pre">AzureBlobFileSystem</span></code> and specify a URI with the <code class="docutils literal notranslate"><span class="pre">az://</span></code> scheme.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/iris.csv&quot;</span><span class="p">)</span>
 
@@ -1501,7 +1501,7 @@ to configure your credentials to be compatible with PyArrow, see their
 <p>To save your <a class="reference internal" href="api/dataset.html#ray.data.Dataset" title="ray.data.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> to NFS file systems, call a method
 like <a class="reference internal" href="api/doc/ray.data.Dataset.write_parquet.html#ray.data.Dataset.write_parquet" title="ray.data.Dataset.write_parquet"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.write_parquet</span></code></a> and specify a
 mounted directory.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/iris.csv&quot;</span><span class="p">)</span>
 
@@ -1522,8 +1522,8 @@ fewer rows to each file. Under the hood, if the number of rows per block is
 larger than the specified value, Ray Data writes
 the number of rows per block to each file.</p>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/iris.csv&quot;</span><span class="p">)</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">write_csv</span><span class="p">(</span><span class="s2">&quot;/tmp/few_files/&quot;</span><span class="p">,</span> <span class="n">min_rows_per_write</span><span class="o">=</span><span class="mi">75</span><span class="p">)</span>
@@ -1543,7 +1543,7 @@ the number of rows per block to each file.</p>
 <p>To convert a <a class="reference internal" href="api/dataset.html#ray.data.Dataset" title="ray.data.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> to a pandas DataFrame, call
 <a class="reference internal" href="api/doc/ray.data.Dataset.to_pandas.html#ray.data.Dataset.to_pandas" title="ray.data.Dataset.to_pandas"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.to_pandas()</span></code></a>. Your data must fit in memory
 on the head node.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/iris.csv&quot;</span><span class="p">)</span>
 
@@ -1580,7 +1580,7 @@ Dask</label><div class="sd-tab-content docutils">
 <p>To convert a <a class="reference internal" href="api/dataset.html#ray.data.Dataset" title="ray.data.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> to a
 <a class="reference external" href="https://docs.dask.org/en/stable/dataframe.html">Dask DataFrame</a>, call
 <a class="reference internal" href="api/doc/ray.data.Dataset.to_dask.html#ray.data.Dataset.to_dask" title="ray.data.Dataset.to_dask"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.to_dask()</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/iris.csv&quot;</span><span class="p">)</span>
 
@@ -1593,8 +1593,8 @@ Dask</label><div class="sd-tab-content docutils">
 Spark</label><div class="sd-tab-content docutils">
 <p>To convert a <a class="reference internal" href="api/dataset.html#ray.data.Dataset" title="ray.data.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> to a <a class="reference external" href="https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/dataframe.html">Spark DataFrame</a>,
 call <a class="reference internal" href="api/doc/ray.data.Dataset.to_spark.html#ray.data.Dataset.to_spark" title="ray.data.Dataset.to_spark"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.to_spark()</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">raydp</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">raydp</span>
 
 <span class="n">spark</span> <span class="o">=</span> <span class="n">raydp</span><span class="o">.</span><span class="n">init_spark</span><span class="p">(</span>
     <span class="n">app_name</span> <span class="o">=</span> <span class="s2">&quot;example&quot;</span><span class="p">,</span>
@@ -1613,7 +1613,7 @@ call <a class="reference internal" href="api/doc/ray.data.Dataset.to_spark.html#
 Modin</label><div class="sd-tab-content docutils">
 <p>To convert a <a class="reference internal" href="api/dataset.html#ray.data.Dataset" title="ray.data.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> to a Modin DataFrame, call
 <a class="reference internal" href="api/doc/ray.data.Dataset.to_modin.html#ray.data.Dataset.to_modin" title="ray.data.Dataset.to_modin"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.to_modin()</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/iris.csv&quot;</span><span class="p">)</span>
 
@@ -1626,7 +1626,7 @@ Modin</label><div class="sd-tab-content docutils">
 Mars</label><div class="sd-tab-content docutils">
 <p>To convert a <a class="reference internal" href="api/dataset.html#ray.data.Dataset" title="ray.data.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> from a Mars DataFrame, call
 <a class="reference internal" href="api/doc/ray.data.Dataset.to_mars.html#ray.data.Dataset.to_mars" title="ray.data.Dataset.to_mars"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.to_mars()</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/iris.csv&quot;</span><span class="p">)</span>
 

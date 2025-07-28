@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1413,14 +1413,14 @@ document.write(`
 <p>The Ray Client is an API that connects a Python script to a <strong>remote</strong> Ray cluster. Effectively, it allows you to leverage a remote Ray cluster just like you would with Ray running on your local machine.</p>
 <p>By changing <code class="docutils literal notranslate"><span class="pre">ray.init()</span></code> to <code class="docutils literal notranslate"><span class="pre">ray.init(&quot;ray://&lt;head_node_host&gt;:&lt;port&gt;&quot;)</span></code>, you can connect from your laptop (or anywhere) directly to a remote cluster and scale-out your Ray code, while maintaining the ability to develop interactively in a Python shell. <strong>This will only work with Ray 1.5+.</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># You can run this code outside of the Ray cluster!</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="c1"># Starting the Ray client. This connects to a remote Ray cluster.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="s2">&quot;ray://&lt;head_node_host&gt;:10001&quot;</span><span class="p">)</span>
 
 <span class="c1"># Normal Ray code follows</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">do_work</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">do_work</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">x</span> <span class="o">**</span> <span class="n">x</span>
 
 <span class="n">do_work</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -1484,14 +1484,14 @@ $<span class="w"> </span>ray<span class="w"> </span>attach<span class="w"> </spa
 </div>
 <p>Then connect to the Ray cluster <strong>from another terminal</strong> using  <code class="docutils literal notranslate"><span class="pre">localhost</span></code> as the
 <code class="docutils literal notranslate"><span class="pre">head_node_host</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="c1"># This will connect to the cluster via the open SSH session.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="s2">&quot;ray://localhost:10001&quot;</span><span class="p">)</span>
 
 <span class="c1"># Normal Ray code follows</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">do_work</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">do_work</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">x</span> <span class="o">**</span> <span class="n">x</span>
 
 <span class="n">do_work</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -1503,14 +1503,14 @@ $<span class="w"> </span>ray<span class="w"> </span>attach<span class="w"> </spa
 <section id="step-3-run-ray-code">
 <h3>Step 3: Run Ray code<a class="headerlink" href="#step-3-run-ray-code" title="Link to this heading">#</a></h3>
 <p>Now, connect to the Ray Cluster with the following and then use Ray like you normally would:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="c1"># replace with the appropriate host and port</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="s2">&quot;ray://&lt;head_node_host&gt;:10001&quot;</span><span class="p">)</span>
 
 <span class="c1"># Normal Ray code follows</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">do_work</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">do_work</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">x</span> <span class="o">**</span> <span class="n">x</span>
 
 <span class="n">do_work</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -1563,7 +1563,7 @@ in your <code class="code docutils literal notranslate"><span class="pre">cluste
 <section id="connect-to-multiple-ray-clusters-experimental">
 <h2>Connect to multiple Ray clusters (Experimental)<a class="headerlink" href="#connect-to-multiple-ray-clusters-experimental" title="Link to this heading">#</a></h2>
 <p>Ray Client allows connecting to multiple Ray clusters in one Python process. To do this, just pass <code class="docutils literal notranslate"><span class="pre">allow_multiple=True</span></code> to <code class="docutils literal notranslate"><span class="pre">ray.init</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="c1"># Create a default client.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="s2">&quot;ray://&lt;head_node_host_cluster&gt;:10001&quot;</span><span class="p">)</span>
 
@@ -1627,12 +1627,12 @@ in your <code class="code docutils literal notranslate"><span class="pre">cluste
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">grpc</span><span class="o">.</span><span class="n">_channel</span><span class="o">.</span><span class="n">_MultiThreadedRendezvous</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">_MultiThreadedRendezvous</span> <span class="n">of</span> <span class="n">RPC</span> <span class="n">that</span> <span class="n">terminated</span> <span class="k">with</span><span class="p">:</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">StatusCode</span><span class="o">.</span><span class="n">INVALID_ARGUMENT</span>
     <span class="n">details</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">debug_error_string</span> <span class="o">=</span> <span class="s2">&quot;{&quot;</span><span class="n">created</span><span class="s2">&quot;:&quot;</span><span class="o">@</span><span class="mf">1628668820.164591000</span><span class="s2">&quot;,&quot;</span><span class="n">description</span><span class="s2">&quot;:&quot;</span><span class="n">Error</span> <span class="n">received</span> <span class="kn">from</span> <span class="nn">peer</span> <span class="n">ipv4</span><span class="p">:</span><span class="mf">10.233.120.107</span><span class="p">:</span><span class="mi">443</span><span class="s2">&quot;,&quot;</span><span class="n">file</span><span class="s2">&quot;:&quot;</span><span class="n">src</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">surface</span><span class="o">/</span><span class="n">call</span><span class="o">.</span><span class="n">cc</span><span class="s2">&quot;,&quot;</span><span class="n">file_line</span><span class="s2">&quot;:1062,&quot;</span><span class="n">grpc_message</span><span class="s2">&quot;:&quot;&quot;,&quot;</span><span class="n">grpc_status</span><span class="s2">&quot;:3}&quot;</span>
+    <span class="n">debug_error_string</span> <span class="o">=</span> <span class="s2">&quot;{&quot;</span><span class="n">created</span><span class="s2">&quot;:&quot;</span><span class="o">@</span><span class="mf">1628668820.164591000</span><span class="s2">&quot;,&quot;</span><span class="n">description</span><span class="s2">&quot;:&quot;</span><span class="n">Error</span> <span class="n">received</span> <span class="kn">from</span><span class="w"> </span><span class="nn">peer</span> <span class="n">ipv4</span><span class="p">:</span><span class="mf">10.233.120.107</span><span class="p">:</span><span class="mi">443</span><span class="s2">&quot;,&quot;</span><span class="n">file</span><span class="s2">&quot;:&quot;</span><span class="n">src</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">surface</span><span class="o">/</span><span class="n">call</span><span class="o">.</span><span class="n">cc</span><span class="s2">&quot;,&quot;</span><span class="n">file_line</span><span class="s2">&quot;:1062,&quot;</span><span class="n">grpc_message</span><span class="s2">&quot;:&quot;&quot;,&quot;</span><span class="n">grpc_status</span><span class="s2">&quot;:3}&quot;</span>
 <span class="o">&gt;</span>
-<span class="n">Got</span> <span class="n">Error</span> <span class="kn">from</span> <span class="nn">logger</span> <span class="n">channel</span> <span class="o">--</span> <span class="n">shutting</span> <span class="n">down</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">_MultiThreadedRendezvous</span> <span class="n">of</span> <span class="n">RPC</span> <span class="n">that</span> <span class="n">terminated</span> <span class="k">with</span><span class="p">:</span>
+<span class="n">Got</span> <span class="n">Error</span> <span class="kn">from</span><span class="w"> </span><span class="nn">logger</span> <span class="n">channel</span> <span class="o">--</span> <span class="n">shutting</span> <span class="n">down</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">_MultiThreadedRendezvous</span> <span class="n">of</span> <span class="n">RPC</span> <span class="n">that</span> <span class="n">terminated</span> <span class="k">with</span><span class="p">:</span>
     <span class="n">status</span> <span class="o">=</span> <span class="n">StatusCode</span><span class="o">.</span><span class="n">INVALID_ARGUMENT</span>
     <span class="n">details</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">debug_error_string</span> <span class="o">=</span> <span class="s2">&quot;{&quot;</span><span class="n">created</span><span class="s2">&quot;:&quot;</span><span class="o">@</span><span class="mf">1628668820.164713000</span><span class="s2">&quot;,&quot;</span><span class="n">description</span><span class="s2">&quot;:&quot;</span><span class="n">Error</span> <span class="n">received</span> <span class="kn">from</span> <span class="nn">peer</span> <span class="n">ipv4</span><span class="p">:</span><span class="mf">10.233.120.107</span><span class="p">:</span><span class="mi">443</span><span class="s2">&quot;,&quot;</span><span class="n">file</span><span class="s2">&quot;:&quot;</span><span class="n">src</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">surface</span><span class="o">/</span><span class="n">call</span><span class="o">.</span><span class="n">cc</span><span class="s2">&quot;,&quot;</span><span class="n">file_line</span><span class="s2">&quot;:1062,&quot;</span><span class="n">grpc_message</span><span class="s2">&quot;:&quot;&quot;,&quot;</span><span class="n">grpc_status</span><span class="s2">&quot;:3}&quot;</span>
+    <span class="n">debug_error_string</span> <span class="o">=</span> <span class="s2">&quot;{&quot;</span><span class="n">created</span><span class="s2">&quot;:&quot;</span><span class="o">@</span><span class="mf">1628668820.164713000</span><span class="s2">&quot;,&quot;</span><span class="n">description</span><span class="s2">&quot;:&quot;</span><span class="n">Error</span> <span class="n">received</span> <span class="kn">from</span><span class="w"> </span><span class="nn">peer</span> <span class="n">ipv4</span><span class="p">:</span><span class="mf">10.233.120.107</span><span class="p">:</span><span class="mi">443</span><span class="s2">&quot;,&quot;</span><span class="n">file</span><span class="s2">&quot;:&quot;</span><span class="n">src</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">surface</span><span class="o">/</span><span class="n">call</span><span class="o">.</span><span class="n">cc</span><span class="s2">&quot;,&quot;</span><span class="n">file_line</span><span class="s2">&quot;:1062,&quot;</span><span class="n">grpc_message</span><span class="s2">&quot;:&quot;&quot;,&quot;</span><span class="n">grpc_status</span><span class="s2">&quot;:3}&quot;</span>
 <span class="o">&gt;</span>
 </pre></div>
 </div>

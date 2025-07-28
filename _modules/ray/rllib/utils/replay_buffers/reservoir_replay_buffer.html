@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,26 +1389,26 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.utils.replay_buffers.reservoir_replay_buffer</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
-<span class="kn">import</span> <span class="nn">random</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
 <span class="c1"># Import ray before psutil will make sure we use psutil&#39;s bundled version</span>
-<span class="kn">import</span> <span class="nn">ray</span>  <span class="c1"># noqa F401</span>
-<span class="kn">import</span> <span class="nn">psutil</span>  <span class="c1"># noqa E402</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>  <span class="c1"># noqa F401</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>  <span class="c1"># noqa E402</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">ExperimentalAPI</span><span class="p">,</span> <span class="n">override</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.replay_buffers.replay_buffer</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExperimentalAPI</span><span class="p">,</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.replay_buffers.replay_buffer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ReplayBuffer</span><span class="p">,</span>
     <span class="n">warn_replay_capacity</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">SampleBatchType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">SampleBatchType</span>
 
 
 <span class="c1"># __sphinx_doc_reservoir_buffer__begin__</span>
 <div class="viewcode-block" id="ReservoirReplayBuffer">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.reservoir_replay_buffer.ReservoirReplayBuffer.html#ray.rllib.utils.replay_buffers.reservoir_replay_buffer.ReservoirReplayBuffer">[docs]</a>
 <span class="nd">@ExperimentalAPI</span>
-<span class="k">class</span> <span class="nc">ReservoirReplayBuffer</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ReservoirReplayBuffer</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This buffer implements reservoir sampling.</span>
 
 <span class="sd">    The algorithm has been described by Jeffrey S. Vitter in &quot;Random sampling</span>
@@ -1417,7 +1417,7 @@ document.write(`
 
 <div class="viewcode-block" id="ReservoirReplayBuffer.__init__">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.reservoir_replay_buffer.ReservoirReplayBuffer.__init__.html#ray.rllib.utils.replay_buffers.reservoir_replay_buffer.ReservoirReplayBuffer.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">capacity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span> <span class="n">storage_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;timesteps&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes a ReservoirBuffer instance.</span>
@@ -1436,7 +1436,7 @@ document.write(`
 
     <span class="nd">@ExperimentalAPI</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_add_single_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">SampleBatchType</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_single_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">SampleBatchType</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a SampleBatch of experiences to self._storage.</span>
 
 <span class="sd">        An item consists of either one or more timesteps, a sequence or an</span>
@@ -1483,7 +1483,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.reservoir_replay_buffer.ReservoirReplayBuffer.stats.html#ray.rllib.utils.replay_buffers.reservoir_replay_buffer.ReservoirReplayBuffer.stats">[docs]</a>
     <span class="nd">@ExperimentalAPI</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the stats of this buffer.</span>
 
 <span class="sd">        Args:</span>
@@ -1506,7 +1506,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.reservoir_replay_buffer.ReservoirReplayBuffer.get_state.html#ray.rllib.utils.replay_buffers.reservoir_replay_buffer.ReservoirReplayBuffer.get_state">[docs]</a>
     <span class="nd">@ExperimentalAPI</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns all local state.</span>
 
 <span class="sd">        Returns:</span>
@@ -1521,7 +1521,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.reservoir_replay_buffer.ReservoirReplayBuffer.set_state.html#ray.rllib.utils.replay_buffers.reservoir_replay_buffer.ReservoirReplayBuffer.set_state">[docs]</a>
     <span class="nd">@ExperimentalAPI</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Restores all local state to the provided `state`.</span>
 
 <span class="sd">        Args:</span>

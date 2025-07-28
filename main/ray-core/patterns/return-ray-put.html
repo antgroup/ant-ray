@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1418,12 +1418,12 @@ In contrast, the caller process (often the driver) is the owner of the return va
 <section id="code-example">
 <h2>Code example<a class="headerlink" href="#code-example" title="Link to this heading">#</a></h2>
 <p>If you want to return a single value regardless if it’s small or large, you should return it directly.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task_with_single_small_return_value_bad</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task_with_single_small_return_value_bad</span><span class="p">():</span>
     <span class="n">small_return_value</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="c1"># The value will be stored in the object store</span>
     <span class="c1"># and the reference is returned to the caller.</span>
@@ -1432,7 +1432,7 @@ In contrast, the caller process (often the driver) is the owner of the return va
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task_with_single_small_return_value_good</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task_with_single_small_return_value_good</span><span class="p">():</span>
     <span class="n">small_return_value</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="c1"># Ray will return the value inline to the caller</span>
     <span class="c1"># which is faster than the previous approach.</span>
@@ -1445,14 +1445,14 @@ In contrast, the caller process (often the driver) is the owner of the return va
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task_with_single_large_return_value_bad</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task_with_single_large_return_value_bad</span><span class="p">():</span>
     <span class="n">large_return_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
     <span class="n">large_return_value_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">large_return_value</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">large_return_value_ref</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task_with_single_large_return_value_good</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task_with_single_large_return_value_good</span><span class="p">():</span>
     <span class="c1"># Both approaches will store the large array to the object store</span>
     <span class="c1"># but this is better since it&#39;s faster and more fault tolerant.</span>
     <span class="n">large_return_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
@@ -1467,12 +1467,12 @@ In contrast, the caller process (often the driver) is the owner of the return va
 
 <span class="c1"># Same thing applies for actor tasks as well.</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">task_with_single_return_value_bad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">task_with_single_return_value_bad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">single_return_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">9</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">single_return_value</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">task_with_single_return_value_good</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">task_with_single_return_value_good</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">9</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
 
 
@@ -1487,7 +1487,7 @@ In contrast, the caller process (often the driver) is the owner of the return va
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This will return a single object</span>
 <span class="c1"># which is a tuple of two ObjectRefs to the actual values.</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_returns</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">task_with_static_multiple_returns_bad1</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task_with_static_multiple_returns_bad1</span><span class="p">():</span>
     <span class="n">return_value_1_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">return_value_2_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">return_value_1_ref</span><span class="p">,</span> <span class="n">return_value_2_ref</span><span class="p">)</span>
@@ -1495,7 +1495,7 @@ In contrast, the caller process (often the driver) is the owner of the return va
 
 <span class="c1"># This will return two objects each of which is an ObjectRef to the actual value.</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_returns</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">task_with_static_multiple_returns_bad2</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task_with_static_multiple_returns_bad2</span><span class="p">():</span>
     <span class="n">return_value_1_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">return_value_2_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">return_value_1_ref</span><span class="p">,</span> <span class="n">return_value_2_ref</span><span class="p">)</span>
@@ -1503,7 +1503,7 @@ In contrast, the caller process (often the driver) is the owner of the return va
 
 <span class="c1"># This will return two objects each of which is the actual value.</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_returns</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">task_with_static_multiple_returns_good</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task_with_static_multiple_returns_good</span><span class="p">():</span>
     <span class="n">return_value_1</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">return_value_2</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">return_value_1</span><span class="p">,</span> <span class="n">return_value_2</span><span class="p">)</span>
@@ -1517,21 +1517,21 @@ In contrast, the caller process (often the driver) is the owner of the return va
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
     <span class="nd">@ray</span><span class="o">.</span><span class="n">method</span><span class="p">(</span><span class="n">num_returns</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">task_with_static_multiple_returns_bad1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">task_with_static_multiple_returns_bad1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">return_value_1_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">return_value_2_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">return_value_1_ref</span><span class="p">,</span> <span class="n">return_value_2_ref</span><span class="p">)</span>
 
     <span class="nd">@ray</span><span class="o">.</span><span class="n">method</span><span class="p">(</span><span class="n">num_returns</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">task_with_static_multiple_returns_bad2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">task_with_static_multiple_returns_bad2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">return_value_1_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">return_value_2_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">return_value_1_ref</span><span class="p">,</span> <span class="n">return_value_2_ref</span><span class="p">)</span>
 
     <span class="nd">@ray</span><span class="o">.</span><span class="n">method</span><span class="p">(</span><span class="n">num_returns</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">task_with_static_multiple_returns_good</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">task_with_static_multiple_returns_good</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># This is faster and more fault tolerant.</span>
         <span class="n">return_value_1</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">return_value_2</span> <span class="o">=</span> <span class="mi">2</span>
@@ -1548,7 +1548,7 @@ In contrast, the caller process (often the driver) is the owner of the return va
 </div>
 <p>If you don’t know the number of returns before calling the task, you should use the <a class="reference internal" href="../tasks/generators.html#id2"><span class="std std-ref">dynamic generator</span></a> pattern if possible.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_returns</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">task_with_dynamic_returns_bad</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task_with_dynamic_returns_bad</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="n">return_value_refs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
         <span class="n">return_value_refs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)))</span>
@@ -1556,7 +1556,7 @@ In contrast, the caller process (often the driver) is the owner of the return va
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_returns</span><span class="o">=</span><span class="s2">&quot;dynamic&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">task_with_dynamic_returns_good</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task_with_dynamic_returns_good</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
         <span class="k">yield</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
 

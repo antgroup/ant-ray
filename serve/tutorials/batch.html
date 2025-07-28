@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1414,12 +1414,12 @@ It increases both throughput and hardware utilization by processing multiple req
 <section id="define-the-deployment">
 <h2>Define the Deployment<a class="headerlink" href="#define-the-deployment" title="Link to this heading">#</a></h2>
 <p>Open a new Python file called <code class="docutils literal notranslate"><span class="pre">tutorial_batch.py</span></code>. First, import Ray Serve and some other helpers.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
 
-<span class="kn">from</span> <span class="nn">starlette.requests</span> <span class="kn">import</span> <span class="n">Request</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">starlette.requests</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">pipeline</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
 </pre></div>
 </div>
 <p>Ray Serve provides the <code class="docutils literal notranslate"><span class="pre">&#64;serve.batch</span></code> decorator to automatically batch individual requests to
@@ -1431,7 +1431,7 @@ a function or class method.</p>
 <li><p>Returns a list of results of equal length, one for each request</p></li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@serve</span><span class="o">.</span><span class="n">batch</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">my_batch_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requests</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">my_batch_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requests</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
     <span class="c1"># Process multiple requests together</span>
     <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">request</span> <span class="ow">in</span> <span class="n">requests</span><span class="p">:</span>
@@ -1442,15 +1442,15 @@ a function or class method.</p>
 <p>You can call the batch handler from another <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">def</span></code> method in your deployment.
 Ray Serve batches and executes these calls together, but returns individual results just like
 normal function calls:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">BatchingDeployment</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">BatchingDeployment</span><span class="p">:</span>
     <span class="nd">@serve</span><span class="o">.</span><span class="n">batch</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">my_batch_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requests</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">my_batch_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requests</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">request</span> <span class="ow">in</span> <span class="n">requests</span><span class="p">:</span>
             <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>  <span class="c1"># processing logic here</span>
         <span class="k">return</span> <span class="n">results</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
         <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_batch_handler</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1465,18 +1465,18 @@ at the cost of latency under low load.</p>
 <p>Next, define a deployment that takes in a list of input strings and runs
 vectorized text generation on the inputs.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">BatchTextGenerator</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BatchTextGenerator</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">pipeline_key</span><span class="p">,</span> <span class="n">model_key</span><span class="p">)</span>
 
     <span class="nd">@serve</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">max_batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">handle_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">handle_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Our input array has length:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">))</span>
 
         <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;generated_text&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_batch</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">query_params</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -1500,7 +1500,7 @@ the maximum possible batch size that Ray Serve executes at once.</p>
 <h3>Option 2: Deploying with the Python API<a class="headerlink" href="#option-2-deploying-with-the-python-api" title="Link to this heading">#</a></h3>
 <p>Alternatively, you can deploy the app using the Python API using the <code class="docutils literal notranslate"><span class="pre">serve.run</span></code> function.
 This command returns a handle that you can use to query the deployment.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.serve.handle</span> <span class="kn">import</span> <span class="n">DeploymentHandle</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.handle</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentHandle</span>
 
 <span class="n">handle</span><span class="p">:</span> <span class="n">DeploymentHandle</span> <span class="o">=</span> <span class="n">serve</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Text-Completion-App&quot;</span><span class="p">)</span>
 </pre></div>
@@ -1521,11 +1521,11 @@ This command returns a handle that you can use to query the deployment.</p>
 <section id="send-http-requests-in-parallel-with-ray">
 <h3>2. Send HTTP requests in parallel with Ray<a class="headerlink" href="#send-http-requests-in-parallel-with-ray" title="Link to this heading">#</a></h3>
 <p>For higher throughput, use <a class="reference internal" href="../../ray-core/tasks.html#ray-remote-functions"><span class="std std-ref">Ray remote tasks</span></a> to send parallel requests:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">requests</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">send_query</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">send_query</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
     <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;http://localhost:8000/&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">text</span><span class="p">})</span>
     <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">text</span>
 
@@ -1544,8 +1544,8 @@ This command returns a handle that you can use to query the deployment.</p>
 <section id="sending-requests-using-deploymenthandle">
 <h3>3. Sending requests using DeploymentHandle<a class="headerlink" href="#sending-requests-using-deploymenthandle" title="Link to this heading">#</a></h3>
 <p>For a more Pythonic way to query the model, you can use the deployment handle directly:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
 
 <span class="n">input_batch</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;Once upon a time,&#39;</span><span class="p">,</span>

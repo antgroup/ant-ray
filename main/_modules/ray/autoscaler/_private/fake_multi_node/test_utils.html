@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,40 +1389,40 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.autoscaler._private.fake_multi_node.test_utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray._private.dict</span> <span class="kn">import</span> <span class="n">deep_update</span>
-<span class="kn">from</span> <span class="nn">ray.autoscaler._private.fake_multi_node.node_provider</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.dict</span><span class="w"> </span><span class="kn">import</span> <span class="n">deep_update</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.autoscaler._private.fake_multi_node.node_provider</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">FAKE_DOCKER_DEFAULT_CLIENT_PORT</span><span class="p">,</span>
     <span class="n">FAKE_DOCKER_DEFAULT_GCS_PORT</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.queue</span> <span class="kn">import</span> <span class="n">Empty</span><span class="p">,</span> <span class="n">Queue</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.queue</span><span class="w"> </span><span class="kn">import</span> <span class="n">Empty</span><span class="p">,</span> <span class="n">Queue</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <span class="n">DEFAULT_DOCKER_IMAGE</span> <span class="o">=</span> <span class="s2">&quot;rayproject/ray:nightly-py</span><span class="si">{major}{minor}</span><span class="s2">-cpu&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">ResourcesNotReadyError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResourcesNotReadyError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
     <span class="k">pass</span>
 
 
 <div class="viewcode-block" id="DockerCluster">
 <a class="viewcode-back" href="../../../../../ray-contribute/fake-autoscaler.html#ray.autoscaler._private.fake_multi_node.test_utils.DockerCluster">[docs]</a>
-<span class="k">class</span> <span class="nc">DockerCluster</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DockerCluster</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Docker cluster wrapper.</span>
 
 <span class="sd">    Creates a directory for starting a fake multinode docker cluster.</span>
@@ -1431,7 +1431,7 @@ document.write(`
 <span class="sd">    and to start and connect to the cluster.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_base_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;example_docker.yaml&quot;</span>
         <span class="p">)</span>
@@ -1455,32 +1455,32 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_execution_queue</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">config_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">config_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config_file</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">cluster_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cluster_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_config</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">cluster_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cluster_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tempdir</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">gcs_port</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gcs_port</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;provider&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s2">&quot;host_gcs_port&quot;</span><span class="p">,</span> <span class="n">FAKE_DOCKER_DEFAULT_GCS_PORT</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">client_port</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">client_port</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;provider&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="s2">&quot;host_client_port&quot;</span><span class="p">,</span> <span class="n">FAKE_DOCKER_DEFAULT_CLIENT_PORT</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="DockerCluster.connect">
 <a class="viewcode-back" href="../../../../../ray-contribute/fake-autoscaler.html#ray.autoscaler._private.fake_multi_node.test_utils.DockerCluster.connect">[docs]</a>
-    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">120</span><span class="p">,</span> <span class="o">**</span><span class="n">init_kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">120</span><span class="p">,</span> <span class="o">**</span><span class="n">init_kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Connect to the docker-compose Ray cluster.</span>
 
 <span class="sd">        Assumes the cluster is at RAY_TESTHOST (defaults to</span>
@@ -1521,12 +1521,12 @@ document.write(`
 
 <div class="viewcode-block" id="DockerCluster.remote_execution_api">
 <a class="viewcode-back" href="../../../../../ray-contribute/fake-autoscaler.html#ray.autoscaler._private.fake_multi_node.test_utils.DockerCluster.remote_execution_api">[docs]</a>
-    <span class="k">def</span> <span class="nf">remote_execution_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RemoteAPI&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remote_execution_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RemoteAPI&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an object to control cluster state from within the cluster.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_execution_queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">(</span><span class="n">actor_options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;num_cpus&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
         <span class="n">stop_event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execution_event</span>
 
-        <span class="k">def</span> <span class="nf">entrypoint</span><span class="p">():</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">entrypoint</span><span class="p">():</span>
             <span class="k">while</span> <span class="ow">not</span> <span class="n">stop_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">cmd</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execution_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -1545,7 +1545,7 @@ document.write(`
 <div class="viewcode-block" id="DockerCluster.wait_for_resources">
 <a class="viewcode-back" href="../../../../../ray-contribute/fake-autoscaler.html#ray.autoscaler._private.fake_multi_node.test_utils.DockerCluster.wait_for_resources">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">wait_for_resources</span><span class="p">(</span><span class="n">resources</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_resources</span><span class="p">(</span><span class="n">resources</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Wait until Ray cluster resources are available</span>
 
 <span class="sd">        Args:</span>
@@ -1568,7 +1568,7 @@ document.write(`
 
 <div class="viewcode-block" id="DockerCluster.update_config">
 <a class="viewcode-back" href="../../../../../ray-contribute/fake-autoscaler.html#ray.autoscaler._private.fake_multi_node.test_utils.DockerCluster.update_config">[docs]</a>
-    <span class="k">def</span> <span class="nf">update_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update autoscaling config.</span>
 
 <span class="sd">        Does a deep update of the base config with a new configuration.</span>
@@ -1618,7 +1618,7 @@ document.write(`
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated cluster config to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_cluster_config</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">maybe_pull_image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">maybe_pull_image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_docker_image</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">images_str</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
@@ -1639,7 +1639,7 @@ document.write(`
 
 <div class="viewcode-block" id="DockerCluster.setup">
 <a class="viewcode-back" href="../../../../../ray-contribute/fake-autoscaler.html#ray.autoscaler._private.fake_multi_node.test_utils.DockerCluster.setup">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup docker compose cluster environment.</span>
 
 <span class="sd">        Creates the temporary directory, writes the initial config file,</span>
@@ -1656,7 +1656,7 @@ document.write(`
 
 <div class="viewcode-block" id="DockerCluster.teardown">
 <a class="viewcode-back" href="../../../../../ray-contribute/fake-autoscaler.html#ray.autoscaler._private.fake_multi_node.test_utils.DockerCluster.teardown">[docs]</a>
-    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_dir</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_dir</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Tear down docker compose cluster environment.</span>
 
 <span class="sd">        Args:</span>
@@ -1669,13 +1669,13 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_config_file</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_start_monitor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_start_monitor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_monitor_process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
             <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitor_script</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span><span class="p">]</span>
         <span class="p">)</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_stop_monitor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_stop_monitor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitor_process</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_monitor_process</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitor_process</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1684,7 +1684,7 @@ document.write(`
 
 <div class="viewcode-block" id="DockerCluster.start">
 <a class="viewcode-back" href="../../../../../ray-contribute/fake-autoscaler.html#ray.autoscaler._private.fake_multi_node.test_utils.DockerCluster.start">[docs]</a>
-    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Start docker compose cluster.</span>
 
 <span class="sd">        Starts the monitor process and runs ``ray up``.</span>
@@ -1698,7 +1698,7 @@ document.write(`
 
 <div class="viewcode-block" id="DockerCluster.stop">
 <a class="viewcode-back" href="../../../../../ray-contribute/fake-autoscaler.html#ray.autoscaler._private.fake_multi_node.test_utils.DockerCluster.stop">[docs]</a>
-    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop docker compose cluster.</span>
 
 <span class="sd">        Runs ``ray down`` and stops the monitor process.</span>
@@ -1714,15 +1714,15 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_execution_event</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nodes_file</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_update_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_status_file</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_node</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_node</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">node_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1758,7 +1758,7 @@ document.write(`
         <span class="k">assert</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Node with ID </span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="s2"> is not in active nodes.&quot;</span>
         <span class="k">return</span> <span class="n">node_id</span>
 
-    <span class="k">def</span> <span class="nf">_get_docker_container</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_docker_container</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_status</span><span class="p">()</span>
         <span class="n">node_status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">node_status</span><span class="p">:</span>
@@ -1768,7 +1768,7 @@ document.write(`
 
 <div class="viewcode-block" id="DockerCluster.kill_node">
 <a class="viewcode-back" href="../../../../../ray-contribute/fake-autoscaler.html#ray.autoscaler._private.fake_multi_node.test_utils.DockerCluster.kill_node">[docs]</a>
-    <span class="k">def</span> <span class="nf">kill_node</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kill_node</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">node_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1791,7 +1791,7 @@ document.write(`
 
 
 
-<span class="k">class</span> <span class="nc">RemoteAPI</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RemoteAPI</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Remote API to control cluster state from within cluster tasks.</span>
 
 <span class="sd">    This API uses a Ray queue to interact with an execution thread on the</span>
@@ -1807,10 +1807,10 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">=</span> <span class="n">queue</span>
 
-    <span class="k">def</span> <span class="nf">kill_node</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kill_node</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">node_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

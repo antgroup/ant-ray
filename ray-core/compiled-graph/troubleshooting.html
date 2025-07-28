@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1473,14 +1473,14 @@ you could possibly run into issues if a NumPy array output from a previous Compi
 of a following execution of the same Compiled Graph. This is because the NumPy array stays in the buffer of the Compiled Graph until you or Python delete it.
 It’s recommended to explicitly delete the NumPy array as Python may not always garbage collect the NumPy array immediately as you may expect.</p>
 <p>For example, the following code sample could result in a hang or RayChannelTimeoutError if the NumPy array isn’t deleted:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">ray.dag</span> <span class="kn">import</span> <span class="n">InputNode</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag</span><span class="w"> </span><span class="kn">import</span> <span class="n">InputNode</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">NumPyActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">get_arr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NumPyActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_arr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
         <span class="n">numpy_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1024</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">numpy_arr</span>
 
@@ -1505,8 +1505,8 @@ Therefore, you should explicitly delete the NumPy array before you try to get th
 Without explicitly tearing down the Compiled Graph, the resources created for actors in a Compiled Graph may have conflicts with further usage of those actors.</p>
 <p>For example, in the following code, Python could delay garbage collection, which triggers the implicit teardown of the first Compiled Graph. This could lead to a segfault due to the resource conflicts mentioned:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">SendActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SendActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">x</span>
 
 

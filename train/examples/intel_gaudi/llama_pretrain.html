@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1455,17 +1455,17 @@ pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com
 <div class="cell_input docutils container">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
 
-<span class="kn">import</span> <span class="nn">transformers</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
-<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">default_data_collator</span>
-<span class="kn">from</span> <span class="nn">transformers.testing_utils</span> <span class="kn">import</span> <span class="n">CaptureLogger</span>
-<span class="kn">from</span> <span class="nn">optimum.habana</span> <span class="kn">import</span> <span class="n">GaudiConfig</span><span class="p">,</span> <span class="n">GaudiTrainer</span><span class="p">,</span> <span class="n">GaudiTrainingArguments</span>
-<span class="kn">from</span> <span class="nn">optimum.habana.utils</span> <span class="kn">import</span> <span class="n">set_seed</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">transformers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_data_collator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers.testing_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">CaptureLogger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimum.habana</span><span class="w"> </span><span class="kn">import</span> <span class="n">GaudiConfig</span><span class="p">,</span> <span class="n">GaudiTrainer</span><span class="p">,</span> <span class="n">GaudiTrainingArguments</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimum.habana.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_seed</span>
 </pre></div>
 </div>
 </div>
@@ -1476,7 +1476,7 @@ pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com
 <p>Download and load dataset from huggingface.co</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">load_datasets</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">load_datasets</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="n">dataset_name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> 
     <span class="n">dataset_config_name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;config_name&quot;</span><span class="p">]</span>
 
@@ -1517,7 +1517,7 @@ pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com
 <p>Download vocabulary from huggingface.co.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">load_tokenizer</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">load_tokenizer</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
     <span class="n">tokenizer_kwargs</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;cache_dir&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
@@ -1537,13 +1537,13 @@ pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com
 <p>tokenize word to token ids.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">tokenize_dataset</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">tokenize_dataset</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">):</span>
     <span class="n">column_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">features</span><span class="p">)</span>
     <span class="n">text_column_name</span> <span class="o">=</span> <span class="s2">&quot;text&quot;</span> <span class="k">if</span> <span class="s2">&quot;text&quot;</span> <span class="ow">in</span> <span class="n">column_names</span> <span class="k">else</span> <span class="n">column_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="n">tok_logger</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;transformers.tokenization_utils_base&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">tokenize_function</span><span class="p">(</span><span class="n">examples</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tokenize_function</span><span class="p">(</span><span class="n">examples</span><span class="p">):</span>
         <span class="k">with</span> <span class="n">CaptureLogger</span><span class="p">(</span><span class="n">tok_logger</span><span class="p">)</span> <span class="k">as</span> <span class="n">cl</span><span class="p">:</span>
             <span class="n">output</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">examples</span><span class="p">[</span><span class="n">text_column_name</span><span class="p">])</span>
         <span class="c1"># clm input could be much much longer than block_size</span>
@@ -1574,7 +1574,7 @@ pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com
 <p>This preprocssing will concatenate all texts from our dataset and generate chunks of block_size, and will pre-train model much faster.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">group_dataset</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">group_dataset</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">):</span>
     <span class="n">config_name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
     <span class="n">auto_config</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">config_name</span><span class="p">)</span>
     <span class="n">max_pos_embeddings</span> <span class="o">=</span> <span class="n">auto_config</span><span class="o">.</span><span class="n">max_position_embeddings</span>
@@ -1590,7 +1590,7 @@ pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com
             <span class="n">block_size</span> <span class="o">=</span> <span class="mi">1024</span>
 
     <span class="c1"># Main data processing function that will concatenate all texts from our dataset and generate chunks of block_size.</span>
-    <span class="k">def</span> <span class="nf">group_texts</span><span class="p">(</span><span class="n">examples</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">group_texts</span><span class="p">(</span><span class="n">examples</span><span class="p">):</span>
         <span class="c1"># Concatenate all texts.</span>
         <span class="n">concatenated_examples</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">examples</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">examples</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
         <span class="n">total_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">concatenated_examples</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">examples</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]])</span>
@@ -1623,7 +1623,7 @@ pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com
 <p>Download and load pre-configed model from huggingface.co, the detail model configurations in config.json</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">load_model</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="p">{})</span>
     <span class="n">auto_config</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
@@ -1643,7 +1643,7 @@ pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com
 <p>No evaluation dataset passed, just training.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_trainer</span><span class="p">(</span><span class="n">training_args</span><span class="p">,</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_trainer</span><span class="p">(</span><span class="n">training_args</span><span class="p">,</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
     <span class="n">gaudi_config</span> <span class="o">=</span> <span class="n">GaudiConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
         <span class="n">training_args</span><span class="o">.</span><span class="n">gaudi_config_name</span><span class="p">,</span> <span class="n">revision</span><span class="o">=</span><span class="s2">&quot;main&quot;</span><span class="p">,</span>
     <span class="p">)</span>
@@ -1678,7 +1678,7 @@ pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">pretrain_llama</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">pretrain_llama</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
 
     <span class="n">training_args</span> <span class="o">=</span> <span class="n">GaudiTrainingArguments</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;training_args&quot;</span><span class="p">])</span>
     <span class="n">set_seed</span><span class="p">(</span><span class="n">training_args</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
@@ -1720,10 +1720,10 @@ pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">num_workers</span><span class="p">,</span> <span class="n">execution_mode</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">ray</span>
-    <span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
-    <span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span><span class="p">,</span> <span class="n">TorchConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">num_workers</span><span class="p">,</span> <span class="n">execution_mode</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span><span class="p">,</span> <span class="n">TorchConfig</span>
 
     <span class="n">pretrain_config</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="p">{</span>

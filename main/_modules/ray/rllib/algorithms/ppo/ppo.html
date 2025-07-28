@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1400,24 +1400,24 @@ document.write(`
 <span class="sd">Detailed documentation: https://docs.ray.io/en/master/rllib-algorithms.html#ppo</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm</span> <span class="kn">import</span> <span class="n">Algorithm</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span><span class="p">,</span> <span class="n">NotProvided</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.execution.rollout_ops</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm</span><span class="w"> </span><span class="kn">import</span> <span class="n">Algorithm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span><span class="p">,</span> <span class="n">NotProvided</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.execution.rollout_ops</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">standardize_fields</span><span class="p">,</span>
     <span class="n">synchronous_parallel_sample</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.execution.train_ops</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.execution.train_ops</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">train_one_step</span><span class="p">,</span>
     <span class="n">multi_gpu_train_one_step</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.policy</span> <span class="kn">import</span> <span class="n">Policy</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">OldAPIStack</span><span class="p">,</span> <span class="n">override</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="n">DEPRECATED_VALUE</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Policy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">OldAPIStack</span><span class="p">,</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEPRECATED_VALUE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ENV_RUNNER_RESULTS</span><span class="p">,</span>
     <span class="n">ENV_RUNNER_SAMPLING_TIMER</span><span class="p">,</span>
     <span class="n">LEARNER_RESULTS</span><span class="p">,</span>
@@ -1430,13 +1430,13 @@ document.write(`
     <span class="n">TIMERS</span><span class="p">,</span>
     <span class="n">ALL_MODULES</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics.learner_info</span> <span class="kn">import</span> <span class="n">LEARNER_STATS_KEY</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.schedules.scheduler</span> <span class="kn">import</span> <span class="n">Scheduler</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">ResultDict</span>
-<span class="kn">from</span> <span class="nn">ray.util.debug</span> <span class="kn">import</span> <span class="n">log_once</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.learner_info</span><span class="w"> </span><span class="kn">import</span> <span class="n">LEARNER_STATS_KEY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.schedules.scheduler</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scheduler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResultDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.debug</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_once</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.core.learner.learner</span> <span class="kn">import</span> <span class="n">Learner</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.learner.learner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Learner</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -1450,7 +1450,7 @@ document.write(`
 
 <div class="viewcode-block" id="PPOConfig">
 <a class="viewcode-back" href="../../../../../rllib/rllib-algorithms.html#ray.rllib.algorithms.ppo.ppo.PPOConfig">[docs]</a>
-<span class="k">class</span> <span class="nc">PPOConfig</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PPOConfig</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a configuration class from which a PPO Algorithm can be built.</span>
 
 <span class="sd">    .. testcode::</span>
@@ -1495,7 +1495,7 @@ document.write(`
 <span class="sd">        ...</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_class</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_class</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes a PPOConfig instance.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exploration_config</span> <span class="o">=</span> <span class="p">{</span>
             <span class="c1"># The Exploration class to use. In the simplest case, this is the name</span>
@@ -1545,9 +1545,9 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">vf_share_layers</span> <span class="o">=</span> <span class="n">DEPRECATED_VALUE</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_default_rl_module_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RLModuleSpec</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_rl_module_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RLModuleSpec</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">framework_str</span> <span class="o">==</span> <span class="s2">&quot;torch&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo.torch.default_ppo_torch_rl_module</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo.torch.default_ppo_torch_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
                 <span class="n">DefaultPPOTorchRLModule</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -1559,9 +1559,9 @@ document.write(`
             <span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_default_learner_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="s2">&quot;Learner&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_learner_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="s2">&quot;Learner&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">framework_str</span> <span class="o">==</span> <span class="s2">&quot;torch&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo.torch.ppo_torch_learner</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo.torch.ppo_torch_learner</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
                 <span class="n">PPOTorchLearner</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -1580,7 +1580,7 @@ document.write(`
 <div class="viewcode-block" id="PPOConfig.training">
 <a class="viewcode-back" href="../../../../../rllib/rllib-algorithms.html#ray.rllib.algorithms.ppo.ppo.PPOConfig.training">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">training</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">training</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">use_critic</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
@@ -1675,7 +1675,7 @@ document.write(`
 
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Call super&#39;s validation method.</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 
@@ -1751,38 +1751,38 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_model_config_auto_includes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_model_config_auto_includes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_model_config_auto_includes</span> <span class="o">|</span> <span class="p">{</span><span class="s2">&quot;vf_share_layers&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span></div>
 
 
 
-<span class="k">class</span> <span class="nc">PPO</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PPO</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_default_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfig</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfig</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">PPOConfig</span><span class="p">()</span>
 
     <span class="nd">@classmethod</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_default_policy_class</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_policy_class</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AlgorithmConfig</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Policy</span><span class="p">]]:</span>
         <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;framework&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;torch&quot;</span><span class="p">:</span>
 
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo.ppo_torch_policy</span> <span class="kn">import</span> <span class="n">PPOTorchPolicy</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo.ppo_torch_policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOTorchPolicy</span>
 
             <span class="k">return</span> <span class="n">PPOTorchPolicy</span>
         <span class="k">elif</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;framework&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;tf&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo.ppo_tf_policy</span> <span class="kn">import</span> <span class="n">PPOTF1Policy</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo.ppo_tf_policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOTF1Policy</span>
 
             <span class="k">return</span> <span class="n">PPOTF1Policy</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo.ppo_tf_policy</span> <span class="kn">import</span> <span class="n">PPOTF2Policy</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo.ppo_tf_policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOTF2Policy</span>
 
             <span class="k">return</span> <span class="n">PPOTF2Policy</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Old API stack (Policy, RolloutWorker, Connector).</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_env_runner_and_connector_v2</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_training_step_old_api_stack</span><span class="p">()</span>
@@ -1856,7 +1856,7 @@ document.write(`
             <span class="p">)</span>
 
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">_training_step_old_api_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultDict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_training_step_old_api_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultDict</span><span class="p">:</span>
         <span class="c1"># Collect batches from sample workers until we have a full batch.</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timers</span><span class="p">[</span><span class="n">SAMPLE_TIMER</span><span class="p">]:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">count_steps_by</span> <span class="o">==</span> <span class="s2">&quot;agent_steps&quot;</span><span class="p">:</span>

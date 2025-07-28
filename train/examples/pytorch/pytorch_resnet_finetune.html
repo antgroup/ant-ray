@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1405,13 +1405,13 @@ We will use <em>hymenoptera_data</em> as the finetuning dataset, which contains 
 <p>The dataset is publicly available <a class="reference external" href="https://www.kaggle.com/datasets/ajayrana/hymenoptera-data">here</a>. Note that it is structured with directory names as the labels. Use <code class="docutils literal notranslate"><span class="pre">torchvision.datasets.ImageFolder()</span></code> to load the images and their corresponding labels.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
-<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">transforms</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">optim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision</span><span class="w"> </span><span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">transforms</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># Data augmentation and normalization for training</span>
 <span class="c1"># Just normalization for validation</span>
@@ -1434,14 +1434,14 @@ We will use <em>hymenoptera_data</em> as the finetuning dataset, which contains 
     <span class="p">),</span>
 <span class="p">}</span>
 
-<span class="k">def</span> <span class="nf">download_datasets</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">download_datasets</span><span class="p">():</span>
     <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span>
         <span class="s2">&quot;wget https://download.pytorch.org/tutorial/hymenoptera_data.zip &gt;/dev/null 2&gt;&amp;1&quot;</span>
     <span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;unzip hymenoptera_data.zip &gt;/dev/null 2&gt;&amp;1&quot;</span><span class="p">)</span>
 
 <span class="c1"># Download and build torch datasets</span>
-<span class="k">def</span> <span class="nf">build_datasets</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_datasets</span><span class="p">():</span>
     <span class="n">torch_datasets</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">]:</span>
         <span class="n">torch_datasets</span><span class="p">[</span><span class="n">split</span><span class="p">]</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span>
@@ -1472,12 +1472,12 @@ We will use <em>hymenoptera_data</em> as the finetuning dataset, which contains 
 <p>Next, let’s define our model. You can either create a model from pre-trained weights or reload the model checkpoint from a previous run.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
 
 <span class="c1"># Option 1: Initialize model with pretrained weights</span>
-<span class="k">def</span> <span class="nf">initialize_model</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">initialize_model</span><span class="p">():</span>
     <span class="c1"># Load pretrained model params</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet50</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -1498,7 +1498,7 @@ We will use <em>hymenoptera_data</em> as the finetuning dataset, which contains 
 <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">initialize_model_from_checkpoint</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">:</span> <span class="n">Checkpoint</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">initialize_model_from_checkpoint</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">:</span> <span class="n">Checkpoint</span><span class="p">):</span>
     <span class="k">with</span> <span class="n">checkpoint</span><span class="o">.</span><span class="n">as_directory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
         <span class="n">state_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="s2">&quot;checkpoint.pt&quot;</span><span class="p">))</span>
     <span class="n">resnet50</span> <span class="o">=</span> <span class="n">initialize_model</span><span class="p">()</span>
@@ -1527,22 +1527,22 @@ We will use <em>hymenoptera_data</em> as the finetuning dataset, which contains 
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tempfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemporaryDirectory</span>
 
-<span class="kn">import</span> <span class="nn">ray.train</span> <span class="k">as</span> <span class="nn">train</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
 
 
 
-<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">preds</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">corrects</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">preds</span> <span class="o">==</span> <span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">corrects</span>
 
 
-<span class="k">def</span> <span class="nf">train_loop_per_worker</span><span class="p">(</span><span class="n">configs</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_loop_per_worker</span><span class="p">(</span><span class="n">configs</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
     <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 
@@ -1649,8 +1649,8 @@ We will use <em>hymenoptera_data</em> as the finetuning dataset, which contains 
 <p>Next, setup the TorchTrainer:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span><span class="p">,</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">CheckpointConfig</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span><span class="p">,</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">CheckpointConfig</span>
 
 <span class="c1"># Scale out model training across 4 GPUs.</span>
 <span class="n">scaling_config</span> <span class="o">=</span> <span class="n">ScalingConfig</span><span class="p">(</span>

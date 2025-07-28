@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1553,9 +1553,9 @@ Use auto-discovery to export Prometheus metrics when using the Ray <a class="ref
 Set a fixed port that Ray should use to export metrics. If you’re using the VM Cluster Launcher, pass <code class="docutils literal notranslate"><span class="pre">--metrics-export-port=&lt;port&gt;</span></code> to <code class="docutils literal notranslate"><span class="pre">ray</span> <span class="pre">start</span></code>.  If you’re using KubeRay, specify <code class="docutils literal notranslate"><span class="pre">rayStartParams.metrics-export-port</span></code> in the RayCluster configuration file. You must specify the port on all nodes in the cluster.</p>
 <p>If you do not know the IP addresses of the nodes in your Ray Cluster, you can also programmatically discover the endpoints by reading the Ray Cluster information. The following example uses a Python script and the <a class="reference internal" href="../ray-core/api/doc/ray.nodes.html#ray.nodes" title="ray.nodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ray.nodes</span></code></a> API to find the metrics agents’ URLs, by combining the <code class="docutils literal notranslate"><span class="pre">NodeManagerAddress</span></code> with the <code class="docutils literal notranslate"><span class="pre">MetricsExportPort</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># On a cluster node:</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
-<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
 <span class="n">pprint</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">nodes</span><span class="p">())</span>
 
 <span class="sd">&quot;&quot;&quot;</span>

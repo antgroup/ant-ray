@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,23 +1389,23 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.serve.deployment</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
-<span class="kn">from</span> <span class="nn">ray.serve._private.config</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.config</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DeploymentConfig</span><span class="p">,</span>
     <span class="n">ReplicaConfig</span><span class="p">,</span>
     <span class="n">handle_num_replicas_auto</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.constants</span> <span class="kn">import</span> <span class="n">SERVE_LOGGER_NAME</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.usage</span> <span class="kn">import</span> <span class="n">ServeUsageTag</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.utils</span> <span class="kn">import</span> <span class="n">DEFAULT</span><span class="p">,</span> <span class="n">Default</span>
-<span class="kn">from</span> <span class="nn">ray.serve.config</span> <span class="kn">import</span> <span class="n">AutoscalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.serve.schema</span> <span class="kn">import</span> <span class="n">DeploymentSchema</span><span class="p">,</span> <span class="n">LoggingConfig</span><span class="p">,</span> <span class="n">RayActorOptionsSchema</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SERVE_LOGGER_NAME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.usage</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServeUsageTag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT</span><span class="p">,</span> <span class="n">Default</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoscalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentSchema</span><span class="p">,</span> <span class="n">LoggingConfig</span><span class="p">,</span> <span class="n">RayActorOptionsSchema</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">SERVE_LOGGER_NAME</span><span class="p">)</span>
 
@@ -1413,7 +1413,7 @@ document.write(`
 <div class="viewcode-block" id="Application">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.Application.html#ray.serve.Application">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Application</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Application</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;One or more deployments bound with arguments that can be deployed together.</span>
 
 <span class="sd">    Can be passed into another `Deployment.bind()` to compose multiple deployments in a</span>
@@ -1449,7 +1449,7 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bound_deployment</span><span class="p">:</span> <span class="s2">&quot;Deployment&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bound_deployment</span><span class="p">:</span> <span class="s2">&quot;Deployment&quot;</span><span class="p">):</span>
         <span class="c1"># This is used by `build_app`, but made private so users don&#39;t use it.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bound_deployment</span> <span class="o">=</span> <span class="n">bound_deployment</span></div>
 
@@ -1458,7 +1458,7 @@ document.write(`
 <div class="viewcode-block" id="Deployment">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.Deployment.html#ray.serve.Deployment">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Deployment</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Deployment</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class (or function) decorated with the `@serve.deployment` decorator.</span>
 
 <span class="sd">    This is run on a number of replica actors. Requests to those replicas call</span>
@@ -1485,7 +1485,7 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">deployment_config</span><span class="p">:</span> <span class="n">DeploymentConfig</span><span class="p">,</span>
@@ -1516,7 +1516,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_replica_config</span> <span class="o">=</span> <span class="n">replica_config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_docs_path</span> <span class="o">=</span> <span class="n">docs_path</span>
 
-    <span class="k">def</span> <span class="nf">_validate_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;name must be a string.&quot;</span><span class="p">)</span>
 
@@ -1528,61 +1528,61 @@ document.write(`
             <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Unique name of this deployment.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_version</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">func_or_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func_or_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Underlying class or function that this deployment wraps.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_replica_config</span><span class="o">.</span><span class="n">deployment_def</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">num_replicas</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_replicas</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Target number of replicas.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deployment_config</span><span class="o">.</span><span class="n">num_replicas</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">user_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">user_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Dynamic user-provided config options.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deployment_config</span><span class="o">.</span><span class="n">user_config</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">max_ongoing_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_ongoing_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Max number of requests a replica can handle at once.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deployment_config</span><span class="o">.</span><span class="n">max_ongoing_requests</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">max_queued_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_queued_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Max number of requests that can be queued in each deployment handle.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deployment_config</span><span class="o">.</span><span class="n">max_queued_requests</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">route_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">route_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;`route_prefix` can no longer be specified at the deployment level. &quot;</span>
             <span class="s2">&quot;Pass it to `serve.run` or in the application config instead.&quot;</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">ray_actor_options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ray_actor_options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Actor options such as resources required for each replica.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_replica_config</span><span class="o">.</span><span class="n">ray_actor_options</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">init_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_replica_config</span><span class="o">.</span><span class="n">init_args</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">init_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_replica_config</span><span class="o">.</span><span class="n">init_kwargs</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
             <span class="s2">&quot;DeprecationWarning: `Deployment.url` is deprecated &quot;</span>
             <span class="s2">&quot;and will be removed in the future.&quot;</span>
@@ -1590,13 +1590,13 @@ document.write(`
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">logging_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">logging_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deployment_config</span><span class="o">.</span><span class="n">logging_config</span>
 
-    <span class="k">def</span> <span class="nf">set_logging_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logging_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_logging_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logging_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_deployment_config</span><span class="o">.</span><span class="n">logging_config</span> <span class="o">=</span> <span class="n">logging_config</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
             <span class="s2">&quot;Deployments cannot be constructed directly. &quot;</span>
             <span class="s2">&quot;Use `deployment.deploy() instead.`&quot;</span>
@@ -1604,7 +1604,7 @@ document.write(`
 
 <div class="viewcode-block" id="Deployment.bind">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.Deployment.html#ray.serve.Deployment.bind">[docs]</a>
-    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Application</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Application</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Bind the arguments to the deployment and return an Application.</span>
 
 <span class="sd">        The returned Application can be deployed using `serve.run` (or via</span>
@@ -1615,7 +1615,7 @@ document.write(`
 
 <div class="viewcode-block" id="Deployment.options">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.Deployment.html#ray.serve.Deployment.options">[docs]</a>
-    <span class="k">def</span> <span class="nf">options</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">options</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">func_or_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="n">Default</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT</span><span class="o">.</span><span class="n">VALUE</span><span class="p">,</span>
@@ -1788,7 +1788,7 @@ document.write(`
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">all</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span>
@@ -1801,15 +1801,15 @@ document.write(`
             <span class="p">]</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Deployment(name=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s2">)&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 
-<span class="k">def</span> <span class="nf">deployment_to_schema</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">Deployment</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DeploymentSchema</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">deployment_to_schema</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">Deployment</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DeploymentSchema</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a live deployment object to a corresponding structured schema.</span>
 
 <span class="sd">    Args:</span>
@@ -1859,7 +1859,7 @@ document.write(`
     <span class="k">return</span> <span class="n">DeploymentSchema</span><span class="p">(</span><span class="o">**</span><span class="n">deployment_options</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">schema_to_deployment</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">DeploymentSchema</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Deployment</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">schema_to_deployment</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">DeploymentSchema</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Deployment</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a deployment with parameters specified in schema.</span>
 
 <span class="sd">    The returned deployment CANNOT be deployed immediately. It&#39;s func_or_class</span>

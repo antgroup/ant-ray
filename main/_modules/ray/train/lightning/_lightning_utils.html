@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,28 +1392,28 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.train.lightning._lightning_utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">packaging.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">Version</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray._private.usage.usage_lib</span> <span class="kn">import</span> <span class="n">TagKey</span><span class="p">,</span> <span class="n">record_extra_usage_tag</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.usage.usage_lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">TagKey</span><span class="p">,</span> <span class="n">record_extra_usage_tag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 
-<span class="k">def</span> <span class="nf">import_lightning</span><span class="p">():</span>  <span class="c1"># noqa: F402</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">import_lightning</span><span class="p">():</span>  <span class="c1"># noqa: F402</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">lightning.pytorch</span> <span class="k">as</span> <span class="nn">pl</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">lightning.pytorch</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
     <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pytorch_lightning</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
     <span class="k">return</span> <span class="n">pl</span>
 
 
@@ -1425,9 +1425,9 @@ document.write(`
 <span class="n">_TORCH_FSDP_AVAILABLE</span> <span class="o">=</span> <span class="n">_TORCH_GREATER_EQUAL_1_12</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">lightning.pytorch.plugins.environments</span> <span class="kn">import</span> <span class="n">LightningEnvironment</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">lightning.pytorch.plugins.environments</span><span class="w"> </span><span class="kn">import</span> <span class="n">LightningEnvironment</span>
 <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">pytorch_lightning.plugins.environments</span> <span class="kn">import</span> <span class="n">LightningEnvironment</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pytorch_lightning.plugins.environments</span><span class="w"> </span><span class="kn">import</span> <span class="n">LightningEnvironment</span>
 
 <span class="k">if</span> <span class="n">_LIGHTNING_GREATER_EQUAL_2_0</span><span class="p">:</span>
     <span class="n">FSDPStrategy</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">strategies</span><span class="o">.</span><span class="n">FSDPStrategy</span>
@@ -1435,7 +1435,7 @@ document.write(`
     <span class="n">FSDPStrategy</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">strategies</span><span class="o">.</span><span class="n">DDPFullyShardedStrategy</span>
 
 <span class="k">if</span> <span class="n">_TORCH_FSDP_AVAILABLE</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">torch.distributed.fsdp</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">torch.distributed.fsdp</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">FullStateDictConfig</span><span class="p">,</span>
         <span class="n">FullyShardedDataParallel</span><span class="p">,</span>
         <span class="n">StateDictType</span><span class="p">,</span>
@@ -1450,7 +1450,7 @@ document.write(`
 <div class="viewcode-block" id="RayDDPStrategy">
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.lightning.RayDDPStrategy.html#ray.train.lightning.RayDDPStrategy">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RayDDPStrategy</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">strategies</span><span class="o">.</span><span class="n">DDPStrategy</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayDDPStrategy</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">strategies</span><span class="o">.</span><span class="n">DDPStrategy</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Subclass of DDPStrategy to ensure compatibility with Ray orchestration.</span>
 
 <span class="sd">    For a full list of initialization arguments, please refer to:</span>
@@ -1460,16 +1460,16 @@ document.write(`
 <span class="sd">    please specify these arguments in :class:`~ray.train.torch.TorchConfig` instead.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">record_extra_usage_tag</span><span class="p">(</span><span class="n">TagKey</span><span class="o">.</span><span class="n">TRAIN_LIGHTNING_RAYDDPSTRATEGY</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">root_device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">root_device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">get_device</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">distributed_sampler_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">distributed_sampler_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="n">num_replicas</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">world_size</span><span class="p">,</span>
             <span class="n">rank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">global_rank</span><span class="p">,</span>
@@ -1480,7 +1480,7 @@ document.write(`
 <div class="viewcode-block" id="RayFSDPStrategy">
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.lightning.RayFSDPStrategy.html#ray.train.lightning.RayFSDPStrategy">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RayFSDPStrategy</span><span class="p">(</span><span class="n">FSDPStrategy</span><span class="p">):</span>  <span class="c1"># noqa: F821</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayFSDPStrategy</span><span class="p">(</span><span class="n">FSDPStrategy</span><span class="p">):</span>  <span class="c1"># noqa: F821</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Subclass of FSDPStrategy to ensure compatibility with Ray orchestration.</span>
 
 <span class="sd">    For a full list of initialization arguments, please refer to:</span>
@@ -1492,16 +1492,16 @@ document.write(`
 <span class="sd">        `sharding_strategy`, `auto_wrap_policy` and other FSDP configurations from 2.1.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">record_extra_usage_tag</span><span class="p">(</span><span class="n">TagKey</span><span class="o">.</span><span class="n">TRAIN_LIGHTNING_RAYFSDPSTRATEGY</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">root_device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">root_device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">get_device</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">distributed_sampler_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">distributed_sampler_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="n">num_replicas</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">world_size</span><span class="p">,</span>
             <span class="n">rank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">global_rank</span><span class="p">,</span>
@@ -1509,7 +1509,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayFSDPStrategy.lightning_module_state_dict">
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.lightning.RayFSDPStrategy.lightning_module_state_dict.html#ray.train.lightning.RayFSDPStrategy.lightning_module_state_dict">[docs]</a>
-    <span class="k">def</span> <span class="nf">lightning_module_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lightning_module_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gathers the full state dict to rank 0 on CPU.</span>
 
 <span class="sd">        FSDP checkpointing is broken in Lightning 2.0.x. This subclass patches the</span>
@@ -1555,23 +1555,23 @@ document.write(`
 <div class="viewcode-block" id="RayDeepSpeedStrategy">
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.lightning.RayDeepSpeedStrategy.html#ray.train.lightning.RayDeepSpeedStrategy">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RayDeepSpeedStrategy</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">strategies</span><span class="o">.</span><span class="n">DeepSpeedStrategy</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayDeepSpeedStrategy</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">strategies</span><span class="o">.</span><span class="n">DeepSpeedStrategy</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Subclass of DeepSpeedStrategy to ensure compatibility with Ray orchestration.</span>
 
 <span class="sd">    For a full list of initialization arguments, please refer to:</span>
 <span class="sd">    https://lightning.ai/docs/pytorch/stable/api/lightning.pytorch.strategies.DeepSpeedStrategy.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">record_extra_usage_tag</span><span class="p">(</span><span class="n">TagKey</span><span class="o">.</span><span class="n">TRAIN_LIGHTNING_RAYDEEPSPEEDSTRATEGY</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">root_device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">root_device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">get_device</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">distributed_sampler_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">distributed_sampler_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="n">num_replicas</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">world_size</span><span class="p">,</span>
             <span class="n">rank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">global_rank</span><span class="p">,</span>
@@ -1582,34 +1582,34 @@ document.write(`
 <div class="viewcode-block" id="RayLightningEnvironment">
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.lightning.RayLightningEnvironment.html#ray.train.lightning.RayLightningEnvironment">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RayLightningEnvironment</span><span class="p">(</span><span class="n">LightningEnvironment</span><span class="p">):</span>  <span class="c1"># noqa: F821</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayLightningEnvironment</span><span class="p">(</span><span class="n">LightningEnvironment</span><span class="p">):</span>  <span class="c1"># noqa: F821</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Setup Lightning DDP training environment for Ray cluster.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">record_extra_usage_tag</span><span class="p">(</span><span class="n">TagKey</span><span class="o">.</span><span class="n">TRAIN_LIGHTNING_RAYLIGHTNINGENVIRONMENT</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">world_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">world_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">train</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_world_size</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">global_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">global_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">train</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_world_rank</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">local_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">local_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">train</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_local_rank</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">node_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">node_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">train</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_node_rank</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">set_world_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_world_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Disable it since `world_size()` directly returns data from Train context.</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">set_global_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_global_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Disable it since `global_rank()` directly returns data from Train.</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
 
@@ -1617,7 +1617,7 @@ document.write(`
 <div class="viewcode-block" id="prepare_trainer">
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.lightning.prepare_trainer.html#ray.train.lightning.prepare_trainer">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">prepare_trainer</span><span class="p">(</span><span class="n">trainer</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_trainer</span><span class="p">(</span><span class="n">trainer</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepare the PyTorch Lightning Trainer for distributed execution.&quot;&quot;&quot;</span>
 
     <span class="c1"># Check strategy class</span>
@@ -1648,7 +1648,7 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RayTrainReportCallback</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayTrainReportCallback</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A simple callback that reports checkpoints to Ray on train epoch end.</span>
 
 <span class="sd">    This callback is a subclass of `lightning.pytorch.callbacks.Callback</span>
@@ -1669,7 +1669,7 @@ document.write(`
 
     <span class="n">CHECKPOINT_NAME</span> <span class="o">=</span> <span class="s2">&quot;checkpoint.ckpt&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trial_name</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_trial_name</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">local_rank</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_local_rank</span><span class="p">()</span>
@@ -1679,7 +1679,7 @@ document.write(`
 
         <span class="n">record_extra_usage_tag</span><span class="p">(</span><span class="n">TagKey</span><span class="o">.</span><span class="n">TRAIN_LIGHTNING_RAYTRAINREPORTCALLBACK</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_train_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">pl_module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">pl_module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Creates a checkpoint dir with fixed name</span>
         <span class="n">tmpdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmpdir_prefix</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">trainer</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">))</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1445,12 +1445,12 @@ of the DAG, where all other non-reachable nodes from the root will be ignored.</
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-0">
 Python</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">inc</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">inc</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">src</span> <span class="o">+</span> <span class="n">inc</span>
 
 <span class="n">a_ref</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">inc</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -1476,19 +1476,19 @@ together to form a DAG.</p>
 <input checked="checked" id="sd-tab-item-1" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-1">
 Python</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init_value</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init_value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="n">init_value</span>
 
-    <span class="k">def</span> <span class="nf">inc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">+=</span> <span class="n">x</span>
 
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span>
 
 <span class="n">a1</span> <span class="o">=</span> <span class="n">Actor</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># Instantiate Actor with init_value 10.</span>
@@ -1497,7 +1497,7 @@ Python</label><div class="sd-tab-content docutils">
 <span class="k">assert</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">execute</span><span class="p">())</span> <span class="o">==</span> <span class="mi">10</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">combine</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">combine</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
 
 <span class="n">a2</span> <span class="o">=</span> <span class="n">Actor</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="c1"># Instantiate another Actor with init_value 10.</span>
@@ -1525,22 +1525,22 @@ as args of <code class="docutils literal notranslate"><span class="pre">dag_node
 <input checked="checked" id="sd-tab-item-2" name="sd-tab-set-2" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-2">
 Python</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
-<span class="kn">from</span> <span class="nn">ray.dag.input_node</span> <span class="kn">import</span> <span class="n">InputNode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.input_node</span><span class="w"> </span><span class="kn">import</span> <span class="n">InputNode</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">a</span><span class="p">(</span><span class="n">user_input</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">(</span><span class="n">user_input</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">user_input</span> <span class="o">*</span> <span class="mi">2</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">b</span><span class="p">(</span><span class="n">user_input</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">(</span><span class="n">user_input</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">user_input</span> <span class="o">+</span> <span class="mi">1</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">c</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
 
 <span class="k">with</span> <span class="n">InputNode</span><span class="p">()</span> <span class="k">as</span> <span class="n">dag_input</span><span class="p">:</span>
@@ -1569,13 +1569,13 @@ shows the multi output node of 2 outputs.</p>
 <input checked="checked" id="sd-tab-item-3" name="sd-tab-set-3" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-3">
 Python</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
-<span class="kn">from</span> <span class="nn">ray.dag.input_node</span> <span class="kn">import</span> <span class="n">InputNode</span>
-<span class="kn">from</span> <span class="nn">ray.dag.output_node</span> <span class="kn">import</span> <span class="n">MultiOutputNode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.input_node</span><span class="w"> </span><span class="kn">import</span> <span class="n">InputNode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.output_node</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiOutputNode</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">input</span> <span class="o">+</span> <span class="mi">1</span>
 
 <span class="k">with</span> <span class="n">InputNode</span><span class="p">()</span> <span class="k">as</span> <span class="n">input_data</span><span class="p">:</span>
@@ -1597,20 +1597,20 @@ However, when a DAG finishes execution, Ray kills Actors created with <code clas
 <input checked="checked" id="sd-tab-item-4" name="sd-tab-set-4" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-4">
 Python</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.dag.input_node</span> <span class="kn">import</span> <span class="n">InputNode</span>
-<span class="kn">from</span> <span class="nn">ray.dag.output_node</span> <span class="kn">import</span> <span class="n">MultiOutputNode</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.input_node</span><span class="w"> </span><span class="kn">import</span> <span class="n">InputNode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.output_node</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiOutputNode</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Worker</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Worker</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">forwarded</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_data</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">forwarded</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">input_data</span> <span class="o">+</span> <span class="mi">1</span>
 
-    <span class="k">def</span> <span class="nf">num_forwarded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_forwarded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">forwarded</span>
 
 <span class="c1"># Create an actor via ``remote`` API not ``bind`` API to avoid</span>

@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1422,12 +1422,12 @@ use the old debugger (e.g. by using a runtime environment).</p>
 <section id="getting-started">
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h2>
 <p>Take the following example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">runtime_env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;env_vars&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;RAY_DEBUG&quot;</span><span class="p">:</span> <span class="s2">&quot;legacy&quot;</span><span class="p">}})</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="nb">breakpoint</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
 
@@ -1492,12 +1492,12 @@ so this should <em>only</em> be used if your cluster is behind a firewall.</p>
 <h2>Stepping between Ray tasks<a class="headerlink" href="#stepping-between-ray-tasks" title="Link to this heading">#</a></h2>
 <p>You can use the debugger to step between Ray tasks. Let’s take the
 following recursive function as an example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">runtime_env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;env_vars&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;RAY_DEBUG&quot;</span><span class="p">:</span> <span class="s2">&quot;legacy&quot;</span><span class="p">}})</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">fact</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fact</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">n</span>
     <span class="k">else</span><span class="p">:</span>
@@ -1505,7 +1505,7 @@ following recursive function as an example:</p>
         <span class="k">return</span> <span class="n">n</span> <span class="o">*</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">n_ref</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">compute</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">():</span>
     <span class="nb">breakpoint</span><span class="p">()</span>
     <span class="n">result_ref</span> <span class="o">=</span> <span class="n">fact</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">result_ref</span><span class="p">)</span>
@@ -1594,12 +1594,12 @@ Continuing<span class="w"> </span>pdb<span class="w"> </span>session<span class=
 we can automatically drop into the debugger when an error occurs or an exception is thrown. This is called <em>post-mortem debugging</em>.</p>
 <p>Copy the following code into a file called <code class="docutils literal notranslate"><span class="pre">post_mortem_debugging.py</span></code>. The flag <code class="docutils literal notranslate"><span class="pre">RAY_DEBUG_POST_MORTEM=1</span></code> will have the effect
 that if an exception happens, Ray will drop into the debugger instead of propagating it further.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">runtime_env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;env_vars&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;RAY_DEBUG&quot;</span><span class="p">:</span> <span class="s2">&quot;legacy&quot;</span><span class="p">,</span> <span class="s2">&quot;RAY_DEBUG_POST_MORTEM&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">}})</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">post_mortem</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">post_mortem</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="n">x</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;An exception is raised.&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x</span>

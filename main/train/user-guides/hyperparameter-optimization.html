@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1419,18 +1419,18 @@ before launching a run with the best performing hyperparameters on all available
 <li><p><a class="reference internal" href="../api/doc/ray.train.ScalingConfig.html#ray.train.ScalingConfig" title="ray.train.ScalingConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScalingConfig</span></code></a> defines the number of training workers and resources per worker for a single Ray Train run.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">train_fn_per_worker</span></code> is the Python code that executes on each distributed training worker for a trial.</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 
-<span class="kn">import</span> <span class="nn">ray.train</span>
-<span class="kn">import</span> <span class="nn">ray.train.torch</span>
-<span class="kn">import</span> <span class="nn">ray.tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune.integration.ray_train</span> <span class="kn">import</span> <span class="n">TuneReportCallback</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train.torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.integration.ray_train</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneReportCallback</span>
 
 
 <span class="c1"># [1] Define your Ray Train worker code.</span>
-<span class="k">def</span> <span class="nf">train_fn_per_worker</span><span class="p">(</span><span class="n">train_loop_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_fn_per_worker</span><span class="p">(</span><span class="n">train_loop_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
     <span class="c1"># Unpack train worker hyperparameters.</span>
     <span class="c1"># Train feeds in the `train_loop_config` defined below.</span>
     <span class="n">lr</span> <span class="o">=</span> <span class="n">train_loop_config</span><span class="p">[</span><span class="s2">&quot;lr&quot;</span><span class="p">]</span>
@@ -1450,7 +1450,7 @@ before launching a run with the best performing hyperparameters on all available
 
 
 <span class="c1"># [2] Define a function that launches the Ray Train run.</span>
-<span class="k">def</span> <span class="nf">train_driver_fn</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_driver_fn</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
     <span class="c1"># Unpack run-level hyperparameters.</span>
     <span class="c1"># Tune feeds in hyperparameters defined in the `param_space` below.</span>
     <span class="n">num_workers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;num_workers&quot;</span><span class="p">]</span>
@@ -1550,7 +1550,7 @@ set <a class="reference internal" href="../../tune/api/doc/ray.tune.TuneConfig.h
 <span class="n">max_concurrent_trials</span> <span class="o">=</span> <span class="n">total_cluster_gpus</span> <span class="o">//</span> <span class="n">num_gpu_workers_per_trial</span>
 
 
-<span class="k">def</span> <span class="nf">train_driver_fn</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_driver_fn</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
     <span class="n">trainer</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">TorchTrainer</span><span class="p">(</span>
         <span class="n">train_fn_per_worker</span><span class="p">,</span>
         <span class="n">scaling_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">ScalingConfig</span><span class="p">(</span>
@@ -1599,10 +1599,10 @@ This number can be calculated based on the limiting cluster resource and the amo
 <span class="c1">#     resources:</span>
 <span class="c1">#         GPU: 4.0</span>
 
-<span class="kn">import</span> <span class="nn">ray.tune</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.tune</span>
 
 
-<span class="k">def</span> <span class="nf">train_driver_fn</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_driver_fn</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="c1"># trainer = TorchTrainer(...)</span>
     <span class="o">...</span>
 
@@ -1631,14 +1631,14 @@ does this by propagating reported Ray Train results over to Ray Tune, where the 
 <p>In the event that the Ray Tune trials running the Ray Train driver process crash, you can enable trial fault tolerance on the Ray Tune side via:
 <a class="reference internal" href="../../tune/api/doc/ray.tune.FailureConfig.html#ray.tune.FailureConfig" title="ray.tune.FailureConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">ray.tune.Tuner(run_config=ray.tune.RunConfig(failure_config))</span></code></a>.</p>
 <p>Fault tolerance on the Ray Train side is configured and handled separately. See the <a class="reference internal" href="fault-tolerance.html#train-fault-tolerance"><span class="std std-ref">Handling Failures and Node Preemption</span></a> user guide for more details.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tempfile</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">import</span> <span class="nn">ray.tune</span>
-<span class="kn">import</span> <span class="nn">ray.train</span>
-<span class="kn">import</span> <span class="nn">ray.train.torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.tune</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train.torch</span>
 
 
-<span class="k">def</span> <span class="nf">train_fn_per_worker</span><span class="p">(</span><span class="n">train_loop_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_fn_per_worker</span><span class="p">(</span><span class="n">train_loop_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
     <span class="c1"># [1] Train worker restoration logic.</span>
     <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">get_checkpoint</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">checkpoint</span><span class="p">:</span>
@@ -1654,7 +1654,7 @@ does this by propagating reported Ray Train results over to Ray Tune, where the 
         <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">train_fn_driver</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_fn_driver</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
     <span class="n">trainer</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">TorchTrainer</span><span class="p">(</span>
         <span class="n">train_fn_per_worker</span><span class="p">,</span>
         <span class="n">run_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">RunConfig</span><span class="p">(</span>
@@ -1692,12 +1692,12 @@ does this by propagating reported Ray Train results over to Ray Tune, where the 
 and passing in the callbacks to the Tuner.</p>
 <p>If any callback functionality depends on reported metrics, make sure to pass the <a class="reference internal" href="../api/doc/ray.tune.integration.ray_train.TuneReportCallback.html#ray.tune.integration.ray_train.TuneReportCallback" title="ray.tune.integration.ray_train.TuneReportCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">ray.tune.integration.ray_train.TuneReportCallback</span></code></a> to the trainer callbacks,
 which propagates results to the Tuner.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray.tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune.integration.ray_train</span> <span class="kn">import</span> <span class="n">TuneReportCallback</span>
-<span class="kn">from</span> <span class="nn">ray.tune.logger</span> <span class="kn">import</span> <span class="n">TBXLoggerCallback</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray.tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.integration.ray_train</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneReportCallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">TBXLoggerCallback</span>
 
 
-<span class="k">def</span> <span class="nf">train_driver_fn</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_driver_fn</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
     <span class="n">trainer</span> <span class="o">=</span> <span class="n">TorchTrainer</span><span class="p">(</span>
         <span class="o">...</span><span class="p">,</span>
         <span class="n">run_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">RunConfig</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">TuneReportCallback</span><span class="p">()])</span>

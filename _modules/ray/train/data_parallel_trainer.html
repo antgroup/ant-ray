@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1392,26 +1392,26 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.train.data_parallel_trainer</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray._private.ray_constants</span> <span class="kn">import</span> <span class="n">env_integer</span>
-<span class="kn">from</span> <span class="nn">ray._private.thirdparty.tabulate.tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
-<span class="kn">from</span> <span class="nn">ray.air.config</span> <span class="kn">import</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">BackendConfig</span><span class="p">,</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">TrainingIterator</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal</span> <span class="kn">import</span> <span class="n">session</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.backend_executor</span> <span class="kn">import</span> <span class="n">BackendExecutor</span><span class="p">,</span> <span class="n">TrialInfo</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.data_config</span> <span class="kn">import</span> <span class="n">DataConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.session</span> <span class="kn">import</span> <span class="n">_TrainingResult</span><span class="p">,</span> <span class="n">get_session</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.utils</span> <span class="kn">import</span> <span class="n">construct_train_func</span><span class="p">,</span> <span class="n">count_required_parameters</span>
-<span class="kn">from</span> <span class="nn">ray.train.base_trainer</span> <span class="kn">import</span> <span class="n">_TRAINER_RESTORE_DEPRECATION_WARNING</span>
-<span class="kn">from</span> <span class="nn">ray.train.constants</span> <span class="kn">import</span> <span class="n">RAY_TRAIN_ENABLE_STATE_TRACKING</span>
-<span class="kn">from</span> <span class="nn">ray.train.trainer</span> <span class="kn">import</span> <span class="n">BaseTrainer</span><span class="p">,</span> <span class="n">GenDataset</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span>
-<span class="kn">from</span> <span class="nn">ray.widgets</span> <span class="kn">import</span> <span class="n">Template</span>
-<span class="kn">from</span> <span class="nn">ray.widgets.util</span> <span class="kn">import</span> <span class="n">repr_with_fallback</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.ray_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">env_integer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.thirdparty.tabulate.tabulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">tabulate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">BackendConfig</span><span class="p">,</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">TrainingIterator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal</span><span class="w"> </span><span class="kn">import</span> <span class="n">session</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.backend_executor</span><span class="w"> </span><span class="kn">import</span> <span class="n">BackendExecutor</span><span class="p">,</span> <span class="n">TrialInfo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.data_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">_TrainingResult</span><span class="p">,</span> <span class="n">get_session</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">construct_train_func</span><span class="p">,</span> <span class="n">count_required_parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.base_trainer</span><span class="w"> </span><span class="kn">import</span> <span class="n">_TRAINER_RESTORE_DEPRECATION_WARNING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">RAY_TRAIN_ENABLE_STATE_TRACKING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.trainer</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseTrainer</span><span class="p">,</span> <span class="n">GenDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.widgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Template</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.widgets.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">repr_with_fallback</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1419,7 +1419,7 @@ document.write(`
 <div class="viewcode-block" id="DataParallelTrainer">
 <a class="viewcode-back" href="../../../train/api/doc/ray.train.data_parallel_trainer.DataParallelTrainer.html#ray.train.tensorflow.tensorflow_trainer.DataParallelTrainer">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">DataParallelTrainer</span><span class="p">(</span><span class="n">BaseTrainer</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataParallelTrainer</span><span class="p">(</span><span class="n">BaseTrainer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A Trainer for data parallel training.</span>
 
 <span class="sd">    You should subclass this Trainer if your Trainer follows SPMD (single program,</span>
@@ -1620,7 +1620,7 @@ document.write(`
         <span class="s2">&quot;train_loop_config&quot;</span>
     <span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">train_loop_per_worker</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">],</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Dict</span><span class="p">],</span> <span class="kc">None</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1666,7 +1666,7 @@ document.write(`
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">env_integer</span><span class="p">(</span><span class="n">RAY_TRAIN_ENABLE_STATE_TRACKING</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">ray.train._internal.state.state_actor</span> <span class="kn">import</span> <span class="n">get_or_create_state_actor</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.state.state_actor</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_or_create_state_actor</span>
 
             <span class="n">get_or_create_state_actor</span><span class="p">()</span>
 
@@ -1674,7 +1674,7 @@ document.write(`
 <a class="viewcode-back" href="../../../train/api/doc/ray.train.data_parallel_trainer.DataParallelTrainer.restore.html#ray.train.tensorflow.tensorflow_trainer.DataParallelTrainer.restore">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">_TRAINER_RESTORE_DEPRECATION_WARNING</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">train_loop_per_worker</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
@@ -1709,14 +1709,14 @@ document.write(`
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_validate_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_validate_attributes</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_train_loop_per_worker</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_train_loop_per_worker</span><span class="p">,</span> <span class="s2">&quot;train_loop_per_worker&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_validate_train_loop_per_worker</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_train_loop_per_worker</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">train_loop_per_worker</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">fn_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">num_required_params</span> <span class="o">=</span> <span class="n">count_required_parameters</span><span class="p">(</span><span class="n">train_loop_per_worker</span><span class="p">)</span>
@@ -1727,7 +1727,7 @@ document.write(`
             <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_validate_scaling_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">scaling_config</span><span class="p">:</span> <span class="n">ScalingConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalingConfig</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_scaling_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">scaling_config</span><span class="p">:</span> <span class="n">ScalingConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalingConfig</span><span class="p">:</span>
         <span class="n">scaling_config</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">DataParallelTrainer</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">_validate_scaling_config</span><span class="p">(</span>
             <span class="n">scaling_config</span>
         <span class="p">)</span>
@@ -1757,7 +1757,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">scaling_config</span>
 
-    <span class="k">def</span> <span class="nf">_run_training</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">training_iterator</span><span class="p">:</span> <span class="n">TrainingIterator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_training</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">training_iterator</span><span class="p">:</span> <span class="n">TrainingIterator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;This method loops over the `TrainingIterator`:</span>
 <span class="sd">        The actual iteration (for ... in ...) waits for the training function</span>
 <span class="sd">        on each worker to report a result and supplies it as a list of results.</span>
@@ -1769,7 +1769,7 @@ document.write(`
             <span class="c1"># TODO(ml-team): add ability to report results from multiple workers.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_propagate_results</span><span class="p">(</span><span class="n">training_results</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_propagate_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">training_results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">_TrainingResult</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_propagate_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">training_results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">_TrainingResult</span><span class="p">]):</span>
         <span class="n">first_worker_result</span> <span class="o">=</span> <span class="n">training_results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">_TrainingResult</span><span class="p">)</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">training_results</span><span class="p">)</span>
 
@@ -1823,7 +1823,7 @@ document.write(`
         <span class="c1"># Report the metrics and checkpoint to Tune.</span>
         <span class="n">tune_session</span><span class="o">.</span><span class="n">_report_training_result</span><span class="p">(</span><span class="n">tracked_training_result</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">training_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">training_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">scaling_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scaling_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaling_config</span><span class="p">)</span>
 
         <span class="n">train_loop_per_worker</span> <span class="o">=</span> <span class="n">construct_train_func</span><span class="p">(</span>
@@ -1873,7 +1873,7 @@ document.write(`
 
 <div class="viewcode-block" id="DataParallelTrainer.get_dataset_config">
 <a class="viewcode-back" href="../../../train/api/doc/ray.train.data_parallel_trainer.DataParallelTrainer.get_dataset_config.html#ray.train.tensorflow.tensorflow_trainer.DataParallelTrainer.get_dataset_config">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_dataset_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataConfig</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_dataset_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataConfig</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a copy of this Trainer&#39;s final dataset configs.</span>
 
 <span class="sd">        Returns:</span>
@@ -1884,7 +1884,7 @@ document.write(`
 
 
     <span class="nd">@repr_with_fallback</span><span class="p">([</span><span class="s2">&quot;ipywidgets&quot;</span><span class="p">,</span> <span class="s2">&quot;8&quot;</span><span class="p">])</span>
-    <span class="k">def</span> <span class="nf">_repr_mimebundle_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_repr_mimebundle_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a mimebundle with an ipywidget repr and a simple text repr.</span>
 
 <span class="sd">        Depending on the frontend where the data is being displayed,</span>
@@ -1897,7 +1897,7 @@ document.write(`
 <span class="sd">        Returns:</span>
 <span class="sd">            A mimebundle containing an ipywidget repr and a simple text repr.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Tab</span><span class="p">,</span> <span class="n">VBox</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Tab</span><span class="p">,</span> <span class="n">VBox</span>
 
         <span class="n">title</span> <span class="o">=</span> <span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;h2&gt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&lt;/h2&gt;&quot;</span><span class="p">)</span>
 
@@ -1937,7 +1937,7 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">bundle</span>
 
-    <span class="k">def</span> <span class="nf">_train_loop_config_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_train_loop_config_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_loop_config</span><span class="p">:</span>
             <span class="n">table_data</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_loop_config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1963,13 +1963,13 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_data_config_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_data_config_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="c1"># TODO make this rendering nicer.</span>
         <span class="n">content</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_config</span><span class="p">)]</span>
         <span class="k">return</span> <span class="n">Template</span><span class="p">(</span><span class="s2">&quot;rendered_html_common.html.j2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_datasets_repr_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">VBox</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_datasets_repr_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">VBox</span>
 
         <span class="n">content</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>

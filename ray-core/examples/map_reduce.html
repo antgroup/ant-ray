@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1434,7 +1434,7 @@ We divide the Zen of Python into three separate “documents” by treating each
 and then splitting the lines into three partitions.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">subprocess</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
 <span class="n">zen_of_python</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;import this&quot;</span><span class="p">])</span>
 <span class="n">corpus</span> <span class="o">=</span> <span class="n">zen_of_python</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
 
@@ -1455,7 +1455,7 @@ The output is the pair <code class="docutils literal notranslate"><span class="p
 For basic text documents we load as Python strings, the process is as follows:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">map_function</span><span class="p">(</span><span class="n">document</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">map_function</span><span class="p">(</span><span class="n">document</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
         <span class="k">yield</span> <span class="n">word</span><span class="p">,</span> <span class="mi">1</span>
 </pre></div>
@@ -1467,10 +1467,10 @@ When we call <code class="docutils literal notranslate"><span class="pre">apply_
 The <code class="docutils literal notranslate"><span class="pre">apply_map</span></code> function returns three lists, one for each partition so that Ray can rearrange the results of the map phase and distribute them to the appropriate nodes.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">apply_map</span><span class="p">(</span><span class="n">corpus</span><span class="p">,</span> <span class="n">num_partitions</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_map</span><span class="p">(</span><span class="n">corpus</span><span class="p">,</span> <span class="n">num_partitions</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
     <span class="n">map_results</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_partitions</span><span class="p">)]</span>
     <span class="k">for</span> <span class="n">document</span> <span class="ow">in</span> <span class="n">corpus</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">map_function</span><span class="p">(</span><span class="n">document</span><span class="p">):</span>
@@ -1524,7 +1524,7 @@ In the reduce phase we create a dictionary that adds up all word occurrences on 
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">apply_reduce</span><span class="p">(</span><span class="o">*</span><span class="n">results</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_reduce</span><span class="p">(</span><span class="o">*</span><span class="n">results</span><span class="p">):</span>
     <span class="n">reduce_results</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>

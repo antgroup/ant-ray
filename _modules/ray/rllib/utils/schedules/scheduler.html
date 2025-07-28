@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,12 +1389,12 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.utils.schedules.scheduler</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.framework</span> <span class="kn">import</span> <span class="n">try_import_tf</span><span class="p">,</span> <span class="n">try_import_torch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.schedules.piecewise_schedule</span> <span class="kn">import</span> <span class="n">PiecewiseSchedule</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">LearningRateOrSchedule</span><span class="p">,</span> <span class="n">TensorType</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">try_import_tf</span><span class="p">,</span> <span class="n">try_import_torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.schedules.piecewise_schedule</span><span class="w"> </span><span class="kn">import</span> <span class="n">PiecewiseSchedule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningRateOrSchedule</span><span class="p">,</span> <span class="n">TensorType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 
 <span class="n">_</span><span class="p">,</span> <span class="n">tf</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">try_import_tf</span><span class="p">()</span>
@@ -1404,7 +1404,7 @@ document.write(`
 <div class="viewcode-block" id="Scheduler">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.html#ray.rllib.utils.schedules.scheduler.Scheduler">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Scheduler</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Scheduler</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to manage a scheduled (framework-dependent) tensor variable.</span>
 
 <span class="sd">    Uses the PiecewiseSchedule (for maximum configuration flexibility)</span>
@@ -1412,7 +1412,7 @@ document.write(`
 
 <div class="viewcode-block" id="Scheduler.__init__">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.__init__.html#ray.rllib.utils.schedules.scheduler.Scheduler.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">fixed_value_or_schedule</span><span class="p">:</span> <span class="n">LearningRateOrSchedule</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1458,7 +1458,7 @@ document.write(`
 <div class="viewcode-block" id="Scheduler.validate">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.validate.html#ray.rllib.utils.schedules.scheduler.Scheduler.validate">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">fixed_value_or_schedule</span><span class="p">:</span> <span class="n">LearningRateOrSchedule</span><span class="p">,</span>
         <span class="n">setting_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1518,7 +1518,7 @@ document.write(`
 
 <div class="viewcode-block" id="Scheduler.get_current_value">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value.html#ray.rllib.utils.schedules.scheduler.Scheduler.get_current_value">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_current_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_current_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the current value (as a tensor variable).</span>
 
 <span class="sd">        This method should be used in loss functions of other (in-graph) places</span>
@@ -1532,7 +1532,7 @@ document.write(`
 
 <div class="viewcode-block" id="Scheduler.update">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.update.html#ray.rllib.utils.schedules.scheduler.Scheduler.update">[docs]</a>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestep</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestep</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the underlying (framework specific) tensor variable.</span>
 
 <span class="sd">        In case of a fixed value, this method does nothing and only returns the fixed</span>
@@ -1558,7 +1558,7 @@ document.write(`
 
 <div class="viewcode-block" id="Scheduler._create_tensor_variable">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler._create_tensor_variable.html#ray.rllib.utils.schedules.scheduler.Scheduler._create_tensor_variable">[docs]</a>
-    <span class="k">def</span> <span class="nf">_create_tensor_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_tensor_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a framework-specific tensor variable to be scheduled.</span>
 
 <span class="sd">        Args:</span>

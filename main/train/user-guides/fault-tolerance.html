@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1431,7 +1431,7 @@ Otherwise, the training will just start from scratch.</p>
 number of retries is configurable through the <code class="docutils literal notranslate"><span class="pre">max_failures</span></code> attribute of the
 <a class="reference internal" href="../api/doc/ray.train.FailureConfig.html#ray.train.FailureConfig" title="ray.train.FailureConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">FailureConfig</span></code></a> argument set in the <a class="reference internal" href="../api/doc/ray.train.RunConfig.html#ray.train.RunConfig" title="ray.train.RunConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">RunConfig</span></code></a>
 passed to the <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>. By default, worker fault tolerance is disabled with <code class="docutils literal notranslate"><span class="pre">max_failures=0</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray.train</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray.train</span>
 
 <span class="c1"># Tries to recover a run up to this many times.</span>
 <span class="n">failure_config</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">FailureConfig</span><span class="p">(</span><span class="n">max_failures</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -1441,14 +1441,14 @@ passed to the <code class="docutils literal notranslate"><span class="pre">Train
 </pre></div>
 </div>
 <p>Altogether, this is what an example Torch training script with worker fault tolerance looks like:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 
-<span class="kn">import</span> <span class="nn">ray.train</span>
-<span class="kn">import</span> <span class="nn">ray.train.torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train.torch</span>
 
 
-<span class="k">def</span> <span class="nf">train_fn_per_worker</span><span class="p">(</span><span class="n">train_loop_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_fn_per_worker</span><span class="p">(</span><span class="n">train_loop_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
     <span class="c1"># [1] Train worker restoration logic.</span>
     <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">get_checkpoint</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">checkpoint</span><span class="p">:</span>
@@ -1557,15 +1557,15 @@ Therefore, always pass a unique run name when launching a new run. In other word
 <p>Here’s an example training script that highlights best practices for job driver fault tolerance:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># entrypoint.py</span>
 
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 
-<span class="kn">import</span> <span class="nn">ray.train</span>
-<span class="kn">import</span> <span class="nn">ray.train.torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train.torch</span>
 
 
-<span class="k">def</span> <span class="nf">train_fn_per_worker</span><span class="p">(</span><span class="n">train_loop_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_fn_per_worker</span><span class="p">(</span><span class="n">train_loop_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
     <span class="c1"># [1] Train worker restoration logic.</span>
     <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">get_checkpoint</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">checkpoint</span><span class="p">:</span>

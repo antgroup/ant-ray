@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1389,16 +1389,16 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.runtime_context</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
-<span class="kn">import</span> <span class="nn">threading</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
 
-<span class="kn">import</span> <span class="nn">ray._private.worker</span>
-<span class="kn">from</span> <span class="nn">ray._private.client_mode_hook</span> <span class="kn">import</span> <span class="n">client_mode_hook</span>
-<span class="kn">from</span> <span class="nn">ray._private.utils</span> <span class="kn">import</span> <span class="n">parse_pg_formatted_resources_to_original</span>
-<span class="kn">from</span> <span class="nn">ray._raylet</span> <span class="kn">import</span> <span class="n">TaskID</span>
-<span class="kn">from</span> <span class="nn">ray.runtime_env</span> <span class="kn">import</span> <span class="n">RuntimeEnv</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray._private.worker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.client_mode_hook</span><span class="w"> </span><span class="kn">import</span> <span class="n">client_mode_hook</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_pg_formatted_resources_to_original</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._raylet</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskID</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.runtime_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">RuntimeEnv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1406,10 +1406,10 @@ document.write(`
 <div class="viewcode-block" id="RuntimeContext">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.runtime_context.RuntimeContext.html#ray.runtime_context.RuntimeContext">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">RuntimeContext</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RuntimeContext</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class used for getting runtime context.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">worker</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">worker</span> <span class="o">=</span> <span class="n">worker</span>
 
@@ -1418,7 +1418,7 @@ document.write(`
     <span class="nd">@Deprecated</span><span class="p">(</span>
         <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Use get_xxx_id() methods to get relevant ids instead&quot;</span><span class="p">,</span> <span class="n">warning</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a dictionary of the current context.</span>
 
 <span class="sd">        Returns:</span>
@@ -1440,7 +1440,7 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Use get_job_id() instead&quot;</span><span class="p">,</span> <span class="n">warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">job_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">job_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current job ID for this worker or driver.</span>
 
 <span class="sd">        Job ID is the id of your Ray drivers that create tasks or actors.</span>
@@ -1456,7 +1456,7 @@ document.write(`
 
 <div class="viewcode-block" id="RuntimeContext.get_job_id">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.runtime_context.RuntimeContext.get_job_id.html#ray.runtime_context.RuntimeContext.get_job_id">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_job_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_job_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current job ID for this worker or driver.</span>
 
 <span class="sd">        Job ID is the id of your Ray drivers that create tasks or actors.</span>
@@ -1479,7 +1479,7 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Use get_node_id() instead&quot;</span><span class="p">,</span> <span class="n">warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">node_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">node_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current node ID for this worker or driver.</span>
 
 <span class="sd">        Node ID is the id of a node that your driver, task, or actor runs.</span>
@@ -1493,7 +1493,7 @@ document.write(`
 
 <div class="viewcode-block" id="RuntimeContext.get_node_id">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.runtime_context.RuntimeContext.get_node_id.html#ray.runtime_context.RuntimeContext.get_node_id">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_node_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_node_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current node ID for this worker or driver.</span>
 
 <span class="sd">        Node ID is the id of a node that your driver, task, or actor runs.</span>
@@ -1515,7 +1515,7 @@ document.write(`
 
 <div class="viewcode-block" id="RuntimeContext.get_worker_id">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.runtime_context.RuntimeContext.get_worker_id.html#ray.runtime_context.RuntimeContext.get_worker_id">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_worker_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_worker_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current worker ID for this worker or driver process.</span>
 
 <span class="sd">        Returns:</span>
@@ -1529,7 +1529,7 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Use get_task_id() instead&quot;</span><span class="p">,</span> <span class="n">warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">task_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">task_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current task ID for this worker.</span>
 
 <span class="sd">        Task ID is the id of a Ray task.</span>
@@ -1572,7 +1572,7 @@ document.write(`
 
 <div class="viewcode-block" id="RuntimeContext.get_task_id">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.runtime_context.RuntimeContext.get_task_id.html#ray.runtime_context.RuntimeContext.get_task_id">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_task_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_task_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current task ID for this worker.</span>
 
 <span class="sd">        Task ID is the id of a Ray task. The ID will be in hex format.</span>
@@ -1620,12 +1620,12 @@ document.write(`
         <span class="k">return</span> <span class="n">task_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">task_id</span><span class="o">.</span><span class="n">is_nil</span><span class="p">()</span> <span class="k">else</span> <span class="kc">None</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_get_current_task_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TaskID</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_current_task_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TaskID</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">current_task_id</span>
 
 <div class="viewcode-block" id="RuntimeContext.get_task_name">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.runtime_context.RuntimeContext.get_task_name.html#ray.runtime_context.RuntimeContext.get_task_name">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_task_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_task_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current task name for this worker.</span>
 
 <span class="sd">        Task name by default is the task&#39;s funciton call string. It can also be</span>
@@ -1686,7 +1686,7 @@ document.write(`
 
 <div class="viewcode-block" id="RuntimeContext.get_task_function_name">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.runtime_context.RuntimeContext.get_task_function_name.html#ray.runtime_context.RuntimeContext.get_task_function_name">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_task_function_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_task_function_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current task function name string for this worker.</span>
 
 <span class="sd">        Example:</span>
@@ -1740,7 +1740,7 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Use get_actor_id() instead&quot;</span><span class="p">,</span> <span class="n">warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">actor_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">actor_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current actor ID in this worker.</span>
 
 <span class="sd">        ID of the actor of the current process.</span>
@@ -1759,7 +1759,7 @@ document.write(`
 
 <div class="viewcode-block" id="RuntimeContext.get_actor_id">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.runtime_context.RuntimeContext.get_actor_id.html#ray.runtime_context.RuntimeContext.get_actor_id">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_actor_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_actor_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current actor ID in this worker.</span>
 
 <span class="sd">        ID of the actor of the current process.</span>
@@ -1783,7 +1783,7 @@ document.write(`
 
 <div class="viewcode-block" id="RuntimeContext.get_actor_name">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.runtime_context.RuntimeContext.get_actor_name.html#ray.runtime_context.RuntimeContext.get_actor_name">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_actor_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_actor_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current actor name of this worker.</span>
 
 <span class="sd">        This shouldn&#39;t be used in a driver process.</span>
@@ -1807,7 +1807,7 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">namespace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">namespace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current namespace of this worker.</span>
 
 <span class="sd">        Returns:</span>
@@ -1816,7 +1816,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">namespace</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">was_current_actor_reconstructed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">was_current_actor_reconstructed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check whether this actor has been restarted.</span>
 
 <span class="sd">        Returns:</span>
@@ -1830,7 +1830,7 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Use get_placement_group_id() instead&quot;</span><span class="p">,</span> <span class="n">warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">current_placement_group_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">current_placement_group_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current Placement group ID of this worker.</span>
 
 <span class="sd">        Returns:</span>
@@ -1840,7 +1840,7 @@ document.write(`
 
 <div class="viewcode-block" id="RuntimeContext.get_placement_group_id">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.runtime_context.RuntimeContext.get_placement_group_id.html#ray.runtime_context.RuntimeContext.get_placement_group_id">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_placement_group_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_placement_group_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current Placement group ID of this worker.</span>
 
 <span class="sd">        Returns:</span>
@@ -1851,7 +1851,7 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">should_capture_child_tasks_in_placement_group</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">should_capture_child_tasks_in_placement_group</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get if the current task should capture parent&#39;s placement group.</span>
 
 <span class="sd">        This returns True if it is called inside a driver.</span>
@@ -1864,7 +1864,7 @@ document.write(`
 
 <div class="viewcode-block" id="RuntimeContext.get_assigned_resources">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.runtime_context.RuntimeContext.get_assigned_resources.html#ray.runtime_context.RuntimeContext.get_assigned_resources">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_assigned_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_assigned_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the assigned resources to this worker.</span>
 
 <span class="sd">        By default for tasks, this will return {&quot;CPU&quot;: 1}.</span>
@@ -1892,7 +1892,7 @@ document.write(`
 
 <div class="viewcode-block" id="RuntimeContext.get_runtime_env_string">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.runtime_context.RuntimeContext.get_runtime_env_string.html#ray.runtime_context.RuntimeContext.get_runtime_env_string">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_runtime_env_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_runtime_env_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the runtime env string used for the current driver or worker.</span>
 
 <span class="sd">        Returns:</span>
@@ -1902,7 +1902,7 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">runtime_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">runtime_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the runtime env used for the current driver or worker.</span>
 
 <span class="sd">        Returns:</span>
@@ -1913,12 +1913,12 @@ document.write(`
         <span class="k">return</span> <span class="n">RuntimeEnv</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_runtime_env_string</span><span class="p">())</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">virtual_cluster_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">virtual_cluster_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">current_virtual_cluster_id</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">current_actor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">current_actor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current actor handle of this actor itself.</span>
 
 <span class="sd">        Returns:</span>
@@ -1933,7 +1933,7 @@ document.write(`
         <span class="k">return</span> <span class="n">worker</span><span class="o">.</span><span class="n">core_worker</span><span class="o">.</span><span class="n">get_actor_handle</span><span class="p">(</span><span class="n">actor_id</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">gcs_address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gcs_address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the GCS address of the ray cluster.</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            The GCS address of the cluster.</span>
@@ -1944,13 +1944,13 @@ document.write(`
 <div class="viewcode-block" id="RuntimeContext.get_resource_ids">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.runtime_context.RuntimeContext.get_resource_ids.html#ray.runtime_context.RuntimeContext.get_resource_ids">[docs]</a>
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;Use get_accelerator_ids() instead&quot;</span><span class="p">,</span> <span class="n">warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_resource_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_resource_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_accelerator_ids</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="RuntimeContext.get_accelerator_ids">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.runtime_context.RuntimeContext.get_accelerator_ids.html#ray.runtime_context.RuntimeContext.get_accelerator_ids">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_accelerator_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_accelerator_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the current worker&#39;s visible accelerator ids.</span>
 
@@ -1983,7 +1983,7 @@ document.write(`
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.runtime_context.get_runtime_context.html#ray.runtime_context.get_runtime_context">[docs]</a>
 <span class="nd">@PublicAPI</span>
 <span class="nd">@client_mode_hook</span>
-<span class="k">def</span> <span class="nf">get_runtime_context</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RuntimeContext</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_runtime_context</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RuntimeContext</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the runtime context of the current driver/worker.</span>
 
 <span class="sd">    The obtained runtime context can be used to get the metadata</span>

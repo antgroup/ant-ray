@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1415,7 +1415,7 @@ document.write(`
 errors, <a class="reference internal" href="../../working-with-tensors.html#transforming-tensors"><span class="std std-ref">resize your tensors</span></a>.</p>
 </div>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="s2">&quot;s3://anonymous@air-example-data/iris.csv&quot;</span>
 <span class="gp">... </span><span class="p">)</span>
@@ -1445,7 +1445,7 @@ errors, <a class="reference internal" href="../../working-with-tensors.html#tran
 <p>If your dataset contains multiple features but your model accepts a single
 tensor as input, combine features with
 <a class="reference internal" href="ray.data.preprocessors.Concatenator.html#ray.data.preprocessors.Concatenator" title="ray.data.preprocessors.Concatenator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Concatenator</span></code></a>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">ray.data.preprocessors</span> <span class="kn">import</span> <span class="n">Concatenator</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.preprocessors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Concatenator</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">columns_to_concat</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sepal length (cm)&quot;</span><span class="p">,</span> <span class="s2">&quot;sepal width (cm)&quot;</span><span class="p">,</span> <span class="s2">&quot;petal length (cm)&quot;</span><span class="p">,</span> <span class="s2">&quot;petal width (cm)&quot;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">preprocessor</span> <span class="o">=</span> <span class="n">Concatenator</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns_to_concat</span><span class="p">,</span> <span class="n">output_column_name</span><span class="o">=</span><span class="s2">&quot;features&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">it</span> <span class="o">=</span> <span class="n">preprocessor</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">iterator</span><span class="p">()</span>
@@ -1467,7 +1467,7 @@ tensor as input, combine features with
 </div>
 <p>If your model accepts different types, shapes, or names of tensors as input, specify the type spec.
 If type specs are not specified, they are automatically inferred from the schema of the iterator.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">it</span><span class="o">.</span><span class="n">to_tf</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">feature_columns</span><span class="o">=</span><span class="s2">&quot;features&quot;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">label_columns</span><span class="o">=</span><span class="s2">&quot;target&quot;</span><span class="p">,</span>
@@ -1479,7 +1479,7 @@ If type specs are not specified, they are automatically inferred from the schema
 </div>
 <p>If your model accepts additional metadata aside from features and label, specify a single additional column or a list of additional columns.
 A common use case is to include sample weights in the data samples and train a <code class="docutils literal notranslate"><span class="pre">tf.keras.Model</span></code> with <code class="docutils literal notranslate"><span class="pre">tf.keras.Model.fit</span></code>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;sample weights&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">it</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">iterator</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">it</span><span class="o">.</span><span class="n">to_tf</span><span class="p">(</span><span class="n">feature_columns</span><span class="o">=</span><span class="s2">&quot;sepal length (cm)&quot;</span><span class="p">,</span> <span class="n">label_columns</span><span class="o">=</span><span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="n">additional_columns</span><span class="o">=</span><span class="s2">&quot;sample weights&quot;</span><span class="p">)</span>

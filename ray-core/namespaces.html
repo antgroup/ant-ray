@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1413,7 +1413,7 @@ first connect to the cluster.</p>
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-0">
 Python</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">namespace</span><span class="o">=</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
 </pre></div>
@@ -1443,14 +1443,14 @@ C++</label><div class="sd-tab-content docutils">
 <input checked="checked" id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-3">
 Python</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s2">&quot;ray&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;--head&quot;</span><span class="p">])</span>
 
     <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-    <span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
       <span class="k">pass</span>
 
     <span class="c1"># Job 1 creates two actors, &quot;orange&quot; and &quot;purple&quot; in the &quot;colors&quot; namespace.</span>
@@ -1579,14 +1579,14 @@ the specified namespace, no matter what namespace of the current job is.</p>
 <input checked="checked" id="sd-tab-item-6" name="sd-tab-set-2" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-6">
 Python</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s2">&quot;ray&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;--head&quot;</span><span class="p">])</span>
 
     <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-    <span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
         <span class="k">pass</span>
 
     <span class="n">ctx</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="s2">&quot;ray://localhost:10001&quot;</span><span class="p">)</span>
@@ -1646,14 +1646,14 @@ will not have access to actors in other namespaces.</p>
 <input checked="checked" id="sd-tab-item-9" name="sd-tab-set-3" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-9">
 Python</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="k">try</span><span class="p">:</span>
   <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s2">&quot;ray&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;--head&quot;</span><span class="p">])</span>
 
   <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-  <span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
+  <span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
       <span class="k">pass</span>
 
   <span class="c1"># Job 1 connects to an anonymous namespace by default</span>
@@ -1731,8 +1731,8 @@ it is not recommended.</p>
 <input checked="checked" id="sd-tab-item-12" name="sd-tab-set-4" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-12">
 Python</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="k">try</span><span class="p">:</span>
   <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s2">&quot;ray&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;--head&quot;</span><span class="p">])</span>

@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1406,17 +1406,17 @@ script. See the <a class="reference external" href="https://horovod.readthedocs.
 for more information.</p>
 <section id="quickstart">
 <h2>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading">#</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">import</span> <span class="nn">horovod.torch</span> <span class="k">as</span> <span class="nn">hvd</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">ScalingConfig</span>
-<span class="kn">import</span> <span class="nn">ray.train.torch</span>  <span class="c1"># Need this to use `train.torch.get_device()`</span>
-<span class="kn">from</span> <span class="nn">ray.train.horovod</span> <span class="kn">import</span> <span class="n">HorovodTrainer</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">horovod.torch</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">hvd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">ScalingConfig</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train.torch</span>  <span class="c1"># Need this to use `train.torch.get_device()`</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.horovod</span><span class="w"> </span><span class="kn">import</span> <span class="n">HorovodTrainer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
 
 <span class="c1"># If using GPUs, set this to True.</span>
 <span class="n">use_gpu</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1428,18 +1428,18 @@ for more information.</p>
 <span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">3</span>
 
 
-<span class="k">class</span> <span class="nc">NeuralNetwork</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NeuralNetwork</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">NeuralNetwork</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layer1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">layer_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">relu</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layer2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">layer_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer1</span><span class="p">(</span><span class="nb">input</span><span class="p">)))</span>
 
 
-<span class="k">def</span> <span class="nf">train_loop_per_worker</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_loop_per_worker</span><span class="p">():</span>
     <span class="n">hvd</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
     <span class="n">dataset_shard</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">get_dataset_shard</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">NeuralNetwork</span><span class="p">()</span>
@@ -1499,8 +1499,8 @@ you shouldn’t need to make any additional changes.</p>
 <p><code class="docutils literal notranslate"><span class="pre">Trainer</span></code>s are the primary Ray Train classes to use to manage state and
 execute training. For Horovod, use a <a class="reference internal" href="api/doc/ray.train.horovod.HorovodTrainer.html#ray.train.horovod.HorovodTrainer" title="ray.train.horovod.HorovodTrainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">HorovodTrainer</span></code></a>
 that you can setup like this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.horovod</span> <span class="kn">import</span> <span class="n">HorovodTrainer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.horovod</span><span class="w"> </span><span class="kn">import</span> <span class="n">HorovodTrainer</span>
 <span class="c1"># For GPU Training, set `use_gpu` to True.</span>
 <span class="n">use_gpu</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">HorovodTrainer</span><span class="p">(</span>
@@ -1513,8 +1513,8 @@ that you can setup like this:</p>
 irrespective of the training framework, for example, PyTorch or TensorFlow.</p>
 <p>To customize the backend setup, you can pass a
 <a class="reference internal" href="api/doc/ray.train.horovod.HorovodConfig.html#ray.train.horovod.HorovodConfig" title="ray.train.horovod.HorovodConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">HorovodConfig</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.horovod</span> <span class="kn">import</span> <span class="n">HorovodTrainer</span><span class="p">,</span> <span class="n">HorovodConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.horovod</span><span class="w"> </span><span class="kn">import</span> <span class="n">HorovodTrainer</span><span class="p">,</span> <span class="n">HorovodConfig</span>
 
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">HorovodTrainer</span><span class="p">(</span>
     <span class="n">train_func</span><span class="p">,</span>

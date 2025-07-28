@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1411,10 +1411,10 @@ Quickstart</label><div class="sd-tab-content docutils">
 <p>In this quick-start example you <code class="code docutils literal notranslate"><span class="pre">minimize</span></code> a simple function of the form <code class="docutils literal notranslate"><span class="pre">f(x)</span> <span class="pre">=</span> <span class="pre">a**2</span> <span class="pre">+</span> <span class="pre">b</span></code>, our <code class="code docutils literal notranslate"><span class="pre">objective</span></code> function.
 The closer <code class="docutils literal notranslate"><span class="pre">a</span></code> is to zero and the smaller <code class="docutils literal notranslate"><span class="pre">b</span></code> is, the smaller the total value of <code class="docutils literal notranslate"><span class="pre">f(x)</span></code>.
 We will define a so-called <code class="code docutils literal notranslate"><span class="pre">search</span> <span class="pre">space</span></code> for  <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> and let Ray Tune explore the space for good values.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 
-<span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>  <span class="c1"># ①</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>  <span class="c1"># ①</span>
     <span class="n">score</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">]</span>
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="n">score</span><span class="p">}</span>
 
@@ -1443,12 +1443,12 @@ In the example below we only tune the <code class="docutils literal notranslate"
 tune any parameter of the model you want.
 After defining the search space, you can simply initialize the <code class="docutils literal notranslate"><span class="pre">HyperOptSearch</span></code> object and pass it to <code class="docutils literal notranslate"><span class="pre">run</span></code>.
 It’s important to tell Ray Tune which metric you want to optimize and whether you want to maximize or minimize it.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.hyperopt</span> <span class="kn">import</span> <span class="n">HyperOptSearch</span>
-<span class="kn">import</span> <span class="nn">keras</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.hyperopt</span><span class="w"> </span><span class="kn">import</span> <span class="n">HyperOptSearch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">keras</span>
 
 
-<span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>  <span class="c1"># ①</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>  <span class="c1"># ①</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Sequential</span><span class="p">()</span>
     <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">784</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;activation&quot;</span><span class="p">]))</span>
     <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;softmax&quot;</span><span class="p">))</span>
@@ -1488,12 +1488,12 @@ but you can tune any other model parameter you want.
 After defining the search space, you can simply initialize the <code class="docutils literal notranslate"><span class="pre">OptunaSearch</span></code> object and pass it to <code class="docutils literal notranslate"><span class="pre">run</span></code>.
 It’s important to tell Ray Tune which metric you want to optimize and whether you want to maximize or minimize it.
 We stop tuning this training run after <code class="docutils literal notranslate"><span class="pre">5</span></code> iterations, but you can easily define other stopping rules as well.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.optuna</span> <span class="kn">import</span> <span class="n">OptunaSearch</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.optuna</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptunaSearch</span>
 
 
-<span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>  <span class="c1"># ①</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>  <span class="c1"># ①</span>
     <span class="n">train_loader</span><span class="p">,</span> <span class="n">test_loader</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">()</span>  <span class="c1"># Load some data</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">ConvNet</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>  <span class="c1"># Create a PyTorch conv net</span>
     <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span>  <span class="c1"># Tune the optimizer</span>

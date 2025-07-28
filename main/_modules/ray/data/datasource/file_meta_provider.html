@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,12 +1389,12 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data.datasource.file_meta_provider</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pathlib</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
     <span class="n">Iterator</span><span class="p">,</span>
@@ -1405,17 +1405,17 @@ document.write(`
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">ray.data._internal.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.remote_fn</span> <span class="kn">import</span> <span class="n">cached_remote_fn</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.util</span> <span class="kn">import</span> <span class="n">RetryingPyFileSystem</span>
-<span class="kn">from</span> <span class="nn">ray.data.block</span> <span class="kn">import</span> <span class="n">BlockMetadata</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource.partitioning</span> <span class="kn">import</span> <span class="n">Partitioning</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.progress_bar</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.remote_fn</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_remote_fn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">RetryingPyFileSystem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockMetadata</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.partitioning</span><span class="w"> </span><span class="kn">import</span> <span class="n">Partitioning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -1424,7 +1424,7 @@ document.write(`
 <div class="viewcode-block" id="FileMetadataProvider">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.FileMetadataProvider.html#ray.data.datasource.FileMetadataProvider">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">FileMetadataProvider</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FileMetadataProvider</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract callable that provides metadata for the files of a single dataset block.</span>
 
 <span class="sd">    Current subclasses:</span>
@@ -1432,7 +1432,7 @@ document.write(`
 <span class="sd">        - :class:`ParquetMetadataProvider`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_get_block_metadata</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_block_metadata</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="s2">&quot;pyarrow.lib.Schema&quot;</span><span class="p">]],</span>
@@ -1452,7 +1452,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="s2">&quot;pyarrow.lib.Schema&quot;</span><span class="p">]],</span>
@@ -1465,7 +1465,7 @@ document.write(`
 <div class="viewcode-block" id="BaseFileMetadataProvider">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.BaseFileMetadataProvider.html#ray.data.datasource.BaseFileMetadataProvider">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">BaseFileMetadataProvider</span><span class="p">(</span><span class="n">FileMetadataProvider</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseFileMetadataProvider</span><span class="p">(</span><span class="n">FileMetadataProvider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract callable that provides metadata for</span>
 <span class="sd">    :class:`~ray.data.datasource.file_based_datasource.FileBasedDatasource`</span>
 <span class="sd">    implementations that reuse the base :meth:`~ray.data.Datasource.prepare_read`</span>
@@ -1477,7 +1477,7 @@ document.write(`
 <span class="sd">        - :class:`DefaultFileMetadataProvider`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_get_block_metadata</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_block_metadata</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="s2">&quot;pyarrow.lib.Schema&quot;</span><span class="p">]],</span>
@@ -1505,7 +1505,7 @@ document.write(`
 
 <div class="viewcode-block" id="BaseFileMetadataProvider.expand_paths">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.BaseFileMetadataProvider.expand_paths.html#ray.data.datasource.BaseFileMetadataProvider.expand_paths">[docs]</a>
-    <span class="k">def</span> <span class="nf">expand_paths</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expand_paths</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;RetryingPyFileSystem&quot;</span><span class="p">],</span>
@@ -1541,7 +1541,7 @@ document.write(`
 <div class="viewcode-block" id="DefaultFileMetadataProvider">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.DefaultFileMetadataProvider.html#ray.data.datasource.DefaultFileMetadataProvider">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">DefaultFileMetadataProvider</span><span class="p">(</span><span class="n">BaseFileMetadataProvider</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DefaultFileMetadataProvider</span><span class="p">(</span><span class="n">BaseFileMetadataProvider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Default metadata provider for</span>
 <span class="sd">    :class:`~ray.data.datasource.file_based_datasource.FileBasedDatasource`</span>
 <span class="sd">    implementations that reuse the base `prepare_read` method.</span>
@@ -1550,7 +1550,7 @@ document.write(`
 <span class="sd">    and assumes a fixed number of rows per file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_get_block_metadata</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_block_metadata</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="s2">&quot;pyarrow.lib.Schema&quot;</span><span class="p">]],</span>
@@ -1570,7 +1570,7 @@ document.write(`
             <span class="n">exec_stats</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>  <span class="c1"># Exec stats filled in later.</span>
 
-    <span class="k">def</span> <span class="nf">expand_paths</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expand_paths</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">filesystem</span><span class="p">:</span> <span class="s2">&quot;RetryingPyFileSystem&quot;</span><span class="p">,</span>
@@ -1584,7 +1584,7 @@ document.write(`
 <div class="viewcode-block" id="FastFileMetadataProvider">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.FastFileMetadataProvider.html#ray.data.datasource.FastFileMetadataProvider">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">FastFileMetadataProvider</span><span class="p">(</span><span class="n">DefaultFileMetadataProvider</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FastFileMetadataProvider</span><span class="p">(</span><span class="n">DefaultFileMetadataProvider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Fast Metadata provider for</span>
 <span class="sd">    :class:`~ray.data.datasource.file_based_datasource.FileBasedDatasource`</span>
 <span class="sd">    implementations.</span>
@@ -1598,7 +1598,7 @@ document.write(`
 <span class="sd">    This should only be used when all input paths exist and are known to be files.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">expand_paths</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expand_paths</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">filesystem</span><span class="p">:</span> <span class="s2">&quot;RetryingPyFileSystem&quot;</span><span class="p">,</span>
@@ -1622,7 +1622,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_handle_read_os_error</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="ne">OSError</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_handle_read_os_error</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="ne">OSError</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="c1"># NOTE: this is not comprehensive yet, and should be extended as more errors arise.</span>
     <span class="c1"># NOTE: The latter patterns are raised in Arrow 10+, while the former is raised in</span>
     <span class="c1"># Arrow &lt; 10.</span>
@@ -1657,19 +1657,19 @@ document.write(`
         <span class="k">raise</span> <span class="n">error</span>
 
 
-<span class="k">def</span> <span class="nf">_expand_paths</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_expand_paths</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="s2">&quot;RetryingPyFileSystem&quot;</span><span class="p">,</span>
     <span class="n">partitioning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Partitioning</span><span class="p">],</span>
     <span class="n">ignore_missing_paths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the file sizes for all provided file paths.&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">pyarrow.fs</span> <span class="kn">import</span> <span class="n">LocalFileSystem</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyarrow.fs</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalFileSystem</span>
 
-    <span class="kn">from</span> <span class="nn">ray.data.datasource.file_based_datasource</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.file_based_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">FILE_SIZE_FETCH_PARALLELIZATION_THRESHOLD</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="kn">from</span> <span class="nn">ray.data.datasource.path_util</span> <span class="kn">import</span> <span class="n">_unwrap_protocol</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.path_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">_unwrap_protocol</span>
 
     <span class="c1"># We break down our processing paths into a few key cases:</span>
     <span class="c1"># 1. If len(paths) &lt; threshold, fetch the file info for the individual files/paths</span>
@@ -1709,7 +1709,7 @@ document.write(`
             <span class="k">yield from</span> <span class="n">_get_file_infos_parallel</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">filesystem</span><span class="p">,</span> <span class="n">ignore_missing_paths</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_file_infos_serial</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_file_infos_serial</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="s2">&quot;RetryingPyFileSystem&quot;</span><span class="p">,</span>
     <span class="n">ignore_missing_paths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1718,7 +1718,7 @@ document.write(`
         <span class="k">yield from</span> <span class="n">_get_file_infos</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filesystem</span><span class="p">,</span> <span class="n">ignore_missing_paths</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_file_infos_common_path_prefix</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_file_infos_common_path_prefix</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">common_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">,</span>
@@ -1756,12 +1756,12 @@ document.write(`
             <span class="k">yield</span> <span class="n">path</span><span class="p">,</span> <span class="n">path_to_size</span><span class="p">[</span><span class="n">path</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_get_file_infos_parallel</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_file_infos_parallel</span><span class="p">(</span>
     <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="s2">&quot;RetryingPyFileSystem&quot;</span><span class="p">,</span>
     <span class="n">ignore_missing_paths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
-    <span class="kn">from</span> <span class="nn">ray.data.datasource.file_based_datasource</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.file_based_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">PATHS_PER_FILE_SIZE_FETCH_TASK</span><span class="p">,</span>
         <span class="n">_unwrap_s3_serialization_workaround</span><span class="p">,</span>
         <span class="n">_wrap_s3_serialization_workaround</span><span class="p">,</span>
@@ -1778,7 +1778,7 @@ document.write(`
     <span class="c1"># serialization workaround to make sure that the pickle roundtrip works as expected.</span>
     <span class="n">filesystem</span> <span class="o">=</span> <span class="n">_wrap_s3_serialization_workaround</span><span class="p">(</span><span class="n">filesystem</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_file_infos_fetcher</span><span class="p">(</span><span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_file_infos_fetcher</span><span class="p">(</span><span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
         <span class="n">fs</span> <span class="o">=</span> <span class="n">_unwrap_s3_serialization_workaround</span><span class="p">(</span><span class="n">filesystem</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
             <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
@@ -1795,7 +1795,7 @@ document.write(`
 <span class="n">Meta</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Meta&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_fetch_metadata_parallel</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fetch_metadata_parallel</span><span class="p">(</span>
     <span class="n">uris</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Uri</span><span class="p">],</span>
     <span class="n">fetch_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">List</span><span class="p">[</span><span class="n">Uri</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="n">Meta</span><span class="p">]],</span>
     <span class="n">desired_uris_per_task</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1821,11 +1821,11 @@ document.write(`
     <span class="k">yield from</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_file_infos</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_file_infos</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">filesystem</span><span class="p">:</span> <span class="s2">&quot;RetryingPyFileSystem&quot;</span><span class="p">,</span> <span class="n">ignore_missing_path</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the file info for all files at or under the provided path.&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">pyarrow.fs</span> <span class="kn">import</span> <span class="n">FileType</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyarrow.fs</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileType</span>
 
     <span class="n">file_infos</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">try</span><span class="p">:</span>
@@ -1845,7 +1845,7 @@ document.write(`
     <span class="k">return</span> <span class="n">file_infos</span>
 
 
-<span class="k">def</span> <span class="nf">_expand_directory</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_expand_directory</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="s2">&quot;RetryingPyFileSystem&quot;</span><span class="p">,</span>
     <span class="n">exclude_prefixes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1868,7 +1868,7 @@ document.write(`
     <span class="k">if</span> <span class="n">exclude_prefixes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">exclude_prefixes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">]</span>
 
-    <span class="kn">from</span> <span class="nn">pyarrow.fs</span> <span class="kn">import</span> <span class="n">FileSelector</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyarrow.fs</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileSelector</span>
 
     <span class="n">selector</span> <span class="o">=</span> <span class="n">FileSelector</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allow_not_found</span><span class="o">=</span><span class="n">ignore_missing_path</span><span class="p">)</span>
     <span class="n">files</span> <span class="o">=</span> <span class="n">filesystem</span><span class="o">.</span><span class="n">get_file_info</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>

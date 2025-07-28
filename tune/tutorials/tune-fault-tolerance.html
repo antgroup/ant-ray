@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1449,14 +1449,14 @@ meaning that the retry attempt after restoring can succeed the next time.</p>
 <p>Let’s say your initial Tune experiment is configured as follows.
 The actual training loop is just for demonstration purposes: the important detail is that
 <a class="reference internal" href="tune-trial-checkpoints.html#tune-trial-checkpoint"><span class="std std-ref">saving and loading checkpoints has been implemented in the trainable</span></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 
-<span class="k">def</span> <span class="nf">trainable</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">trainable</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="c1"># Checkpoint loading</span>
     <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">get_checkpoint</span><span class="p">()</span>
     <span class="n">start</span> <span class="o">=</span> <span class="mi">1</span>
@@ -1535,8 +1535,8 @@ If the experiment has been interrupted due to one of the reasons listed above, u
 <p>When running in a production setting, one may want a <em>single script</em> that (1) launches the
 initial training run in the beginning and (2) restores the experiment if (1) already happened.</p>
 <p>Use the <a class="reference internal" href="../api/doc/ray.tune.Tuner.can_restore.html#ray.tune.Tuner.can_restore" title="ray.tune.Tuner.can_restore"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Tuner.can_restore</span></code></a> utility to accomplish this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 <span class="n">storage_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~/ray_results&quot;</span><span class="p">)</span>
 <span class="n">exp_name</span> <span class="o">=</span> <span class="s2">&quot;tune_fault_tolerance_guide&quot;</span>
@@ -1571,17 +1571,17 @@ and then pass the new object references to Tune.</p>
 For example, this could be a image classification model used to calculate an Inception Score
 to evaluate the quality of a generative model.
 We may have multiple models that we want to tune over, where each trial samples one of the models to use.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 
-<span class="k">class</span> <span class="nc">LargeModel</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LargeModel</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span>
         <span class="c1"># Load weights based on the `model_id`...</span>
 
 
-<span class="k">def</span> <span class="nf">train_fn</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_fn</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="c1"># Retrieve the model from the object store.</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;model_ref&quot;</span><span class="p">])</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model_id</span><span class="p">)</span>
@@ -1648,7 +1648,7 @@ Ray Data can contain object references, so the same problems described above app
 <p>Ray Tune provides a way to configure failure handling of individual trials with the <a class="reference internal" href="../api/doc/ray.tune.FailureConfig.html#ray.tune.FailureConfig" title="ray.tune.FailureConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">FailureConfig</span></code></a>.</p>
 <p>Assuming that we’re using the <code class="docutils literal notranslate"><span class="pre">trainable</span></code> from the previous example that implements
 trial checkpoint saving and loading, here is how to configure <a class="reference internal" href="../api/doc/ray.tune.FailureConfig.html#ray.tune.FailureConfig" title="ray.tune.FailureConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">FailureConfig</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 <span class="n">tuner</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
     <span class="n">trainable</span><span class="p">,</span>

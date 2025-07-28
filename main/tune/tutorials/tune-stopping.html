@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1410,10 +1410,10 @@ document.write(`
 </ol>
 <p>This user guide will illustrate how to achieve these types of stopping criteria in a Tune experiment.</p>
 <p>For all the code examples, we use the following training function for demonstration:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
-<span class="k">def</span> <span class="nf">my_trainable</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_trainable</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="c1"># Do some training...</span>
@@ -1457,7 +1457,7 @@ Function API or <code class="docutils literal notranslate"><span class="pre">ste
 <p>In the example below, each trial will be stopped either when it completes <code class="docutils literal notranslate"><span class="pre">10</span></code> iterations or when it
 reaches a mean accuracy of <code class="docutils literal notranslate"><span class="pre">0.8</span></code> or more.</p>
 <p>These metrics are assumed to be <strong>increasing</strong>, so the trial will stop once the reported metric has exceeded the threshold specified in the dictionary.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 <span class="n">tuner</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
     <span class="n">my_trainable</span><span class="p">,</span>
@@ -1475,10 +1475,10 @@ If a function is passed in, it must take <code class="docutils literal notransla
 (<code class="docutils literal notranslate"><span class="pre">True</span></code> if trial should be stopped and <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise).</p>
 <p>In the example below, each trial will be stopped either when it completes <code class="docutils literal notranslate"><span class="pre">10</span></code> iterations or when it
 reaches a mean accuracy of <code class="docutils literal notranslate"><span class="pre">0.8</span></code> or more.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 
-<span class="k">def</span> <span class="nf">stop_fn</span><span class="p">(</span><span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">stop_fn</span><span class="p">(</span><span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;mean_accuracy&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.8</span> <span class="ow">or</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;training_iteration&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">10</span>
 
 
@@ -1494,20 +1494,20 @@ Custom Stopper Class</label><div class="sd-tab-content docutils">
 stopping individual trials or even entire experiments based on custom stopping
 criteria. For example, the following example stops all trials after the criteria
 is achieved by any individual trial and prevents new ones from starting:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">Stopper</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stopper</span>
 
 
-<span class="k">class</span> <span class="nc">CustomStopper</span><span class="p">(</span><span class="n">Stopper</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomStopper</span><span class="p">(</span><span class="n">Stopper</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;mean_accuracy&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.8</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span>
 
-    <span class="k">def</span> <span class="nf">stop_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns whether to stop trials and prevent new ones from starting.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span>
 
@@ -1538,7 +1538,7 @@ after a specified timeout, or stopping the full experiment after a certain amoun
 <section id="stop-trials-individually-with-a-timeout">
 <h3>Stop trials individually with a timeout<a class="headerlink" href="#stop-trials-individually-with-a-timeout" title="Link to this heading">#</a></h3>
 <p>You can use a dictionary stopping criteria as described above, using the <code class="docutils literal notranslate"><span class="pre">time_total_s</span></code> metric that is auto-filled by Tune.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 <span class="n">tuner</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
     <span class="n">my_trainable</span><span class="p">,</span>
@@ -1560,7 +1560,7 @@ In this case, you can explicitly implement timeout logic in the training loop.</
 <section id="stop-the-experiment-with-a-timeout">
 <h3>Stop the experiment with a timeout<a class="headerlink" href="#stop-the-experiment-with-a-timeout" title="Link to this heading">#</a></h3>
 <p>Use the <code class="docutils literal notranslate"><span class="pre">TuneConfig(time_budget_s)</span></code> configuration to tell Tune to stop the experiment after <code class="docutils literal notranslate"><span class="pre">time_budget_s</span></code> seconds.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 <span class="c1"># Stop the entire experiment after ANY trial has run for more than 5 seconds.</span>
 <span class="n">tuner</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span><span class="n">my_trainable</span><span class="p">,</span> <span class="n">tune_config</span><span class="o">=</span><span class="n">tune</span><span class="o">.</span><span class="n">TuneConfig</span><span class="p">(</span><span class="n">time_budget_s</span><span class="o">=</span><span class="mf">5.0</span><span class="p">))</span>
@@ -1578,11 +1578,11 @@ if using the <a class="reference internal" href="../api/trainable.html#tune-func
 <h2>Stop on trial failures<a class="headerlink" href="#stop-on-trial-failures" title="Link to this heading">#</a></h2>
 <p>In addition to stopping trials based on their performance, you can also stop the entire experiment if any trial encounters a runtime error. To do this, you can use the <a class="reference internal" href="../api/doc/ray.tune.FailureConfig.html#ray.tune.FailureConfig" title="ray.tune.FailureConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">ray.tune.FailureConfig</span></code></a> class.</p>
 <p>With this configuration, if any trial encounters an error, the entire experiment will stop immediately.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 
-<span class="k">def</span> <span class="nf">my_failing_trainable</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_failing_trainable</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;should_fail&quot;</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failing (on purpose)!&quot;</span><span class="p">)</span>
     <span class="c1"># Do some training...</span>
@@ -1607,8 +1607,8 @@ These schedulers monitor the performance of trials and stop them early if they a
 <p><a class="reference internal" href="../api/doc/ray.tune.schedulers.AsyncHyperBandScheduler.html#ray.tune.schedulers.AsyncHyperBandScheduler" title="ray.tune.schedulers.AsyncHyperBandScheduler"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncHyperBandScheduler</span></code></a> and <a class="reference internal" href="../api/doc/ray.tune.schedulers.HyperBandForBOHB.html#ray.tune.schedulers.HyperBandForBOHB" title="ray.tune.schedulers.HyperBandForBOHB"><code class="xref py py-class docutils literal notranslate"><span class="pre">HyperBandForBOHB</span></code></a> are examples of early stopping schedulers built into Tune.
 See <a class="reference internal" href="../api/schedulers.html#tune-schedulers"><span class="std std-ref">the Tune scheduler API reference</span></a> for a full list, as well as more realistic examples.</p>
 <p>In the following example, we use both a dictionary stopping criteria along with an early-stopping criteria:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers</span> <span class="kn">import</span> <span class="n">AsyncHyperBandScheduler</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncHyperBandScheduler</span>
 
 
 <span class="n">scheduler</span> <span class="o">=</span> <span class="n">AsyncHyperBandScheduler</span><span class="p">(</span><span class="n">time_attr</span><span class="o">=</span><span class="s2">&quot;training_iteration&quot;</span><span class="p">)</span>

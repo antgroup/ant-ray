@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1392,11 +1392,11 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.util.scheduling_strategies</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.util.placement_group</span> <span class="kn">import</span> <span class="n">PlacementGroup</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.placement_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroup</span>
 
 <span class="c1"># &quot;DEFAULT&quot;: The default hybrid scheduling strategy</span>
 <span class="c1"># based on config scheduler_spread_threshold.</span>
@@ -1408,7 +1408,7 @@ document.write(`
 <div class="viewcode-block" id="PlacementGroupSchedulingStrategy">
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.scheduling_strategies.PlacementGroupSchedulingStrategy.html#ray.util.scheduling_strategies.PlacementGroupSchedulingStrategy">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">PlacementGroupSchedulingStrategy</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlacementGroupSchedulingStrategy</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Placement group based scheduling strategy.</span>
 
 <span class="sd">    Attributes:</span>
@@ -1422,7 +1422,7 @@ document.write(`
 <span class="sd">            as its parent. It is False by default.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">placement_group</span><span class="p">:</span> <span class="s2">&quot;PlacementGroup&quot;</span><span class="p">,</span>
         <span class="n">placement_group_bundle_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
@@ -1437,7 +1437,7 @@ document.write(`
 <div class="viewcode-block" id="NodeAffinitySchedulingStrategy">
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.scheduling_strategies.NodeAffinitySchedulingStrategy.html#ray.util.scheduling_strategies.NodeAffinitySchedulingStrategy">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">NodeAffinitySchedulingStrategy</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NodeAffinitySchedulingStrategy</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Static scheduling strategy used to run a task or actor on a particular node.</span>
 
 <span class="sd">    Attributes:</span>
@@ -1454,7 +1454,7 @@ document.write(`
 <span class="sd">            or be scheduled somewhere else if soft is True.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">soft</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -1472,7 +1472,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_validate_label_match_operator_values</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">operator</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_label_match_operator_values</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">operator</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">values</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;The variadic parameter of the </span><span class="si">{</span><span class="n">operator</span><span class="si">}</span><span class="s2"> operator&quot;</span>
@@ -1491,39 +1491,39 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">In</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">values</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">In</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">values</span><span class="p">):</span>
         <span class="n">_validate_label_match_operator_values</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="s2">&quot;In&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">NotIn</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">values</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NotIn</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">values</span><span class="p">):</span>
         <span class="n">_validate_label_match_operator_values</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="s2">&quot;NotIn&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Exists</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Exists</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">DoesNotExist</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DoesNotExist</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
 
-<span class="k">class</span> <span class="nc">_LabelMatchExpression</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_LabelMatchExpression</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An expression used to select node by node&#39;s labels</span>
 <span class="sd">    Attributes:</span>
 <span class="sd">        key: the key of label</span>
 <span class="sd">        operator: In、NotIn、Exists、DoesNotExist</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">operator</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">In</span><span class="p">,</span> <span class="n">NotIn</span><span class="p">,</span> <span class="n">Exists</span><span class="p">,</span> <span class="n">DoesNotExist</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">operator</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">In</span><span class="p">,</span> <span class="n">NotIn</span><span class="p">,</span> <span class="n">Exists</span><span class="p">,</span> <span class="n">DoesNotExist</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span>
 
@@ -1532,7 +1532,7 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">NodeLabelSchedulingStrategy</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NodeLabelSchedulingStrategy</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Label based node affinity scheduling strategy</span>
 
@@ -1542,14 +1542,14 @@ document.write(`
 <span class="sd">    })</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">hard</span><span class="p">:</span> <span class="n">LabelMatchExpressionsT</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">soft</span><span class="p">:</span> <span class="n">LabelMatchExpressionsT</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hard</span> <span class="o">=</span> <span class="n">_convert_map_to_expressions</span><span class="p">(</span><span class="n">hard</span><span class="p">,</span> <span class="s2">&quot;hard&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">soft</span> <span class="o">=</span> <span class="n">_convert_map_to_expressions</span><span class="p">(</span><span class="n">soft</span><span class="p">,</span> <span class="s2">&quot;soft&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_usage</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_check_usage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_usage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hard</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">soft</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;The `hard` and `soft` parameter &quot;</span>
@@ -1557,7 +1557,7 @@ document.write(`
             <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_convert_map_to_expressions</span><span class="p">(</span><span class="n">map_expressions</span><span class="p">:</span> <span class="n">LabelMatchExpressionsT</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_convert_map_to_expressions</span><span class="p">(</span><span class="n">map_expressions</span><span class="p">:</span> <span class="n">LabelMatchExpressionsT</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="n">expressions</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">map_expressions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">expressions</span>

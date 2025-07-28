@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1411,7 +1411,7 @@ documentation to the new code base.</p>
 <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig" title="ray.rllib.algorithms.algorithm_config.AlgorithmConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AlgorithmConfig</span></code></a>.</p>
 <p>The following is an example of defining a simple lambda that prints out an episode’s return after
 the episode terminates:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
 
 <span class="n">ppo</span> <span class="o">=</span> <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">PPOConfig</span><span class="p">()</span>
@@ -1447,16 +1447,16 @@ need to subclass the <a class="reference internal" href="package_ref/doc/ray.rll
 one or more methods, for example <a class="reference internal" href="package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init" title="ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init"><code class="xref py py-meth docutils literal notranslate"><span class="pre">on_algorithm_init()</span></code></a>:</p>
 <p>The following is the same example that prints out a terminated episode’s return, but uses
 a subclass of <a class="reference internal" href="package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.html#ray.rllib.callbacks.callbacks.RLlibCallback" title="ray.rllib.callbacks.callbacks.RLlibCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">RLlibCallback</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.callbacks.callbacks</span> <span class="kn">import</span> <span class="n">RLlibCallback</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.callbacks.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLlibCallback</span>
 
-<span class="k">class</span> <span class="nc">EpisodeReturn</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EpisodeReturn</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="c1"># Keep some global state in between individual callback events.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">overall_sum_of_rewards</span> <span class="o">=</span> <span class="mf">0.0</span>
 
-    <span class="k">def</span> <span class="nf">on_episode_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">episode</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_episode_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">episode</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">overall_sum_of_rewards</span> <span class="o">+=</span> <span class="n">episode</span><span class="o">.</span><span class="n">get_return</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Episode done. R=</span><span class="si">{</span><span class="n">episode</span><span class="o">.</span><span class="n">get_return</span><span class="p">()</span><span class="si">}</span><span class="s2"> Global SUM=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">overall_sum_of_rewards</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -1592,12 +1592,12 @@ provided in the list.</p></li>
 by calling the <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.callbacks.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.callbacks" title="ray.rllib.algorithms.algorithm_config.AlgorithmConfig.callbacks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">callbacks()</span></code></a> method
 and defining the <code class="docutils literal notranslate"><span class="pre">on_train_result</span></code> argument in this call.</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyCallbacks</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">on_train_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">metrics_logger</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyCallbacks</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">metrics_logger</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RLlibCallback subclass&quot;</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">MyDebugCallbacks</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">on_train_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">metrics_logger</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyDebugCallbacks</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">metrics_logger</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;debug subclass&quot;</span><span class="p">)</span>
 
 <span class="c1"># Define the callbacks order through the config.</span>
@@ -1632,10 +1632,10 @@ contents to disk from time to time.</p>
 <p>You normally don’t want to write the contents of buffers along with your
 <a class="reference internal" href="checkpoints.html#rllib-checkpoints-docs"><span class="std std-ref">Algorithm checkpoints</span></a>, so writing less often, in a more
 controlled fashion through a custom callback could be a good compromise.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ormsgpack</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.dqn</span> <span class="kn">import</span> <span class="n">DQNConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ormsgpack</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.dqn</span><span class="w"> </span><span class="kn">import</span> <span class="n">DQNConfig</span>
 
-<span class="k">def</span> <span class="nf">_write_buffer_if_necessary</span><span class="p">(</span><span class="n">algorithm</span><span class="p">,</span> <span class="n">metrics_logger</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_write_buffer_if_necessary</span><span class="p">(</span><span class="n">algorithm</span><span class="p">,</span> <span class="n">metrics_logger</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
     <span class="c1"># Write the buffer contents only every ith iteration.</span>
     <span class="k">if</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">training_iteration</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># python dict</span>
@@ -1689,13 +1689,13 @@ link is pointing directly downwards.
 of the injected code. See <a class="reference internal" href="metrics-logger.html#rllib-metric-logger-docs"><span class="std std-ref">MetricsLogger API</span></a> for more details about the MetricsLogger API.</p>
 <p>Also, see this more complex example that
 <a class="reference external" href="https://github.com/ray-project/ray/blob/master/rllib/examples/metrics/custom_metrics_in_env_runners.py">generates and logs a PacMan heatmap (image) to WandB</a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.callbacks.callbacks</span> <span class="kn">import</span> <span class="n">RLlibCallback</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.callbacks.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLlibCallback</span>
 
-<span class="k">class</span> <span class="nc">LogAcrobotAngle</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">on_episode_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">episode</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogAcrobotAngle</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_episode_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">episode</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># First get the angle from the env (note that `env` is a VectorEnv).</span>
         <span class="c1"># See https://github.com/Farama-Foundation/Gymnasium/blob/main/gymnasium/envs/classic_control/acrobot.py</span>
         <span class="c1"># for the env source code.</span>
@@ -1706,7 +1706,7 @@ of the injected code. See <a class="reference internal" href="metrics-logger.htm
         <span class="c1"># Log the theta1 degree value in the episode object, temporarily.</span>
         <span class="n">episode</span><span class="o">.</span><span class="n">add_temporary_timestep_data</span><span class="p">(</span><span class="s2">&quot;theta1&quot;</span><span class="p">,</span> <span class="n">deg_theta1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_episode_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">episode</span><span class="p">,</span> <span class="n">metrics_logger</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_episode_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">episode</span><span class="p">,</span> <span class="n">metrics_logger</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Get all the logged theta1 degree values and average them.</span>
         <span class="n">theta1s</span> <span class="o">=</span> <span class="n">episode</span><span class="o">.</span><span class="n">get_temporary_timestep_data</span><span class="p">(</span><span class="s2">&quot;theta1&quot;</span><span class="p">)</span>
         <span class="n">avg_theta1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">theta1s</span><span class="p">)</span>

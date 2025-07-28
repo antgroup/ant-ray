@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1428,8 +1428,8 @@ and artifacts to share them with others or use them in downstream tasks.</p></li
 <p>Cloud storage is the recommended persistent storage option.</p>
 </div>
 <p>Use cloud storage by specifying a bucket URI as the <a class="reference internal" href="../api/doc/ray.train.RunConfig.html#ray.train.RunConfig" title="ray.train.RunConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">RunConfig(storage_path)</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
 
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">TorchTrainer</span><span class="p">(</span>
     <span class="o">...</span><span class="p">,</span>
@@ -1446,8 +1446,8 @@ In this example, all files are uploaded to shared storage at <code class="docuti
 <section id="shared-filesystem-nfs-hdfs">
 <h2>Shared filesystem (NFS, HDFS)<a class="headerlink" href="#shared-filesystem-nfs-hdfs" title="Link to this heading">#</a></h2>
 <p>Use by specifying the shared storage path as the <a class="reference internal" href="../api/doc/ray.train.RunConfig.html#ray.train.RunConfig" title="ray.train.RunConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">RunConfig(storage_path)</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
 
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">TorchTrainer</span><span class="p">(</span>
     <span class="o">...</span><span class="p">,</span>
@@ -1472,8 +1472,8 @@ In this example, all files are saved to <code class="docutils literal notranslat
 local filesystem as the storage location for checkpoints and other artifacts.
 Results are saved to <code class="docutils literal notranslate"><span class="pre">~/ray_results</span></code> in a sub-directory with a unique auto-generated name by default,
 unless you customize this with <code class="docutils literal notranslate"><span class="pre">storage_path</span></code> and <code class="docutils literal notranslate"><span class="pre">name</span></code> in <a class="reference internal" href="../api/doc/ray.train.RunConfig.html#ray.train.RunConfig" title="ray.train.RunConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">RunConfig</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
 
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">TorchTrainer</span><span class="p">(</span>
     <span class="o">...</span><span class="p">,</span>
@@ -1519,10 +1519,10 @@ to be a qualified filesystem path <em>without the protocol prefix</em>.</p>
 then the <code class="docutils literal notranslate"><span class="pre">storage_path</span></code> should be <code class="docutils literal notranslate"><span class="pre">bucket-name/sub-path/</span></code> with the <code class="docutils literal notranslate"><span class="pre">s3://</span></code> stripped.
 See the example below for example usage.</p>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyarrow.fs</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
 
 <span class="n">fs</span> <span class="o">=</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">(</span>
     <span class="n">endpoint_override</span><span class="o">=</span><span class="s2">&quot;http://localhost:9000&quot;</span><span class="p">,</span>
@@ -1546,8 +1546,8 @@ See the example below for example usage.</p>
 such as <code class="docutils literal notranslate"><span class="pre">s3fs</span></code>, <code class="docutils literal notranslate"><span class="pre">gcsfs</span></code>, etc.</p>
 <p>You can use any of these implementations by wrapping the <code class="docutils literal notranslate"><span class="pre">fsspec</span></code> filesystem with a <code class="docutils literal notranslate"><span class="pre">pyarrow.fs</span></code> utility:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make sure to install: `pip install -U s3fs`</span>
-<span class="kn">import</span> <span class="nn">s3fs</span>
-<span class="kn">import</span> <span class="nn">pyarrow.fs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">s3fs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
 
 <span class="n">s3_fs</span> <span class="o">=</span> <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">(</span>
     <span class="n">key</span><span class="o">=</span><span class="s1">&#39;miniokey...&#39;</span><span class="p">,</span>
@@ -1573,8 +1573,8 @@ such as <code class="docutils literal notranslate"><span class="pre">s3fs</span>
 <p>You can follow the <a class="reference internal" href="#custom-storage-filesystem"><span class="std std-ref">examples shown above</span></a> to configure
 a custom S3 filesystem to work with MinIO.</p>
 <p>Note that including these as query parameters in the <code class="docutils literal notranslate"><span class="pre">storage_path</span></code> URI directly is another option:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
 
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">TorchTrainer</span><span class="p">(</span>
     <span class="o">...</span><span class="p">,</span>
@@ -1596,14 +1596,14 @@ and how they’re structured in storage.</p>
 <p class="admonition-title">See also</p>
 <p>This example includes checkpointing, which is covered in detail in <a class="reference internal" href="checkpoints.html#train-checkpointing"><span class="std std-ref">Saving and Loading Checkpoints</span></a>.</p>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">import</span> <span class="nn">ray.train</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
 
-<span class="k">def</span> <span class="nf">train_fn</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_fn</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
         <span class="c1"># Training logic here</span>
         <span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">}</span>
@@ -1666,11 +1666,11 @@ have a mirrored working directory to access the same relative paths.</p>
 <p>One way to achieve this is setting the
 <a class="reference internal" href="../../ray-core/handling-dependencies.html#workflow-local-files"><span class="std std-ref">working directory in the Ray runtime environment</span></a>.</p>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray.train</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
 
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;RAY_CHDIR_TO_TRIAL_DIR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
 
@@ -1681,7 +1681,7 @@ have a mirrored working directory to access the same relative paths.</p>
 <span class="c1"># Set the working directory in the Ray runtime environment</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">runtime_env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;working_dir&quot;</span><span class="p">:</span> <span class="s2">&quot;.&quot;</span><span class="p">})</span>
 
-<span class="k">def</span> <span class="nf">train_fn_per_worker</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_fn_per_worker</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="c1"># Check that each worker can access the working directory</span>
     <span class="c1"># NOTE: The working directory is copied to each worker and is read only.</span>
     <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">&quot;./data.txt&quot;</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
@@ -1754,7 +1754,7 @@ co-located on the same node, make sure that workers don’t delete files within 
 shared working directory.</p>
 <p>A best practice is to only write artifacts from a single worker unless you
 really need artifacts from multiple.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
 
 <span class="k">if</span> <span class="n">train</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_world_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
     <span class="c1"># Only the global rank 0 worker saves artifacts.</span>

@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1536,13 +1536,13 @@ This will allow you to download profiling files from other nodes.</p>
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-0">
 Actors</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">memray</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">memray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Every memory allocation after `__enter__` method will be tracked.</span>
         <span class="n">memray</span><span class="o">.</span><span class="n">Tracker</span><span class="p">(</span>
             <span class="s2">&quot;/tmp/ray/session_latest/logs/&quot;</span>
@@ -1550,7 +1550,7 @@ Actors</label><div class="sd-tab-content docutils">
         <span class="p">)</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="nb">bytearray</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;1&quot;</span> <span class="o">*</span> <span class="mi">1000000</span><span class="p">)]</span>
 
-    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;1&quot;</span> <span class="o">*</span> <span class="mi">1000000</span><span class="p">))</span>
 
 
@@ -1563,12 +1563,12 @@ Actors</label><div class="sd-tab-content docutils">
 </input><label class="sd-tab-label" for="sd-tab-item-1">
 Tasks</label><div class="sd-tab-content docutils">
 <p>Note that tasks have a shorter lifetime, so there could be lots of memory profiling files.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">memray</span>  <span class="c1"># noqa</span>
-<span class="kn">import</span> <span class="nn">ray</span>  <span class="c1"># noqa</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">memray</span>  <span class="c1"># noqa</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>  <span class="c1"># noqa</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">():</span>
     <span class="k">with</span> <span class="n">memray</span><span class="o">.</span><span class="n">Tracker</span><span class="p">(</span>
         <span class="s2">&quot;/tmp/ray/session_latest/logs/&quot;</span>
         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_task_id</span><span class="p">()</span><span class="si">}</span><span class="s2">_mem_profile.bin&quot;</span>

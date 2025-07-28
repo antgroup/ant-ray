@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1392,27 +1392,27 @@ document.write(`
                   
   <section id="xgboost-dynamic-resources-example">
 <h1>XGBoost Dynamic Resources Example<a class="headerlink" href="#xgboost-dynamic-resources-example" title="Link to this heading">#</a></h1>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">sklearn.datasets</span>
-<span class="kn">import</span> <span class="nn">sklearn.metrics</span>
-<span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sklearn.datasets</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sklearn.metrics</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xgboost</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xgb</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune.execution.placement_groups</span> <span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
-<span class="kn">from</span> <span class="nn">ray.tune.experiment</span> <span class="kn">import</span> <span class="n">Trial</span>
-<span class="kn">from</span> <span class="nn">ray.tune.integration.xgboost</span> <span class="kn">import</span> <span class="n">TuneReportCheckpointCallback</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers</span> <span class="kn">import</span> <span class="n">ASHAScheduler</span><span class="p">,</span> <span class="n">ResourceChangingScheduler</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.placement_groups</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.integration.xgboost</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneReportCheckpointCallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ASHAScheduler</span><span class="p">,</span> <span class="n">ResourceChangingScheduler</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.execution.tune_controller</span> <span class="kn">import</span> <span class="n">TuneController</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.tune_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneController</span>
 
 <span class="n">CHECKPOINT_FILENAME</span> <span class="o">=</span> <span class="s2">&quot;booster-checkpoint.json&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">get_best_model_checkpoint</span><span class="p">(</span><span class="n">best_result</span><span class="p">:</span> <span class="s2">&quot;ray.train.Result&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_best_model_checkpoint</span><span class="p">(</span><span class="n">best_result</span><span class="p">:</span> <span class="s2">&quot;ray.train.Result&quot;</span><span class="p">):</span>
     <span class="n">best_bst</span> <span class="o">=</span> <span class="n">TuneReportCheckpointCallback</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span>
         <span class="n">best_result</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">CHECKPOINT_FILENAME</span>
     <span class="p">)</span>
@@ -1425,7 +1425,7 @@ document.write(`
 
 <span class="c1"># our train function needs to be able to checkpoint</span>
 <span class="c1"># to work with ResourceChangingScheduler</span>
-<span class="k">def</span> <span class="nf">train_breast_cancer</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_breast_cancer</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
     <span class="c1"># This is a simple training function to be passed into Tune</span>
     <span class="c1"># Load dataset</span>
     <span class="n">data</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">load_breast_cancer</span><span class="p">(</span><span class="n">return_X_y</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1466,7 +1466,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">tune_xgboost</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">tune_xgboost</span><span class="p">():</span>
     <span class="n">search_space</span> <span class="o">=</span> <span class="p">{</span>
         <span class="c1"># You can mix constants with search space objects.</span>
         <span class="s2">&quot;objective&quot;</span><span class="p">:</span> <span class="s2">&quot;binary:logistic&quot;</span><span class="p">,</span>
@@ -1484,7 +1484,7 @@ document.write(`
         <span class="n">max_t</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">grace_period</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">reduction_factor</span><span class="o">=</span><span class="mi">2</span>  <span class="c1"># 16 training iterations</span>
     <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">example_resources_allocation_function</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">example_resources_allocation_function</span><span class="p">(</span>
         <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span>
         <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span>
         <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>

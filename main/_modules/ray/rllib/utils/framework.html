@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,31 +1389,31 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.utils.framework</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
 
-<span class="kn">import</span> <span class="nn">tree</span>  <span class="c1"># pip install dm_tree</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tree</span>  <span class="c1"># pip install dm_tree</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="n">Deprecated</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TensorShape</span><span class="p">,</span>
     <span class="n">TensorStructType</span><span class="p">,</span>
     <span class="n">TensorType</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">convert_to_tensor</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_to_tensor</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">TensorStructType</span><span class="p">,</span>
     <span class="n">framework</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1429,7 +1429,7 @@ document.write(`
 <span class="sd">        The converted tensor struct matching the input data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">framework</span> <span class="o">==</span> <span class="s2">&quot;torch&quot;</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">ray.rllib.utils.torch_utils</span> <span class="kn">import</span> <span class="n">convert_to_torch_tensor</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.torch_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert_to_torch_tensor</span>
 
         <span class="k">return</span> <span class="n">convert_to_torch_tensor</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">framework</span> <span class="o">==</span> <span class="s2">&quot;tf2&quot;</span><span class="p">:</span>
@@ -1442,7 +1442,7 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">get_device</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="s2">&quot;AlgorithmConfig&quot;</span><span class="p">,</span> <span class="n">num_gpus_requested</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_device</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="s2">&quot;AlgorithmConfig&quot;</span><span class="p">,</span> <span class="n">num_gpus_requested</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a single device (CPU or some GPU) depending on a config.</span>
 
 <span class="sd">    Args:</span>
@@ -1461,7 +1461,7 @@ document.write(`
         <span class="c1"># TODO (Kourosh): Instead of using _TorchAccelerator, we should use the public</span>
         <span class="c1">#  API in ray.train but allow for session to be None without any errors raised.</span>
         <span class="k">if</span> <span class="n">num_gpus_requested</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.air._internal.torch_utils</span> <span class="kn">import</span> <span class="n">get_devices</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.torch_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_devices</span>
 
             <span class="c1"># `get_devices()` returns a list that contains the 0th device if</span>
             <span class="c1"># it is called from outside a Ray Train session. It&#39;s necessary to give</span>
@@ -1494,7 +1494,7 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">try_import_jax</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">try_import_jax</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Tries importing JAX and FLAX and returns both modules (or Nones).</span>
 
 <span class="sd">    Args:</span>
@@ -1511,8 +1511,8 @@ document.write(`
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">jax</span>
-        <span class="kn">import</span> <span class="nn">flax</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">flax</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
@@ -1526,7 +1526,7 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">try_import_tf</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">try_import_tf</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Tries importing tf and returns the module (or None).</span>
 
 <span class="sd">    Args:</span>
@@ -1561,7 +1561,7 @@ document.write(`
 
     <span class="k">else</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf_module</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf_module</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
@@ -1592,35 +1592,35 @@ document.write(`
 
 
 <span class="c1"># Fake module for tf.</span>
-<span class="k">class</span> <span class="nc">_TFStub</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_TFStub</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keras</span> <span class="o">=</span> <span class="n">_KerasStub</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># if tf should return False</span>
         <span class="k">return</span> <span class="kc">False</span>
 
 
 <span class="c1"># Fake module for tf.keras.</span>
-<span class="k">class</span> <span class="nc">_KerasStub</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_KerasStub</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Model</span> <span class="o">=</span> <span class="n">_FakeTfClassStub</span>
 
 
 <span class="c1"># Fake classes under keras (e.g for tf.keras.Model)</span>
-<span class="k">class</span> <span class="nc">_FakeTfClassStub</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_FakeTfClassStub</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;Could not import `tensorflow`. Try pip install tensorflow.&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">tf_function</span><span class="p">(</span><span class="n">tf_module</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">tf_function</span><span class="p">(</span><span class="n">tf_module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Conditional decorator for @tf.function.</span>
 
 <span class="sd">    Use @tf_function(tf) instead to avoid errors if tf is not installed.&quot;&quot;&quot;</span>
 
     <span class="c1"># The actual decorator to use (pass in `tf` (which could be None)).</span>
-    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
         <span class="c1"># If tf not installed -&gt; return function as is (won&#39;t be used anyways).</span>
         <span class="k">if</span> <span class="n">tf_module</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">tf_module</span><span class="o">.</span><span class="n">executing_eagerly</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">func</span>
@@ -1631,7 +1631,7 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">try_import_tfp</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">try_import_tfp</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Tries importing tfp and returns the module (or None).</span>
 
 <span class="sd">    Args:</span>
@@ -1648,7 +1648,7 @@ document.write(`
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">tensorflow_probability</span> <span class="k">as</span> <span class="nn">tfp</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow_probability</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tfp</span>
 
         <span class="k">return</span> <span class="n">tfp</span>
     <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -1658,8 +1658,8 @@ document.write(`
 
 
 <span class="c1"># Fake module for torch.nn.</span>
-<span class="k">class</span> <span class="nc">_NNStub</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_NNStub</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
         <span class="c1"># Fake nn.functional module within torch.nn.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">functional</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Module</span> <span class="o">=</span> <span class="n">_FakeTorchClassStub</span>
@@ -1667,13 +1667,13 @@ document.write(`
 
 
 <span class="c1"># Fake class for e.g. torch.nn.Module to allow it to be inherited from.</span>
-<span class="k">class</span> <span class="nc">_FakeTorchClassStub</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_FakeTorchClassStub</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;Could not import `torch`. Try pip install torch.&quot;</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_ParallelStub</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_ParallelStub</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">DataParallel</span> <span class="o">=</span> <span class="n">_FakeTorchClassStub</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">DistributedDataParallel</span> <span class="o">=</span> <span class="n">_FakeTorchClassStub</span>
 
@@ -1681,7 +1681,7 @@ document.write(`
 <div class="viewcode-block" id="try_import_torch">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.utils.framework.try_import_torch.html#ray.rllib.utils.framework.try_import_torch">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">try_import_torch</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">try_import_torch</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Tries importing torch and returns the module (or None).</span>
 
 <span class="sd">    Args:</span>
@@ -1698,8 +1698,8 @@ document.write(`
         <span class="k">return</span> <span class="n">_torch_stubs</span><span class="p">()</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">torch</span>
-        <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
 
         <span class="k">return</span> <span class="n">torch</span><span class="p">,</span> <span class="n">nn</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -1713,13 +1713,13 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_torch_stubs</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_torch_stubs</span><span class="p">():</span>
     <span class="n">nn</span> <span class="o">=</span> <span class="n">_NNStub</span><span class="p">()</span>
     <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">nn</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">get_variable</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span>
     <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">framework</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;tf&quot;</span><span class="p">,</span>
     <span class="n">trainable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1755,7 +1755,7 @@ document.write(`
 <span class="sd">        python primitive).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">framework</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;tf2&quot;</span><span class="p">,</span> <span class="s2">&quot;tf&quot;</span><span class="p">]:</span>
-        <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
 
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">dtype</span> <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span>
             <span class="n">value</span><span class="p">,</span>
@@ -1798,7 +1798,7 @@ document.write(`
     <span class="n">new</span><span class="o">=</span><span class="s2">&quot;rllib/models/utils.py::get_activation_fn&quot;</span><span class="p">,</span>
     <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_activation_fn</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">framework</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;tf&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_activation_fn</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">framework</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;tf&quot;</span><span class="p">):</span>
     <span class="k">pass</span>
 </pre></div>
 

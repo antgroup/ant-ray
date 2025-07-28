@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1404,11 +1404,11 @@ function, but on different data.</p>
 Actors.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">train_loop_per_worker</span></code> function is expected to take in either 0 or 1
 arguments:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train_loop_per_worker</span><span class="p">():</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">train_loop_per_worker</span><span class="p">():</span>
     <span class="o">...</span>
 </pre></div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train_loop_per_worker</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">train_loop_per_worker</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
     <span class="o">...</span>
 </pre></div>
 </div>
@@ -1422,9 +1422,9 @@ shards that can then be accessed by <code class="docutils literal notranslate"><
 <code class="docutils literal notranslate"><span class="pre">train.get_dataset_shard(...)</span></code> will return the the entire Dataset.</p>
 <p>Inside the <code class="docutils literal notranslate"><span class="pre">train_loop_per_worker</span></code> function, you can use any of the
 <a class="reference internal" href="../api.html#train-loop-api"><span class="std std-ref">Ray Train loop methods</span></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
 
-<span class="k">def</span> <span class="nf">train_loop_per_worker</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_loop_per_worker</span><span class="p">():</span>
     <span class="c1"># Report intermediate results for callbacks or logging and</span>
     <span class="c1"># checkpoint data.</span>
     <span class="n">train</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
@@ -1449,12 +1449,12 @@ shards that can then be accessed by <code class="docutils literal notranslate"><
 used or persisted anywhere.</p>
 <p><strong>How do I use DataParallelTrainer or any of its subclasses?</strong></p>
 <p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.data_parallel_trainer</span> <span class="kn">import</span> <span class="n">DataParallelTrainer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.data_parallel_trainer</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataParallelTrainer</span>
 
-<span class="k">def</span> <span class="nf">train_loop_for_worker</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_loop_for_worker</span><span class="p">():</span>
     <span class="n">dataset_shard_for_this_worker</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">get_dataset_shard</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
 
     <span class="c1"># 3 items for 3 workers, each worker gets 1 item</span>
@@ -1490,36 +1490,36 @@ distributed Tensorflow on each actor.</p></li>
 </ul>
 </div></blockquote>
 <p>For 1, you can set a predefined training loop in __init__</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train.data_parallel_trainer</span> <span class="kn">import</span> <span class="n">DataParallelTrainer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.data_parallel_trainer</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataParallelTrainer</span>
 
-<span class="k">class</span> <span class="nc">MyDataParallelTrainer</span><span class="p">(</span><span class="n">DataParallelTrainer</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyDataParallelTrainer</span><span class="p">(</span><span class="n">DataParallelTrainer</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">predefined_train_loop_per_worker</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="mi">1</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">predefined_train_loop_per_worker</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>For 2, you can implement the <code class="docutils literal notranslate"><span class="pre">ray.train.Backend</span></code> and <code class="docutils literal notranslate"><span class="pre">ray.train.BackendConfig</span></code>
 interfaces.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">ray.train.backend</span> <span class="kn">import</span> <span class="n">Backend</span><span class="p">,</span> <span class="n">BackendConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">Backend</span><span class="p">,</span> <span class="n">BackendConfig</span>
 
-<span class="k">class</span> <span class="nc">MyBackend</span><span class="p">(</span><span class="n">Backend</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">on_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_group</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">set_env_var</span><span class="p">(</span><span class="n">env_var_value</span><span class="p">):</span>
-            <span class="kn">import</span> <span class="nn">os</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyBackend</span><span class="p">(</span><span class="n">Backend</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_group</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">set_env_var</span><span class="p">(</span><span class="n">env_var_value</span><span class="p">):</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
             <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MY_ENV_VAR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">env_var_value</span>
 
         <span class="n">worker_group</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">set_env_var</span><span class="p">,</span> <span class="n">backend_config</span><span class="o">.</span><span class="n">env_var</span><span class="p">)</span>
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">MyBackendConfig</span><span class="p">(</span><span class="n">BackendConfig</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyBackendConfig</span><span class="p">(</span><span class="n">BackendConfig</span><span class="p">):</span>
     <span class="n">env_var</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default_value&quot;</span>
 
-    <span class="k">def</span> <span class="nf">backend_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">backend_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">MyBackend</span>
 
-<span class="k">class</span> <span class="nc">MyTrainer</span><span class="p">(</span><span class="n">DataParallelTrainer</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_loop_per_worker</span><span class="p">,</span> <span class="n">my_backend_config</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyTrainer</span><span class="p">(</span><span class="n">DataParallelTrainer</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_loop_per_worker</span><span class="p">,</span> <span class="n">my_backend_config</span><span class="p">:</span>
         <span class="n">MyBackendConfig</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>

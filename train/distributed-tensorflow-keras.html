@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1411,13 +1411,13 @@ for more information.</p>
 Ray Train also works with vanilla TensorFlow.</p>
 <section id="quickstart">
 <h2>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading">#</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.tensorflow</span> <span class="kn">import</span> <span class="n">TensorflowTrainer</span>
-<span class="kn">from</span> <span class="nn">ray.train.tensorflow.keras</span> <span class="kn">import</span> <span class="n">ReportCheckpointCallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.tensorflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorflowTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.tensorflow.keras</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReportCheckpointCallback</span>
 
 
 <span class="c1"># If using GPUs, set this to True.</span>
@@ -1428,7 +1428,7 @@ Ray Train also works with vanilla TensorFlow.</p>
 <span class="n">size</span> <span class="o">=</span> <span class="mi">100</span>
 
 
-<span class="k">def</span> <span class="nf">build_model</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_model</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">Model</span><span class="p">:</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
         <span class="p">[</span>
             <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">InputLayer</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="p">()),</span>
@@ -1441,7 +1441,7 @@ Ray Train also works with vanilla TensorFlow.</p>
     <span class="k">return</span> <span class="n">model</span>
 
 
-<span class="k">def</span> <span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
     <span class="n">batch_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;batch_size&quot;</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
     <span class="n">epochs</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;epochs&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 
@@ -1533,8 +1533,8 @@ at the beginning of your <code class="docutils literal notranslate"><span class=
 execute training. For distributed Tensorflow,
 use a <a class="reference internal" href="api/doc/ray.train.tensorflow.TensorflowTrainer.html#ray.train.tensorflow.TensorflowTrainer" title="ray.train.tensorflow.TensorflowTrainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">TensorflowTrainer</span></code></a>
 that you can setup like this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.tensorflow</span> <span class="kn">import</span> <span class="n">TensorflowTrainer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.tensorflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorflowTrainer</span>
 <span class="c1"># For GPU Training, set `use_gpu` to True.</span>
 <span class="n">use_gpu</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">TensorflowTrainer</span><span class="p">(</span>
@@ -1545,8 +1545,8 @@ that you can setup like this:</p>
 </div>
 <p>To customize the backend setup, you can pass a
 <a class="reference internal" href="api/doc/ray.train.tensorflow.TensorflowConfig.html#ray.train.tensorflow.TensorflowConfig" title="ray.train.tensorflow.TensorflowConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">TensorflowConfig</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.tensorflow</span> <span class="kn">import</span> <span class="n">TensorflowTrainer</span><span class="p">,</span> <span class="n">TensorflowConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.tensorflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorflowTrainer</span><span class="p">,</span> <span class="n">TensorflowConfig</span>
 
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">TensorflowTrainer</span><span class="p">(</span>
     <span class="n">train_func</span><span class="p">,</span>
@@ -1578,19 +1578,19 @@ a TensorFlow dataset in your training function so that you can use the Keras
 API for model training.</p>
 <p><a class="reference external" href="https://github.com/ray-project/ray/blob/master/python/ray/train/examples/tf/tune_tensorflow_autoencoder_example.py">See this example</a>
 for distributed data loading. The relevant parts are:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train.tensorflow</span> <span class="kn">import</span> <span class="n">prepare_dataset_shard</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.tensorflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">prepare_dataset_shard</span>
 
-<span class="k">def</span> <span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
     <span class="c1"># ...</span>
 
     <span class="c1"># Get dataset shard from Ray Train</span>
     <span class="n">dataset_shard</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_dataset_shard</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
 
     <span class="c1"># Define a helper function to build a TensorFlow dataset</span>
-    <span class="k">def</span> <span class="nf">to_tf_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">to_tensor_iterator</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_tf_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">to_tensor_iterator</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">iter_tf_batches</span><span class="p">(</span>
                 <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">dtypes</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span>
             <span class="p">):</span>
@@ -1624,9 +1624,9 @@ to Ray Train. This reporting logs the results to the console output and appends 
 local log files. The logging also triggers <a class="reference internal" href="user-guides/checkpoints.html#train-dl-configure-checkpoints"><span class="std std-ref">checkpoint bookkeeping</span></a>.</p>
 <p>The easiest way to report your results with Keras is by using the
 <a class="reference internal" href="api/doc/ray.train.tensorflow.keras.ReportCheckpointCallback.html#ray.train.tensorflow.keras.ReportCheckpointCallback" title="ray.train.tensorflow.keras.ReportCheckpointCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReportCheckpointCallback</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train.tensorflow.keras</span> <span class="kn">import</span> <span class="n">ReportCheckpointCallback</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.tensorflow.keras</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReportCheckpointCallback</span>
 
-<span class="k">def</span> <span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
     <span class="c1"># ...</span>
     <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
         <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">ReportCheckpointCallback</span><span class="p">()])</span>
@@ -1649,18 +1649,18 @@ workers on the <code class="docutils literal notranslate"><span class="pre">Trai
 the <a class="reference internal" href="api/doc/ray.train.Result.html#ray.train.Result" title="ray.train.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a>, and access the best saved checkpoints with the <code class="docutils literal notranslate"><span class="pre">best_checkpoints</span></code>
 attribute.</p>
 <p>These concrete examples demonstrate how Ray Train appropriately saves checkpoints, model weights but not models, in distributed training.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.tensorflow</span> <span class="kn">import</span> <span class="n">TensorflowTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.tensorflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorflowTrainer</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="k">def</span> <span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
     <span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="c1"># create a toy dataset</span>
     <span class="c1"># data   : X - dim = (n, 4)</span>
@@ -1699,17 +1699,17 @@ attribute.</p>
 directory</span></a> of each run.</p>
 <section id="load-checkpoints">
 <h3>Load checkpoints<a class="headerlink" href="#load-checkpoints" title="Link to this heading">#</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.tensorflow</span> <span class="kn">import</span> <span class="n">TensorflowTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.tensorflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorflowTrainer</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="k">def</span> <span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
     <span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="c1"># create a toy dataset</span>
     <span class="c1"># data   : X - dim = (n, 4)</span>

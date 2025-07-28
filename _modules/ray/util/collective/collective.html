@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1393,14 +1393,14 @@ document.write(`
                   
   <h1>Source code for ray.util.collective.collective</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;APIs exposed under the namespace ray.util.collective.&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.util.collective</span> <span class="kn">import</span> <span class="n">types</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.collective</span><span class="w"> </span><span class="kn">import</span> <span class="n">types</span>
 
 <span class="n">_NCCL_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">_GLOO_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>
@@ -1408,7 +1408,7 @@ document.write(`
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.util.collective.collective_group.nccl_collective_group</span> <span class="kn">import</span> <span class="n">NCCLGroup</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.collective.collective_group.nccl_collective_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">NCCLGroup</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">_NCCL_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
@@ -1418,22 +1418,22 @@ document.write(`
     <span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.util.collective.collective_group.gloo_collective_group</span> <span class="kn">import</span> <span class="n">GLOOGroup</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.collective.collective_group.gloo_collective_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">GLOOGroup</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">_GLOO_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">nccl_available</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">nccl_available</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">_NCCL_AVAILABLE</span>
 
 
-<span class="k">def</span> <span class="nf">gloo_available</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gloo_available</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">_GLOO_AVAILABLE</span>
 
 
 <div class="viewcode-block" id="GroupManager">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.GroupManager">[docs]</a>
-<span class="k">class</span> <span class="nc">GroupManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GroupManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Use this class to manage the collective groups we created so far.</span>
 
 <span class="sd">    Each process will have an instance of `GroupManager`. Each process</span>
@@ -1441,13 +1441,13 @@ document.write(`
 <span class="sd">    and other metadata are stored in the global `_group_mgr` object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name_group_map</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_group_name_map</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="GroupManager.create_collective_group">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.GroupManager.create_collective_group">[docs]</a>
-    <span class="k">def</span> <span class="nf">create_collective_group</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_collective_group</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">world_size</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">group_name</span><span class="p">,</span> <span class="n">gloo_timeout</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The entry to create new collective groups in the manager.</span>
@@ -1478,12 +1478,12 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_group_map</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span></div>
 
 
-    <span class="k">def</span> <span class="nf">is_group_exist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_group_exist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_name</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_group_map</span>
 
 <div class="viewcode-block" id="GroupManager.get_group_by_name">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.GroupManager.get_group_by_name">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_group_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_group_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the collective group handle by its name.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_group_exist</span><span class="p">(</span><span class="n">group_name</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;The group &#39;</span><span class="si">{}</span><span class="s2">&#39; is not initialized.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">group_name</span><span class="p">))</span>
@@ -1493,7 +1493,7 @@ document.write(`
 
 <div class="viewcode-block" id="GroupManager.destroy_collective_group">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.GroupManager.destroy_collective_group">[docs]</a>
-    <span class="k">def</span> <span class="nf">destroy_collective_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">destroy_collective_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Group destructor.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_group_exist</span><span class="p">(</span><span class="n">group_name</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;The group &#39;</span><span class="si">{}</span><span class="s2">&#39; does not exist.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">group_name</span><span class="p">))</span>
@@ -1523,7 +1523,7 @@ document.write(`
 
 <div class="viewcode-block" id="is_group_initialized">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.is_group_initialized">[docs]</a>
-<span class="k">def</span> <span class="nf">is_group_initialized</span><span class="p">(</span><span class="n">group_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_group_initialized</span><span class="p">(</span><span class="n">group_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the group is initialized in this process by the group name.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_group_mgr</span><span class="o">.</span><span class="n">is_group_exist</span><span class="p">(</span><span class="n">group_name</span><span class="p">)</span></div>
 
@@ -1531,7 +1531,7 @@ document.write(`
 
 <div class="viewcode-block" id="init_collective_group">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.init_collective_group">[docs]</a>
-<span class="k">def</span> <span class="nf">init_collective_group</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">init_collective_group</span><span class="p">(</span>
     <span class="n">world_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">backend</span><span class="o">=</span><span class="n">types</span><span class="o">.</span><span class="n">Backend</span><span class="o">.</span><span class="n">NCCL</span><span class="p">,</span>
@@ -1571,7 +1571,7 @@ document.write(`
 
 <div class="viewcode-block" id="create_collective_group">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.create_collective_group">[docs]</a>
-<span class="k">def</span> <span class="nf">create_collective_group</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_collective_group</span><span class="p">(</span>
     <span class="n">actors</span><span class="p">,</span>
     <span class="n">world_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">ranks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
@@ -1626,7 +1626,7 @@ document.write(`
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Ranks cannot be greater than world_size.&quot;</span><span class="p">)</span>
 
     <span class="c1"># avoid a circular dependency</span>
-    <span class="kn">from</span> <span class="nn">ray.util.collective.util</span> <span class="kn">import</span> <span class="n">Info</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.collective.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">Info</span>
 
     <span class="c1"># store the information into a NamedActor that can be accessed later.</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;info_&quot;</span> <span class="o">+</span> <span class="n">group_name</span>
@@ -1640,7 +1640,7 @@ document.write(`
 <span class="c1"># TODO (we need a declarative destroy() API here.)</span>
 <div class="viewcode-block" id="destroy_collective_group">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.destroy_collective_group">[docs]</a>
-<span class="k">def</span> <span class="nf">destroy_collective_group</span><span class="p">(</span><span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">destroy_collective_group</span><span class="p">(</span><span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Destroy a collective group given its group name.&quot;&quot;&quot;</span>
     <span class="n">_check_inside_actor</span><span class="p">()</span>
     <span class="k">global</span> <span class="n">_group_mgr</span>
@@ -1650,7 +1650,7 @@ document.write(`
 
 <div class="viewcode-block" id="get_rank">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.get_rank">[docs]</a>
-<span class="k">def</span> <span class="nf">get_rank</span><span class="p">(</span><span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_rank</span><span class="p">(</span><span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the rank of this process in the given group.</span>
 
 <span class="sd">    Args:</span>
@@ -1671,7 +1671,7 @@ document.write(`
 
 <div class="viewcode-block" id="get_collective_group_size">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.get_collective_group_size">[docs]</a>
-<span class="k">def</span> <span class="nf">get_collective_group_size</span><span class="p">(</span><span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_collective_group_size</span><span class="p">(</span><span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the size of the collective group with the given name.</span>
 
 <span class="sd">    Args:</span>
@@ -1691,7 +1691,7 @@ document.write(`
 
 <div class="viewcode-block" id="allreduce">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.allreduce">[docs]</a>
-<span class="k">def</span> <span class="nf">allreduce</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">types</span><span class="o">.</span><span class="n">ReduceOp</span><span class="o">.</span><span class="n">SUM</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">allreduce</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">types</span><span class="o">.</span><span class="n">ReduceOp</span><span class="o">.</span><span class="n">SUM</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Collective allreduce the tensor across the group.</span>
 
 <span class="sd">    Args:</span>
@@ -1712,7 +1712,7 @@ document.write(`
 
 <div class="viewcode-block" id="allreduce_multigpu">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.allreduce_multigpu">[docs]</a>
-<span class="k">def</span> <span class="nf">allreduce_multigpu</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">allreduce_multigpu</span><span class="p">(</span>
     <span class="n">tensor_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">types</span><span class="o">.</span><span class="n">ReduceOp</span><span class="o">.</span><span class="n">SUM</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Collective allreduce a list of tensors across the group.</span>
@@ -1737,7 +1737,7 @@ document.write(`
 
 <div class="viewcode-block" id="barrier">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.barrier">[docs]</a>
-<span class="k">def</span> <span class="nf">barrier</span><span class="p">(</span><span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">barrier</span><span class="p">(</span><span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Barrier all processes in the collective group.</span>
 
 <span class="sd">    Args:</span>
@@ -1753,7 +1753,7 @@ document.write(`
 
 <div class="viewcode-block" id="reduce">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.reduce">[docs]</a>
-<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reduce</span><span class="p">(</span>
     <span class="n">tensor</span><span class="p">,</span> <span class="n">dst_rank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">types</span><span class="o">.</span><span class="n">ReduceOp</span><span class="o">.</span><span class="n">SUM</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reduce the tensor across the group to the destination rank.</span>
@@ -1782,7 +1782,7 @@ document.write(`
 
 <div class="viewcode-block" id="reduce_multigpu">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.reduce_multigpu">[docs]</a>
-<span class="k">def</span> <span class="nf">reduce_multigpu</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reduce_multigpu</span><span class="p">(</span>
     <span class="n">tensor_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
     <span class="n">dst_rank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">dst_tensor</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -1821,7 +1821,7 @@ document.write(`
 
 <div class="viewcode-block" id="broadcast">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.broadcast">[docs]</a>
-<span class="k">def</span> <span class="nf">broadcast</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">src_rank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">broadcast</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">src_rank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Broadcast the tensor from a source process to all others.</span>
 
 <span class="sd">    Args:</span>
@@ -1846,7 +1846,7 @@ document.write(`
 
 <div class="viewcode-block" id="broadcast_multigpu">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.broadcast_multigpu">[docs]</a>
-<span class="k">def</span> <span class="nf">broadcast_multigpu</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">broadcast_multigpu</span><span class="p">(</span>
     <span class="n">tensor_list</span><span class="p">,</span> <span class="n">src_rank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">src_tensor</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Broadcast the tensor from a source GPU to all other GPUs.</span>
@@ -1877,7 +1877,7 @@ document.write(`
 
 <div class="viewcode-block" id="allgather">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.allgather">[docs]</a>
-<span class="k">def</span> <span class="nf">allgather</span><span class="p">(</span><span class="n">tensor_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">allgather</span><span class="p">(</span><span class="n">tensor_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Allgather tensors from each process of the group into a list.</span>
 
 <span class="sd">    Args:</span>
@@ -1905,7 +1905,7 @@ document.write(`
 
 <div class="viewcode-block" id="allgather_multigpu">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.allgather_multigpu">[docs]</a>
-<span class="k">def</span> <span class="nf">allgather_multigpu</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">allgather_multigpu</span><span class="p">(</span>
     <span class="n">output_tensor_lists</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">input_tensor_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Allgather tensors from each gpus of the group into lists.</span>
@@ -1932,7 +1932,7 @@ document.write(`
 
 <div class="viewcode-block" id="reducescatter">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.reducescatter">[docs]</a>
-<span class="k">def</span> <span class="nf">reducescatter</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reducescatter</span><span class="p">(</span>
     <span class="n">tensor</span><span class="p">,</span> <span class="n">tensor_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">types</span><span class="o">.</span><span class="n">ReduceOp</span><span class="o">.</span><span class="n">SUM</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reducescatter a list of tensors across the group.</span>
@@ -1965,7 +1965,7 @@ document.write(`
 
 <div class="viewcode-block" id="reducescatter_multigpu">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.reducescatter_multigpu">[docs]</a>
-<span class="k">def</span> <span class="nf">reducescatter_multigpu</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reducescatter_multigpu</span><span class="p">(</span>
     <span class="n">output_tensor_list</span><span class="p">,</span>
     <span class="n">input_tensor_lists</span><span class="p">,</span>
     <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
@@ -1997,7 +1997,7 @@ document.write(`
 
 <div class="viewcode-block" id="send">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.send">[docs]</a>
-<span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">dst_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">dst_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Send a tensor to a remote process synchronously.</span>
 
 <span class="sd">    Args:</span>
@@ -2021,7 +2021,7 @@ document.write(`
 
 <div class="viewcode-block" id="send_multigpu">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.send_multigpu">[docs]</a>
-<span class="k">def</span> <span class="nf">send_multigpu</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">send_multigpu</span><span class="p">(</span>
     <span class="n">tensor</span><span class="p">,</span>
     <span class="n">dst_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">dst_gpu_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -2066,7 +2066,7 @@ document.write(`
 
 <div class="viewcode-block" id="recv">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.recv">[docs]</a>
-<span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">src_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">recv</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">src_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Receive a tensor from a remote process synchronously.</span>
 
 <span class="sd">    Args:</span>
@@ -2090,7 +2090,7 @@ document.write(`
 
 <div class="viewcode-block" id="recv_multigpu">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.recv_multigpu">[docs]</a>
-<span class="k">def</span> <span class="nf">recv_multigpu</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">recv_multigpu</span><span class="p">(</span>
     <span class="n">tensor</span><span class="p">,</span>
     <span class="n">src_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">src_gpu_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -2133,7 +2133,7 @@ document.write(`
 
 <div class="viewcode-block" id="synchronize">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.synchronize">[docs]</a>
-<span class="k">def</span> <span class="nf">synchronize</span><span class="p">(</span><span class="n">gpu_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">synchronize</span><span class="p">(</span><span class="n">gpu_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Synchronize the current process to a give device.</span>
 
 <span class="sd">    Args:</span>
@@ -2144,7 +2144,7 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">types</span><span class="o">.</span><span class="n">cupy_available</span><span class="p">():</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;synchronize call requires CUDA and NCCL.&quot;</span><span class="p">)</span>
-    <span class="kn">import</span> <span class="nn">cupy</span> <span class="k">as</span> <span class="nn">cp</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
     <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Device</span><span class="p">(</span><span class="n">gpu_id</span><span class="p">)</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span></div>
 
@@ -2152,7 +2152,7 @@ document.write(`
 
 <div class="viewcode-block" id="get_group_handle">
 <a class="viewcode-back" href="../../../../ray-more-libs/ray-collective.html#ray.util.collective.collective.get_group_handle">[docs]</a>
-<span class="k">def</span> <span class="nf">get_group_handle</span><span class="p">(</span><span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_group_handle</span><span class="p">(</span><span class="n">group_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the group is initialized and return the group handle.</span>
 
 <span class="sd">    Args:</span>
@@ -2196,13 +2196,13 @@ document.write(`
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                     <span class="s2">&quot;The collective group &#39;</span><span class="si">{}</span><span class="s2">&#39; is not &quot;</span>
                     <span class="s2">&quot;initialized in the process.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">group_name</span><span class="p">)</span>
-                <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
     <span class="n">g</span> <span class="o">=</span> <span class="n">_group_mgr</span><span class="o">.</span><span class="n">get_group_by_name</span><span class="p">(</span><span class="n">group_name</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">g</span></div>
 
 
 
-<span class="k">def</span> <span class="nf">_check_single_tensor_input</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_single_tensor_input</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the tensor is with a supported type.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="k">return</span>
@@ -2218,7 +2218,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_check_backend_availability</span><span class="p">(</span><span class="n">backend</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">Backend</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_backend_availability</span><span class="p">(</span><span class="n">backend</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">Backend</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether the backend is available.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">Backend</span><span class="o">.</span><span class="n">GLOO</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">gloo_available</span><span class="p">():</span>
@@ -2228,7 +2228,7 @@ document.write(`
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;NCCL is not available.&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_check_inside_actor</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_inside_actor</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if currently it is inside a Ray actor/task.&quot;&quot;&quot;</span>
     <span class="n">worker</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">global_worker</span>
     <span class="k">if</span> <span class="n">worker</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="n">ray</span><span class="o">.</span><span class="n">WORKER_MODE</span><span class="p">:</span>
@@ -2239,7 +2239,7 @@ document.write(`
         <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_check_rank_valid</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_rank_valid</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check the rank: 0 &lt;= rank &lt; world_size.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">rank</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;rank &#39;</span><span class="si">{}</span><span class="s2">&#39; is negative.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rank</span><span class="p">))</span>
@@ -2249,7 +2249,7 @@ document.write(`
         <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_check_tensor_list_input</span><span class="p">(</span><span class="n">tensor_list</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_tensor_list_input</span><span class="p">(</span><span class="n">tensor_list</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the input is a list of supported tensor types.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tensor_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
@@ -2262,7 +2262,7 @@ document.write(`
         <span class="n">_check_single_tensor_input</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_check_tensor_lists_input</span><span class="p">(</span><span class="n">tensor_lists</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_tensor_lists_input</span><span class="p">(</span><span class="n">tensor_lists</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the input is a list of lists of supported tensor types.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tensor_lists</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
@@ -2275,7 +2275,7 @@ document.write(`
         <span class="n">_check_tensor_list_input</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_check_root_tensor_valid</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">root_tensor</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_root_tensor_valid</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">root_tensor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check the root_tensor device is 0 &lt;= root_tensor &lt; length&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">root_tensor</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;root_tensor &#39;</span><span class="si">{}</span><span class="s2">&#39; is negative.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">root_tensor</span><span class="p">))</span>

@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,33 +1392,33 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.train._internal.session</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">platform</span>
-<span class="kn">import</span> <span class="nn">queue</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Type</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">queue</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Type</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.air._internal.util</span> <span class="kn">import</span> <span class="n">RunnerThread</span><span class="p">,</span> <span class="n">StartTraceback</span>
-<span class="kn">from</span> <span class="nn">ray.air.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunnerThread</span><span class="p">,</span> <span class="n">StartTraceback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_ERROR_FETCH_TIMEOUT</span><span class="p">,</span>
     <span class="n">_RESULT_FETCH_TIMEOUT</span><span class="p">,</span>
     <span class="n">SESSION_MISUSE_LOG_ONCE_KEY</span><span class="p">,</span>
     <span class="n">TIME_THIS_ITER_S</span><span class="p">,</span>
     <span class="n">TIMESTAMP</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.accelerator</span> <span class="kn">import</span> <span class="n">Accelerator</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.storage</span> <span class="kn">import</span> <span class="n">StorageContext</span>
-<span class="kn">from</span> <span class="nn">ray.train.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.accelerator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Accelerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">StorageContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">CHECKPOINT_DIR_NAME</span><span class="p">,</span>
     <span class="n">DETAILED_AUTOFILLED_KEYS</span><span class="p">,</span>
     <span class="n">RAY_CHDIR_TO_TRIAL_DIR</span><span class="p">,</span>
@@ -1428,26 +1428,26 @@ document.write(`
     <span class="n">WORKER_PID</span><span class="p">,</span>
     <span class="n">_v2_migration_warnings_enabled</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.train.error</span> <span class="kn">import</span> <span class="n">SessionMisuseError</span>
-<span class="kn">from</span> <span class="nn">ray.train.utils</span> <span class="kn">import</span> <span class="n">_log_deprecation_warning</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
-<span class="kn">from</span> <span class="nn">ray.util.debug</span> <span class="kn">import</span> <span class="n">log_once</span>
-<span class="kn">from</span> <span class="nn">ray.util.placement_group</span> <span class="kn">import</span> <span class="n">_valid_resource_shape</span>
-<span class="kn">from</span> <span class="nn">ray.util.scheduling_strategies</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.error</span><span class="w"> </span><span class="kn">import</span> <span class="n">SessionMisuseError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_log_deprecation_warning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.debug</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_once</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.placement_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">_valid_resource_shape</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.scheduling_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PlacementGroupSchedulingStrategy</span><span class="p">,</span>
     <span class="n">SchedulingStrategyT</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.data</span> <span class="kn">import</span> <span class="n">DataIterator</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.execution.placement_groups</span> <span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataIterator</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.placement_groups</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">TrialInfo</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrialInfo</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The trial information to propagate to TrainSession.&quot;&quot;&quot;</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
@@ -1460,7 +1460,7 @@ document.write(`
     <span class="n">run_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<span class="k">class</span> <span class="nc">_FutureTrainingResult</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_FutureTrainingResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A future that will be resolved to a `_TrainingResult`.</span>
 
 <span class="sd">    This is needed for specific schedulers such as PBT that schedule saves.</span>
@@ -1468,10 +1468,10 @@ document.write(`
 <span class="sd">    This wrapper should be removed after refactoring PBT to not schedule saves anymore.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">future</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">future</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">future</span> <span class="o">=</span> <span class="n">future</span>
 
-    <span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;_TrainingResult&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;_TrainingResult&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve into ``_TrainingResult``.</span>
 
 <span class="sd">        This will return None for function trainables if no checkpoint has been</span>
@@ -1490,23 +1490,23 @@ document.write(`
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error resolving result: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_TrainingResult</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_TrainingResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A (checkpoint, metrics) result reported by the user.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Checkpoint</span><span class="p">],</span> <span class="n">metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Checkpoint</span><span class="p">],</span> <span class="n">metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint</span> <span class="o">=</span> <span class="n">checkpoint</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;TrainingResult(checkpoint=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">checkpoint</span><span class="si">}</span><span class="s2">, metrics=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="si">}</span><span class="s2">)&quot;</span>
 
 
 <span class="c1"># TODO(xwjiang): This needs a better name.</span>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">_TrainSession</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_TrainSession</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Holds information for training on each worker.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">training_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
         <span class="n">world_rank</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
@@ -1568,22 +1568,22 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-    <span class="k">def</span> <span class="nf">get_current_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_current_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">local_ip</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_node_ip_address</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_ip</span>
 
-    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Starts the training thread.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">training_started</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">training_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">training_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
         <span class="n">trial_info</span><span class="p">:</span> <span class="n">TrialInfo</span><span class="p">,</span>
@@ -1629,11 +1629,11 @@ document.write(`
             <span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">storage</span><span class="o">.</span><span class="n">trial_working_directory</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">pause_reporting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pause_reporting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Ignore all future ``session.report()`` calls.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ignore_report</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Finishes the training thread.</span>
 
 <span class="sd">        Raises any Exception from training.</span>
@@ -1656,7 +1656,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">output</span>
 
-    <span class="k">def</span> <span class="nf">get_next</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_TrainingResult</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_next</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_TrainingResult</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the next ``_TrainingResult`` from the result queue.</span>
 
 <span class="sd">        If the result queue is empty, then this function returns ``None``.</span>
@@ -1719,7 +1719,7 @@ document.write(`
         <span class="c1"># Return None if there are no more results to fetch.</span>
         <span class="k">return</span> <span class="n">result</span>
 
-    <span class="k">def</span> <span class="nf">_auto_fill_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_auto_fill_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add autofilled metrics and update attributes.&quot;&quot;&quot;</span>
         <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="n">current_datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
@@ -1750,7 +1750,7 @@ document.write(`
         <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">auto_filled_metrics</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span>
 
-    <span class="k">def</span> <span class="nf">_auto_fill_checkpoint_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_auto_fill_checkpoint_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add autofilled metrics and update attributes.&quot;&quot;&quot;</span>
         <span class="n">current_datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 
@@ -1761,14 +1761,14 @@ document.write(`
         <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">auto_filled_metrics</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span>
 
-    <span class="k">def</span> <span class="nf">_report_thread_runner_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_report_thread_runner_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">_ERROR_FETCH_TIMEOUT</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">StartTraceback</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="k">raise</span> <span class="n">StartTraceback</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="k">except</span> <span class="n">queue</span><span class="o">.</span><span class="n">Empty</span><span class="p">:</span>
             <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">_report_training_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">training_result</span><span class="p">:</span> <span class="n">_TrainingResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_report_training_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">training_result</span><span class="p">:</span> <span class="n">_TrainingResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Place a training result on the result queue for the main thread to process,</span>
 <span class="sd">        then block until the main thread signals that training should continue.</span>
 
@@ -1796,10 +1796,10 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">stop_event</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Checkpoint</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Checkpoint</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Special case: early fail for Torch tensors</span>
         <span class="k">if</span> <span class="s2">&quot;torch&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.air._internal.torch_utils</span> <span class="kn">import</span> <span class="n">contains_tensor</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.torch_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">contains_tensor</span>
 
             <span class="k">if</span> <span class="n">contains_tensor</span><span class="p">(</span><span class="n">metrics</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1848,30 +1848,30 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_report_training_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">experiment_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">experiment_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_info</span><span class="o">.</span><span class="n">experiment_name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trial_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trial_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_info</span><span class="o">.</span><span class="n">name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trial_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trial_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_info</span><span class="o">.</span><span class="n">id</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">run_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_info</span><span class="o">.</span><span class="n">run_id</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trial_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PlacementGroupFactory&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trial_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PlacementGroupFactory&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_info</span><span class="o">.</span><span class="n">resources</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trial_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trial_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_info</span><span class="o">.</span><span class="n">logdir</span>
 
-    <span class="k">def</span> <span class="nf">get_dataset_shard</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_dataset_shard</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dataset_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;DataIterator&quot;</span><span class="p">]:</span>
@@ -1902,7 +1902,7 @@ document.write(`
 <span class="n">_session</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_TrainSession</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">_tune_task_and_actor_launch_hook</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_tune_task_and_actor_launch_hook</span><span class="p">(</span>
     <span class="n">fn</span><span class="p">,</span> <span class="n">resources</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">strategy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SchedulingStrategyT</span><span class="p">]</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Launch hook to catch nested tasks that can&#39;t fit in the placement group.</span>
@@ -1966,7 +1966,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">init_session</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">init_session</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">global</span> <span class="n">_session</span>
     <span class="k">if</span> <span class="n">_session</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1975,7 +1975,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="c1"># Setup hooks for generating placement group resource deadlock warnings.</span>
-    <span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">remote_function</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">remote_function</span>
 
     <span class="k">if</span> <span class="s2">&quot;TUNE_DISABLE_RESOURCE_CHECKS&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
         <span class="n">actor</span><span class="o">.</span><span class="n">_actor_launch_hook</span> <span class="o">=</span> <span class="n">_tune_task_and_actor_launch_hook</span>
@@ -1984,17 +1984,17 @@ document.write(`
     <span class="n">_session</span> <span class="o">=</span> <span class="n">_TrainSession</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">get_session</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_TrainSession</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_session</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_TrainSession</span><span class="p">]:</span>
     <span class="k">return</span> <span class="n">_session</span>
 
 
-<span class="k">def</span> <span class="nf">shutdown_session</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">shutdown_session</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Shuts down the initialized session.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_session</span>
     <span class="n">_session</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">_raise_accelerator_session_misuse</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_raise_accelerator_session_misuse</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raises a SessionMisuseError because a utility function was used improperly.&quot;&quot;&quot;</span>
     <span class="k">raise</span> <span class="n">SessionMisuseError</span><span class="p">(</span>
         <span class="s2">&quot;prepare/accelerate utility functions should be called inside a training &quot;</span>
@@ -2002,7 +2002,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">get_accelerator</span><span class="p">(</span><span class="n">default_accelerator_cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Accelerator</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Accelerator</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_accelerator</span><span class="p">(</span><span class="n">default_accelerator_cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Accelerator</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Accelerator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The accelerator for this training session.</span>
 
 <span class="sd">    If an accelerator has not been set, then this method will construct an</span>
@@ -2019,7 +2019,7 @@ document.write(`
     <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">accelerator</span>
 
 
-<span class="k">def</span> <span class="nf">set_accelerator</span><span class="p">(</span><span class="n">accelerator</span><span class="p">:</span> <span class="n">Accelerator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_accelerator</span><span class="p">(</span><span class="n">accelerator</span><span class="p">:</span> <span class="n">Accelerator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the accelerator for this training session.</span>
 
 <span class="sd">    Args:</span>
@@ -2037,14 +2037,14 @@ document.write(`
     <span class="n">session</span><span class="o">.</span><span class="n">accelerator</span> <span class="o">=</span> <span class="n">accelerator</span>
 
 
-<span class="k">def</span> <span class="nf">_warn_session_misuse</span><span class="p">(</span><span class="n">default_value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_warn_session_misuse</span><span class="p">(</span><span class="n">default_value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Warns if fn is being used outside of session and returns ``default_value``.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inner</span><span class="p">(</span><span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
         <span class="n">fn_name</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span>
 
         <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">session</span> <span class="o">=</span> <span class="n">get_session</span><span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">session</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">log_once</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SESSION_MISUSE_LOG_ONCE_KEY</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">fn_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">):</span>
@@ -2065,7 +2065,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train._internal.session.report.html#ray.train._internal.session.report">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">report</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">checkpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Checkpoint</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2159,10 +2159,10 @@ document.write(`
         <span class="p">)</span>
 
     <span class="c1"># If we are running in a Tune function, switch to `ray.tune.report`.</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.trainable.trainable_fn_utils</span> <span class="kn">import</span> <span class="n">_in_tune_session</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable.trainable_fn_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_in_tune_session</span>
 
     <span class="k">if</span> <span class="n">_in_tune_session</span><span class="p">():</span>
-        <span class="kn">import</span> <span class="nn">ray.tune</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">ray.tune</span>
 
         <span class="k">if</span> <span class="n">_v2_migration_warnings_enabled</span><span class="p">():</span>
             <span class="n">_log_deprecation_warning</span><span class="p">(</span>
@@ -2182,7 +2182,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train._internal.session.get_checkpoint.html#ray.train._internal.session.get_checkpoint">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">get_checkpoint</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Checkpoint</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_checkpoint</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Checkpoint</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Access the latest reported checkpoint to resume from if one exists.</span>
 
 <span class="sd">    Example:</span>
@@ -2224,10 +2224,10 @@ document.write(`
 <span class="sd">            Otherwise, return None.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># If we are running in a Tune function, switch to `ray.tune.get_checkpoint`.</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.trainable.trainable_fn_utils</span> <span class="kn">import</span> <span class="n">_in_tune_session</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable.trainable_fn_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_in_tune_session</span>
 
     <span class="k">if</span> <span class="n">_in_tune_session</span><span class="p">():</span>
-        <span class="kn">import</span> <span class="nn">ray.tune</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">ray.tune</span>
 
         <span class="k">if</span> <span class="n">_v2_migration_warnings_enabled</span><span class="p">():</span>
             <span class="n">_log_deprecation_warning</span><span class="p">(</span>
@@ -2245,49 +2245,49 @@ document.write(`
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">get_metadata</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_metadata</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;User metadata dict passed to the Trainer constructor.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">get_session</span><span class="p">()</span><span class="o">.</span><span class="n">metadata</span>
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">get_experiment_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_experiment_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Experiment name for the corresponding trial.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">get_session</span><span class="p">()</span><span class="o">.</span><span class="n">experiment_name</span>
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">get_trial_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_trial_name</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Trial name for the corresponding trial.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">get_session</span><span class="p">()</span><span class="o">.</span><span class="n">trial_name</span>
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">get_trial_id</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_trial_id</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Trial id for the corresponding trial.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">get_session</span><span class="p">()</span><span class="o">.</span><span class="n">trial_id</span>
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">get_run_id</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_run_id</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Unique Train Run id for the corresponding trial.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">get_session</span><span class="p">()</span><span class="o">.</span><span class="n">run_id</span>
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">get_trial_resources</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="s2">&quot;PlacementGroupFactory&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_trial_resources</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="s2">&quot;PlacementGroupFactory&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Trial resources for the corresponding trial.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">get_session</span><span class="p">()</span><span class="o">.</span><span class="n">trial_resources</span>
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">get_trial_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_trial_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Log directory corresponding to the trial directory for a Tune session.</span>
 <span class="sd">    If calling from a Train session, this will give the trial directory of its parent</span>
 <span class="sd">    Tune session.</span>
@@ -2312,7 +2312,7 @@ document.write(`
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">(</span><span class="n">default_value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_world_size</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_world_size</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the current world size (i.e. total number of workers) for this run.</span>
 
 <span class="sd">    .. testcode::</span>
@@ -2352,7 +2352,7 @@ document.write(`
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">(</span><span class="n">default_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_world_rank</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_world_rank</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the world rank of this worker.</span>
 
 <span class="sd">    .. testcode::</span>
@@ -2391,7 +2391,7 @@ document.write(`
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">(</span><span class="n">default_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_local_rank</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_local_rank</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the local rank of this worker (rank of the worker on its node).</span>
 
 <span class="sd">    .. testcode::</span>
@@ -2433,7 +2433,7 @@ document.write(`
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">(</span><span class="n">default_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_local_world_size</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_local_world_size</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the local world size of this node (i.e. number of workers on this node).</span>
 
 <span class="sd">    Example:</span>
@@ -2472,7 +2472,7 @@ document.write(`
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">(</span><span class="n">default_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_node_rank</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_node_rank</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the rank of this node.</span>
 
 <span class="sd">    Example:</span>
@@ -2513,7 +2513,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train._internal.session.get_dataset_shard.html#ray.train._internal.session.get_dataset_shard">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">get_dataset_shard</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_dataset_shard</span><span class="p">(</span>
     <span class="n">dataset_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;DataIterator&quot;</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the :class:`ray.data.DataIterator` shard for this worker.</span>
@@ -2571,7 +2571,7 @@ document.write(`
 
 <span class="nd">@DeveloperAPI</span>
 <span class="nd">@_warn_session_misuse</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">get_storage</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">StorageContext</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_storage</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">StorageContext</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the :class:`~ray.train._internal.storage.StorageContext` storage</span>
 <span class="sd">    context which gives advanced access to the filesystem and paths</span>
 <span class="sd">    configured through `RunConfig`.</span>

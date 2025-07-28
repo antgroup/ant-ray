@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1576,14 +1576,14 @@ you would have to <a class="reference external" href="https://github.com/ray-pro
 The reason is that we want to ensure every code snippet on our documentation is tested.
 This requires us to have a process for including and testing code snippets in documents. To learn how to write testable code
 snippets, read <a class="reference internal" href="writing-code-snippets.html"><span class="doc std std-doc">How to write code snippets</span></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
 
 
-<span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>  <span class="c1"># Define an objective function.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>  <span class="c1"># Define an objective function.</span>
     <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span>
 
 
-<span class="k">def</span> <span class="nf">trainable</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>  <span class="c1"># Pass a &quot;config&quot; dictionary into your trainable.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">trainable</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>  <span class="c1"># Pass a &quot;config&quot; dictionary into your trainable.</span>
 
     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>  <span class="c1"># &quot;Train&quot; for 20 iterations and compute intermediate scores.</span>
         <span class="n">score</span> <span class="o">=</span> <span class="n">objective</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">])</span>
@@ -1657,11 +1657,11 @@ To add code to your notebook, you can use the <code class="docutils literal notr
 Here’s an example:</p>
 <div class="highlight-markdown notranslate"><div class="highlight"><pre><span></span><span class="sb">```python</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray.rllib.agents.ppo</span> <span class="k">as</span> <span class="nn">ppo</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.rllib.agents.ppo</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ppo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
 
-<span class="k">def</span> <span class="nf">train_ppo_model</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_ppo_model</span><span class="p">():</span>
     <span class="n">trainer</span> <span class="o">=</span> <span class="n">ppo</span><span class="o">.</span><span class="n">PPOTrainer</span><span class="p">(</span>
         <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;framework&quot;</span><span class="p">:</span> <span class="s2">&quot;torch&quot;</span><span class="p">,</span> <span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
         <span class="n">env</span><span class="o">=</span><span class="s2">&quot;CartPole-v0&quot;</span><span class="p">,</span>
@@ -1677,11 +1677,11 @@ Here’s an example:</p>
 </pre></div>
 </div>
 <p>Putting this markdown block into your document will render as follows in the browser:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray.rllib.agents.ppo</span> <span class="k">as</span> <span class="nn">ppo</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.rllib.agents.ppo</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ppo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
 
-<span class="k">def</span> <span class="nf">train_ppo_model</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_ppo_model</span><span class="p">():</span>
     <span class="n">trainer</span> <span class="o">=</span> <span class="n">ppo</span><span class="o">.</span><span class="n">PPOTrainer</span><span class="p">(</span>
         <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;framework&quot;</span><span class="p">:</span> <span class="s2">&quot;torch&quot;</span><span class="p">,</span> <span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
         <span class="n">env</span><span class="o">=</span><span class="s2">&quot;CartPole-v0&quot;</span><span class="p">,</span>

@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../../_static/autodoc_pydantic.css" />
@@ -1389,11 +1389,11 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.llm._internal.serve.deployments.routers.router</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">AsyncGenerator</span><span class="p">,</span>
     <span class="n">Awaitable</span><span class="p">,</span>
@@ -1406,14 +1406,14 @@ document.write(`
 <span class="p">)</span>
 
 
-<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">status</span>
-<span class="kn">from</span> <span class="nn">fastapi.middleware.cors</span> <span class="kn">import</span> <span class="n">CORSMiddleware</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray._private.utils</span> <span class="kn">import</span> <span class="n">get_or_create_event_loop</span>
-<span class="kn">from</span> <span class="nn">ray.serve.handle</span> <span class="kn">import</span> <span class="n">DeploymentHandle</span>
-<span class="kn">from</span> <span class="nn">starlette.responses</span> <span class="kn">import</span> <span class="n">JSONResponse</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">StreamingResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.middleware.cors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CORSMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_or_create_event_loop</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.handle</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentHandle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">starlette.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">StreamingResponse</span>
 
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.configs.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.configs.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">RAYLLM_ROUTER_HTTP_TIMEOUT</span><span class="p">,</span>
     <span class="n">ROUTER_TO_MODEL_REPLICA_RATIO</span><span class="p">,</span>
     <span class="n">RAYLLM_ROUTER_MIN_REPLICAS</span><span class="p">,</span>
@@ -1421,17 +1421,17 @@ document.write(`
     <span class="n">RAYLLM_ROUTER_MAX_REPLICAS</span><span class="p">,</span>
     <span class="n">RAYLLM_ROUTER_TARGET_ONGOING_REQUESTS</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.observability.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.observability.metrics.fast_api_metrics</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.observability.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.observability.metrics.fast_api_metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">add_http_metrics_middleware</span><span class="p">,</span>
     <span class="n">metrics_lifespan</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.deployments.llm.multiplex.utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.deployments.llm.multiplex.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_base_model_id</span><span class="p">,</span>
     <span class="n">get_lora_model_ids</span><span class="p">,</span>
     <span class="n">get_lora_model_metadata</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.configs.openai_api_models</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.configs.openai_api_models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ChatCompletionRequest</span><span class="p">,</span>
     <span class="n">ChatCompletionResponse</span><span class="p">,</span>
     <span class="n">ChatCompletionStreamResponse</span><span class="p">,</span>
@@ -1443,31 +1443,31 @@ document.write(`
     <span class="n">OpenAIHTTPException</span><span class="p">,</span>
     <span class="n">to_model_metadata</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.configs.openai_api_models_patch</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.configs.openai_api_models_patch</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ErrorResponse</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.configs.server_models</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.configs.server_models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LLMConfig</span><span class="p">,</span>
     <span class="n">ModelData</span><span class="p">,</span>
     <span class="n">Model</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.deployments.routers.middleware</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.deployments.routers.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">SetRequestIdMiddleware</span><span class="p">,</span>
     <span class="n">add_exception_handling_middleware</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.deployments.utils.server_utils</span> <span class="kn">import</span> <span class="n">replace_prefix</span>
-<span class="kn">from</span> <span class="nn">ray.serve.config</span> <span class="kn">import</span> <span class="n">AutoscalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.deployments.utils.server_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">replace_prefix</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoscalingConfig</span>
 
 <span class="c1"># Import asyncio timeout depends on python version</span>
 <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">asyncio</span> <span class="kn">import</span> <span class="n">timeout</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">asyncio</span><span class="w"> </span><span class="kn">import</span> <span class="n">timeout</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">async_timeout</span> <span class="kn">import</span> <span class="n">timeout</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">async_timeout</span><span class="w"> </span><span class="kn">import</span> <span class="n">timeout</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">init</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FastAPI</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">init</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FastAPI</span><span class="p">:</span>
     <span class="n">_fastapi_router_app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">(</span><span class="n">lifespan</span><span class="o">=</span><span class="n">metrics_lifespan</span><span class="p">)</span>
 
     <span class="c1"># NOTE: PLEASE READ CAREFULLY BEFORE MODIFYING</span>
@@ -1505,7 +1505,7 @@ document.write(`
 <span class="n">fastapi_router_app</span> <span class="o">=</span> <span class="n">init</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_apply_openai_json_format</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_apply_openai_json_format</span><span class="p">(</span>
     <span class="n">response</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ChatCompletionStreamResponse</span><span class="p">,</span> <span class="n">CompletionStreamResponse</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a CompletionStreamResponse to OpenAI format.</span>
@@ -1520,7 +1520,7 @@ document.write(`
     <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">()</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
-<span class="k">async</span> <span class="k">def</span> <span class="nf">_openai_json_wrapper</span><span class="p">(</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_openai_json_wrapper</span><span class="p">(</span>
     <span class="n">generator</span><span class="p">:</span> <span class="n">AsyncGenerator</span><span class="p">[</span>
         <span class="n">Union</span><span class="p">[</span><span class="n">ChatCompletionStreamResponse</span><span class="p">,</span> <span class="n">CompletionStreamResponse</span><span class="p">],</span> <span class="kc">None</span>
     <span class="p">],</span>
@@ -1546,7 +1546,7 @@ document.write(`
     <span class="k">yield</span> <span class="s2">&quot;data: [DONE]</span><span class="se">\n\n</span><span class="s2">&quot;</span>
 
 
-<span class="k">async</span> <span class="k">def</span> <span class="nf">_peek_at_openai_json_generator</span><span class="p">(</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_peek_at_openai_json_generator</span><span class="p">(</span>
     <span class="n">generator</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">LLMChatResponse</span><span class="p">,</span> <span class="n">LLMCompletionsResponse</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
     <span class="n">Union</span><span class="p">[</span><span class="n">ChatCompletionStreamResponse</span><span class="p">,</span> <span class="n">CompletionStreamResponse</span><span class="p">,</span> <span class="n">ErrorResponse</span><span class="p">],</span>
@@ -1561,8 +1561,8 @@ document.write(`
     <span class="k">return</span> <span class="n">first_response</span><span class="p">,</span> <span class="n">_openai_json_wrapper</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="n">first_response</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">LLMRouter</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LLMRouter</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">llm_deployments</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DeploymentHandle</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1588,12 +1588,12 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup_handle_and_config_maps</span><span class="p">(</span><span class="n">llm_deployments</span><span class="o">=</span><span class="n">llm_deployments</span><span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_default_get_lora_model_metadata_func</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_default_get_lora_model_metadata_func</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">llm_config</span><span class="p">:</span> <span class="n">LLMConfig</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="k">await</span> <span class="n">get_lora_model_metadata</span><span class="p">(</span><span class="n">model_id</span><span class="p">,</span> <span class="n">llm_config</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_setup_handle_and_config_maps</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_setup_handle_and_config_maps</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">llm_deployments</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DeploymentHandle</span><span class="p">]</span>
     <span class="p">):</span>
         <span class="k">for</span> <span class="n">handle</span> <span class="ow">in</span> <span class="n">llm_deployments</span><span class="p">:</span>
@@ -1610,10 +1610,10 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_completed</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">check_health</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">check_health</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_completed</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_get_configured_serve_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_configured_serve_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets a ServeHandle to a model deployment.</span>
 
 <span class="sd">        Configures the handle&#39;s options, and stores it in a cache.</span>
@@ -1653,7 +1653,7 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configured_serve_handles</span><span class="p">[</span><span class="n">model_id</span><span class="p">]</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_response</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_response</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">body</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">CompletionRequest</span><span class="p">,</span> <span class="n">ChatCompletionRequest</span><span class="p">],</span>
@@ -1674,7 +1674,7 @@ document.write(`
         <span class="k">async</span> <span class="k">for</span> <span class="n">response</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_handle</span><span class="p">,</span> <span class="n">call_method</span><span class="p">)</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">body</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">response</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ModelData</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ModelData</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">model_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_llm_configs</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">to_model_metadata</span><span class="p">(</span><span class="n">model_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_llm_configs</span><span class="p">[</span><span class="n">model_id</span><span class="p">])</span>
 
@@ -1701,7 +1701,7 @@ document.write(`
                 <span class="p">)</span>
 
     <span class="nd">@fastapi_router_app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/v1/models&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">Model</span><span class="p">)</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">models</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Model</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">models</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Model</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;OpenAI API-compliant endpoint to get all rayllm models.&quot;&quot;&quot;</span>
         <span class="n">all_models</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">base_model_id</span><span class="p">,</span> <span class="n">llm_config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_llm_configs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1723,7 +1723,7 @@ document.write(`
 
     <span class="c1"># :path allows us to have slashes in the model name</span>
     <span class="nd">@fastapi_router_app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/v1/models/{model:path}&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">ModelData</span><span class="p">)</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">model_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModelData</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">model_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModelData</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;OpenAI API-compliant endpoint to get one rayllm model.</span>
 
 <span class="sd">        :param model: The model ID (e.g. &quot;amazon/LightGPT&quot;)</span>
@@ -1739,7 +1739,7 @@ document.write(`
         <span class="k">return</span> <span class="n">model_data</span>
 
     <span class="nd">@fastapi_router_app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/v1/completions&quot;</span><span class="p">)</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">completions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n">CompletionRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">completions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n">CompletionRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Given a prompt, the model will return one or more predicted completions,</span>
 <span class="sd">        and can also return the probabilities of alternative tokens at each position.</span>
 
@@ -1770,7 +1770,7 @@ document.write(`
                 <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>
 
     <span class="nd">@fastapi_router_app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/v1/chat/completions&quot;</span><span class="p">)</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n">ChatCompletionRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n">ChatCompletionRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Given a prompt, the model will return one or more predicted completions,</span>
 <span class="sd">        and can also return the probabilities of alternative tokens at each position.</span>
 
@@ -1804,7 +1804,7 @@ document.write(`
 <div class="viewcode-block" id="LLMRouter.as_deployment">
 <a class="viewcode-back" href="../../../../../../../serve/api/doc/ray.serve.llm.LLMRouter.as_deployment.html#ray.serve.llm.LLMRouter.as_deployment">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">as_deployment</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_deployment</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">llm_configs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">LLMConfig</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">serve</span><span class="o">.</span><span class="n">Deployment</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts this class to a Ray Serve deployment with ingress.</span>

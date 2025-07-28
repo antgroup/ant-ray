@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,25 +1389,25 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.algorithms.algorithm</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">import</span> <span class="nn">concurrent</span>
-<span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">import</span> <span class="nn">importlib.metadata</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">packaging</span> <span class="kn">import</span> <span class="n">version</span>
-<span class="kn">import</span> <span class="nn">pathlib</span>
-<span class="kn">import</span> <span class="nn">pyarrow.fs</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">concurrent</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.metadata</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">packaging</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
     <span class="n">Collection</span><span class="p">,</span>
@@ -1422,25 +1422,25 @@ document.write(`
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">tree</span>  <span class="c1"># pip install dm_tree</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tree</span>  <span class="c1"># pip install dm_tree</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.tune.result</span> <span class="kn">import</span> <span class="n">TRAINING_ITERATION</span>
-<span class="kn">from</span> <span class="nn">ray._private.usage.usage_lib</span> <span class="kn">import</span> <span class="n">TagKey</span><span class="p">,</span> <span class="n">record_extra_usage_tag</span>
-<span class="kn">from</span> <span class="nn">ray.actor</span> <span class="kn">import</span> <span class="n">ActorHandle</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
-<span class="kn">import</span> <span class="nn">ray.cloudpickle</span> <span class="k">as</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.registry</span> <span class="kn">import</span> <span class="n">ALGORITHMS_CLASS_TO_NAME</span> <span class="k">as</span> <span class="n">ALL_ALGORITHMS</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRAINING_ITERATION</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.usage.usage_lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">TagKey</span><span class="p">,</span> <span class="n">record_extra_usage_tag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.actor</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActorHandle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.cloudpickle</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">ALGORITHMS_CLASS_TO_NAME</span> <span class="k">as</span> <span class="n">ALL_ALGORITHMS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AggregatorActor</span><span class="p">,</span>
     <span class="n">_get_env_runner_bundles</span><span class="p">,</span>
     <span class="n">_get_learner_bundles</span><span class="p">,</span>
     <span class="n">_get_main_process_bundle</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.callbacks.utils</span> <span class="kn">import</span> <span class="n">make_callback</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.connectors.agent.obs_preproc</span> <span class="kn">import</span> <span class="n">ObsPreprocessorConnector</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.callbacks.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_callback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.agent.obs_preproc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObsPreprocessorConnector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">COMPONENT_ENV_RUNNER</span><span class="p">,</span>
     <span class="n">COMPONENT_EVAL_ENV_RUNNER</span><span class="p">,</span>
     <span class="n">COMPONENT_LEARNER</span><span class="p">,</span>
@@ -1449,36 +1449,36 @@ document.write(`
     <span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span>
     <span class="n">DEFAULT_MODULE_ID</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.columns</span> <span class="kn">import</span> <span class="n">Columns</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.columns</span><span class="w"> </span><span class="kn">import</span> <span class="n">Columns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MultiRLModule</span><span class="p">,</span>
     <span class="n">MultiRLModuleSpec</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module</span> <span class="kn">import</span> <span class="n">validate_module_id</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModule</span><span class="p">,</span> <span class="n">RLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.env_context</span> <span class="kn">import</span> <span class="n">EnvContext</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.env_runner</span> <span class="kn">import</span> <span class="n">EnvRunner</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.env_runner_group</span> <span class="kn">import</span> <span class="n">EnvRunnerGroup</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.utils</span> <span class="kn">import</span> <span class="n">_gym_env_creator</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.evaluation.metrics</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_module_id</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModule</span><span class="p">,</span> <span class="n">RLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.env_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.env_runner</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvRunner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.env_runner_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvRunnerGroup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_gym_env_creator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.evaluation.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">collect_episodes</span><span class="p">,</span>
     <span class="n">summarize_episodes</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.execution.rollout_ops</span> <span class="kn">import</span> <span class="n">synchronous_parallel_sample</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.offline</span> <span class="kn">import</span> <span class="n">get_dataset_and_shards</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.offline.estimators</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.execution.rollout_ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">synchronous_parallel_sample</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.offline</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_dataset_and_shards</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.offline.estimators</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">OffPolicyEstimator</span><span class="p">,</span>
     <span class="n">ImportanceSampling</span><span class="p">,</span>
     <span class="n">WeightedImportanceSampling</span><span class="p">,</span>
     <span class="n">DirectMethod</span><span class="p">,</span>
     <span class="n">DoublyRobust</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.offline.offline_evaluator</span> <span class="kn">import</span> <span class="n">OfflineEvaluator</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.policy</span> <span class="kn">import</span> <span class="n">Policy</span><span class="p">,</span> <span class="n">PolicySpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.sample_batch</span> <span class="kn">import</span> <span class="n">DEFAULT_POLICY_ID</span><span class="p">,</span> <span class="n">SampleBatch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils</span> <span class="kn">import</span> <span class="n">deep_update</span><span class="p">,</span> <span class="n">FilterManager</span><span class="p">,</span> <span class="n">force_list</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.actor_manager</span> <span class="kn">import</span> <span class="n">FaultTolerantActorManager</span><span class="p">,</span> <span class="n">RemoteCallResults</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.offline.offline_evaluator</span><span class="w"> </span><span class="kn">import</span> <span class="n">OfflineEvaluator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Policy</span><span class="p">,</span> <span class="n">PolicySpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.sample_batch</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_POLICY_ID</span><span class="p">,</span> <span class="n">SampleBatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">deep_update</span><span class="p">,</span> <span class="n">FilterManager</span><span class="p">,</span> <span class="n">force_list</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.actor_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">FaultTolerantActorManager</span><span class="p">,</span> <span class="n">RemoteCallResults</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DeveloperAPI</span><span class="p">,</span>
     <span class="n">ExperimentalAPI</span><span class="p">,</span>
     <span class="n">OldAPIStack</span><span class="p">,</span>
@@ -1487,23 +1487,23 @@ document.write(`
     <span class="n">OverrideToImplementCustomLogic_CallToSuperRecommended</span><span class="p">,</span>
     <span class="n">PublicAPI</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.checkpoints</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.checkpoints</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Checkpointable</span><span class="p">,</span>
     <span class="n">CHECKPOINT_VERSION</span><span class="p">,</span>
     <span class="n">CHECKPOINT_VERSION_LEARNER_AND_ENV_RUNNER</span><span class="p">,</span>
     <span class="n">get_checkpoint_info</span><span class="p">,</span>
     <span class="n">try_import_msgpack</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.debug</span> <span class="kn">import</span> <span class="n">update_global_seed_if_necessary</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.debug</span><span class="w"> </span><span class="kn">import</span> <span class="n">update_global_seed_if_necessary</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEPRECATED_VALUE</span><span class="p">,</span>
     <span class="n">Deprecated</span><span class="p">,</span>
     <span class="n">deprecation_warning</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.error</span> <span class="kn">import</span> <span class="n">ERR_MSG_INVALID_ENV_DESCRIPTOR</span><span class="p">,</span> <span class="n">EnvError</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.framework</span> <span class="kn">import</span> <span class="n">try_import_tf</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.from_config</span> <span class="kn">import</span> <span class="n">from_config</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.error</span><span class="w"> </span><span class="kn">import</span> <span class="n">ERR_MSG_INVALID_ENV_DESCRIPTOR</span><span class="p">,</span> <span class="n">EnvError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">try_import_tf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.from_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AGGREGATOR_ACTOR_RESULTS</span><span class="p">,</span>
     <span class="n">ALL_MODULES</span><span class="p">,</span>
     <span class="n">ENV_RUNNER_RESULTS</span><span class="p">,</span>
@@ -1540,13 +1540,13 @@ document.write(`
     <span class="n">TRAINING_STEP_TIMER</span><span class="p">,</span>
     <span class="n">STEPS_TRAINED_THIS_ITER_COUNTER</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics.learner_info</span> <span class="kn">import</span> <span class="n">LEARNER_INFO</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics.metrics_logger</span> <span class="kn">import</span> <span class="n">MetricsLogger</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics.stats</span> <span class="kn">import</span> <span class="n">Stats</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.replay_buffers</span> <span class="kn">import</span> <span class="n">MultiAgentReplayBuffer</span><span class="p">,</span> <span class="n">ReplayBuffer</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.serialization</span> <span class="kn">import</span> <span class="n">deserialize_type</span><span class="p">,</span> <span class="n">NOT_SERIALIZABLE</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.spaces</span> <span class="kn">import</span> <span class="n">space_utils</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.learner_info</span><span class="w"> </span><span class="kn">import</span> <span class="n">LEARNER_INFO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.metrics_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsLogger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stats</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.replay_buffers</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentReplayBuffer</span><span class="p">,</span> <span class="n">ReplayBuffer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.serialization</span><span class="w"> </span><span class="kn">import</span> <span class="n">deserialize_type</span><span class="p">,</span> <span class="n">NOT_SERIALIZABLE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.spaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">space_utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AgentConnectorDataType</span><span class="p">,</span>
     <span class="n">AgentID</span><span class="p">,</span>
     <span class="n">AgentToModuleMappingFn</span><span class="p">,</span>
@@ -1566,20 +1566,20 @@ document.write(`
     <span class="n">TensorStructType</span><span class="p">,</span>
     <span class="n">TensorType</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.train.constants</span> <span class="kn">import</span> <span class="n">DEFAULT_STORAGE_PATH</span>
-<span class="kn">from</span> <span class="nn">ray.tune.execution.placement_groups</span> <span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
-<span class="kn">from</span> <span class="nn">ray.tune.experiment.trial</span> <span class="kn">import</span> <span class="n">ExportFormat</span>
-<span class="kn">from</span> <span class="nn">ray.tune.logger</span> <span class="kn">import</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">UnifiedLogger</span>
-<span class="kn">from</span> <span class="nn">ray.tune.registry</span> <span class="kn">import</span> <span class="n">ENV_CREATOR</span><span class="p">,</span> <span class="n">_global_registry</span>
-<span class="kn">from</span> <span class="nn">ray.tune.resources</span> <span class="kn">import</span> <span class="n">Resources</span>
-<span class="kn">from</span> <span class="nn">ray.tune.trainable</span> <span class="kn">import</span> <span class="n">Trainable</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">log_once</span>
-<span class="kn">from</span> <span class="nn">ray.util.timer</span> <span class="kn">import</span> <span class="n">_Timer</span>
-<span class="kn">from</span> <span class="nn">ray.tune.registry</span> <span class="kn">import</span> <span class="n">get_trainable_cls</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_STORAGE_PATH</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.placement_groups</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment.trial</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExportFormat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">UnifiedLogger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">ENV_CREATOR</span><span class="p">,</span> <span class="n">_global_registry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resources</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trainable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_once</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.timer</span><span class="w"> </span><span class="kn">import</span> <span class="n">_Timer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_trainable_cls</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.core.learner.learner_group</span> <span class="kn">import</span> <span class="n">LearnerGroup</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.offline.offline_data</span> <span class="kn">import</span> <span class="n">OfflineData</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.learner.learner_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearnerGroup</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.offline.offline_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">OfflineData</span>
 
 <span class="n">tf1</span><span class="p">,</span> <span class="n">tf</span><span class="p">,</span> <span class="n">tfv</span> <span class="o">=</span> <span class="n">try_import_tf</span><span class="p">()</span>
 
@@ -1589,7 +1589,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">Algorithm</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">,</span> <span class="n">Trainable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Algorithm</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">,</span> <span class="n">Trainable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An RLlib algorithm responsible for training one or more neural network models.</span>
 
 <span class="sd">    You can write your own Algorithm classes by sub-classing from `Algorithm`</span>
@@ -1680,7 +1680,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint.html#ray.rllib.algorithms.algorithm.Algorithm.from_checkpoint">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">from_checkpoint</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_checkpoint</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Checkpoint</span><span class="p">],</span>
         <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1787,7 +1787,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.__init__">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.__init__.html#ray.rllib.algorithms.algorithm.Algorithm.__init__">[docs]</a>
     <span class="nd">@PublicAPI</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AlgorithmConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># deprecated arg</span>
@@ -1893,7 +1893,7 @@ document.write(`
             <span class="c1"># via &quot;logger_config.type&quot;.</span>
             <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">logger_config</span> <span class="ow">and</span> <span class="s2">&quot;type&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">logger_config</span><span class="p">:</span>
 
-                <span class="k">def</span> <span class="nf">default_logger_creator</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+                <span class="k">def</span><span class="w"> </span><span class="nf">default_logger_creator</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 <span class="w">                    </span><span class="sd">&quot;&quot;&quot;Creates a custom logger with the default prefix.&quot;&quot;&quot;</span>
                     <span class="n">cfg</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;logger_config&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
                     <span class="bp">cls</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
@@ -1905,7 +1905,7 @@ document.write(`
             <span class="c1"># If no `type` given, use tune&#39;s UnifiedLogger as last resort.</span>
             <span class="k">else</span><span class="p">:</span>
 
-                <span class="k">def</span> <span class="nf">default_logger_creator</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+                <span class="k">def</span><span class="w"> </span><span class="nf">default_logger_creator</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 <span class="w">                    </span><span class="sd">&quot;&quot;&quot;Creates a Unified logger with the default prefix.&quot;&quot;&quot;</span>
                     <span class="k">return</span> <span class="n">UnifiedLogger</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">logdir</span><span class="p">,</span> <span class="n">loggers</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
@@ -1934,12 +1934,12 @@ document.write(`
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html#ray.rllib.algorithms.algorithm.Algorithm.get_default_config">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_default_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfig</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfig</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">AlgorithmConfig</span><span class="p">()</span></div>
 
 
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">_remote_worker_ids_for_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remote_worker_ids_for_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of remote worker IDs to fetch metrics from.</span>
 
 <span class="sd">        Specific Algorithm implementations can override this method to</span>
@@ -1954,7 +1954,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html#ray.rllib.algorithms.algorithm.Algorithm.setup">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic_CallToSuperRecommended</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Trainable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AlgorithmConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AlgorithmConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Setup our config: Merge the user-supplied config dict (which could</span>
         <span class="c1"># be a partial config dict) with the class&#39; default.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">AlgorithmConfig</span><span class="p">):</span>
@@ -2020,7 +2020,7 @@ document.write(`
         <span class="c1"># If an input path is available and we are on the new API stack generate</span>
         <span class="c1"># an `OfflineData` instance.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">is_offline</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.offline.offline_data</span> <span class="kn">import</span> <span class="n">OfflineData</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.offline.offline_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">OfflineData</span>
 
             <span class="c1"># Use either user-provided `OfflineData` class or RLlib&#39;s default.</span>
             <span class="n">offline_data_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">offline_data_class</span> <span class="ow">or</span> <span class="n">OfflineData</span>
@@ -2123,7 +2123,7 @@ document.write(`
             <span class="n">method_config</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">method_type</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_rl_module_and_learner</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.env</span> <span class="kn">import</span> <span class="n">INPUT_ENV_SPACES</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env</span><span class="w"> </span><span class="kn">import</span> <span class="n">INPUT_ENV_SPACES</span>
 
             <span class="n">spaces</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="n">INPUT_ENV_SPACES</span><span class="p">:</span> <span class="p">(</span>
@@ -2313,7 +2313,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_policy_class.html#ray.rllib.algorithms.algorithm.Algorithm.get_default_policy_class">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_default_policy_class</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_policy_class</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">AlgorithmConfig</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Policy</span><span class="p">]]:</span>
@@ -2331,7 +2331,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.step">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.step.html#ray.rllib.algorithms.algorithm.Algorithm.step">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Trainable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultDict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultDict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements the main `Algorithm.train()` logic.</span>
 
 <span class="sd">        Takes n attempts to perform a single training step. Thereby</span>
@@ -2429,7 +2429,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.evaluate">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html#ray.rllib.algorithms.algorithm.Algorithm.evaluate">[docs]</a>
     <span class="nd">@PublicAPI</span>
-    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">parallel_train_future</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultDict</span><span class="p">:</span>
@@ -2601,7 +2601,7 @@ document.write(`
         <span class="k">return</span> <span class="n">eval_results</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_evaluate_with_custom_eval_function</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ResultDict</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_with_custom_eval_function</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ResultDict</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Evaluating current state of </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> using the custom eval function &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">custom_evaluation_function</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -2628,7 +2628,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">eval_results</span><span class="p">,</span> <span class="n">env_steps</span><span class="p">,</span> <span class="n">agent_steps</span>
 
-    <span class="k">def</span> <span class="nf">_evaluate_on_local_env_runner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_runner</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_on_local_env_runner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_runner</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">env_runner</span><span class="p">,</span> <span class="s2">&quot;input_reader&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">env_runner</span><span class="o">.</span><span class="n">input_reader</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Can&#39;t evaluate on a local worker if this local worker does not have &quot;</span>
@@ -2692,7 +2692,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">env_runner_results</span><span class="p">,</span> <span class="n">env_steps</span><span class="p">,</span> <span class="n">agent_steps</span><span class="p">,</span> <span class="n">all_batches</span>
 
-    <span class="k">def</span> <span class="nf">_evaluate_with_auto_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallel_train_future</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_with_auto_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallel_train_future</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Evaluating current state of </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> for as long as the parallelly &quot;</span>
             <span class="s2">&quot;running training step takes.&quot;</span>
@@ -2709,7 +2709,7 @@ document.write(`
 
         <span class="c1"># Remote function used on healthy EnvRunners to sample, get metrics, and</span>
         <span class="c1"># step counts.</span>
-        <span class="k">def</span> <span class="nf">_env_runner_remote</span><span class="p">(</span><span class="n">worker</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="nb">round</span><span class="p">,</span> <span class="nb">iter</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_env_runner_remote</span><span class="p">(</span><span class="n">worker</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="nb">round</span><span class="p">,</span> <span class="nb">iter</span><span class="p">):</span>
             <span class="c1"># Sample AND get_metrics, but only return metrics (and steps actually taken)</span>
             <span class="c1"># to save time.</span>
             <span class="n">episodes</span> <span class="o">=</span> <span class="n">worker</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
@@ -2861,7 +2861,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">env_runner_results</span><span class="p">,</span> <span class="n">env_steps</span><span class="p">,</span> <span class="n">agent_steps</span><span class="p">,</span> <span class="n">all_batches</span>
 
-    <span class="k">def</span> <span class="nf">_evaluate_with_fixed_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_with_fixed_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># How many episodes/timesteps do we need to run?</span>
         <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">evaluation_duration_unit</span>
         <span class="n">eval_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span>
@@ -2871,7 +2871,7 @@ document.write(`
 
         <span class="c1"># Remote function used on healthy EnvRunners to sample, get metrics, and</span>
         <span class="c1"># step counts.</span>
-        <span class="k">def</span> <span class="nf">_env_runner_remote</span><span class="p">(</span><span class="n">worker</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="nb">round</span><span class="p">,</span> <span class="nb">iter</span><span class="p">,</span> <span class="n">_force_reset</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_env_runner_remote</span><span class="p">(</span><span class="n">worker</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="nb">round</span><span class="p">,</span> <span class="nb">iter</span><span class="p">,</span> <span class="n">_force_reset</span><span class="p">):</span>
             <span class="c1"># Sample AND get_metrics, but only return metrics (and steps actually taken)</span>
             <span class="c1"># to save time. Also return the iteration to check, whether we should</span>
             <span class="c1"># discard and outdated result (from a slow worker).</span>
@@ -3058,7 +3058,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.restore_env_runners">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_env_runners.html#ray.rllib.algorithms.algorithm.Algorithm.restore_env_runners">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">restore_env_runners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_runner_group</span><span class="p">:</span> <span class="n">EnvRunnerGroup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore_env_runners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_runner_group</span><span class="p">:</span> <span class="n">EnvRunnerGroup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Try bringing back unhealthy EnvRunners and - if successful - sync with local.</span>
 
 <span class="sd">        Algorithms that use custom EnvRunners may override this method to</span>
@@ -3094,7 +3094,7 @@ document.write(`
             <span class="n">state</span> <span class="o">=</span> <span class="n">from_env_runner</span><span class="o">.</span><span class="n">get_state</span><span class="p">()</span>
             <span class="n">state_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">_sync_env_runner</span><span class="p">(</span><span class="n">er</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_sync_env_runner</span><span class="p">(</span><span class="n">er</span><span class="p">):</span>
                 <span class="n">er</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">state_ref</span><span class="p">))</span>
 
             <span class="c1"># Take out (old) connector states from local worker&#39;s state.</span>
@@ -3108,7 +3108,7 @@ document.write(`
                     <span class="n">from_env_runner</span><span class="o">.</span><span class="n">module</span>
                 <span class="p">)</span>
 
-                <span class="k">def</span> <span class="nf">_sync_env_runner</span><span class="p">(</span><span class="n">er</span><span class="p">):</span>  <span class="c1"># noqa</span>
+                <span class="k">def</span><span class="w"> </span><span class="nf">_sync_env_runner</span><span class="p">(</span><span class="n">er</span><span class="p">):</span>  <span class="c1"># noqa</span>
                     <span class="c1"># Remove modules, if necessary.</span>
                     <span class="k">for</span> <span class="n">module_id</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">er</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">_rl_modules</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                         <span class="k">if</span> <span class="n">module_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">multi_rl_module_spec</span><span class="o">.</span><span class="n">rl_module_specs</span><span class="p">:</span>
@@ -3165,7 +3165,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.training_step">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.training_step.html#ray.rllib.algorithms.algorithm.Algorithm.training_step">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Default single iteration logic of an algorithm.</span>
 
 <span class="sd">        - Collect on-policy samples (SampleBatches) in parallel using the</span>
@@ -3242,7 +3242,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.get_module">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_module.html#ray.rllib.algorithms.algorithm.Algorithm.get_module">[docs]</a>
     <span class="nd">@PublicAPI</span>
-    <span class="k">def</span> <span class="nf">get_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span> <span class="o">=</span> <span class="n">DEFAULT_MODULE_ID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RLModule</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span> <span class="o">=</span> <span class="n">DEFAULT_MODULE_ID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RLModule</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the (single-agent) RLModule with `model_id` (None if ID not found).</span>
 
 <span class="sd">        Args:</span>
@@ -3263,7 +3263,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.add_module">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.add_module.html#ray.rllib.algorithms.algorithm.Algorithm.add_module">[docs]</a>
     <span class="nd">@PublicAPI</span>
-    <span class="k">def</span> <span class="nf">add_module</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_module</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">,</span>
         <span class="n">module_spec</span><span class="p">:</span> <span class="n">RLModuleSpec</span><span class="p">,</span>
@@ -3355,7 +3355,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">multi_agent</span><span class="p">(</span><span class="n">policies_to_train</span><span class="o">=</span><span class="n">new_should_module_be_updated</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">freeze</span><span class="p">()</span>
 
-        <span class="k">def</span> <span class="nf">_add</span><span class="p">(</span><span class="n">_env_runner</span><span class="p">,</span> <span class="n">_module_spec</span><span class="o">=</span><span class="n">module_spec</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_add</span><span class="p">(</span><span class="n">_env_runner</span><span class="p">,</span> <span class="n">_module_spec</span><span class="o">=</span><span class="n">module_spec</span><span class="p">):</span>
             <span class="c1"># Add the RLModule to the existing one on the EnvRunner.</span>
             <span class="n">_env_runner</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">add_module</span><span class="p">(</span>
                 <span class="n">module_id</span><span class="o">=</span><span class="n">module_id</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="n">_module_spec</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -3403,7 +3403,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.remove_module">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_module.html#ray.rllib.algorithms.algorithm.Algorithm.remove_module">[docs]</a>
     <span class="nd">@PublicAPI</span>
-    <span class="k">def</span> <span class="nf">remove_module</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_module</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3463,7 +3463,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">multi_agent</span><span class="p">(</span><span class="n">policies_to_train</span><span class="o">=</span><span class="n">new_should_module_be_updated</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">freeze</span><span class="p">()</span>
 
-        <span class="k">def</span> <span class="nf">_remove</span><span class="p">(</span><span class="n">_env_runner</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_remove</span><span class="p">(</span><span class="n">_env_runner</span><span class="p">):</span>
             <span class="c1"># Remove the RLModule from the existing one on the EnvRunner.</span>
             <span class="n">_env_runner</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">remove_module</span><span class="p">(</span><span class="n">module_id</span><span class="o">=</span><span class="n">module_id</span><span class="p">)</span>
             <span class="c1"># Update the `agent_to_module_mapping_fn` on the EnvRunner.</span>
@@ -3514,7 +3514,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.get_policy">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_policy.html#ray.rllib.algorithms.algorithm.Algorithm.get_policy">[docs]</a>
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">get_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy_id</span><span class="p">:</span> <span class="n">PolicyID</span> <span class="o">=</span> <span class="n">DEFAULT_POLICY_ID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Policy</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy_id</span><span class="p">:</span> <span class="n">PolicyID</span> <span class="o">=</span> <span class="n">DEFAULT_POLICY_ID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Policy</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return policy for the specified id, or None.</span>
 
 <span class="sd">        Args:</span>
@@ -3526,7 +3526,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.get_weights">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_weights.html#ray.rllib.algorithms.algorithm.Algorithm.get_weights">[docs]</a>
     <span class="nd">@PublicAPI</span>
-    <span class="k">def</span> <span class="nf">get_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policies</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">PolicyID</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policies</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">PolicyID</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a dict mapping Module/Policy IDs to weights.</span>
 
 <span class="sd">        Args:</span>
@@ -3542,7 +3542,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.set_weights">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_weights.html#ray.rllib.algorithms.algorithm.Algorithm.set_weights">[docs]</a>
     <span class="nd">@PublicAPI</span>
-    <span class="k">def</span> <span class="nf">set_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">PolicyID</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">PolicyID</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set RLModule/Policy weights by Module/Policy ID.</span>
 
 <span class="sd">        Args:</span>
@@ -3566,7 +3566,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.add_policy">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.add_policy.html#ray.rllib.algorithms.algorithm.Algorithm.add_policy">[docs]</a>
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">add_policy</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_policy</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">policy_id</span><span class="p">:</span> <span class="n">PolicyID</span><span class="p">,</span>
         <span class="n">policy_cls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Policy</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3695,7 +3695,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.remove_policy">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html#ray.rllib.algorithms.algorithm.Algorithm.remove_policy">[docs]</a>
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">remove_policy</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_policy</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">policy_id</span><span class="p">:</span> <span class="n">PolicyID</span> <span class="o">=</span> <span class="n">DEFAULT_POLICY_ID</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3745,7 +3745,7 @@ document.write(`
                 <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">fn</span><span class="p">(</span><span class="n">worker</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">fn</span><span class="p">(</span><span class="n">worker</span><span class="p">):</span>
             <span class="n">worker</span><span class="o">.</span><span class="n">remove_policy</span><span class="p">(</span>
                 <span class="n">policy_id</span><span class="o">=</span><span class="n">policy_id</span><span class="p">,</span>
                 <span class="n">policy_mapping_fn</span><span class="o">=</span><span class="n">policy_mapping_fn</span><span class="p">,</span>
@@ -3765,7 +3765,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.from_state.html#ray.rllib.algorithms.algorithm.Algorithm.from_state">[docs]</a>
     <span class="nd">@OldAPIStack</span>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_state</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Algorithm&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_state</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Algorithm&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Recovers an Algorithm from a state object.</span>
 
 <span class="sd">        The `state` of an instantiated Algorithm can be retrieved by calling its</span>
@@ -3801,7 +3801,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.export_policy_model">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_model.html#ray.rllib.algorithms.algorithm.Algorithm.export_policy_model">[docs]</a>
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">export_policy_model</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_policy_model</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">export_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">policy_id</span><span class="p">:</span> <span class="n">PolicyID</span> <span class="o">=</span> <span class="n">DEFAULT_POLICY_ID</span><span class="p">,</span>
@@ -3822,7 +3822,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.export_policy_checkpoint">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint.html#ray.rllib.algorithms.algorithm.Algorithm.export_policy_checkpoint">[docs]</a>
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">export_policy_checkpoint</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_policy_checkpoint</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">export_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">policy_id</span><span class="p">:</span> <span class="n">PolicyID</span> <span class="o">=</span> <span class="n">DEFAULT_POLICY_ID</span><span class="p">,</span>
@@ -3848,7 +3848,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.save_checkpoint">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint.html#ray.rllib.algorithms.algorithm.Algorithm.save_checkpoint">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Trainable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">save_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Exports checkpoint to a local directory.</span>
 
 <span class="sd">        The structure of an Algorithm checkpoint dir will be as follows::</span>
@@ -3942,7 +3942,7 @@ document.write(`
 
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Trainable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">load_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># New API stack: Delegate to the `Checkpointable` implementation of</span>
         <span class="c1"># `restore_from_path()`.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_rl_module_and_learner</span><span class="p">:</span>
@@ -3967,7 +3967,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.get_state">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_state.html#ray.rllib.algorithms.algorithm.Algorithm.get_state">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">components</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -4037,7 +4037,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.set_state">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.set_state.html#ray.rllib.algorithms.algorithm.Algorithm.set_state">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Set the (training) EnvRunners&#39; states.</span>
         <span class="k">if</span> <span class="n">COMPONENT_ENV_RUNNER</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span>
@@ -4075,7 +4075,7 @@ document.write(`
 
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_checkpointable_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Checkpointable&quot;</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_checkpointable_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Checkpointable&quot;</span><span class="p">]]:</span>
         <span class="n">components</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span><span class="n">COMPONENT_LEARNER_GROUP</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">learner_group</span><span class="p">),</span>
         <span class="p">]</span>
@@ -4093,7 +4093,7 @@ document.write(`
         <span class="k">return</span> <span class="n">components</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_ctor_args_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ctor_args_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_state</span><span class="p">(),),</span>  <span class="c1"># *args,</span>
             <span class="p">{},</span>  <span class="c1"># **kwargs</span>
@@ -4102,7 +4102,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.restore_from_path">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_from_path.html#ray.rllib.algorithms.algorithm.Algorithm.restore_from_path">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">restore_from_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore_from_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Override from parent method, b/c we might have to sync the EnvRunner weights</span>
         <span class="c1"># after having restored/loaded the LearnerGroup state.</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">restore_from_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -4122,7 +4122,7 @@ document.write(`
 
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Trainable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">log_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">ResultDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">ResultDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Log after the callback is invoked, so that the user has a chance</span>
         <span class="c1"># to mutate the result.</span>
         <span class="c1"># TODO (sven): It might not make sense to pass in the MetricsLogger at this late</span>
@@ -4143,7 +4143,7 @@ document.write(`
         <span class="n">Trainable</span><span class="o">.</span><span class="n">log_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Trainable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Stop all Learners.</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;learner_group&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">learner_group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">learner_group</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
@@ -4166,7 +4166,7 @@ document.write(`
     <span class="nd">@OverrideToImplementCustomLogic</span>
     <span class="nd">@classmethod</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Trainable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">default_resource_request</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default_resource_request</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AlgorithmConfig</span><span class="p">,</span> <span class="n">PartialAlgorithmConfigDict</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Resources</span><span class="p">,</span> <span class="n">PlacementGroupFactory</span><span class="p">]:</span>
         <span class="n">config</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_default_config</span><span class="p">()</span><span class="o">.</span><span class="n">update_from_dict</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
@@ -4214,12 +4214,12 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">_before_evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_before_evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Pre-evaluation callback.&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_get_env_id_and_creator</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_env_id_and_creator</span><span class="p">(</span>
         <span class="n">env_specifier</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EnvType</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">AlgorithmConfig</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">EnvCreator</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns env_id and creator callable given original env id from config.</span>
@@ -4241,7 +4241,7 @@ document.write(`
             <span class="c1"># A class path specifier.</span>
             <span class="k">elif</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">env_specifier</span><span class="p">:</span>
 
-                <span class="k">def</span> <span class="nf">env_creator_from_classpath</span><span class="p">(</span><span class="n">env_context</span><span class="p">):</span>
+                <span class="k">def</span><span class="w"> </span><span class="nf">env_creator_from_classpath</span><span class="p">(</span><span class="n">env_context</span><span class="p">):</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">env_obj</span> <span class="o">=</span> <span class="n">from_config</span><span class="p">(</span><span class="n">env_specifier</span><span class="p">,</span> <span class="n">env_context</span><span class="p">)</span>
                     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
@@ -4274,14 +4274,14 @@ document.write(`
                     <span class="p">)</span>
 
                 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-                <span class="k">class</span> <span class="nc">_wrapper</span><span class="p">(</span><span class="n">env_specifier</span><span class="p">):</span>
+                <span class="k">class</span><span class="w"> </span><span class="nc">_wrapper</span><span class="p">(</span><span class="n">env_specifier</span><span class="p">):</span>
                     <span class="c1"># Add convenience `_get_spaces` and `_is_multi_agent`</span>
                     <span class="c1"># methods:</span>
-                    <span class="k">def</span> <span class="nf">_get_spaces</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                    <span class="k">def</span><span class="w"> </span><span class="nf">_get_spaces</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span>
 
-                    <span class="k">def</span> <span class="nf">_is_multi_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-                        <span class="kn">from</span> <span class="nn">ray.rllib.env.multi_agent_env</span> <span class="kn">import</span> <span class="n">MultiAgentEnv</span>
+                    <span class="k">def</span><span class="w"> </span><span class="nf">_is_multi_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.multi_agent_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentEnv</span>
 
                         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MultiAgentEnv</span><span class="p">)</span>
 
@@ -4307,7 +4307,7 @@ document.write(`
                 <span class="s1">&#39;(e.g., YourEnvCls) or a registered env id (e.g., &quot;your_env&quot;).&#39;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_sync_filters_if_needed</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sync_filters_if_needed</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">central_worker</span><span class="p">:</span> <span class="n">EnvRunner</span><span class="p">,</span>
@@ -4341,7 +4341,7 @@ document.write(`
 
     <span class="nd">@classmethod</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Trainable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">resource_help</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AlgorithmConfig</span><span class="p">,</span> <span class="n">AlgorithmConfigDict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resource_help</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">AlgorithmConfig</span><span class="p">,</span> <span class="n">AlgorithmConfigDict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">You can adjust the resource requests of RLlib Algorithms by calling &quot;</span>
             <span class="s2">&quot;`AlgorithmConfig.env_runners(&quot;</span>
@@ -4354,7 +4354,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Trainable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_auto_filled_metrics</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_auto_filled_metrics</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">now</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">time_this_iter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4379,7 +4379,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.merge_algorithm_configs">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.merge_algorithm_configs.html#ray.rllib.algorithms.algorithm.Algorithm.merge_algorithm_configs">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">merge_algorithm_configs</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">merge_algorithm_configs</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">config1</span><span class="p">:</span> <span class="n">AlgorithmConfigDict</span><span class="p">,</span>
         <span class="n">config2</span><span class="p">:</span> <span class="n">PartialAlgorithmConfigDict</span><span class="p">,</span>
@@ -4427,7 +4427,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.validate_env.html#ray.rllib.algorithms.algorithm.Algorithm.validate_env">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="nd">@ExperimentalAPI</span>
-    <span class="k">def</span> <span class="nf">validate_env</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="n">EnvType</span><span class="p">,</span> <span class="n">env_context</span><span class="p">:</span> <span class="n">EnvContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_env</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="n">EnvType</span><span class="p">,</span> <span class="n">env_context</span><span class="p">:</span> <span class="n">EnvContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Env validator function for this Algorithm class.</span>
 
 <span class="sd">        Override this in child classes to define custom validation</span>
@@ -4445,7 +4445,7 @@ document.write(`
         <span class="k">pass</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_run_one_training_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ResultDict</span><span class="p">,</span> <span class="s2">&quot;TrainIterCtx&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_one_training_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ResultDict</span><span class="p">,</span> <span class="s2">&quot;TrainIterCtx&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs one training iteration (`self.iteration` will be +1 after this).</span>
 
 <span class="sd">        Calls `self.training_step()` repeatedly until the configured minimum time (sec),</span>
@@ -4529,7 +4529,7 @@ document.write(`
         <span class="c1"># result dict.</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">reduce</span><span class="p">(),</span> <span class="n">train_iter_ctx</span>
 
-    <span class="k">def</span> <span class="nf">_run_one_evaluation</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_one_evaluation</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">parallel_train_future</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultDict</span><span class="p">:</span>
@@ -4600,7 +4600,7 @@ document.write(`
 
         <span class="k">return</span> <span class="p">{</span><span class="n">EVALUATION_RESULTS</span><span class="p">:</span> <span class="n">eval_results</span><span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">_run_one_training_iteration_and_evaluation_in_parallel</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_one_training_iteration_and_evaluation_in_parallel</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ResultDict</span><span class="p">,</span> <span class="n">ResultDict</span><span class="p">,</span> <span class="s2">&quot;TrainIterCtx&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs one training iteration and one evaluation step in parallel.</span>
@@ -4636,7 +4636,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">train_results</span><span class="p">,</span> <span class="n">evaluation_results</span><span class="p">,</span> <span class="n">train_iter_ctx</span>
 
-    <span class="k">def</span> <span class="nf">_run_offline_evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_offline_evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs offline evaluation via `OfflineEvaluator.estimate_on_dataset()` API.</span>
 
 <span class="sd">        This method will be used when `evaluation_dataset` is provided.</span>
@@ -4659,7 +4659,7 @@ document.write(`
         <span class="k">return</span> <span class="n">offline_eval_results</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_should_create_evaluation_env_runners</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">eval_config</span><span class="p">:</span> <span class="s2">&quot;AlgorithmConfig&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_should_create_evaluation_env_runners</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">eval_config</span><span class="p">:</span> <span class="s2">&quot;AlgorithmConfig&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Determines whether we need to create evaluation workers.</span>
 
 <span class="sd">        Returns False if we need to run offline evaluation</span>
@@ -4677,7 +4677,7 @@ document.write(`
             <span class="ow">or</span> <span class="n">eval_config</span><span class="o">.</span><span class="n">evaluation_interval</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_compile_iteration_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">train_results</span><span class="p">,</span> <span class="n">eval_results</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compile_iteration_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">train_results</span><span class="p">,</span> <span class="n">eval_results</span><span class="p">):</span>
         <span class="c1"># Error if users still use `self._timers`.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timers</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -4724,7 +4724,7 @@ document.write(`
         <span class="c1"># Compile all throughput stats.</span>
         <span class="n">throughputs</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="k">def</span> <span class="nf">_reduce</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_reduce</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">Stats</span><span class="p">):</span>
                 <span class="n">ret</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span>
                 <span class="n">_throughput</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="n">throughput</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -4742,7 +4742,7 @@ document.write(`
         <span class="n">deep_update</span><span class="p">(</span><span class="n">all_results</span><span class="p">,</span> <span class="n">throughputs</span><span class="p">,</span> <span class="n">new_keys_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">all_results</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_rl_module_and_learner</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(&quot;</span>
@@ -4755,16 +4755,16 @@ document.write(`
             <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">env_runner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">env_runner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The local EnvRunner instance within the algo&#39;s EnvRunnerGroup.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">eval_env_runner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_env_runner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The local EnvRunner instance within the algo&#39;s evaluation EnvRunnerGroup.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span>
 
-    <span class="k">def</span> <span class="nf">_record_usage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_record_usage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Record the framework and algorithm used.</span>
 
 <span class="sd">        Args:</span>
@@ -4779,7 +4779,7 @@ document.write(`
         <span class="n">record_extra_usage_tag</span><span class="p">(</span><span class="n">TagKey</span><span class="o">.</span><span class="n">RLLIB_ALGORITHM</span><span class="p">,</span> <span class="n">alg</span><span class="p">)</span>
 
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">_export_model</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_model</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">export_formats</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">export_dir</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="n">ExportFormat</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">export_formats</span><span class="p">)</span>
@@ -4799,7 +4799,7 @@ document.write(`
         <span class="k">return</span> <span class="n">exported</span>
 
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns current state of Algorithm, sufficient to restore it from scratch.</span>
 
 <span class="sd">        Returns:</span>
@@ -4845,7 +4845,7 @@ document.write(`
         <span class="k">return</span> <span class="n">state</span>
 
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the algorithm to the provided state.</span>
 
 <span class="sd">        Args:</span>
@@ -4871,7 +4871,7 @@ document.write(`
                 <span class="c1"># Avoid `state` being pickled into the remote function below.</span>
                 <span class="n">_eval_policy_mapping_fn</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;eval_policy_mapping_fn&quot;</span><span class="p">)</span>
 
-                <span class="k">def</span> <span class="nf">_setup_eval_worker</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
+                <span class="k">def</span><span class="w"> </span><span class="nf">_setup_eval_worker</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
                     <span class="n">w</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">remote_state_ref</span><span class="p">))</span>
                     <span class="c1"># Override `policy_mapping_fn` as it might be different for eval</span>
                     <span class="c1"># workers.</span>
@@ -4909,7 +4909,7 @@ document.write(`
 
     <span class="nd">@OldAPIStack</span>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_checkpoint_info_to_algorithm_state</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_checkpoint_info_to_algorithm_state</span><span class="p">(</span>
         <span class="n">checkpoint_info</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">policy_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Collection</span><span class="p">[</span><span class="n">PolicyID</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -5062,7 +5062,7 @@ document.write(`
         <span class="k">return</span> <span class="n">state</span>
 
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">_create_local_replay_buffer_if_necessary</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_local_replay_buffer_if_necessary</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">PartialAlgorithmConfigDict</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MultiAgentReplayBuffer</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a MultiAgentReplayBuffer instance if necessary.</span>
@@ -5092,7 +5092,7 @@ document.write(`
         <span class="k">return</span> <span class="n">from_config</span><span class="p">(</span><span class="n">ReplayBuffer</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;replay_buffer_config&quot;</span><span class="p">])</span>
 
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">_run_one_training_iteration_old_api_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_one_training_iteration_old_api_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timers</span><span class="p">[</span><span class="n">TRAINING_ITERATION_TIMER</span><span class="p">]:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;framework&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;tf2&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">tf</span><span class="o">.</span><span class="n">executing_eagerly</span><span class="p">():</span>
                 <span class="n">tf1</span><span class="o">.</span><span class="n">enable_eager_execution</span><span class="p">()</span>
@@ -5113,7 +5113,7 @@ document.write(`
         <span class="k">return</span> <span class="n">results</span><span class="p">,</span> <span class="n">train_iter_ctx</span>
 
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">_compile_iteration_results_old_api_stack</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compile_iteration_results_old_api_stack</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">episodes_this_iter</span><span class="p">,</span> <span class="n">step_ctx</span><span class="p">,</span> <span class="n">iteration_results</span>
     <span class="p">):</span>
         <span class="c1"># Results to be returned.</span>
@@ -5238,7 +5238,7 @@ document.write(`
         <span class="s2">&quot;actions through `RLModule.forward_inference({&#39;obs&#39;: [obs batch]})`.&quot;</span><span class="p">,</span>
         <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">compute_single_action</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_single_action</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">observation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TensorStructType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">TensorStructType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -5351,7 +5351,7 @@ document.write(`
         <span class="s2">&quot;through `RLModule.forward_inference({&#39;obs&#39;: [obs batch]})`.&quot;</span><span class="p">,</span>
         <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">compute_actions</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_actions</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">observations</span><span class="p">:</span> <span class="n">TensorStructType</span><span class="p">,</span>
         <span class="n">state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">TensorStructType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -5434,7 +5434,7 @@ document.write(`
             <span class="k">return</span> <span class="n">actions</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Algorithm.restore_env_runners&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">restore_workers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore_workers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">restore_env_runners</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span>
@@ -5442,7 +5442,7 @@ document.write(`
         <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">workers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">workers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span>
@@ -5450,18 +5450,18 @@ document.write(`
         <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">evaluation_workers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluation_workers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span></div>
 
 
 
-<span class="k">class</span> <span class="nc">TrainIterCtx</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo</span><span class="p">:</span> <span class="n">Algorithm</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrainIterCtx</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo</span><span class="p">:</span> <span class="n">Algorithm</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">algo</span> <span class="o">=</span> <span class="n">algo</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time_start</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time_stop</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Before first call to `step()`, `results` is expected to be None -&gt;</span>
         <span class="c1"># Start with self.failures=-1 -&gt; set to 0 before the very first call</span>
         <span class="c1"># to `self.step()`.</span>
@@ -5498,14 +5498,14 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time_stop</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">get_time_taken_sec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_time_taken_sec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the time we spent in the context in seconds.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_stop</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_start</span>
 
-    <span class="k">def</span> <span class="nf">should_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">should_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
         <span class="c1"># Before first call to `step()`.</span>
         <span class="k">if</span> <span class="n">results</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
             <span class="c1"># Fail after n retries.</span>

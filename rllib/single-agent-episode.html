@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1451,7 +1451,7 @@ but for <a class="reference internal" href="package_ref/env/env/ray.rllib.env.mu
 <p>RLlib usually takes care of creating <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> instances
 and moving them around, for example from <a class="reference internal" href="package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.html#ray.rllib.env.env_runner.EnvRunner" title="ray.rllib.env.env_runner.EnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvRunner</span></code></a> to <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a>.
 However, here is how to manually generate and fill an initially empty episode with dummy data:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.env.single_agent_episode</span> <span class="kn">import</span> <span class="n">SingleAgentEpisode</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.single_agent_episode</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleAgentEpisode</span>
 
 <span class="c1"># Construct a new episode (without any data in it yet).</span>
 <span class="n">episode</span> <span class="o">=</span> <span class="n">SingleAgentEpisode</span><span class="p">()</span>
@@ -1505,7 +1505,7 @@ are shown here. Their behavior is intuitive, returning a single item when provid
 <p>The following code snippet summarizes the various capabilities of the different getter methods:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># We can now access information from the episode via its getter APIs.</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.test_utils</span> <span class="kn">import</span> <span class="n">check</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.test_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">check</span>
 
 <span class="c1"># Get the very first observation (&quot;reset observation&quot;). Note that a single observation</span>
 <span class="c1"># is returned here (not a list of size 1 or a batch of size 1).</span>

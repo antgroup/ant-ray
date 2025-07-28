@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1405,8 +1405,8 @@ document.write(`
 <span class="sig-prename descclassname"><span class="pre">ray.serve.llm.</span></span><span class="sig-name descname"><span class="pre">build_llm_deployment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">llm_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ray.serve.llm.LLMConfig.html#ray.serve.llm.LLMConfig" title="ray.serve.llm.LLMConfig"><span class="pre">LLMConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="ray.serve.Application.html#ray.serve.Application" title="ray.serve.Application"><span class="pre">Application</span></a></span></span><a class="reference internal" href="../../../_modules/ray/serve/llm.html#build_llm_deployment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ray.serve.llm.build_llm_deployment" title="Link to this definition">#</a></dt>
 <dd><p>Helper to build a single vllm deployment from the given llm config.</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray.serve.llm</span> <span class="kn">import</span> <span class="n">LLMConfig</span><span class="p">,</span> <span class="n">build_llm_deployment</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.llm</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLMConfig</span><span class="p">,</span> <span class="n">build_llm_deployment</span>
 
 <span class="c1"># Configure the model</span>
 <span class="n">llm_config</span> <span class="o">=</span> <span class="n">LLMConfig</span><span class="p">(</span>
@@ -1430,10 +1430,10 @@ document.write(`
 <span class="n">model_handle</span> <span class="o">=</span> <span class="n">serve</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">llm_app</span><span class="p">)</span>
 
 <span class="c1"># Querying the model handle</span>
-<span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="n">model_handle</span> <span class="o">=</span> <span class="n">model_handle</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">query_model</span><span class="p">(</span><span class="n">model_handle</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">ray.serve.llm.openai_api_models</span> <span class="kn">import</span> <span class="n">ChatCompletionRequest</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">query_model</span><span class="p">(</span><span class="n">model_handle</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.llm.openai_api_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatCompletionRequest</span>
 
     <span class="n">request</span> <span class="o">=</span> <span class="n">ChatCompletionRequest</span><span class="p">(</span>
         <span class="n">model</span><span class="o">=</span><span class="s2">&quot;qwen-0.5b&quot;</span><span class="p">,</span>

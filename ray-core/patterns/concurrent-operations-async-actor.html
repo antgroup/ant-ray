@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1418,31 +1418,31 @@ Normally the control is yielded when the method is doing IO operations but you c
 <p>You have an actor with a long polling method that continuously fetches tasks from the remote store and executes them.
 You also want to query the number of tasks executed while the long polling method is running.</p>
 <p>With the default actor, the code will look like this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">TaskStore</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">get_next_task</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TaskStore</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_next_task</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;task&quot;</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">TaskExecutor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_store</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TaskExecutor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_store</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task_store</span> <span class="o">=</span> <span class="n">task_store</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_executed_tasks</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">task</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">task_store</span><span class="o">.</span><span class="n">get_next_task</span><span class="o">.</span><span class="n">remote</span><span class="p">())</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_execute_task</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_execute_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_execute_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
         <span class="c1"># Executing the task</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_executed_tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_executed_tasks</span> <span class="o">+</span> <span class="mi">1</span>
 
-    <span class="k">def</span> <span class="nf">get_num_executed_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_num_executed_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_executed_tasks</span>
 
 
@@ -1460,12 +1460,12 @@ You also want to query the number of tasks executed while the long polling metho
 <p>This is problematic because <code class="docutils literal notranslate"><span class="pre">TaskExecutor.run</span></code> method runs forever and never yield the control to run other methods.
 We can solve this problem by using <a class="reference internal" href="../actors/async_api.html#async-actors"><span class="std std-ref">async actors</span></a> and use <code class="docutils literal notranslate"><span class="pre">await</span></code> to yield control:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">AsyncTaskExecutor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_store</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AsyncTaskExecutor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_store</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task_store</span> <span class="o">=</span> <span class="n">task_store</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_executed_tasks</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="c1"># Here we use await instead of ray.get() to</span>
             <span class="c1"># wait for the next task and it will yield</span>
@@ -1473,11 +1473,11 @@ We can solve this problem by using <a class="reference internal" href="../actors
             <span class="n">task</span> <span class="o">=</span> <span class="k">await</span> <span class="n">task_store</span><span class="o">.</span><span class="n">get_next_task</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_execute_task</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_execute_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_execute_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
         <span class="c1"># Executing the task</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_executed_tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_executed_tasks</span> <span class="o">+</span> <span class="mi">1</span>
 
-    <span class="k">def</span> <span class="nf">get_num_executed_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_num_executed_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_executed_tasks</span>
 
 

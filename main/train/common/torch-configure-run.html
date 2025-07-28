@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1397,7 +1397,7 @@ document.write(`
 <li><p><a class="reference internal" href="../api/doc/ray.train.ScalingConfig.html#ray.train.ScalingConfig" title="ray.train.ScalingConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">num_workers</span></code></a> - The number of distributed training worker processes.</p></li>
 <li><p><a class="reference internal" href="../api/doc/ray.train.ScalingConfig.html#ray.train.ScalingConfig" title="ray.train.ScalingConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">use_gpu</span></code></a> - Whether each worker should use a GPU (or CPU).</p></li>
 </ol>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
 <span class="n">scaling_config</span> <span class="o">=</span> <span class="n">ScalingConfig</span><span class="p">(</span><span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">use_gpu</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1407,7 +1407,7 @@ document.write(`
 <h1>Configure persistent storage<a class="headerlink" href="#configure-persistent-storage" title="Link to this heading">#</a></h1>
 <p>Create a <a class="reference internal" href="../api/doc/ray.train.RunConfig.html#ray.train.RunConfig" title="ray.train.RunConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">RunConfig</span></code></a> object to specify the path where results
 (including checkpoints and artifacts) will be saved.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">RunConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunConfig</span>
 
 <span class="c1"># Local path (/some/local/path/unique_run_name)</span>
 <span class="n">run_config</span> <span class="o">=</span> <span class="n">RunConfig</span><span class="p">(</span><span class="n">storage_path</span><span class="o">=</span><span class="s2">&quot;/some/local/path&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;unique_run_name&quot;</span><span class="p">)</span>
@@ -1432,7 +1432,7 @@ during checkpointing for multi-node clusters.</p>
 <h1>Launch a training job<a class="headerlink" href="#launch-a-training-job" title="Link to this heading">#</a></h1>
 <p>Tying this all together, you can now launch a distributed training job
 with a <a class="reference internal" href="../api/doc/ray.train.torch.TorchTrainer.html#ray.train.torch.TorchTrainer" title="ray.train.torch.TorchTrainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">TorchTrainer</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
 
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">TorchTrainer</span><span class="p">(</span>
     <span class="n">train_func</span><span class="p">,</span> <span class="n">scaling_config</span><span class="o">=</span><span class="n">scaling_config</span><span class="p">,</span> <span class="n">run_config</span><span class="o">=</span><span class="n">run_config</span>

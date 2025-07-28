@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,16 +1389,16 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.algorithms.bc.bc</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.marwil.marwil</span> <span class="kn">import</span> <span class="n">MARWIL</span><span class="p">,</span> <span class="n">MARWILConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">override</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">RLModuleSpecType</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.marwil.marwil</span><span class="w"> </span><span class="kn">import</span> <span class="n">MARWIL</span><span class="p">,</span> <span class="n">MARWILConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpecType</span>
 
 
 <div class="viewcode-block" id="BCConfig">
 <a class="viewcode-back" href="../../../../../rllib/rllib-algorithms.html#ray.rllib.algorithms.bc.bc.BCConfig">[docs]</a>
-<span class="k">class</span> <span class="nc">BCConfig</span><span class="p">(</span><span class="n">MARWILConfig</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BCConfig</span><span class="p">(</span><span class="n">MARWILConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a configuration class from which a new BC Algorithm can be built</span>
 
 <span class="sd">    .. testcode::</span>
@@ -1441,7 +1441,7 @@ document.write(`
 <span class="sd">        ).fit()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_class</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_class</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">algo_class</span><span class="o">=</span><span class="n">algo_class</span> <span class="ow">or</span> <span class="n">BC</span><span class="p">)</span>
 
         <span class="c1"># fmt: off</span>
@@ -1460,9 +1460,9 @@ document.write(`
         <span class="c1"># fmt: on</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_default_rl_module_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RLModuleSpecType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_rl_module_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RLModuleSpecType</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">framework_str</span> <span class="o">==</span> <span class="s2">&quot;torch&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.bc.torch.default_bc_torch_rl_module</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.bc.torch.default_bc_torch_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
                 <span class="n">DefaultBCTorchRLModule</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -1474,7 +1474,7 @@ document.write(`
             <span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">build_learner_connector</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_learner_connector</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">input_observation_space</span><span class="p">,</span>
         <span class="n">input_action_space</span><span class="p">,</span>
@@ -1493,7 +1493,7 @@ document.write(`
         <span class="k">return</span> <span class="n">pipeline</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">MARWILConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Call super&#39;s validation method.</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 
@@ -1502,7 +1502,7 @@ document.write(`
 
 
 
-<span class="k">class</span> <span class="nc">BC</span><span class="p">(</span><span class="n">MARWIL</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BC</span><span class="p">(</span><span class="n">MARWIL</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Behavioral Cloning (derived from MARWIL).</span>
 
 <span class="sd">    Uses MARWIL with beta force-set to 0.0.</span>
@@ -1510,7 +1510,7 @@ document.write(`
 
     <span class="nd">@classmethod</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">MARWIL</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_default_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfig</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfig</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">BCConfig</span><span class="p">()</span>
 </pre></div>
 

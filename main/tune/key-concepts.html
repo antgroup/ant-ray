@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1427,14 +1427,14 @@ Function API</label><div class="sd-tab-content docutils">
 <p>With the <a class="reference internal" href="api/trainable.html#tune-function-api"><span class="std std-ref">the function-based API</span></a> you create a function (here called <code class="docutils literal notranslate"><span class="pre">trainable</span></code>) that
 takes in a dictionary of hyperparameters.
 This function computes a <code class="docutils literal notranslate"><span class="pre">score</span></code> in a “training loop” and <code class="code docutils literal notranslate"><span class="pre">reports</span></code> this score back to Tune:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
 
 
-<span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>  <span class="c1"># Define an objective function.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>  <span class="c1"># Define an objective function.</span>
     <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span>
 
 
-<span class="k">def</span> <span class="nf">trainable</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>  <span class="c1"># Pass a &quot;config&quot; dictionary into your trainable.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">trainable</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>  <span class="c1"># Pass a &quot;config&quot; dictionary into your trainable.</span>
 
     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>  <span class="c1"># &quot;Train&quot; for 20 iterations and compute intermediate scores.</span>
         <span class="n">score</span> <span class="o">=</span> <span class="n">objective</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">])</span>
@@ -1454,21 +1454,21 @@ You can also use <code class="docutils literal notranslate"><span class="pre">yi
 </input><label class="sd-tab-label" for="sd-tab-item-1">
 Class API</label><div class="sd-tab-content docutils">
 <p>Here’s an example of specifying the objective function using the <a class="reference internal" href="api/trainable.html#tune-class-api"><span class="std std-ref">class-based API</span></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 
-<span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span>
 
 
-<span class="k">class</span> <span class="nc">Trainable</span><span class="p">(</span><span class="n">tune</span><span class="o">.</span><span class="n">Trainable</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Trainable</span><span class="p">(</span><span class="n">tune</span><span class="o">.</span><span class="n">Trainable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="c1"># config (dict): A dict of hyperparameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># This is called iteratively.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># This is called iteratively.</span>
         <span class="n">score</span> <span class="o">=</span> <span class="n">objective</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="n">score</span><span class="p">}</span>
@@ -1581,7 +1581,7 @@ with a good starting point for your hyperparameter optimization.</p>
 <p>For instance, to use Tune with simple Bayesian optimization through the <code class="docutils literal notranslate"><span class="pre">bayesian-optimization</span></code> package
 (make sure to first run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">bayesian-optimization</span></code>), we can define an <code class="docutils literal notranslate"><span class="pre">algo</span></code> using <code class="docutils literal notranslate"><span class="pre">BayesOptSearch</span></code>.
 Simply pass in a <code class="docutils literal notranslate"><span class="pre">search_alg</span></code> argument to <code class="docutils literal notranslate"><span class="pre">tune.TuneConfig</span></code>, which is taken in by <code class="docutils literal notranslate"><span class="pre">Tuner</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.tune.search.bayesopt</span> <span class="kn">import</span> <span class="n">BayesOptSearch</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.bayesopt</span><span class="w"> </span><span class="kn">import</span> <span class="n">BayesOptSearch</span>
 
 <span class="c1"># Define the search space</span>
 <span class="n">search_space</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">)}</span>
@@ -1695,7 +1695,7 @@ configurations to evaluate.</p>
 All schedulers take in a <code class="docutils literal notranslate"><span class="pre">metric</span></code>, which is the value reported by your trainable.
 The <code class="docutils literal notranslate"><span class="pre">metric</span></code> is then maximized or minimized according to the <code class="docutils literal notranslate"><span class="pre">mode</span></code> you provide.
 To use a scheduler, just pass in a <code class="docutils literal notranslate"><span class="pre">scheduler</span></code> argument to <code class="docutils literal notranslate"><span class="pre">tune.TuneConfig</span></code>, which is taken in by <code class="docutils literal notranslate"><span class="pre">Tuner</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.tune.schedulers</span> <span class="kn">import</span> <span class="n">HyperBandScheduler</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers</span><span class="w"> </span><span class="kn">import</span> <span class="n">HyperBandScheduler</span>
 
 <span class="c1"># Create HyperBand scheduler and minimize the score</span>
 <span class="n">hyperband</span> <span class="o">=</span> <span class="n">HyperBandScheduler</span><span class="p">(</span><span class="n">metric</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;max&quot;</span><span class="p">)</span>

@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1463,8 +1463,8 @@ sudo<span class="w"> </span>/usr/sbin/sshd<span class="w"> </span>-D
 <section id="create-a-ray-task">
 <h2>Create a Ray task<a class="headerlink" href="#create-a-ray-task" title="Link to this heading">#</a></h2>
 <p>Create a file <code class="code docutils literal notranslate"><span class="pre">job.py</span></code> with the following snippet. Add <code class="code docutils literal notranslate"><span class="pre">breakpoint()</span></code> in the Ray task. If you want to use the post-mortem debugging below, also add the <code class="code docutils literal notranslate"><span class="pre">RAY_DEBUG_POST_MORTEM=1</span></code> environment variable.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
 <span class="c1"># Add the RAY_DEBUG_POST_MORTEM=1 environment variable</span>
 <span class="c1"># if you want to activate post-mortem debugging</span>
@@ -1476,14 +1476,14 @@ sudo<span class="w"> </span>/usr/sbin/sshd<span class="w"> </span>-D
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">my_task</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_task</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
     <span class="nb">breakpoint</span><span class="p">()</span>  <span class="c1"># Add a breakpoint in the Ray task.</span>
     <span class="k">return</span> <span class="n">y</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">post_mortem</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">post_mortem</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="n">x</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;An exception is raised.&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x</span>

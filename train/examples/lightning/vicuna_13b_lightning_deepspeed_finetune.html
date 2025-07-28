@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1473,7 +1473,7 @@ document.write(`
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">NUM_WORKERS</span> <span class="o">=</span> <span class="mi">16</span>
 <span class="n">BATCH_SIZE_PER_WORKER</span> <span class="o">=</span> <span class="mi">8</span>
@@ -1521,11 +1521,11 @@ document.write(`
 <p>Here we preprocess the CoNaLa dataset with Ray Data. You can also use HuggingFace Datasets and pass it directly to <code class="docutils literal notranslate"><span class="pre">LightningConfigBuilder.fit_params()</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span>
-<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">concatenate_datasets</span><span class="p">,</span> <span class="n">load_dataset</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">concatenate_datasets</span><span class="p">,</span> <span class="n">load_dataset</span>
 
 <span class="c1"># Combine the curated dataset and automatically-mined dataset</span>
 <span class="n">hf_dataset_curated</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;neulab/conala&quot;</span><span class="p">)</span>
@@ -1542,7 +1542,7 @@ document.write(`
 <span class="n">PROMPT_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;Intent: </span><span class="si">{intent}</span><span class="se">\n</span><span class="s2">One-line code snippet: </span><span class="si">{snippet}</span><span class="s2">&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">fill_prompt</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fill_prompt</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
     <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;input_sentence&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
         <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">PROMPT_TEMPLATE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">intent</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;rewritten_intent&quot;</span><span class="p">]</span>
@@ -1557,7 +1557,7 @@ document.write(`
 
 
 <span class="c1"># Tokenize input sentences to tensors</span>
-<span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">tokenize</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
     <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
         <span class="n">MODEL_NAME</span><span class="p">,</span> <span class="n">padding_side</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">use_fast</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">)</span>
@@ -1592,37 +1592,37 @@ document.write(`
 <p>Here we load the pre-trained model weights from HuggingFace Model Hub, and wrap them into <code class="docutils literal notranslate"><span class="pre">pl.LightningModule</span></code>. We adopted the efficient model initialization techniques introduced in <a class="reference external" href="https://github.com/Lightning-Universe/lightning-transformers">Lightning-transformers</a> to avoid unnecessary full weights loading.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">transformers</span>
-<span class="kn">import</span> <span class="nn">lightning.pytorch</span> <span class="k">as</span> <span class="nn">pl</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span>
-<span class="kn">from</span> <span class="nn">deepspeed.ops.adam</span> <span class="kn">import</span> <span class="n">DeepSpeedCPUAdam</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">transformers</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">lightning.pytorch</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">deepspeed.ops.adam</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeepSpeedCPUAdam</span>
 
 
-<span class="k">class</span> <span class="nc">ZeRO3Config</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pl_module</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZeRO3Config</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pl_module</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">pl_module</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">config</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">is_zero3</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_zero3</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>
 
 
-<span class="k">def</span> <span class="nf">enable_transformers_pretrained_deepspeed_sharding</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">enable_transformers_pretrained_deepspeed_sharding</span><span class="p">(</span>
     <span class="n">pl_module</span><span class="p">:</span> <span class="s2">&quot;pl.LightningModule&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">transformers</span><span class="o">.</span><span class="n">deepspeed</span><span class="o">.</span><span class="n">_hf_deepspeed_config_weak_ref</span> <span class="o">=</span> <span class="n">ZeRO3Config</span><span class="p">(</span><span class="n">pl_module</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">Vicuna13BModel</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Vicuna13BModel</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="c1"># Enable tf32 for better performance</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">matmul</span><span class="o">.</span><span class="n">allow_tf32</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Defer model initialization to inject deepspeed configs to HF.</span>
         <span class="c1"># During initialization, HF transformers can immediately partition </span>
         <span class="c1"># the model across all gpus avoid the overhead in time and memory </span>
@@ -1633,7 +1633,7 @@ document.write(`
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DeepSpeed Configs: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model Archetecture: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span>
             <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">],</span>
             <span class="n">labels</span><span class="o">=</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">],</span>
@@ -1641,12 +1641,12 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">outputs</span><span class="o">.</span><span class="n">loss</span>
 
-    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;train_loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sync_dist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">loss</span>
 
-    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DeepSpeedCPUAdam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1669,7 +1669,7 @@ document.write(`
 <p>Regarding other knobs such as <code class="docutils literal notranslate"><span class="pre">reduce_bucket_size</span></code>, <code class="docutils literal notranslate"><span class="pre">stage3_prefetch_bucket_size</span></code> and <code class="docutils literal notranslate"><span class="pre">stage3_param_persistence_threshold</span></code>, we kept them as the <a class="reference external" href="https://huggingface.co/docs/transformers/main_classes/deepspeed#zero3-config">default values in HuggingFace</a>. Feel free to further adjust them to speed up the training process.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoConfig</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">MODEL_NAME</span><span class="p">)</span>
 <span class="n">HIDDEN_SIZE</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">hidden_size</span>
@@ -1704,10 +1704,10 @@ document.write(`
 <p>For Ray Data ingestion, we fetched the preprocessed and sharded dataset with <a class="reference internal" href="../../api/doc/ray.train.get_dataset_shard.html#ray.train.get_dataset_shard" title="ray.train.get_dataset_shard"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_dataset_shard()</span></code></a>, and created a dataloader with <a class="reference internal" href="../../../data/api/doc/ray.data.Dataset.iter_torch_batches.html#ray.data.Dataset.iter_torch_batches" title="ray.data.Dataset.iter_torch_batches"><code class="xref py py-meth docutils literal notranslate"><span class="pre">iter_torch_batches()</span></code></a>. It returns a custom iterator that replaces the Torch DataLoader.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray.train</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">CheckpointConfig</span><span class="p">,</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
-<span class="kn">from</span> <span class="nn">ray.train.lightning</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray.train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">CheckpointConfig</span><span class="p">,</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.lightning</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">prepare_trainer</span><span class="p">,</span>
     <span class="n">RayDeepSpeedStrategy</span><span class="p">,</span> 
     <span class="n">RayLightningEnvironment</span><span class="p">,</span> 
@@ -1715,7 +1715,7 @@ document.write(`
 <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Training function for each worker.&quot;&quot;&quot;</span>
 
     <span class="c1"># Unpack the `train_loop_config`</span>
@@ -2250,7 +2250,7 @@ Epoch 0: : 58it [36:47, 38.07s/it, v_num=0, train_loss=0.523]
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;aws s3 sync s3://</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2"> /mnt/local_storage&quot;</span><span class="p">)</span>
 </pre></div>
@@ -2265,11 +2265,11 @@ Epoch 0: : 58it [36:47, 38.07s/it, v_num=0, train_loss=0.523]
 <p>Next, we removed the optimizer states and consolidate the checkpoint into a single binary file using DeepSpeed utilities. Also, since we wrapped vicuna-13b within a <code class="docutils literal notranslate"><span class="pre">LightningModule</span></code>, we need to remove the prefix <code class="docutils literal notranslate"><span class="pre">_forward_module.model.model</span></code> so that we can directly load the checkpoint into a HF vicuna model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">deepspeed.utils.zero_to_fp32</span> <span class="kn">import</span> <span class="n">get_fp32_state_dict_from_zero_checkpoint</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">deepspeed.utils.zero_to_fp32</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_fp32_state_dict_from_zero_checkpoint</span>
 
-<span class="k">def</span> <span class="nf">extract_fp32_ckpt_from_zero</span><span class="p">(</span><span class="n">zero_ckpt_dir</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_fp32_ckpt_from_zero</span><span class="p">(</span><span class="n">zero_ckpt_dir</span><span class="p">):</span>
     <span class="n">state_dict</span> <span class="o">=</span> <span class="n">get_fp32_state_dict_from_zero_checkpoint</span><span class="p">(</span><span class="n">zero_ckpt_dir</span><span class="p">)</span>
     <span class="n">vicuna_state_dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_forward_module.model.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
@@ -2303,11 +2303,11 @@ Reconstructed Trainable fp32 state dict with 363 params 13015864320 elements
 <p>This ensures that only 1x model size of RAM is used for model initialization.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">lightning.pytorch</span> <span class="k">as</span> <span class="nn">pl</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoConfig</span><span class="p">,</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span>
-<span class="kn">from</span> <span class="nn">accelerate</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">lightning.pytorch</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoConfig</span><span class="p">,</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">accelerate</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">init_empty_weights</span><span class="p">,</span>
     <span class="n">infer_auto_device_map</span><span class="p">,</span>
     <span class="n">load_checkpoint_and_dispatch</span><span class="p">,</span>
@@ -2338,7 +2338,7 @@ Reconstructed Trainable fp32 state dict with 363 params 13015864320 elements
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">pipeline</span>
 
 <span class="n">generator</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span>
     <span class="s2">&quot;text-generation&quot;</span><span class="p">,</span>
@@ -2415,7 +2415,7 @@ One-line code snippet:  `os.kill(os.getpid(), signal.SIGUSR1)``
 <p>The generated code snippets look pretty reasonable. The results covered Pandas operations, regular expressions, and Linux commands. Let’s test them one by one.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s2">&quot;col&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;abc def ghi&quot;</span><span class="p">,</span> <span class="s2">&quot; 12 3 456&quot;</span><span class="p">,</span> <span class="s2">&quot;     &quot;</span><span class="p">]})</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Before</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
@@ -2442,7 +2442,7 @@ After
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 
 <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">&lt;bookstore&gt;</span>
@@ -2476,7 +2476,7 @@ After
 <p>Finally, let’s hand it over to LLM and let it wrap up the demo:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">signal</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">signal</span>
 
 <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGUSR1</span><span class="p">)</span>  <span class="c1"># Terminate the current process~</span>
 </pre></div>

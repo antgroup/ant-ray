@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1421,19 +1421,19 @@ You can <code class="docutils literal notranslate"><span class="pre">await</span
 <span id="serve-model-composition-deployment-handles"></span><h2>Basic DeploymentHandle example<a class="headerlink" href="#basic-deploymenthandle-example" title="Link to this heading">#</a></h2>
 <p>This example has two deployments:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># File name: hello.py</span>
-<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">ray.serve.handle</span> <span class="kn">import</span> <span class="n">DeploymentHandle</span>
+<span class="linenos"> 2</span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="linenos"> 3</span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.handle</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentHandle</span>
 <span class="linenos"> 4</span>
 <span class="linenos"> 5</span>
 <span class="linenos"> 6</span><span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="linenos"> 7</span><span class="k">class</span> <span class="nc">LanguageClassifer</span><span class="p">:</span>
-<span class="linenos"> 8</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="linenos"> 7</span><span class="k">class</span><span class="w"> </span><span class="nc">LanguageClassifer</span><span class="p">:</span>
+<span class="linenos"> 8</span>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 <span class="linenos"> 9</span>        <span class="bp">self</span><span class="p">,</span> <span class="n">spanish_responder</span><span class="p">:</span> <span class="n">DeploymentHandle</span><span class="p">,</span> <span class="n">french_responder</span><span class="p">:</span> <span class="n">DeploymentHandle</span>
 <span class="linenos">10</span>    <span class="p">):</span>
 <span class="linenos">11</span>        <span class="bp">self</span><span class="o">.</span><span class="n">spanish_responder</span> <span class="o">=</span> <span class="n">spanish_responder</span>
 <span class="linenos">12</span>        <span class="bp">self</span><span class="o">.</span><span class="n">french_responder</span> <span class="o">=</span> <span class="n">french_responder</span>
 <span class="linenos">13</span>
-<span class="linenos">14</span>    <span class="k">async</span> <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">http_request</span><span class="p">):</span>
+<span class="linenos">14</span>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">http_request</span><span class="p">):</span>
 <span class="linenos">15</span>        <span class="n">request</span> <span class="o">=</span> <span class="k">await</span> <span class="n">http_request</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 <span class="linenos">16</span>        <span class="n">language</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">request</span><span class="p">[</span><span class="s2">&quot;language&quot;</span><span class="p">],</span> <span class="n">request</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
 <span class="linenos">17</span>
@@ -1448,14 +1448,14 @@ You can <code class="docutils literal notranslate"><span class="pre">await</span
 <span class="linenos">26</span>
 <span class="linenos">27</span>
 <span class="linenos">28</span><span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="linenos">29</span><span class="k">class</span> <span class="nc">SpanishResponder</span><span class="p">:</span>
-<span class="linenos">30</span>    <span class="k">def</span> <span class="nf">say_hello</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="linenos">29</span><span class="k">class</span><span class="w"> </span><span class="nc">SpanishResponder</span><span class="p">:</span>
+<span class="linenos">30</span>    <span class="k">def</span><span class="w"> </span><span class="nf">say_hello</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="linenos">31</span>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Hola </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="linenos">32</span>
 <span class="linenos">33</span>
 <span class="linenos">34</span><span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="linenos">35</span><span class="k">class</span> <span class="nc">FrenchResponder</span><span class="p">:</span>
-<span class="linenos">36</span>    <span class="k">def</span> <span class="nf">say_hello</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="linenos">35</span><span class="k">class</span><span class="w"> </span><span class="nc">FrenchResponder</span><span class="p">:</span>
+<span class="linenos">36</span>    <span class="k">def</span><span class="w"> </span><span class="nf">say_hello</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="linenos">37</span>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Bonjour </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="linenos">38</span>
 <span class="linenos">39</span>
@@ -1494,7 +1494,7 @@ You should use <code class="docutils literal notranslate"><span class="pre">awai
 </div>
 <p>You can use this client script to interact with the example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># File name: hello_client.py</span>
-<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 
 <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
     <span class="s2">&quot;http://localhost:8000&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="s2">&quot;spanish&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Dora&quot;</span><span class="p">}</span>
@@ -1528,35 +1528,35 @@ manages the <code class="docutils literal notranslate"><span class="pre">await</
 </ul>
 <p>Note how the response from the <code class="docutils literal notranslate"><span class="pre">Adder</span></code> handle passes directly to the <code class="docutils literal notranslate"><span class="pre">Multiplier</span></code> handle, but inside the multiplier, the input argument resolves to the output of the <code class="docutils literal notranslate"><span class="pre">Adder</span></code> call.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># File name: chain.py</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray.serve.handle</span> <span class="kn">import</span> <span class="n">DeploymentHandle</span><span class="p">,</span> <span class="n">DeploymentResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.handle</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentHandle</span><span class="p">,</span> <span class="n">DeploymentResponse</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">Adder</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Adder</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">increment</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_increment</span> <span class="o">=</span> <span class="n">increment</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">val</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_increment</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">Multiplier</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiple</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Multiplier</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiple</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_multiple</span> <span class="o">=</span> <span class="n">multiple</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">val</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_multiple</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">Ingress</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">adder</span><span class="p">:</span> <span class="n">DeploymentHandle</span><span class="p">,</span> <span class="n">multiplier</span><span class="p">:</span> <span class="n">DeploymentHandle</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Ingress</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">adder</span><span class="p">:</span> <span class="n">DeploymentHandle</span><span class="p">,</span> <span class="n">multiplier</span><span class="p">:</span> <span class="n">DeploymentHandle</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_adder</span> <span class="o">=</span> <span class="n">adder</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_multiplier</span> <span class="o">=</span> <span class="n">multiplier</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="n">adder_response</span><span class="p">:</span> <span class="n">DeploymentResponse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_adder</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
         <span class="c1"># Pass the adder response directly into the multiplier (no `await` needed).</span>
         <span class="n">multiplier_response</span><span class="p">:</span> <span class="n">DeploymentResponse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_multiplier</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span>
@@ -1587,29 +1587,29 @@ Similar to <code class="docutils literal notranslate"><span class="pre">Deployme
 Note that you can’t pass <code class="docutils literal notranslate"><span class="pre">DeploymentResponseGenerators</span></code> to other handle calls.</p>
 <p>Example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># File name: stream.py</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">AsyncGenerator</span><span class="p">,</span> <span class="n">Generator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncGenerator</span><span class="p">,</span> <span class="n">Generator</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray.serve.handle</span> <span class="kn">import</span> <span class="n">DeploymentHandle</span><span class="p">,</span> <span class="n">DeploymentResponseGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.handle</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentHandle</span><span class="p">,</span> <span class="n">DeploymentResponseGenerator</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">Streamer</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Streamer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">limit</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">i</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">Caller</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">streamer</span><span class="p">:</span> <span class="n">DeploymentHandle</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Caller</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">streamer</span><span class="p">:</span> <span class="n">DeploymentHandle</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_streamer</span> <span class="o">=</span> <span class="n">streamer</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
             <span class="c1"># Must set `stream=True` on the handle, then the output will be a</span>
             <span class="c1"># response generator.</span>
             <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="c1"># Response generator can be used in an `async for` block.</span>
         <span class="n">r</span><span class="p">:</span> <span class="n">DeploymentResponseGenerator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streamer</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
         <span class="k">async</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
@@ -1644,28 +1644,28 @@ To compose <code class="docutils literal notranslate"><span class="pre">Deployme
 For this purpose, you can use the <a class="reference internal" href="api/doc/ray.serve.handle.DeploymentResponse.html#ray.serve.handle.DeploymentResponse" title="ray.serve.handle.DeploymentResponse"><code class="xref py py-mod docutils literal notranslate"><span class="pre">DeploymentResponse._to_object_ref</span></code></a> and <a class="reference internal" href="api/doc/ray.serve.handle.DeploymentResponse.html#ray.serve.handle.DeploymentResponse" title="ray.serve.handle.DeploymentResponse"><code class="xref py py-mod docutils literal notranslate"><span class="pre">DeploymentResponse._to_object_ref_sync</span></code></a> developer APIs.</p>
 <p>Example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># File name: response_to_object_ref.py</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray.serve.handle</span> <span class="kn">import</span> <span class="n">DeploymentHandle</span><span class="p">,</span> <span class="n">DeploymentResponse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.handle</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentHandle</span><span class="p">,</span> <span class="n">DeploymentResponse</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">say_hi_task</span><span class="p">(</span><span class="n">inp</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">say_hi_task</span><span class="p">(</span><span class="n">inp</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Ray task got message: &#39;</span><span class="si">{</span><span class="n">inp</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">SayHi</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SayHi</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;Hi from Serve deployment&quot;</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">Ingress</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">say_hi</span><span class="p">:</span> <span class="n">DeploymentHandle</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Ingress</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">say_hi</span><span class="p">:</span> <span class="n">DeploymentHandle</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_say_hi</span> <span class="o">=</span> <span class="n">say_hi</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Make a call to the SayHi deployment and pass the result ref to</span>
         <span class="c1"># a downstream Ray task.</span>
         <span class="n">response</span><span class="p">:</span> <span class="n">DeploymentResponse</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_say_hi</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>

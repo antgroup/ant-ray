@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1392,19 +1392,19 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.train.huggingface.transformers._transformers_utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tempfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemporaryDirectory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span>
 
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">IterableDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">IterableDataset</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray._private.usage.usage_lib</span> <span class="kn">import</span> <span class="n">TagKey</span><span class="p">,</span> <span class="n">record_extra_usage_tag</span>
-<span class="kn">from</span> <span class="nn">ray.data.iterator</span> <span class="kn">import</span> <span class="n">_IterableFromIterator</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.usage.usage_lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">TagKey</span><span class="p">,</span> <span class="n">record_extra_usage_tag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.iterator</span><span class="w"> </span><span class="kn">import</span> <span class="n">_IterableFromIterator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1412,9 +1412,9 @@ document.write(`
 <span class="n">TRANSFORMERS_IMPORT_ERROR</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="ne">ImportError</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">transformers.trainer</span>
-    <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">Trainer</span>
-    <span class="kn">from</span> <span class="nn">transformers.trainer_callback</span> <span class="kn">import</span> <span class="n">TrainerCallback</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">transformers.trainer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trainer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">transformers.trainer_callback</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainerCallback</span>
 <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
     <span class="n">TRANSFORMERS_IMPORT_ERROR</span> <span class="o">=</span> <span class="n">e</span>
     <span class="n">TrainerCallback</span> <span class="o">=</span> <span class="nb">object</span>
@@ -1423,7 +1423,7 @@ document.write(`
 <div class="viewcode-block" id="RayTrainReportCallback">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.huggingface.transformers.RayTrainReportCallback.html#ray.train.huggingface.transformers.RayTrainReportCallback">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RayTrainReportCallback</span><span class="p">(</span><span class="n">TrainerCallback</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayTrainReportCallback</span><span class="p">(</span><span class="n">TrainerCallback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A simple callback to report checkpoints and metrics to Ray Train.</span>
 
 <span class="sd">    This callback is a subclass of `transformers.TrainerCallback</span>
@@ -1460,13 +1460,13 @@ document.write(`
 
     <span class="n">CHECKPOINT_NAME</span> <span class="o">=</span> <span class="s2">&quot;checkpoint&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">record_extra_usage_tag</span><span class="p">(</span><span class="n">TagKey</span><span class="o">.</span><span class="n">TRAIN_TRANSFORMERS_RAYTRAINREPORTCALLBACK</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RayTrainReportCallback.on_save">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.huggingface.transformers.RayTrainReportCallback.on_save.html#ray.train.huggingface.transformers.RayTrainReportCallback.on_save">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">control</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">control</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Event called after a checkpoint save.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
             <span class="c1"># Aggregate all the logged metrics</span>
@@ -1489,21 +1489,21 @@ document.write(`
 
 
 
-<span class="k">class</span> <span class="nc">RayTorchIterableDataset</span><span class="p">(</span><span class="n">IterableDataset</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayTorchIterableDataset</span><span class="p">(</span><span class="n">IterableDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper class for ray data iterables.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_iterable</span> <span class="o">=</span> <span class="n">data_iterable</span>
 
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_iterable</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="prepare_trainer">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.huggingface.transformers.prepare_trainer.html#ray.train.huggingface.transformers.prepare_trainer">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">prepare_trainer</span><span class="p">(</span><span class="n">trainer</span><span class="p">:</span> <span class="s2">&quot;Trainer&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Trainer&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_trainer</span><span class="p">(</span><span class="n">trainer</span><span class="p">:</span> <span class="s2">&quot;Trainer&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Trainer&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepare your HuggingFace Transformer Trainer for Ray Train.</span>
 
 <span class="sd">    This utility function enable the trainer integrates with Ray Data Integration.</span>
@@ -1517,17 +1517,17 @@ document.write(`
 
     <span class="n">base_trainer_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">transformers</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">Trainer</span><span class="p">]</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="vm">__class__</span>
 
-    <span class="k">class</span> <span class="nc">RayTransformersTrainer</span><span class="p">(</span><span class="n">base_trainer_class</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">RayTransformersTrainer</span><span class="p">(</span><span class="n">base_trainer_class</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;A Wrapper of `transformers.Trainer` for Ray Data Integration.&quot;&quot;&quot;</span>
 
-        <span class="k">def</span> <span class="nf">get_train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">_IterableFromIterator</span><span class="p">):</span>
                 <span class="n">dataset</span> <span class="o">=</span> <span class="n">RayTorchIterableDataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_train_dataloader</span><span class="p">()</span>
 
-        <span class="k">def</span> <span class="nf">get_eval_dataloader</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_eval_dataloader</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">eval_dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">eval_dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

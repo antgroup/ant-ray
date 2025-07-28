@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1421,10 +1421,10 @@ number of links returned from a site (<code class="docutils literal notranslate"
 <p>Here’s the full implementation:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
-<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bs4</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeautifulSoup</span>
 
-<span class="k">def</span> <span class="nf">extract_links</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">base_url</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_links</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">base_url</span><span class="p">,</span> <span class="n">max_results</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
     <span class="n">links</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
         <span class="n">url</span> <span class="o">=</span> <span class="n">e</span><span class="p">[</span><span class="s2">&quot;href&quot;</span><span class="p">]</span>
@@ -1435,7 +1435,7 @@ number of links returned from a site (<code class="docutils literal notranslate"
     <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">links</span><span class="p">[:</span><span class="n">max_results</span><span class="p">])</span>
 
 
-<span class="k">def</span> <span class="nf">find_links</span><span class="p">(</span><span class="n">start_url</span><span class="p">,</span> <span class="n">base_url</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_links</span><span class="p">(</span><span class="n">start_url</span><span class="p">,</span> <span class="n">base_url</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>
 
@@ -1486,10 +1486,10 @@ We can do this with <a class="reference external" href="https://docs.ray.io/en/l
 We simply use the <code class="docutils literal notranslate"><span class="pre">ray.remote</span></code> decorator to wrap the <code class="docutils literal notranslate"><span class="pre">find_links</span></code> function in a task called <code class="docutils literal notranslate"><span class="pre">find_links_task</span></code> like this:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">find_links_task</span><span class="p">(</span><span class="n">start_url</span><span class="p">,</span> <span class="n">base_url</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_links_task</span><span class="p">(</span><span class="n">start_url</span><span class="p">,</span> <span class="n">base_url</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">find_links</span><span class="p">(</span><span class="n">start_url</span><span class="p">,</span> <span class="n">base_url</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
 </pre></div>
 </div>

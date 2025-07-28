@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,10 +1389,10 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data.datasource.file_based_datasource</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">io</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -1405,10 +1405,10 @@ document.write(`
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.util</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">RetryingContextManager</span><span class="p">,</span>
     <span class="n">RetryingPyFileSystem</span><span class="p">,</span>
     <span class="n">_check_pyarrow_version</span><span class="p">,</span>
@@ -1416,27 +1416,27 @@ document.write(`
     <span class="n">iterate_with_retry</span><span class="p">,</span>
     <span class="n">make_async_gen</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data.block</span> <span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">BlockAccessor</span>
-<span class="kn">from</span> <span class="nn">ray.data.context</span> <span class="kn">import</span> <span class="n">DataContext</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource.datasource</span> <span class="kn">import</span> <span class="n">Datasource</span><span class="p">,</span> <span class="n">ReadTask</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource.file_meta_provider</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">BlockAccessor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">Datasource</span><span class="p">,</span> <span class="n">ReadTask</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.file_meta_provider</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BaseFileMetadataProvider</span><span class="p">,</span>
     <span class="n">DefaultFileMetadataProvider</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource.partitioning</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.partitioning</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Partitioning</span><span class="p">,</span>
     <span class="n">PathPartitionFilter</span><span class="p">,</span>
     <span class="n">PathPartitionParser</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource.path_util</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.path_util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_has_file_extension</span><span class="p">,</span>
     <span class="n">_resolve_paths_and_filesystem</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -1453,7 +1453,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.FileShuffleConfig.html#ray.data.FileShuffleConfig">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">FileShuffleConfig</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FileShuffleConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for file shuffling.</span>
 
 <span class="sd">    This configuration object controls how files are shuffled while reading file-based</span>
@@ -1478,7 +1478,7 @@ document.write(`
 
     <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensure that the seed is either None or an integer.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Seed must be an integer or None.&quot;</span><span class="p">)</span></div>
@@ -1488,7 +1488,7 @@ document.write(`
 <div class="viewcode-block" id="FileBasedDatasource">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.FileBasedDatasource.html#ray.data.FileBasedDatasource">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">FileBasedDatasource</span><span class="p">(</span><span class="n">Datasource</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FileBasedDatasource</span><span class="p">(</span><span class="n">Datasource</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;File-based datasource for reading files.</span>
 
 <span class="sd">    Don&#39;t use this class directly. Instead, subclass it and implement `_read_stream()`.</span>
@@ -1503,7 +1503,7 @@ document.write(`
     <span class="c1"># If zero or negative, reading will be performed in the main thread.</span>
     <span class="n">_NUM_THREADS_PER_TASK</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1594,21 +1594,21 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_paths_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file_sizes_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">file_sizes</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_paths_ref</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_file_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_file_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_sizes_ref</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">estimate_inmemory_data_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">estimate_inmemory_data_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
         <span class="n">total_size</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">sz</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_sizes</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">sz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">total_size</span> <span class="o">+=</span> <span class="n">sz</span>
         <span class="k">return</span> <span class="n">total_size</span>
 
-    <span class="k">def</span> <span class="nf">get_read_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ReadTask</span><span class="p">]:</span>
-        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_read_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ReadTask</span><span class="p">]:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
         <span class="n">open_stream_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_stream_args</span>
         <span class="n">partitioning</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partitioning</span>
@@ -1629,7 +1629,7 @@ document.write(`
         <span class="k">if</span> <span class="n">open_stream_args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">open_stream_args</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="k">def</span> <span class="nf">read_files</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">read_files</span><span class="p">(</span>
             <span class="n">read_paths</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Block</span><span class="p">]:</span>
             <span class="k">nonlocal</span> <span class="n">filesystem</span><span class="p">,</span> <span class="n">open_stream_args</span><span class="p">,</span> <span class="n">partitioning</span>
@@ -1660,8 +1660,8 @@ document.write(`
                             <span class="p">)</span>
                         <span class="k">yield</span> <span class="n">block</span>
 
-        <span class="k">def</span> <span class="nf">create_read_task_fn</span><span class="p">(</span><span class="n">read_paths</span><span class="p">,</span> <span class="n">num_threads</span><span class="p">):</span>
-            <span class="k">def</span> <span class="nf">read_task_fn</span><span class="p">():</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">create_read_task_fn</span><span class="p">(</span><span class="n">read_paths</span><span class="p">,</span> <span class="n">num_threads</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">read_task_fn</span><span class="p">():</span>
                 <span class="k">nonlocal</span> <span class="n">num_threads</span><span class="p">,</span> <span class="n">read_paths</span>
 
                 <span class="c1"># TODO: We should refactor the code so that we can get the results in</span>
@@ -1714,7 +1714,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">read_tasks</span>
 
-    <span class="k">def</span> <span class="nf">_open_input_source</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_open_input_source</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">filesystem</span><span class="p">:</span> <span class="s2">&quot;RetryingPyFileSystem&quot;</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1729,8 +1729,8 @@ document.write(`
 <span class="sd">        Implementations that do not support streaming reads (e.g. that require random</span>
 <span class="sd">        access) should override this method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
-        <span class="kn">from</span> <span class="nn">pyarrow.fs</span> <span class="kn">import</span> <span class="n">HadoopFileSystem</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pyarrow.fs</span><span class="w"> </span><span class="kn">import</span> <span class="n">HadoopFileSystem</span>
 
         <span class="n">compression</span> <span class="o">=</span> <span class="n">open_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;compression&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">compression</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1741,7 +1741,7 @@ document.write(`
             <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
                 <span class="c1"># Arrow&#39;s compression inference on the file path</span>
                 <span class="c1"># doesn&#39;t work for Snappy, so we double-check ourselves.</span>
-                <span class="kn">import</span> <span class="nn">pathlib</span>
+                <span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
 
                 <span class="n">suffix</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
                 <span class="k">if</span> <span class="n">suffix</span> <span class="ow">and</span> <span class="n">suffix</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="s2">&quot;snappy&quot;</span><span class="p">:</span>
@@ -1764,7 +1764,7 @@ document.write(`
         <span class="n">file</span> <span class="o">=</span> <span class="n">filesystem</span><span class="o">.</span><span class="n">open_input_stream</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="n">buffer_size</span><span class="p">,</span> <span class="o">**</span><span class="n">open_args</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">compression</span> <span class="o">==</span> <span class="s2">&quot;snappy&quot;</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">snappy</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">snappy</span>
 
             <span class="n">stream</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filesystem</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(),</span> <span class="n">HadoopFileSystem</span><span class="p">):</span>
@@ -1777,11 +1777,11 @@ document.write(`
 
         <span class="k">return</span> <span class="n">file</span>
 
-    <span class="k">def</span> <span class="nf">_rows_per_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rows_per_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of rows per file, or None if unknown.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_read_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="s2">&quot;pyarrow.NativeFile&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Block</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="s2">&quot;pyarrow.NativeFile&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Block</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Streaming read a single file.</span>
 
 <span class="sd">        This method should be implemented by subclasses.</span>
@@ -1791,16 +1791,16 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">supports_distributed_reads</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">supports_distributed_reads</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supports_distributed_reads</span></div>
 
 
 
-<span class="k">def</span> <span class="nf">_add_partitions</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_partitions</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">,</span> <span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">],</span> <span class="n">partitions</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">,</span> <span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">]:</span>
-    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
 
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">))</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="p">):</span>
@@ -1809,11 +1809,11 @@ document.write(`
         <span class="k">return</span> <span class="n">_add_partitions_to_dataframe</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">partitions</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_add_partitions_to_table</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_partitions_to_table</span><span class="p">(</span>
     <span class="n">table</span><span class="p">:</span> <span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">,</span> <span class="n">partitions</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
-    <span class="kn">import</span> <span class="nn">pyarrow.compute</span> <span class="k">as</span> <span class="nn">pc</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.compute</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pc</span>
 
     <span class="n">column_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">partitions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1841,10 +1841,10 @@ document.write(`
     <span class="k">return</span> <span class="n">table</span>
 
 
-<span class="k">def</span> <span class="nf">_add_partitions_to_dataframe</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_partitions_to_dataframe</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">,</span> <span class="n">partitions</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
     <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">partitions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">column</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="n">field</span><span class="p">)</span>
@@ -1864,11 +1864,11 @@ document.write(`
     <span class="k">return</span> <span class="n">df</span>
 
 
-<span class="k">def</span> <span class="nf">_wrap_s3_serialization_workaround</span><span class="p">(</span><span class="n">filesystem</span><span class="p">:</span> <span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_wrap_s3_serialization_workaround</span><span class="p">(</span><span class="n">filesystem</span><span class="p">:</span> <span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">):</span>
     <span class="c1"># This is needed because pa.fs.S3FileSystem assumes pa.fs is already</span>
     <span class="c1"># imported before deserialization. See #17085.</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
-    <span class="kn">import</span> <span class="nn">pyarrow.fs</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
 
     <span class="n">wrap_retries</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">fs_to_be_wrapped</span> <span class="o">=</span> <span class="n">filesystem</span>  <span class="c1"># Only unwrap for S3FileSystemWrapper</span>
@@ -1886,7 +1886,7 @@ document.write(`
     <span class="k">return</span> <span class="n">filesystem</span>
 
 
-<span class="k">def</span> <span class="nf">_unwrap_s3_serialization_workaround</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_unwrap_s3_serialization_workaround</span><span class="p">(</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">,</span> <span class="s2">&quot;_S3FileSystemWrapper&quot;</span><span class="p">],</span>
 <span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filesystem</span><span class="p">,</span> <span class="n">_S3FileSystemWrapper</span><span class="p">):</span>
@@ -1900,8 +1900,8 @@ document.write(`
     <span class="k">return</span> <span class="n">filesystem</span>
 
 
-<span class="k">class</span> <span class="nc">_S3FileSystemWrapper</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_S3FileSystemWrapper</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">fs</span><span class="p">:</span> <span class="s2">&quot;pyarrow.fs.S3FileSystem&quot;</span><span class="p">,</span>
         <span class="n">wrap_retries</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1911,35 +1911,35 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_wrap_retries</span> <span class="o">=</span> <span class="n">wrap_retries</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_retryable_erros</span> <span class="o">=</span> <span class="n">retryable_errors</span>
 
-    <span class="k">def</span> <span class="nf">unwrap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unwrap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fs</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_reconstruct</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fs_reconstruct</span><span class="p">,</span> <span class="n">fs_args</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reconstruct</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fs_reconstruct</span><span class="p">,</span> <span class="n">fs_args</span><span class="p">):</span>
         <span class="c1"># Implicitly trigger S3 subsystem initialization by importing</span>
         <span class="c1"># pyarrow.fs.</span>
-        <span class="kn">import</span> <span class="nn">pyarrow.fs</span>  <span class="c1"># noqa: F401</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>  <span class="c1"># noqa: F401</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">fs_reconstruct</span><span class="p">(</span><span class="o">*</span><span class="n">fs_args</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_S3FileSystemWrapper</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fs</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_wrap_arrow_serialization_workaround</span><span class="p">(</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_wrap_arrow_serialization_workaround</span><span class="p">(</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
     <span class="k">if</span> <span class="s2">&quot;filesystem&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;filesystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_wrap_s3_serialization_workaround</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;filesystem&quot;</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">kwargs</span>
 
 
-<span class="k">def</span> <span class="nf">_unwrap_arrow_serialization_workaround</span><span class="p">(</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_unwrap_arrow_serialization_workaround</span><span class="p">(</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filesystem&quot;</span><span class="p">),</span> <span class="n">_S3FileSystemWrapper</span><span class="p">):</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;filesystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;filesystem&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unwrap</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">kwargs</span>
 
 
-<span class="k">def</span> <span class="nf">_resolve_kwargs</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_kwargs</span><span class="p">(</span>
     <span class="n">kwargs_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="k">if</span> <span class="n">kwargs_fn</span><span class="p">:</span>
@@ -1948,7 +1948,7 @@ document.write(`
     <span class="k">return</span> <span class="n">kwargs</span>
 
 
-<span class="k">def</span> <span class="nf">_validate_shuffle_arg</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_shuffle_arg</span><span class="p">(</span>
     <span class="n">shuffle</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">],</span> <span class="n">FileShuffleConfig</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>

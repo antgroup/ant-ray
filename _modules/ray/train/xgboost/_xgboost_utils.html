@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,45 +1392,45 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.train.xgboost._xgboost_utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">xgboost.core</span> <span class="kn">import</span> <span class="n">Booster</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xgboost.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Booster</span>
 
-<span class="kn">import</span> <span class="nn">ray.train</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils</span> <span class="kn">import</span> <span class="n">flatten_dict</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">xgboost.callback</span> <span class="kn">import</span> <span class="n">TrainingCallback</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">xgboost.callback</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingCallback</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
 
-    <span class="k">class</span> <span class="nc">TrainingCallback</span><span class="p">:</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">TrainingCallback</span><span class="p">:</span>
         <span class="k">pass</span>
 
 
-<span class="k">class</span> <span class="nc">TuneCallback</span><span class="p">(</span><span class="n">TrainingCallback</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TuneCallback</span><span class="p">(</span><span class="n">TrainingCallback</span><span class="p">):</span>
     <span class="c1"># TODO(justinvyu): [code_removal] Remove this after enforcing min xgboost version.</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for Tune&#39;s XGBoost callbacks.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compatibility with xgboost&lt;1.3&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">after_iteration</span><span class="p">(</span>
             <span class="n">env</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">iteration</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">evaluation_result_list</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">after_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Booster</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">evals_log</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">after_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Booster</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">evals_log</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
 
 <div class="viewcode-block" id="RayTrainReportCallback">
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.xgboost.RayTrainReportCallback.html#ray.tune.integration.xgboost.RayTrainReportCallback">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RayTrainReportCallback</span><span class="p">(</span><span class="n">TuneCallback</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayTrainReportCallback</span><span class="p">(</span><span class="n">TuneCallback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;XGBoost callback to save checkpoints and report metrics.</span>
 
 <span class="sd">    Args:</span>
@@ -1492,7 +1492,7 @@ document.write(`
 
     <span class="n">CHECKPOINT_NAME</span> <span class="o">=</span> <span class="s2">&quot;model.ubj&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">CHECKPOINT_NAME</span><span class="p">,</span>
@@ -1521,7 +1521,7 @@ document.write(`
 <div class="viewcode-block" id="RayTrainReportCallback.get_model">
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.xgboost.RayTrainReportCallback.get_model.html#ray.tune.integration.xgboost.RayTrainReportCallback.get_model">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">:</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">CHECKPOINT_NAME</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Booster</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve the model stored in a checkpoint reported by this callback.</span>
@@ -1538,7 +1538,7 @@ document.write(`
             <span class="k">return</span> <span class="n">booster</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_get_report_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evals_log</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_report_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evals_log</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">evals_log</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">):</span>
             <span class="c1"># xgboost&gt;=1.3</span>
             <span class="n">result_dict</span> <span class="o">=</span> <span class="n">flatten_dict</span><span class="p">(</span><span class="n">evals_log</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
@@ -1564,7 +1564,7 @@ document.write(`
         <span class="k">return</span> <span class="n">report_dict</span>
 
     <span class="nd">@contextmanager</span>
-    <span class="k">def</span> <span class="nf">_get_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Booster</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Checkpoint</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Booster</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Checkpoint</span><span class="p">]:</span>
         <span class="c1"># NOTE: The world rank returns None for Tune usage without Train.</span>
         <span class="k">if</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_world_rank</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_checkpoint_dir</span><span class="p">:</span>
@@ -1573,7 +1573,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">yield</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">after_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Booster</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">evals_log</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">after_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Booster</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">evals_log</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_evals_log</span> <span class="o">=</span> <span class="n">evals_log</span>
 
         <span class="n">checkpointing_disabled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frequency</span> <span class="o">==</span> <span class="mi">0</span>
@@ -1590,7 +1590,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">report_dict</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">after_training</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Booster</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Booster</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">after_training</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Booster</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Booster</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkpoint_at_end</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">model</span>
 

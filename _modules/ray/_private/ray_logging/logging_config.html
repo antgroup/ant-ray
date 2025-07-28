@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,41 +1389,41 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray._private.ray_logging.logging_config</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Set</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Set</span>
 
-<span class="kn">from</span> <span class="nn">ray._private.ray_logging</span> <span class="kn">import</span> <span class="n">default_impl</span>
-<span class="kn">from</span> <span class="nn">ray._private.ray_logging.constants</span> <span class="kn">import</span> <span class="n">LOGRECORD_STANDARD_ATTRS</span>
-<span class="kn">from</span> <span class="nn">ray._private.ray_logging.formatters</span> <span class="kn">import</span> <span class="n">TextFormatter</span><span class="p">,</span> <span class="n">JSONFormatter</span>
-<span class="kn">from</span> <span class="nn">ray._private.ray_logging.filters</span> <span class="kn">import</span> <span class="n">CoreContextFilter</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.ray_logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_impl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.ray_logging.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGRECORD_STANDARD_ATTRS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.ray_logging.formatters</span><span class="w"> </span><span class="kn">import</span> <span class="n">TextFormatter</span><span class="p">,</span> <span class="n">JSONFormatter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.ray_logging.filters</span><span class="w"> </span><span class="kn">import</span> <span class="n">CoreContextFilter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 
-<span class="k">class</span> <span class="nc">LoggingConfigurator</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LoggingConfigurator</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_supported_encodings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_supported_encodings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logging_config</span><span class="p">:</span> <span class="s2">&quot;LoggingConfig&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logging_config</span><span class="p">:</span> <span class="s2">&quot;LoggingConfig&quot;</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
 
-<span class="k">class</span> <span class="nc">DefaultLoggingConfigurator</span><span class="p">(</span><span class="n">LoggingConfigurator</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DefaultLoggingConfigurator</span><span class="p">(</span><span class="n">LoggingConfigurator</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_encoding_to_formatter</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;TEXT&quot;</span><span class="p">:</span> <span class="n">TextFormatter</span><span class="p">(),</span>
             <span class="s2">&quot;JSON&quot;</span><span class="p">:</span> <span class="n">JSONFormatter</span><span class="p">(),</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">get_supported_encodings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_supported_encodings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoding_to_formatter</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logging_config</span><span class="p">:</span> <span class="s2">&quot;LoggingConfig&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logging_config</span><span class="p">:</span> <span class="s2">&quot;LoggingConfig&quot;</span><span class="p">):</span>
         <span class="n">formatter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoding_to_formatter</span><span class="p">[</span><span class="n">logging_config</span><span class="o">.</span><span class="n">encoding</span><span class="p">]</span>
         <span class="n">formatter</span><span class="o">.</span><span class="n">set_additional_log_standard_attrs</span><span class="p">(</span>
             <span class="n">logging_config</span><span class="o">.</span><span class="n">additional_log_standard_attrs</span>
@@ -1460,14 +1460,14 @@ document.write(`
 <a class="viewcode-back" href="../../../../ray-core/api/doc/ray.LoggingConfig.html#ray.LoggingConfig">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">LoggingConfig</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LoggingConfig</span><span class="p">:</span>
     <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;TEXT&quot;</span>
     <span class="n">log_level</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;INFO&quot;</span>
     <span class="c1"># The list of valid attributes are defined as LOGRECORD_STANDARD_ATTRS in</span>
     <span class="c1"># constants.py.</span>
     <span class="n">additional_log_standard_attrs</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_logging_configurator</span><span class="o">.</span><span class="n">get_supported_encodings</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Invalid encoding type: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="si">}</span><span class="s2">. &quot;</span>
@@ -1483,11 +1483,11 @@ document.write(`
                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">LOGRECORD_STANDARD_ATTRS</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_configure_logging</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_configure_logging</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the logging configuration for the current process.&quot;&quot;&quot;</span>
         <span class="n">_logging_configurator</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_apply</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the logging configuration.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_configure_logging</span><span class="p">()</span></div>
 

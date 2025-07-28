@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1392,43 +1392,43 @@ document.write(`
 <span></span><span class="c1"># Try import ray[train] core requirements (defined in setup.py)</span>
 <span class="c1"># isort: off</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">fsspec</span>  <span class="c1"># noqa: F401</span>
-    <span class="kn">import</span> <span class="nn">pandas</span>  <span class="c1"># noqa: F401</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span>  <span class="c1"># noqa: F401</span>
-    <span class="kn">import</span> <span class="nn">requests</span>  <span class="c1"># noqa: F401</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">fsspec</span>  <span class="c1"># noqa: F401</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>  <span class="c1"># noqa: F401</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span>  <span class="c1"># noqa: F401</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>  <span class="c1"># noqa: F401</span>
 <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
         <span class="s2">&quot;Can&#39;t import ray.train as some dependencies are missing. &quot;</span>
         <span class="s1">&#39;Run `pip install &quot;ray[train]&quot;` to fix.&#39;</span>
-    <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 <span class="c1"># isort: on</span>
 
 
-<span class="kn">from</span> <span class="nn">ray._private.usage</span> <span class="kn">import</span> <span class="n">usage_lib</span>
-<span class="kn">from</span> <span class="nn">ray.air.config</span> <span class="kn">import</span> <span class="n">CheckpointConfig</span><span class="p">,</span> <span class="n">FailureConfig</span><span class="p">,</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.air.result</span> <span class="kn">import</span> <span class="n">Result</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.usage</span><span class="w"> </span><span class="kn">import</span> <span class="n">usage_lib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">CheckpointConfig</span><span class="p">,</span> <span class="n">FailureConfig</span><span class="p">,</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.result</span><span class="w"> </span><span class="kn">import</span> <span class="n">Result</span>
 
 <span class="c1"># Import this first so it can be used in other modules</span>
-<span class="kn">from</span> <span class="nn">ray.train._checkpoint</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.data_config</span> <span class="kn">import</span> <span class="n">DataConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.session</span> <span class="kn">import</span> <span class="n">get_checkpoint</span><span class="p">,</span> <span class="n">get_dataset_shard</span><span class="p">,</span> <span class="n">report</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.syncer</span> <span class="kn">import</span> <span class="n">SyncConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.backend</span> <span class="kn">import</span> <span class="n">BackendConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.constants</span> <span class="kn">import</span> <span class="n">TRAIN_DATASET_KEY</span>
-<span class="kn">from</span> <span class="nn">ray.train.context</span> <span class="kn">import</span> <span class="n">get_context</span>
-<span class="kn">from</span> <span class="nn">ray.train.trainer</span> <span class="kn">import</span> <span class="n">TrainingIterator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._checkpoint</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.data_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_checkpoint</span><span class="p">,</span> <span class="n">get_dataset_shard</span><span class="p">,</span> <span class="n">report</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.syncer</span><span class="w"> </span><span class="kn">import</span> <span class="n">SyncConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">BackendConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRAIN_DATASET_KEY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_context</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.trainer</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingIterator</span>
 
-<span class="kn">from</span> <span class="nn">ray.train.v2._internal.constants</span> <span class="kn">import</span> <span class="n">is_v2_enabled</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2._internal.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_v2_enabled</span>
 
 <span class="k">if</span> <span class="n">is_v2_enabled</span><span class="p">():</span>
-    <span class="kn">from</span> <span class="nn">ray.train.v2.api.callback</span> <span class="kn">import</span> <span class="n">UserCallback</span>  <span class="c1"># noqa: F811</span>
-    <span class="kn">from</span> <span class="nn">ray.train.v2.api.config</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa: F811</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2.api.callback</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserCallback</span>  <span class="c1"># noqa: F811</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2.api.config</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa: F811</span>
         <span class="n">FailureConfig</span><span class="p">,</span>
         <span class="n">RunConfig</span><span class="p">,</span>
         <span class="n">ScalingConfig</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="kn">from</span> <span class="nn">ray.train.v2.api.result</span> <span class="kn">import</span> <span class="n">Result</span>  <span class="c1"># noqa: F811</span>
-    <span class="kn">from</span> <span class="nn">ray.train.v2.api.train_fn_utils</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa: F811</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2.api.result</span><span class="w"> </span><span class="kn">import</span> <span class="n">Result</span>  <span class="c1"># noqa: F811</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2.api.train_fn_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa: F811</span>
         <span class="n">get_checkpoint</span><span class="p">,</span>
         <span class="n">get_context</span><span class="p">,</span>
         <span class="n">get_dataset_shard</span><span class="p">,</span>

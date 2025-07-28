@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1392,18 +1392,18 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.context</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">ray.train._internal</span> <span class="kn">import</span> <span class="n">session</span>
-<span class="kn">from</span> <span class="nn">ray.train.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal</span><span class="w"> </span><span class="kn">import</span> <span class="n">session</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_v2_migration_warnings_enabled</span><span class="p">,</span>
     <span class="n">V2_MIGRATION_GUIDE_MESSAGE</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.train.context</span> <span class="kn">import</span> <span class="n">TrainContext</span> <span class="k">as</span> <span class="n">TrainV1Context</span>
-<span class="kn">from</span> <span class="nn">ray.train.utils</span> <span class="kn">import</span> <span class="n">_copy_doc</span>
-<span class="kn">from</span> <span class="nn">ray.tune.execution.placement_groups</span> <span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainContext</span> <span class="k">as</span> <span class="n">TrainV1Context</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_copy_doc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.placement_groups</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
 <span class="c1"># The context singleton on this process.</span>
 <span class="n">_tune_context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;TuneContext&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1418,7 +1418,7 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TuneContext</span><span class="p">(</span><span class="n">TrainV1Context</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TuneContext</span><span class="p">(</span><span class="n">TrainV1Context</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Context to access metadata within Ray Tune functions.&quot;&quot;&quot;</span>
 
     <span class="c1"># NOTE: These methods are deprecated on the TrainContext, but are still</span>
@@ -1428,28 +1428,28 @@ document.write(`
 <div class="viewcode-block" id="TuneContext.get_trial_name">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.TuneContext.get_trial_name.html#ray.tune.TuneContext.get_trial_name">[docs]</a>
     <span class="nd">@_copy_doc</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">get_trial_name</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_trial_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_trial_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">get_trial_name</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="TuneContext.get_trial_id">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.TuneContext.get_trial_id.html#ray.tune.TuneContext.get_trial_id">[docs]</a>
     <span class="nd">@_copy_doc</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">get_trial_id</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_trial_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_trial_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">get_trial_id</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="TuneContext.get_trial_resources">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.TuneContext.get_trial_resources.html#ray.tune.TuneContext.get_trial_resources">[docs]</a>
     <span class="nd">@_copy_doc</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">get_trial_resources</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_trial_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlacementGroupFactory</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_trial_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlacementGroupFactory</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">get_trial_resources</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="TuneContext.get_trial_dir">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.TuneContext.get_trial_dir.html#ray.tune.TuneContext.get_trial_dir">[docs]</a>
     <span class="nd">@_copy_doc</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">get_trial_dir</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_trial_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_trial_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">get_trial_dir</span><span class="p">()</span></div>
 
 
@@ -1458,7 +1458,7 @@ document.write(`
 <div class="viewcode-block" id="TuneContext.get_metadata">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.TuneContext.get_metadata.html#ray.tune.TuneContext.get_metadata">[docs]</a>
     <span class="nd">@Deprecated</span>
-    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span>
             <span class="s2">&quot;`get_metadata` is deprecated for Ray Tune, as it has never been usable.&quot;</span>
         <span class="p">)</span></div>
@@ -1471,7 +1471,7 @@ document.write(`
         <span class="n">warning</span><span class="o">=</span><span class="n">_v2_migration_warnings_enabled</span><span class="p">(),</span>
     <span class="p">)</span>
     <span class="nd">@_copy_doc</span><span class="p">(</span><span class="n">TrainV1Context</span><span class="o">.</span><span class="n">get_world_size</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_world_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_world_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">get_world_size</span><span class="p">()</span></div>
 
 
@@ -1482,7 +1482,7 @@ document.write(`
         <span class="n">warning</span><span class="o">=</span><span class="n">_v2_migration_warnings_enabled</span><span class="p">(),</span>
     <span class="p">)</span>
     <span class="nd">@_copy_doc</span><span class="p">(</span><span class="n">TrainV1Context</span><span class="o">.</span><span class="n">get_world_rank</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_world_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_world_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">get_world_rank</span><span class="p">()</span></div>
 
 
@@ -1493,7 +1493,7 @@ document.write(`
         <span class="n">warning</span><span class="o">=</span><span class="n">_v2_migration_warnings_enabled</span><span class="p">(),</span>
     <span class="p">)</span>
     <span class="nd">@_copy_doc</span><span class="p">(</span><span class="n">TrainV1Context</span><span class="o">.</span><span class="n">get_local_rank</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_local_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_local_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">get_local_rank</span><span class="p">()</span></div>
 
 
@@ -1506,7 +1506,7 @@ document.write(`
         <span class="n">warning</span><span class="o">=</span><span class="n">_v2_migration_warnings_enabled</span><span class="p">(),</span>
     <span class="p">)</span>
     <span class="nd">@_copy_doc</span><span class="p">(</span><span class="n">TrainV1Context</span><span class="o">.</span><span class="n">get_local_world_size</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_local_world_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_local_world_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">get_local_world_size</span><span class="p">()</span></div>
 
 
@@ -1517,13 +1517,13 @@ document.write(`
         <span class="n">warning</span><span class="o">=</span><span class="n">_v2_migration_warnings_enabled</span><span class="p">(),</span>
     <span class="p">)</span>
     <span class="nd">@_copy_doc</span><span class="p">(</span><span class="n">TrainV1Context</span><span class="o">.</span><span class="n">get_node_rank</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_node_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_node_rank</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">get_node_rank</span><span class="p">()</span></div>
 
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_context</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">TuneContext</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_context</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">TuneContext</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get or create a singleton Ray Tune context.</span>
 
 <span class="sd">    The context is only available in a tune function passed to the `ray.tune.Tuner`.</span>

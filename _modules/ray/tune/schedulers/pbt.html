@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1397,41 +1397,41 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.schedulers.pbt</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">ray.air.constants</span> <span class="kn">import</span> <span class="n">TRAINING_ITERATION</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.session</span> <span class="kn">import</span> <span class="n">_FutureTrainingResult</span><span class="p">,</span> <span class="n">_TrainingResult</span>
-<span class="kn">from</span> <span class="nn">ray.tune.error</span> <span class="kn">import</span> <span class="n">TuneError</span>
-<span class="kn">from</span> <span class="nn">ray.tune.experiment</span> <span class="kn">import</span> <span class="n">Trial</span>
-<span class="kn">from</span> <span class="nn">ray.tune.result</span> <span class="kn">import</span> <span class="n">DEFAULT_METRIC</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers.trial_scheduler</span> <span class="kn">import</span> <span class="n">FIFOScheduler</span><span class="p">,</span> <span class="n">TrialScheduler</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search</span> <span class="kn">import</span> <span class="n">SearchGenerator</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.sample</span> <span class="kn">import</span> <span class="n">Domain</span><span class="p">,</span> <span class="n">Function</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.variant_generator</span> <span class="kn">import</span> <span class="n">format_vars</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils.util</span> <span class="kn">import</span> <span class="n">SafeFallbackEncoder</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
-<span class="kn">from</span> <span class="nn">ray.util.debug</span> <span class="kn">import</span> <span class="n">log_once</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRAINING_ITERATION</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">_FutureTrainingResult</span><span class="p">,</span> <span class="n">_TrainingResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.error</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_METRIC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers.trial_scheduler</span><span class="w"> </span><span class="kn">import</span> <span class="n">FIFOScheduler</span><span class="p">,</span> <span class="n">TrialScheduler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search</span><span class="w"> </span><span class="kn">import</span> <span class="n">SearchGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.sample</span><span class="w"> </span><span class="kn">import</span> <span class="n">Domain</span><span class="p">,</span> <span class="n">Function</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.variant_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_vars</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">SafeFallbackEncoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.debug</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_once</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.execution.tune_controller</span> <span class="kn">import</span> <span class="n">TuneController</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.tune_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneController</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_PBTTrialState</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_PBTTrialState</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Internal PBT state tracked per-trial.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">orig_tag</span> <span class="o">=</span> <span class="n">trial</span><span class="o">.</span><span class="n">experiment_tag</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">last_score</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">last_checkpoint</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1439,7 +1439,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">last_train_time</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Used for synchronous mode.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">last_result</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Used for synchronous mode.</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span>
             <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">last_score</span><span class="p">,</span>
@@ -1450,7 +1450,7 @@ document.write(`
         <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_explore</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_explore</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
     <span class="n">mutations</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
     <span class="n">resample_probability</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -1544,7 +1544,7 @@ document.write(`
     <span class="k">return</span> <span class="n">new_config</span><span class="p">,</span> <span class="n">operations</span>
 
 
-<span class="k">def</span> <span class="nf">_make_experiment_tag</span><span class="p">(</span><span class="n">orig_tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">mutations</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_experiment_tag</span><span class="p">(</span><span class="n">orig_tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">mutations</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Appends perturbed params to the trial name to show in the console.&quot;&quot;&quot;</span>
 
     <span class="n">resolved_vars</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1553,7 +1553,7 @@ document.write(`
     <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">@perturbed[</span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">orig_tag</span><span class="p">,</span> <span class="n">format_vars</span><span class="p">(</span><span class="n">resolved_vars</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">_fill_config</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fill_config</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">search_space</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Domain</span><span class="p">]</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add attr to config by sampling from search_space.</span>
@@ -1573,7 +1573,7 @@ document.write(`
             <span class="n">_fill_config</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="n">attr</span><span class="p">],</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_filter_mutated_params_from_config</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_filter_mutated_params_from_config</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">hyperparam_mutations</span><span class="p">:</span> <span class="n">Dict</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter out hyperparameters from a config so that only parameters specified</span>
@@ -1619,7 +1619,7 @@ document.write(`
 <div class="viewcode-block" id="PopulationBasedTraining">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.PopulationBasedTraining.html#ray.tune.schedulers.pb2.PopulationBasedTraining">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">PopulationBasedTraining</span><span class="p">(</span><span class="n">FIFOScheduler</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PopulationBasedTraining</span><span class="p">(</span><span class="n">FIFOScheduler</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Implements the Population Based Training (PBT) algorithm.</span>
 
 <span class="sd">    https://www.deepmind.com/blog/population-based-training-of-neural-networks</span>
@@ -1743,7 +1743,7 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">time_attr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;time_total_s&quot;</span><span class="p">,</span>
         <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1827,7 +1827,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_checkpoints</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_perturbations</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">def</span> <span class="nf">set_search_properties</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_search_properties</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">**</span><span class="n">spec</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="ow">and</span> <span class="n">metric</span><span class="p">:</span>
@@ -1851,7 +1851,7 @@ document.write(`
 
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">tune_controller</span><span class="o">.</span><span class="n">search_alg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
             <span class="n">tune_controller</span><span class="o">.</span><span class="n">search_alg</span><span class="p">,</span> <span class="n">SearchGenerator</span>
         <span class="p">):</span>
@@ -1900,7 +1900,7 @@ document.write(`
                 <span class="c1"># Make sure this attribute is added to CLI output.</span>
                 <span class="n">trial</span><span class="o">.</span><span class="n">evaluated_params</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">trial</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_result</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_result</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time_attr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
@@ -2032,7 +2032,7 @@ document.write(`
                 <span class="k">else</span> <span class="n">TrialScheduler</span><span class="o">.</span><span class="n">PAUSE</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_save_trial_state</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save_trial_state</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">_PBTTrialState</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Saves necessary trial information when result is received.</span>
@@ -2052,7 +2052,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">score</span>
 
-    <span class="k">def</span> <span class="nf">_checkpoint_or_exploit</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_checkpoint_or_exploit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span>
         <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span>
@@ -2121,7 +2121,7 @@ document.write(`
                 <span class="k">return</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_exploit</span><span class="p">(</span><span class="n">tune_controller</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">trial_to_clone</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_log_config_on_step</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_config_on_step</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">trial_state</span><span class="p">:</span> <span class="n">_PBTTrialState</span><span class="p">,</span>
         <span class="n">new_state</span><span class="p">:</span> <span class="n">_PBTTrialState</span><span class="p">,</span>
@@ -2163,7 +2163,7 @@ document.write(`
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">trial_path</span><span class="p">,</span> <span class="s2">&quot;a+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">policy</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">SafeFallbackEncoder</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_new_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">trial_to_clone</span><span class="p">:</span> <span class="n">Trial</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_new_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">trial_to_clone</span><span class="p">:</span> <span class="n">Trial</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets new config for trial by exploring trial_to_clone&#39;s config.</span>
 
 <span class="sd">        Args:</span>
@@ -2184,7 +2184,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_custom_explore_fn</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_summarize_hyperparam_changes</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_summarize_hyperparam_changes</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">old_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
         <span class="n">new_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
@@ -2263,7 +2263,7 @@ document.write(`
                 <span class="n">summary_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">old_val</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">arrow</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">new_val</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="k">return</span> <span class="n">summary_str</span>
 
-    <span class="k">def</span> <span class="nf">_exploit</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_exploit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span>
         <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span>
@@ -2343,7 +2343,7 @@ document.write(`
         <span class="n">trial_state</span><span class="o">.</span><span class="n">last_perturbation_time</span> <span class="o">=</span> <span class="n">new_state</span><span class="o">.</span><span class="n">last_perturbation_time</span>
         <span class="n">trial_state</span><span class="o">.</span><span class="n">last_train_time</span> <span class="o">=</span> <span class="n">new_state</span><span class="o">.</span><span class="n">last_train_time</span>
 
-    <span class="k">def</span> <span class="nf">_quantiles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_quantiles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns trials in the lower and upper `quantile` of the population.</span>
 
 <span class="sd">        If there is not enough data to compute this, returns empty lists.</span>
@@ -2369,7 +2369,7 @@ document.write(`
 
 <div class="viewcode-block" id="PopulationBasedTraining.choose_trial_to_run">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.PopulationBasedTraining.choose_trial_to_run.html#ray.tune.schedulers.pb2.PopulationBasedTraining.choose_trial_to_run">[docs]</a>
-    <span class="k">def</span> <span class="nf">choose_trial_to_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Trial</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">choose_trial_to_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Trial</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensures all trials get fair share of time (as defined by time_attr).</span>
 
 <span class="sd">        This enables the PBT scheduler to support a greater number of</span>
@@ -2393,12 +2393,12 @@ document.write(`
 
 
     <span class="c1"># Unit test only. TODO(xwjiang): Remove test-specific APIs.</span>
-    <span class="k">def</span> <span class="nf">reset_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_perturbations</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_checkpoints</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="c1"># Unit test only. TODO(xwjiang): Remove test-specific APIs.</span>
-    <span class="k">def</span> <span class="nf">last_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">last_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
         <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">trials</span><span class="p">:</span>
             <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial_state</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span>
@@ -2406,7 +2406,7 @@ document.write(`
                 <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">last_score</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">scores</span>
 
-    <span class="k">def</span> <span class="nf">debug_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">debug_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;PopulationBasedTraining: </span><span class="si">{}</span><span class="s2"> checkpoints, </span><span class="si">{}</span><span class="s2"> perturbs&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_num_checkpoints</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_perturbations</span>
         <span class="p">)</span></div>
@@ -2416,7 +2416,7 @@ document.write(`
 <div class="viewcode-block" id="PopulationBasedTrainingReplay">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.PopulationBasedTrainingReplay.html#ray.tune.schedulers.pb2.PopulationBasedTrainingReplay">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">PopulationBasedTrainingReplay</span><span class="p">(</span><span class="n">FIFOScheduler</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PopulationBasedTrainingReplay</span><span class="p">(</span><span class="n">FIFOScheduler</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Replays a Population Based Training run.</span>
 
 <span class="sd">    Population Based Training does not return a single hyperparameter</span>
@@ -2465,7 +2465,7 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">policy_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">policy_file</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">policy_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Policy file not found: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">policy_file</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()))</span>
@@ -2486,7 +2486,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_policy_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_policy</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_next_policy</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_policy_iter</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_load_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]]]:</span>
         <span class="n">raw_policy</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">policy_file</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">fp</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
@@ -2495,7 +2495,7 @@ document.write(`
                 <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                         <span class="s2">&quot;Could not read PBT policy file: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">policy_file</span><span class="p">)</span>
-                    <span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+                    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
                 <span class="n">raw_policy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">parsed_row</span><span class="p">))</span>
 
         <span class="c1"># Loop through policy from end to start to obtain changepoints</span>
@@ -2516,7 +2516,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">last_old_conf</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">policy</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;More than one trial added to PBT replay run. This &quot;</span>
@@ -2540,7 +2540,7 @@ document.write(`
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_trial</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_result</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_result</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">TRAINING_ITERATION</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
@@ -2583,7 +2583,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">TrialScheduler</span><span class="o">.</span><span class="n">NOOP</span>
 
-    <span class="k">def</span> <span class="nf">debug_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">debug_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;PopulationBasedTraining replay: Step </span><span class="si">{}</span><span class="s2">, perturb </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_current_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_perturbations</span>
         <span class="p">)</span></div>

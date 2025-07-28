@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1440,12 +1440,12 @@ By default, it’s 20% of the total number of nodes.</p>
 <p>Currently Ray handles actors that don’t require any resources (i.e., <code class="docutils literal notranslate"><span class="pre">num_cpus=0</span></code> with no other resources) specially by randomly choosing a node in the cluster without considering resource utilization.
 Since nodes are randomly chosen, actors that don’t require any resources are effectively SPREAD across the cluster.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">func</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">():</span>
     <span class="k">return</span> <span class="mi">1</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
     <span class="k">pass</span>
 
 
@@ -1465,12 +1465,12 @@ Since nodes are randomly chosen, actors that don’t require any resources are e
 <h3>“SPREAD”<a class="headerlink" href="#spread" title="Link to this heading">#</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">&quot;SPREAD&quot;</span></code> strategy will try to spread the tasks or actors among available nodes.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">scheduling_strategy</span><span class="o">=</span><span class="s2">&quot;SPREAD&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">spread_func</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">spread_func</span><span class="p">():</span>
     <span class="k">return</span> <span class="mi">2</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">SpreadActor</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SpreadActor</span><span class="p">:</span>
     <span class="k">pass</span>
 
 
@@ -1505,12 +1505,12 @@ desired task or actor placements. It has the following known limitations:</p>
 especially in a multi-tenant cluster: for example, an application won’t know what else is being scheduled onto the same nodes.</p></li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">node_affinity_func</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">node_affinity_func</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_node_id</span><span class="p">()</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">NodeAffinityActor</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NodeAffinityActor</span><span class="p">:</span>
     <span class="k">pass</span>
 
 
@@ -1556,7 +1556,7 @@ they have higher precedence and data locality is no longer considered.</p>
 <p>Locality-aware scheduling is only for tasks not actors.</p>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">large_object_func</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">large_object_func</span><span class="p">():</span>
     <span class="c1"># Large object is stored in the local object store</span>
     <span class="c1"># and available in the distributed memory,</span>
     <span class="c1"># instead of returning inline directly to the caller.</span>
@@ -1564,14 +1564,14 @@ they have higher precedence and data locality is no longer considered.</p>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">small_object_func</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">small_object_func</span><span class="p">():</span>
     <span class="c1"># Small object is returned inline directly to the caller,</span>
     <span class="c1"># instead of storing in the distributed memory.</span>
     <span class="k">return</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">consume_func</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">consume_func</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 

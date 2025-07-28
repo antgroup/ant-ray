@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1408,23 +1408,23 @@ For example, you might have a path to trained model weights and want to test out
 In Ray Serve, these parameters are typically passed to the constructor of your deployments using <code class="docutils literal notranslate"><span class="pre">.bind()</span></code>.
 This pattern allows you to be configure deployments using ordinary Python code but it requires modifying the code anytime one of the parameters needs to change.</p>
 <p>To pass arguments without changing the code, define an “application builder” function that takes an arguments dictionary (or <a class="reference internal" href="#typed-app-builders"><span class="std std-ref">Pydantic object</span></a>) and returns the built application to be run.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray.serve</span> <span class="kn">import</span> <span class="n">Application</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve</span><span class="w"> </span><span class="kn">import</span> <span class="n">Application</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">HelloWorld</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HelloWorld</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_message</span> <span class="o">=</span> <span class="n">message</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Message:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_message</span>
 
 
-<span class="k">def</span> <span class="nf">app_builder</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Application</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">app_builder</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Application</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">HelloWorld</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">])</span>
 
 
@@ -1481,27 +1481,27 @@ For example, to pass a new message to the <code class="docutils literal notransl
 <span id="typed-app-builders"></span><h3>Typing arguments with Pydantic<a class="headerlink" href="#typing-arguments-with-pydantic" title="Link to this heading">#</a></h3>
 <p>To avoid writing logic to parse and validate the arguments by hand, define a <a class="reference external" href="https://pydantic-docs.helpmanual.io/usage/models/">Pydantic model</a> as the single input parameter’s type to your application builder function (the parameter must be type annotated).
 Arguments are passed the same way, but the resulting dictionary is used to construct the Pydantic model using <code class="docutils literal notranslate"><span class="pre">model.parse_obj(args_dict)</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray.serve</span> <span class="kn">import</span> <span class="n">Application</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve</span><span class="w"> </span><span class="kn">import</span> <span class="n">Application</span>
 
 
-<span class="k">class</span> <span class="nc">HelloWorldArgs</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HelloWorldArgs</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">HelloWorld</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HelloWorld</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_message</span> <span class="o">=</span> <span class="n">message</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Message:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_message</span>
 
 
-<span class="k">def</span> <span class="nf">typed_app_builder</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">HelloWorldArgs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Application</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">typed_app_builder</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">HelloWorldArgs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Application</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">HelloWorld</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 
 
@@ -1546,17 +1546,17 @@ The same application builder <code class="docutils literal notranslate"><span cl
 <h3>Configuring multiple composed deployments<a class="headerlink" href="#configuring-multiple-composed-deployments" title="Link to this heading">#</a></h3>
 <p>You can use the arguments passed to an application builder to configure multiple deployments in a single application.
 For example a model composition application might take weights to two different models as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
 
-<span class="kn">from</span> <span class="nn">ray.serve</span> <span class="kn">import</span> <span class="n">Application</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve</span><span class="w"> </span><span class="kn">import</span> <span class="n">Application</span>
 
 
-<span class="k">class</span> <span class="nc">ComposedArgs</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ComposedArgs</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">model1_uri</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">model2_uri</span><span class="p">:</span> <span class="nb">str</span>
 
 
-<span class="k">def</span> <span class="nf">composed_app_builder</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">ComposedArgs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Application</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">composed_app_builder</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">ComposedArgs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Application</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">IngressDeployment</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
         <span class="n">Model1</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">model1_uri</span><span class="p">),</span>
         <span class="n">Model2</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">model2_uri</span><span class="p">),</span>

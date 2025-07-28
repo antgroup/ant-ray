@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1389,34 +1389,34 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.remote_function</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
-<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Lock</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">Lock</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">ray._private.signature</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">Language</span><span class="p">,</span> <span class="n">cross_language</span>
-<span class="kn">from</span> <span class="nn">ray._private</span> <span class="kn">import</span> <span class="n">ray_option_utils</span>
-<span class="kn">from</span> <span class="nn">ray._private.auto_init_hook</span> <span class="kn">import</span> <span class="n">wrap_auto_init</span>
-<span class="kn">from</span> <span class="nn">ray._private.client_mode_hook</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray._private.signature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">Language</span><span class="p">,</span> <span class="n">cross_language</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private</span><span class="w"> </span><span class="kn">import</span> <span class="n">ray_option_utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.auto_init_hook</span><span class="w"> </span><span class="kn">import</span> <span class="n">wrap_auto_init</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.client_mode_hook</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">client_mode_convert_function</span><span class="p">,</span>
     <span class="n">client_mode_should_convert</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray._private.ray_option_utils</span> <span class="kn">import</span> <span class="n">_warn_if_using_deprecated_placement_group</span>
-<span class="kn">from</span> <span class="nn">ray._private.serialization</span> <span class="kn">import</span> <span class="n">pickle_dumps</span>
-<span class="kn">from</span> <span class="nn">ray._private.utils</span> <span class="kn">import</span> <span class="n">get_runtime_env_info</span><span class="p">,</span> <span class="n">parse_runtime_env</span>
-<span class="kn">from</span> <span class="nn">ray._raylet</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.ray_option_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_warn_if_using_deprecated_placement_group</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.serialization</span><span class="w"> </span><span class="kn">import</span> <span class="n">pickle_dumps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_runtime_env_info</span><span class="p">,</span> <span class="n">parse_runtime_env</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._raylet</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">STREAMING_GENERATOR_RETURN</span><span class="p">,</span>
     <span class="n">ObjectRefGenerator</span><span class="p">,</span>
     <span class="n">PythonFunctionDescriptor</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
-<span class="kn">from</span> <span class="nn">ray.util.placement_group</span> <span class="kn">import</span> <span class="n">_configure_placement_group_based_on_context</span>
-<span class="kn">from</span> <span class="nn">ray.util.scheduling_strategies</span> <span class="kn">import</span> <span class="n">PlacementGroupSchedulingStrategy</span>
-<span class="kn">from</span> <span class="nn">ray.util.tracing.tracing_helper</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.placement_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">_configure_placement_group_based_on_context</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.scheduling_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroupSchedulingStrategy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.tracing.tracing_helper</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_inject_tracing_into_function</span><span class="p">,</span>
     <span class="n">_tracing_task_invocation</span><span class="p">,</span>
 <span class="p">)</span>
@@ -1429,7 +1429,7 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">RemoteFunction</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RemoteFunction</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A remote function.</span>
 
 <span class="sd">    This is a decorated function. It can be used to spawn tasks.</span>
@@ -1477,7 +1477,7 @@ document.write(`
 <span class="sd">            this remote function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">language</span><span class="p">,</span>
         <span class="n">function</span><span class="p">,</span>
@@ -1543,7 +1543,7 @@ document.write(`
 
         <span class="c1"># Override task.remote&#39;s signature and docstring</span>
         <span class="nd">@wraps</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">_remote_proxy</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_remote_proxy</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote</span><span class="p">(</span>
                 <span class="n">serialized_runtime_env_info</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_serialized_base_runtime_env_info</span><span class="p">,</span>
                 <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
@@ -1553,7 +1553,7 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">remote</span> <span class="o">=</span> <span class="n">_remote_proxy</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="s2">&quot;Remote functions cannot be called directly. Instead &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;of running &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_function_name</span><span class="si">}</span><span class="s2">()&#39;, &quot;</span>
@@ -1561,18 +1561,18 @@ document.write(`
         <span class="p">)</span>
 
     <span class="c1"># Lock is not picklable</span>
-    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">attrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">del</span> <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;_inject_lock&quot;</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">attrs</span>
 
-    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;_inject_lock&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
 
 <div class="viewcode-block" id="RemoteFunction.options">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.remote_function.RemoteFunction.options.html#ray.remote_function.RemoteFunction.options">[docs]</a>
-    <span class="k">def</span> <span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">task_options</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">task_options</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Configures and overrides the task invocation parameters.</span>
 
 <span class="sd">        The arguments are the same as those that can be passed to :obj:`ray.remote`.</span>
@@ -1670,8 +1670,8 @@ document.write(`
                     <span class="n">serialize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="p">)</span>
 
-        <span class="k">class</span> <span class="nc">FuncWrapper</span><span class="p">:</span>
-            <span class="k">def</span> <span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">FuncWrapper</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">func_cls</span><span class="o">.</span><span class="n">_remote</span><span class="p">(</span>
                     <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
                     <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
@@ -1680,12 +1680,12 @@ document.write(`
                 <span class="p">)</span>
 
             <span class="nd">@DeveloperAPI</span>
-            <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">                For Ray DAG building that creates static graph from decorated</span>
 <span class="sd">                class or functions.</span>
 <span class="sd">                &quot;&quot;&quot;</span>
-                <span class="kn">from</span> <span class="nn">ray.dag.function_node</span> <span class="kn">import</span> <span class="n">FunctionNode</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.function_node</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionNode</span>
 
                 <span class="k">return</span> <span class="n">FunctionNode</span><span class="p">(</span><span class="n">func_cls</span><span class="o">.</span><span class="n">_function</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">updated_options</span><span class="p">)</span>
 
@@ -1694,7 +1694,7 @@ document.write(`
 
     <span class="nd">@wrap_auto_init</span>
     <span class="nd">@_tracing_task_invocation</span>
-    <span class="k">def</span> <span class="nf">_remote</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remote</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1708,7 +1708,7 @@ document.write(`
         <span class="k">if</span> <span class="n">client_mode_should_convert</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">client_mode_convert_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">task_options</span><span class="p">)</span>
 
-        <span class="kn">from</span> <span class="nn">ray.util.insight</span> <span class="kn">import</span> <span class="n">record_control_flow</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.insight</span><span class="w"> </span><span class="kn">import</span> <span class="n">record_control_flow</span>
 
         <span class="n">record_control_flow</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_function_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
@@ -1719,7 +1719,7 @@ document.write(`
             <span class="c1"># Only need to record on the driver side</span>
             <span class="c1"># since workers are created via tasks or actors</span>
             <span class="c1"># launched from the driver.</span>
-            <span class="kn">from</span> <span class="nn">ray._private.usage</span> <span class="kn">import</span> <span class="n">usage_lib</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.usage</span><span class="w"> </span><span class="kn">import</span> <span class="n">usage_lib</span>
 
             <span class="n">usage_lib</span><span class="o">.</span><span class="n">record_library_usage</span><span class="p">(</span><span class="s2">&quot;core&quot;</span><span class="p">)</span>
 
@@ -1859,7 +1859,7 @@ document.write(`
         <span class="n">enable_task_events</span> <span class="o">=</span> <span class="n">task_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enable_task_events&quot;</span><span class="p">)</span>
         <span class="n">labels</span> <span class="o">=</span> <span class="n">task_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_labels&quot;</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">invocation</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">invocation</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_cross_language</span><span class="p">:</span>
                 <span class="n">list_args</span> <span class="o">=</span> <span class="n">cross_language</span><span class="o">.</span><span class="n">_format_args</span><span class="p">(</span><span class="n">worker</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
             <span class="k">elif</span> <span class="ow">not</span> <span class="n">args</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_function_signature</span><span class="p">:</span>
@@ -1910,13 +1910,13 @@ document.write(`
         <span class="k">return</span> <span class="n">invocation</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For Ray DAG building that creates static graph from decorated</span>
 <span class="sd">        class or functions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="kn">from</span> <span class="nn">ray.dag.function_node</span> <span class="kn">import</span> <span class="n">FunctionNode</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.function_node</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionNode</span>
 
         <span class="k">return</span> <span class="n">FunctionNode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_function</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_options</span><span class="p">)</span>
 </pre></div>

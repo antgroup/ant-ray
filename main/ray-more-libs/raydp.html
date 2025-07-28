@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1418,8 +1418,8 @@ your models using TensorFlow and PyTorch.</p>
 <h2>Creating a Spark Session<a class="headerlink" href="#creating-a-spark-session" title="Link to this heading">#</a></h2>
 <p>To create a spark session, call <code class="docutils literal notranslate"><span class="pre">raydp.init_spark</span></code></p>
 <p>For example,</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">raydp</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">raydp</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 <span class="n">spark</span> <span class="o">=</span> <span class="n">raydp</span><span class="o">.</span><span class="n">init_spark</span><span class="p">(</span>
@@ -1436,18 +1436,18 @@ your models using TensorFlow and PyTorch.</p>
 <section id="training-a-spark-dataframe-with-tensorflow">
 <h3>Training a Spark DataFrame with TensorFlow<a class="headerlink" href="#training-a-spark-dataframe-with-tensorflow" title="Link to this heading">#</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">raydp.tf.TFEstimator</span></code> provides an API for training with TensorFlow.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyspark.sql.functions</span> <span class="kn">import</span> <span class="n">col</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">col</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
 <span class="c1"># calculate z = x + 2y + 1000</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">col</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>\
   <span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">col</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">200</span><span class="p">)</span>\
   <span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">col</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1000</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">raydp.utils</span> <span class="kn">import</span> <span class="n">random_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">raydp.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">random_split</span>
 <span class="n">train_df</span><span class="p">,</span> <span class="n">test_df</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">])</span>
 
 <span class="c1"># TensorFlow code</span>
-<span class="kn">from</span> <span class="nn">tensorflow</span> <span class="kn">import</span> <span class="n">keras</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">keras</span>
 <span class="n">input_1</span> <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
 <span class="n">input_2</span> <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
 
@@ -1459,7 +1459,7 @@ your models using TensorFlow and PyTorch.</p>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
 <span class="n">loss</span> <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">MeanSquaredError</span><span class="p">()</span>
 
-<span class="kn">from</span> <span class="nn">raydp.tf</span> <span class="kn">import</span> <span class="n">TFEstimator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">raydp.tf</span><span class="w"> </span><span class="kn">import</span> <span class="n">TFEstimator</span>
 <span class="n">estimator</span> <span class="o">=</span> <span class="n">TFEstimator</span><span class="p">(</span>
   <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
   <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
@@ -1485,24 +1485,24 @@ your models using TensorFlow and PyTorch.</p>
 <h3>Training a Spark DataFrame with PyTorch<a class="headerlink" href="#training-a-spark-dataframe-with-pytorch" title="Link to this heading">#</a></h3>
 <p>Similarly, <code class="docutils literal notranslate"><span class="pre">raydp.torch.TorchEstimator</span></code> provides an API for training with
 PyTorch.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyspark.sql.functions</span> <span class="kn">import</span> <span class="n">col</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">col</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
 <span class="c1"># calculate z = x + 2y + 1000</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">col</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>\
   <span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">col</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">200</span><span class="p">)</span>\
   <span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">col</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1000</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">raydp.utils</span> <span class="kn">import</span> <span class="n">random_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">raydp.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">random_split</span>
 <span class="n">train_df</span><span class="p">,</span> <span class="n">test_df</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">])</span>
 
 <span class="c1"># PyTorch Code</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="k">class</span> <span class="nc">LinearModel</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LinearModel</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">LinearModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
@@ -1510,12 +1510,12 @@ PyTorch.</p>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
 <span class="n">loss_fn</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">lr_scheduler_creator</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">lr_scheduler_creator</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">MultiStepLR</span><span class="p">(</span>
       <span class="n">optimizer</span><span class="p">,</span> <span class="n">milestones</span><span class="o">=</span><span class="p">[</span><span class="mi">150</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">350</span><span class="p">],</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 
 <span class="c1"># You can use the RayDP Estimator API or libraries like Ray Train for distributed training.</span>
-<span class="kn">from</span> <span class="nn">raydp.torch</span> <span class="kn">import</span> <span class="n">TorchEstimator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">raydp.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchEstimator</span>
 <span class="n">estimator</span> <span class="o">=</span> <span class="n">TorchEstimator</span><span class="p">(</span>
   <span class="n">num_workers</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
   <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="p">,</span>

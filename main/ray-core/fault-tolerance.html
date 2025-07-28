@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1417,10 +1417,10 @@ In particular, Ray can automatically recover from some failures in the <a class=
 <p>First, if the fault tolerance mechanisms provided by Ray don’t work for you,
 you can always catch <a class="reference internal" href="api/exceptions.html#ray-core-exceptions"><span class="std std-ref">exceptions</span></a> caused by failures and recover manually.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">read_only</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="kn">import</span> <span class="nn">sys</span>
-        <span class="kn">import</span> <span class="nn">random</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_only</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
         <span class="n">rand</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">rand</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">:</span>
@@ -1450,12 +1450,12 @@ As long as there are still references to an object,
 the owner worker of the object keeps running even after the corresponding task or actor finishes.
 If the owner worker fails, Ray <a class="reference internal" href="fault_tolerance/objects.html#fault-tolerance-ownership"><span class="std std-ref">cannot recover</span></a> the object automatically for those who try to access the object.
 One example of creating such outlived objects is returning <code class="docutils literal notranslate"><span class="pre">ObjectRef</span></code> created by <code class="docutils literal notranslate"><span class="pre">ray.put()</span></code> from a task:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 
 <span class="c1"># Non-fault tolerant version:</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">a</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">():</span>
     <span class="n">x_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x_ref</span>
 
@@ -1477,7 +1477,7 @@ If <code class="docutils literal notranslate"><span class="pre">x</span></code> 
 See <a class="reference internal" href="patterns/return-ray-put.html"><span class="doc">Anti-pattern: Returning ray.put() ObjectRefs from a task harms performance and fault tolerance</span></a> for more details.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fault tolerant version:</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">a</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">a</span><span class="p">():</span>
     <span class="c1"># Here we return the value directly instead of calling ray.put() first.</span>
     <span class="k">return</span> <span class="mi">1</span>
 
@@ -1492,7 +1492,7 @@ See <a class="reference internal" href="patterns/return-ray-put.html"><span clas
 <p>Third, avoid using <a class="reference internal" href="scheduling/resources.html#custom-resources"><span class="std std-ref">custom resource requirements</span></a> that can only be satisfied by a particular node.
 If that particular node fails, the running tasks or actors cannot be retried.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">b</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">b</span><span class="p">():</span>
     <span class="k">return</span> <span class="mi">1</span>
 
 

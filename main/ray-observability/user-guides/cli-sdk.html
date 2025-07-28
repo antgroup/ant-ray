@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1452,18 +1452,18 @@ Demands:
 <section id="get-started">
 <h3>Get started<a class="headerlink" href="#get-started" title="Link to this heading">#</a></h3>
 <p>This example uses the following script that runs two Tasks and creates two Actors.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task_running_300_seconds</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task_running_300_seconds</span><span class="p">():</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
 <span class="c1"># Create 2 tasks</span>
@@ -1500,7 +1500,7 @@ Table (group by func_name):
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-1">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">summarize_tasks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">summarize_tasks</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">summarize_tasks</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -1533,7 +1533,7 @@ Table:
 <input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-3">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">list_actors</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_actors</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">list_actors</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -1567,7 +1567,7 @@ state: ALIVE
 <input id="sd-tab-item-5" name="sd-tab-set-2" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-5">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">get_actor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_actor</span>
 <span class="c1"># In this case, 31405554844820381c2f0f8501000000</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">get_actor</span><span class="p">(</span><span class="nb">id</span><span class="o">=&lt;</span><span class="n">ACTOR_ID</span><span class="o">&gt;</span><span class="p">))</span>
 </pre></div>
@@ -1594,7 +1594,7 @@ Actor created
 <input id="sd-tab-item-7" name="sd-tab-set-3" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-7">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">get_log</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_log</span>
 
 <span class="c1"># In this case, ACTOR_ID is 31405554844820381c2f0f8501000000</span>
 <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">get_log</span><span class="p">(</span><span class="n">actor_id</span><span class="o">=&lt;</span><span class="n">ACTOR_ID</span><span class="o">&gt;</span><span class="p">):</span>
@@ -1636,7 +1636,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-9" name="sd-tab-set-4" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-9">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">summarize_actors</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">summarize_actors</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">summarize_actors</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -1657,7 +1657,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-11" name="sd-tab-set-5" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-11">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">summarize_tasks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">summarize_tasks</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">summarize_tasks</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -1684,7 +1684,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-13" name="sd-tab-set-6" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-13">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">summarize_objects</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">summarize_objects</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">summarize_objects</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -1720,7 +1720,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-15" name="sd-tab-set-7" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-15">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">list_nodes</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_nodes</span>
 <span class="n">list_nodes</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1738,7 +1738,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-17" name="sd-tab-set-8" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-17">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">list_placement_groups</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_placement_groups</span>
 <span class="n">list_placement_groups</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1760,7 +1760,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-19" name="sd-tab-set-9" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-19">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">list_objects</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_objects</span>
 <span class="n">list_objects</span><span class="p">(</span><span class="n">filters</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;pid&quot;</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="mi">1234</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;reference_type&quot;</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="s2">&quot;LOCAL_REFERENCE&quot;</span><span class="p">)])</span>
 </pre></div>
 </div>
@@ -1778,7 +1778,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-21" name="sd-tab-set-10" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-21">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">list_actors</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_actors</span>
 <span class="n">list_actors</span><span class="p">(</span><span class="n">filters</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="s2">&quot;ALIVE&quot;</span><span class="p">)])</span>
 </pre></div>
 </div>
@@ -1796,7 +1796,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-23" name="sd-tab-set-11" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-23">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">list_tasks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_tasks</span>
 <span class="n">list_tasks</span><span class="p">(</span><span class="n">filters</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="s2">&quot;RUNNING&quot;</span><span class="p">)])</span>
 </pre></div>
 </div>
@@ -1814,7 +1814,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-25" name="sd-tab-set-12" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-25">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">list_tasks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_tasks</span>
 <span class="n">list_tasks</span><span class="p">(</span><span class="n">filters</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="s2">&quot;!=&quot;</span><span class="p">,</span> <span class="s2">&quot;RUNNING&quot;</span><span class="p">)])</span>
 </pre></div>
 </div>
@@ -1832,7 +1832,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-27" name="sd-tab-set-13" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-27">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">list_tasks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_tasks</span>
 <span class="n">list_tasks</span><span class="p">(</span><span class="n">filters</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="s2">&quot;RUNNING&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="s2">&quot;task_running_300_seconds()&quot;</span><span class="p">)])</span>
 </pre></div>
 </div>
@@ -1854,7 +1854,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-29" name="sd-tab-set-14" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-29">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">list_tasks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_tasks</span>
 <span class="n">list_tasks</span><span class="p">(</span><span class="n">detail</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1876,7 +1876,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-31" name="sd-tab-set-15" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-31">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">get_task</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_task</span>
 <span class="n">get_task</span><span class="p">(</span><span class="nb">id</span><span class="o">=&lt;</span><span class="n">TASK_ID</span><span class="o">&gt;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1894,7 +1894,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-33" name="sd-tab-set-16" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-33">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">get_node</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_node</span>
 <span class="n">get_node</span><span class="p">(</span><span class="nb">id</span><span class="o">=&lt;</span><span class="n">NODE_ID</span><span class="o">&gt;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1919,7 +1919,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-35">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># You could get the node ID / node IP from `ray list nodes`</span>
-<span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">list_logs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_logs</span>
 <span class="c1"># `ray logs` by default print logs from a head node.</span>
 <span class="c1"># To list the same logs, you should provide the head node ID.</span>
 <span class="c1"># Get the node ID / node IP from `ray list nodes`</span>
@@ -1943,7 +1943,7 @@ ray<span class="w"> </span>logs<span class="w"> </span>gcs_server.out<span class
 <input id="sd-tab-item-37" name="sd-tab-set-18" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-37">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">get_log</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_log</span>
 
 <span class="c1"># Node IP can be retrieved from list_nodes() or ray.nodes()</span>
 <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">get_log</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;gcs_server.out&quot;</span><span class="p">,</span> <span class="n">node_id</span><span class="o">=&lt;</span><span class="n">NODE_ID</span><span class="o">&gt;</span><span class="p">):</span>
@@ -1967,7 +1967,7 @@ ray<span class="w"> </span>logs<span class="w"> </span>cluster<span class="w"> <
 <input id="sd-tab-item-39" name="sd-tab-set-19" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-39">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">get_log</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_log</span>
 
 <span class="c1"># Retrieve the Node IP from list_nodes() or ray.nodes()</span>
 <span class="c1"># The loop blocks with `follow=True`</span>
@@ -1989,7 +1989,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-41" name="sd-tab-set-20" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-41">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">get_log</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_log</span>
 
 <span class="c1"># Get the Actor&#39;s ID from the output of `ray list actors`.</span>
 <span class="c1"># The loop blocks with `follow=True`</span>
@@ -2011,7 +2011,7 @@ CLI (Recommended)</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-43" name="sd-tab-set-21" type="radio">
 </input><label class="sd-tab-label" data-sync-id="Python SDK (Internal Developer API)" for="sd-tab-item-43">
 Python SDK (Internal Developer API)</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.state</span> <span class="kn">import</span> <span class="n">get_log</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_log</span>
 
 <span class="c1"># Retrieve the node IP from list_nodes() or ray.nodes()</span>
 <span class="c1"># get the PID of the worker running the Actor easily when output</span>

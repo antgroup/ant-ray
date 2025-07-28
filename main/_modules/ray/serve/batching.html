@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,15 +1389,15 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.serve.batching</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">import</span> <span class="nn">io</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
-<span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">isasyncgenfunction</span><span class="p">,</span> <span class="n">iscoroutinefunction</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">isasyncgenfunction</span><span class="p">,</span> <span class="n">iscoroutinefunction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">AsyncGenerator</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -1414,13 +1414,13 @@ document.write(`
     <span class="n">overload</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray._private.signature</span> <span class="kn">import</span> <span class="n">extract_signature</span><span class="p">,</span> <span class="n">flatten_args</span><span class="p">,</span> <span class="n">recover_args</span>
-<span class="kn">from</span> <span class="nn">ray._private.utils</span> <span class="kn">import</span> <span class="n">get_or_create_event_loop</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.constants</span> <span class="kn">import</span> <span class="n">SERVE_LOGGER_NAME</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.utils</span> <span class="kn">import</span> <span class="n">extract_self_if_method_call</span>
-<span class="kn">from</span> <span class="nn">ray.serve.exceptions</span> <span class="kn">import</span> <span class="n">RayServeException</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.signature</span><span class="w"> </span><span class="kn">import</span> <span class="n">extract_signature</span><span class="p">,</span> <span class="n">flatten_args</span><span class="p">,</span> <span class="n">recover_args</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_or_create_event_loop</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SERVE_LOGGER_NAME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">extract_self_if_method_call</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">RayServeException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">SERVE_LOGGER_NAME</span><span class="p">)</span>
 
@@ -1431,19 +1431,19 @@ document.write(`
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">_SingleRequest</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_SingleRequest</span><span class="p">:</span>
     <span class="n">self_arg</span><span class="p">:</span> <span class="n">Any</span>
     <span class="n">flattened_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
     <span class="n">future</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span>
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">_GeneratorResult</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_GeneratorResult</span><span class="p">:</span>
     <span class="n">result</span><span class="p">:</span> <span class="n">Any</span>
     <span class="n">next_future</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span>
 
 
-<span class="k">def</span> <span class="nf">_batch_args_kwargs</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_batch_args_kwargs</span><span class="p">(</span>
     <span class="n">list_of_flattened_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Batch a list of flatten args and returns regular args and kwargs&quot;&quot;&quot;</span>
@@ -1468,8 +1468,8 @@ document.write(`
     <span class="k">return</span> <span class="n">recover_args</span><span class="p">(</span><span class="n">batched_flattened_args</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_BatchQueue</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_BatchQueue</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">max_batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">batch_wait_timeout_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -1509,7 +1509,7 @@ document.write(`
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_warn_if_max_batch_size_exceeds_max_ongoing_requests</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_warn_if_max_batch_size_exceeds_max_ongoing_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_warn_if_max_batch_size_exceeds_max_ongoing_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper to check whether the max_batch_size is bounded.</span>
 
 <span class="sd">        Log a warning to configure `max_ongoing_requests` if it&#39;s bounded.</span>
@@ -1525,16 +1525,16 @@ document.write(`
                 <span class="s2">&quot;`max_ongoing_requests` to be &gt;= `max_batch_size`.&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">set_max_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_max_batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_max_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_max_batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates queue&#39;s max_batch_size.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_batch_size</span> <span class="o">=</span> <span class="n">new_max_batch_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_warn_if_max_batch_size_exceeds_max_ongoing_requests</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">_SingleRequest</span><span class="p">,</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">_SingleRequest</span><span class="p">,</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put_nowait</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">requests_available_event</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">wait_for_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Wait for batch respecting self.max_batch_size and self.timeout_s.</span>
 
 <span class="sd">        Returns a batch of up to self.max_batch_size items. Waits for up to</span>
@@ -1587,7 +1587,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">batch</span>
 
-    <span class="k">def</span> <span class="nf">_validate_results</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_results</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">input_batch_length</span><span class="p">:</span> <span class="nb">int</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">!=</span> <span class="n">input_batch_length</span><span class="p">:</span>
@@ -1597,7 +1597,7 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;returned list has length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_consume_func_generator</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_consume_func_generator</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">func_generator</span><span class="p">:</span> <span class="n">AsyncGenerator</span><span class="p">,</span>
         <span class="n">initial_futures</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span><span class="p">],</span>
@@ -1648,7 +1648,7 @@ document.write(`
                 <span class="k">if</span> <span class="n">future</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">FINISHED_TOKEN</span><span class="p">:</span>
                     <span class="n">_set_exception_if_not_done</span><span class="p">(</span><span class="n">future</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_assign_func_results</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_assign_func_results</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">func_future</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span><span class="p">,</span>
         <span class="n">futures</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span><span class="p">],</span>
@@ -1665,7 +1665,7 @@ document.write(`
             <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">futures</span><span class="p">:</span>
                 <span class="n">_set_exception_if_not_done</span><span class="p">(</span><span class="n">future</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_process_batches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_process_batches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Loops infinitely and processes queued request batches.&quot;&quot;&quot;</span>
 
         <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loop</span><span class="o">.</span><span class="n">is_closed</span><span class="p">():</span>
@@ -1677,7 +1677,7 @@ document.write(`
                     <span class="s2">&quot;_process_batches asyncio task ran into an unexpected exception.&quot;</span>
                 <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_process_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_process_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Processes queued request batch.&quot;&quot;&quot;</span>
 
         <span class="n">batch</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">_SingleRequest</span><span class="p">]</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">wait_for_batch</span><span class="p">()</span>
@@ -1717,7 +1717,7 @@ document.write(`
             <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">futures</span><span class="p">:</span>
                 <span class="n">_set_exception_if_not_done</span><span class="p">(</span><span class="n">future</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_handle_batch_task</span> <span class="ow">is</span> <span class="kc">None</span>
             <span class="ow">or</span> <span class="ow">not</span> <span class="n">get_or_create_event_loop</span><span class="p">()</span><span class="o">.</span><span class="n">is_running</span><span class="p">()</span>
@@ -1730,7 +1730,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_handle_batch_task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
 
 
-<span class="k">class</span> <span class="nc">_LazyBatchQueueWrapper</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_LazyBatchQueueWrapper</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Stores a _BatchQueue and updates its settings.</span>
 
 <span class="sd">    _BatchQueue cannot be pickled, you must construct it lazily</span>
@@ -1738,7 +1738,7 @@ document.write(`
 <span class="sd">    first access.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">max_batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
         <span class="n">batch_wait_timeout_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1750,7 +1750,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">handle_batch_func</span> <span class="o">=</span> <span class="n">handle_batch_func</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">queue</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_BatchQueue</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">queue</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_BatchQueue</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns _BatchQueue.</span>
 
 <span class="sd">        Initializes queue when called for the first time.</span>
@@ -1763,7 +1763,7 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span>
 
-    <span class="k">def</span> <span class="nf">set_max_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_max_batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_max_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_max_batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates queue&#39;s max_batch_size.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">max_batch_size</span> <span class="o">=</span> <span class="n">new_max_batch_size</span>
@@ -1771,19 +1771,19 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">set_max_batch_size</span><span class="p">(</span><span class="n">new_max_batch_size</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">set_batch_wait_timeout_s</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_batch_wait_timeout_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_batch_wait_timeout_s</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_batch_wait_timeout_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_wait_timeout_s</span> <span class="o">=</span> <span class="n">new_batch_wait_timeout_s</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">batch_wait_timeout_s</span> <span class="o">=</span> <span class="n">new_batch_wait_timeout_s</span>
 
-    <span class="k">def</span> <span class="nf">get_max_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_max_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_batch_size</span>
 
-    <span class="k">def</span> <span class="nf">get_batch_wait_timeout_s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_batch_wait_timeout_s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_wait_timeout_s</span>
 
-    <span class="k">def</span> <span class="nf">_get_curr_iteration_start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_curr_iteration_start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets current iteration&#39;s start time on default _BatchQueue implementation.</span>
 
 <span class="sd">        Returns None if the batch handler doesn&#39;t use a default _BatchQueue.</span>
@@ -1794,7 +1794,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_is_batching_task_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_is_batching_task_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets whether default _BatchQueue&#39;s background task is alive.</span>
 
 <span class="sd">        Returns False if the batch handler doesn&#39;t use a default _BatchQueue.</span>
@@ -1805,7 +1805,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_handling_task_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_handling_task_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the stack for the default _BatchQueue&#39;s background task.</span>
 
 <span class="sd">        Returns empty string if the batch handler doesn&#39;t use a default _BatchQueue.</span>
@@ -1819,7 +1819,7 @@ document.write(`
             <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">_validate_max_batch_size</span><span class="p">(</span><span class="n">max_batch_size</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_max_batch_size</span><span class="p">(</span><span class="n">max_batch_size</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_batch_size</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_batch_size</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">max_batch_size</span><span class="o">.</span><span class="n">is_integer</span><span class="p">():</span>
             <span class="n">max_batch_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_batch_size</span><span class="p">)</span>
@@ -1834,7 +1834,7 @@ document.write(`
         <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_validate_batch_wait_timeout_s</span><span class="p">(</span><span class="n">batch_wait_timeout_s</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_batch_wait_timeout_s</span><span class="p">(</span><span class="n">batch_wait_timeout_s</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch_wait_timeout_s</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="s2">&quot;batch_wait_timeout_s must be a float &gt;= 0, &quot;</span> <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="n">batch_wait_timeout_s</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -1851,44 +1851,44 @@ document.write(`
 <span class="n">R</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;R&quot;</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_SyncBatchingMethod</span><span class="p">(</span><span class="n">Protocol</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">SelfType</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">R</span><span class="p">]):</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">self_</span><span class="p">:</span> <span class="n">SelfType</span><span class="p">,</span> <span class="n">__batch</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">R</span><span class="p">]:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_SyncBatchingMethod</span><span class="p">(</span><span class="n">Protocol</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">SelfType</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">R</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">self_</span><span class="p">:</span> <span class="n">SelfType</span><span class="p">,</span> <span class="n">__batch</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">R</span><span class="p">]:</span>
         <span class="o">...</span>
 
 
-<span class="k">class</span> <span class="nc">_AsyncBatchingMethod</span><span class="p">(</span><span class="n">Protocol</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">SelfType</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">R</span><span class="p">]):</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">self_</span><span class="p">:</span> <span class="n">SelfType</span><span class="p">,</span> <span class="n">__batch</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">R</span><span class="p">]:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_AsyncBatchingMethod</span><span class="p">(</span><span class="n">Protocol</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">SelfType</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">R</span><span class="p">]):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">self_</span><span class="p">:</span> <span class="n">SelfType</span><span class="p">,</span> <span class="n">__batch</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">R</span><span class="p">]:</span>
         <span class="o">...</span>
 
 
 <span class="nd">@overload</span>  <span class="c1"># Sync function for `batch` called WITHOUT arguments</span>
-<span class="k">def</span> <span class="nf">batch</span><span class="p">(</span><span class="n">_sync_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="n">R</span><span class="p">]],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">],</span> <span class="n">R</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">batch</span><span class="p">(</span><span class="n">_sync_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="n">R</span><span class="p">]],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">],</span> <span class="n">R</span><span class="p">]:</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>  <span class="c1"># Async function for `batch` called WITHOUT arguments</span>
-<span class="k">def</span> <span class="nf">batch</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">batch</span><span class="p">(</span>
     <span class="n">_async_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">]],</span> <span class="n">Coroutine</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">R</span><span class="p">]]],</span> <span class="o">/</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">],</span> <span class="n">Coroutine</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">R</span><span class="p">]]:</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>  <span class="c1"># Sync method for `batch` called WITHOUT arguments</span>
-<span class="k">def</span> <span class="nf">batch</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">batch</span><span class="p">(</span>
     <span class="n">_sync_meth</span><span class="p">:</span> <span class="n">_SyncBatchingMethod</span><span class="p">[</span><span class="n">SelfType</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="o">/</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">SelfType</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="n">R</span><span class="p">]:</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>  <span class="c1"># Async method for `batch` called WITHOUT arguments</span>
-<span class="k">def</span> <span class="nf">batch</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">batch</span><span class="p">(</span>
     <span class="n">_async_meth</span><span class="p">:</span> <span class="n">_AsyncBatchingMethod</span><span class="p">[</span><span class="n">SelfType</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="o">/</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">SelfType</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="n">Coroutine</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">R</span><span class="p">]]:</span>
     <span class="o">...</span>
 
 
 <span class="nd">@overload</span>  <span class="c1"># `batch` called WITH arguments</span>
-<span class="k">def</span> <span class="nf">batch</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">batch</span><span class="p">(</span>
     <span class="n">_</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">/</span><span class="p">,</span>
     <span class="n">max_batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
@@ -1897,27 +1897,27 @@ document.write(`
     <span class="o">...</span>
 
 
-<span class="k">class</span> <span class="nc">_BatchDecorator</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_BatchDecorator</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Descibes behaviour of decorator produced by calling `batch` with arguments&quot;&quot;&quot;</span>
 
     <span class="nd">@overload</span>  <span class="c1"># Sync function</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_sync_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="n">R</span><span class="p">]],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">],</span> <span class="n">R</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_sync_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="n">R</span><span class="p">]],</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">],</span> <span class="n">R</span><span class="p">]:</span>
         <span class="o">...</span>
 
     <span class="nd">@overload</span>  <span class="c1"># Async function</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">_async_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">]],</span> <span class="n">Coroutine</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">R</span><span class="p">]]],</span> <span class="o">/</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">],</span> <span class="n">Coroutine</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">R</span><span class="p">]]:</span>
         <span class="o">...</span>
 
     <span class="nd">@overload</span>  <span class="c1"># Sync method</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">_sync_meth</span><span class="p">:</span> <span class="n">_SyncBatchingMethod</span><span class="p">[</span><span class="n">SelfType</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="o">/</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">SelfType</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="n">R</span><span class="p">]:</span>
         <span class="o">...</span>
 
     <span class="nd">@overload</span>  <span class="c1"># Async method</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">_async_meth</span><span class="p">:</span> <span class="n">_AsyncBatchingMethod</span><span class="p">[</span><span class="n">SelfType</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="o">/</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">SelfType</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="n">Coroutine</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">R</span><span class="p">]]:</span>
         <span class="o">...</span>
@@ -1926,7 +1926,7 @@ document.write(`
 <div class="viewcode-block" id="batch">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.batch.html#ray.serve.batch">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">batch</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">batch</span><span class="p">(</span>
     <span class="n">_func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">/</span><span class="p">,</span>
     <span class="n">max_batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
@@ -1993,14 +1993,14 @@ document.write(`
     <span class="n">_validate_max_batch_size</span><span class="p">(</span><span class="n">max_batch_size</span><span class="p">)</span>
     <span class="n">_validate_batch_wait_timeout_s</span><span class="p">(</span><span class="n">batch_wait_timeout_s</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_batch_decorator</span><span class="p">(</span><span class="n">_func</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_batch_decorator</span><span class="p">(</span><span class="n">_func</span><span class="p">):</span>
         <span class="n">lazy_batch_queue_wrapper</span> <span class="o">=</span> <span class="n">_LazyBatchQueueWrapper</span><span class="p">(</span>
             <span class="n">max_batch_size</span><span class="p">,</span>
             <span class="n">batch_wait_timeout_s</span><span class="p">,</span>
             <span class="n">_func</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">async</span> <span class="k">def</span> <span class="nf">batch_handler_generator</span><span class="p">(</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">batch_handler_generator</span><span class="p">(</span>
             <span class="n">first_future</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span><span class="p">,</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Generator that handles generator batch functions.&quot;&quot;&quot;</span>
@@ -2014,7 +2014,7 @@ document.write(`
                 <span class="k">except</span> <span class="ne">StopAsyncIteration</span><span class="p">:</span>
                     <span class="k">break</span>
 
-        <span class="k">def</span> <span class="nf">enqueue_request</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">enqueue_request</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span><span class="p">:</span>
             <span class="n">flattened_args</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="n">flatten_args</span><span class="p">(</span><span class="n">extract_signature</span><span class="p">(</span><span class="n">_func</span><span class="p">),</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
 
             <span class="c1"># If the function is a method, remove self as an argument.</span>
@@ -2029,12 +2029,12 @@ document.write(`
             <span class="k">return</span> <span class="n">future</span>
 
         <span class="nd">@wraps</span><span class="p">(</span><span class="n">_func</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">generator_batch_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">generator_batch_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">first_future</span> <span class="o">=</span> <span class="n">enqueue_request</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">batch_handler_generator</span><span class="p">(</span><span class="n">first_future</span><span class="p">)</span>
 
         <span class="nd">@wraps</span><span class="p">(</span><span class="n">_func</span><span class="p">)</span>
-        <span class="k">async</span> <span class="k">def</span> <span class="nf">batch_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">batch_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="c1"># This will raise if the underlying call raised an exception.</span>
             <span class="k">return</span> <span class="k">await</span> <span class="n">enqueue_request</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
 
@@ -2078,14 +2078,14 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_set_result_if_not_done</span><span class="p">(</span><span class="n">future</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_result_if_not_done</span><span class="p">(</span><span class="n">future</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the future&#39;s result if the future is not done.&quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">future</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
         <span class="n">future</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_set_exception_if_not_done</span><span class="p">(</span><span class="n">future</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span><span class="p">,</span> <span class="n">exception</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_exception_if_not_done</span><span class="p">(</span><span class="n">future</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span><span class="p">,</span> <span class="n">exception</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the future&#39;s exception if the future is not done.&quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">future</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>

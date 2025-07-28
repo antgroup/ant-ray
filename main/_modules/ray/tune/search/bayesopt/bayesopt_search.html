@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1397,37 +1397,37 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.search.bayesopt.bayesopt_search</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">from</span> <span class="nn">ray.tune.result</span> <span class="kn">import</span> <span class="n">DEFAULT_METRIC</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_METRIC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">UNDEFINED_METRIC_MODE</span><span class="p">,</span>
     <span class="n">UNDEFINED_SEARCH_SPACE</span><span class="p">,</span>
     <span class="n">UNRESOLVED_SEARCH_SPACE</span><span class="p">,</span>
     <span class="n">Searcher</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.sample</span> <span class="kn">import</span> <span class="n">Domain</span><span class="p">,</span> <span class="n">Float</span><span class="p">,</span> <span class="n">Quantized</span><span class="p">,</span> <span class="n">Uniform</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.variant_generator</span> <span class="kn">import</span> <span class="n">parse_spec_vars</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils</span> <span class="kn">import</span> <span class="n">flatten_dict</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils.util</span> <span class="kn">import</span> <span class="n">is_nan_or_inf</span><span class="p">,</span> <span class="n">unflatten_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.sample</span><span class="w"> </span><span class="kn">import</span> <span class="n">Domain</span><span class="p">,</span> <span class="n">Float</span><span class="p">,</span> <span class="n">Quantized</span><span class="p">,</span> <span class="n">Uniform</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.variant_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_spec_vars</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_nan_or_inf</span><span class="p">,</span> <span class="n">unflatten_dict</span>
 
 <span class="k">try</span><span class="p">:</span>  <span class="c1"># Python 3 only -- needed for lint test.</span>
-    <span class="kn">import</span> <span class="nn">bayes_opt</span> <span class="k">as</span> <span class="nn">byo</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">bayes_opt</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">byo</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">byo</span> <span class="o">=</span> <span class="kc">None</span>
 
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">ExperimentAnalysis</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExperimentAnalysis</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_dict_hash</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">precision</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_dict_hash</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">precision</span><span class="p">):</span>
     <span class="n">flatconfig</span> <span class="o">=</span> <span class="n">flatten_dict</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">flatconfig</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
@@ -1439,7 +1439,7 @@ document.write(`
 
 <div class="viewcode-block" id="BayesOptSearch">
 <a class="viewcode-back" href="../../../../../tune/api/doc/ray.tune.search.bayesopt.BayesOptSearch.html#ray.tune.search.bayesopt.BayesOptSearch">[docs]</a>
-<span class="k">class</span> <span class="nc">BayesOptSearch</span><span class="p">(</span><span class="n">Searcher</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BayesOptSearch</span><span class="p">(</span><span class="n">Searcher</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Uses bayesian-optimization/BayesianOptimization to optimize hyperparameters.</span>
 
 <span class="sd">    bayesian-optimization/BayesianOptimization is a library for Bayesian Optimization. More</span>
@@ -1539,7 +1539,7 @@ document.write(`
     <span class="c1"># bayes_opt.BayesianOptimization: Optimization object</span>
     <span class="n">optimizer</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1612,7 +1612,7 @@ document.write(`
         <span class="k">if</span> <span class="n">space</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup_optimizer</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_setup_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="p">:</span>
             <span class="c1"># If only a mode was passed, use anonymous metric</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="o">=</span> <span class="n">DEFAULT_METRIC</span>
@@ -1628,7 +1628,7 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analysis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">register_analysis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_analysis</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">set_search_properties</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_search_properties</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="o">**</span><span class="n">spec</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">:</span>
@@ -1650,7 +1650,7 @@ document.write(`
 
 <div class="viewcode-block" id="BayesOptSearch.suggest">
 <a class="viewcode-back" href="../../../../../tune/api/doc/ray.tune.search.bayesopt.BayesOptSearch.suggest.html#ray.tune.search.bayesopt.BayesOptSearch.suggest">[docs]</a>
-    <span class="k">def</span> <span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return new point to be explored by black box function.</span>
 
 <span class="sd">        Args:</span>
@@ -1717,7 +1717,7 @@ document.write(`
 
 <div class="viewcode-block" id="BayesOptSearch.register_analysis">
 <a class="viewcode-back" href="../../../../../tune/api/doc/ray.tune.search.bayesopt.BayesOptSearch.register_analysis.html#ray.tune.search.bayesopt.BayesOptSearch.register_analysis">[docs]</a>
-    <span class="k">def</span> <span class="nf">register_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="s2">&quot;ExperimentAnalysis&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="s2">&quot;ExperimentAnalysis&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Integrate the given analysis into the gaussian process.</span>
 
 <span class="sd">        Args:</span>
@@ -1735,7 +1735,7 @@ document.write(`
 
 <div class="viewcode-block" id="BayesOptSearch.on_trial_complete">
 <a class="viewcode-back" href="../../../../../tune/api/doc/ray.tune.search.bayesopt.BayesOptSearch.on_trial_complete.html#ray.tune.search.bayesopt.BayesOptSearch.on_trial_complete">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_trial_complete</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_complete</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Notification for the completion of trial.</span>
@@ -1775,22 +1775,22 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">_register_result</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_register_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_register_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Register given tuple of params and results.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">is_nan_or_inf</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="p">]):</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric_op</span> <span class="o">*</span> <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">state</span>
 
-    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BayesOptSearch.save">
 <a class="viewcode-back" href="../../../../../tune/api/doc/ray.tune.search.bayesopt.BayesOptSearch.save.html#ray.tune.search.bayesopt.BayesOptSearch.save">[docs]</a>
-    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Storing current optimizer state.&quot;&quot;&quot;</span>
         <span class="n">save_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_state</span><span class="p">()</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -1799,7 +1799,7 @@ document.write(`
 
 <div class="viewcode-block" id="BayesOptSearch.restore">
 <a class="viewcode-back" href="../../../../../tune/api/doc/ray.tune.search.bayesopt.BayesOptSearch.restore.html#ray.tune.search.bayesopt.BayesOptSearch.restore">[docs]</a>
-    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Restoring current optimizer state.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">save_object</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
@@ -1818,7 +1818,7 @@ document.write(`
 
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">convert_search_space</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">join</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert_search_space</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">join</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
         <span class="n">resolved_vars</span><span class="p">,</span> <span class="n">domain_vars</span><span class="p">,</span> <span class="n">grid_vars</span> <span class="o">=</span> <span class="n">parse_spec_vars</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">grid_vars</span><span class="p">:</span>
@@ -1831,7 +1831,7 @@ document.write(`
         <span class="n">spec</span> <span class="o">=</span> <span class="n">flatten_dict</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">prevent_delimiter</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">resolved_vars</span><span class="p">,</span> <span class="n">domain_vars</span><span class="p">,</span> <span class="n">grid_vars</span> <span class="o">=</span> <span class="n">parse_spec_vars</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">resolve_value</span><span class="p">(</span><span class="n">domain</span><span class="p">:</span> <span class="n">Domain</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">resolve_value</span><span class="p">(</span><span class="n">domain</span><span class="p">:</span> <span class="n">Domain</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
             <span class="n">sampler</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">get_sampler</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">Quantized</span><span class="p">):</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>

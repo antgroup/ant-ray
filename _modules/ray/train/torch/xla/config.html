@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1392,19 +1392,19 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.train.torch.xla.config</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.utils</span> <span class="kn">import</span> <span class="n">get_address_and_port</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.worker_group</span> <span class="kn">import</span> <span class="n">WorkerGroup</span>
-<span class="kn">from</span> <span class="nn">ray.train.backend</span> <span class="kn">import</span> <span class="n">Backend</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchConfig</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_address_and_port</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.worker_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">WorkerGroup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">Backend</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1413,7 +1413,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.torch.xla.TorchXLAConfig.html#ray.train.torch.xla.TorchXLAConfig">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">TorchXLAConfig</span><span class="p">(</span><span class="n">TorchConfig</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TorchXLAConfig</span><span class="p">(</span><span class="n">TorchConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Configuration for torch XLA setup.</span>
 <span class="sd">    See https://pytorch.org/xla/release/1.13/index.html for more info.</span>
@@ -1424,18 +1424,18 @@ document.write(`
     <span class="n">neuron_parallel_compile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">backend_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">backend_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_TorchAwsNeuronXLABackend</span></div>
 
 
 
-<span class="k">def</span> <span class="nf">_kill_xrt_server</span><span class="p">():</span>
-    <span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_kill_xrt_server</span><span class="p">():</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
 
     <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s2">&quot;pkill&quot;</span><span class="p">,</span> <span class="s2">&quot;-f&quot;</span><span class="p">,</span> <span class="s2">&quot;xrt_run_server&quot;</span><span class="p">])</span>
 
 
-<span class="k">def</span> <span class="nf">_set_xla_env_vars</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_xla_env_vars</span><span class="p">():</span>
     <span class="c1"># https://pytorch.org/docs/1.13/elastic/run.html#environment-variables</span>
     <span class="n">context</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span>
 
@@ -1461,11 +1461,11 @@ document.write(`
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;NCCL_ASYNC_ERROR_HANDLING&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_setup_xla_torch_process_group</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_setup_xla_torch_process_group</span><span class="p">():</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">torch.distributed</span> <span class="k">as</span> <span class="nn">dist</span>
-        <span class="kn">import</span> <span class="nn">torch_xla.core.xla_model</span> <span class="k">as</span> <span class="nn">xm</span>  <span class="c1"># noqa F401</span>
-        <span class="kn">import</span> <span class="nn">torch_xla.distributed.xla_backend</span>  <span class="c1"># noqa F401</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">torch.distributed</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dist</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">torch_xla.core.xla_model</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xm</span>  <span class="c1"># noqa F401</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">torch_xla.distributed.xla_backend</span>  <span class="c1"># noqa F401</span>
 
         <span class="n">dist</span><span class="o">.</span><span class="n">init_process_group</span><span class="p">(</span><span class="s2">&quot;xla&quot;</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -1474,17 +1474,17 @@ document.write(`
 
 <span class="c1"># The following env vars enable Neuron graph extraction for parallel compilation</span>
 <span class="c1">#   Note: model outputs are invalid and should be ignored while these env vars are set</span>
-<span class="k">def</span> <span class="nf">_set_neuron_parallel_compile_env_vars</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_neuron_parallel_compile_env_vars</span><span class="p">():</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;NEURON_PARALLEL_COMPILE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;NEURON_EXTRACT_GRAPHS_ONLY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;NEURON_FALL_BACK_TO_NULL_NEFF&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
 
 
 <span class="c1"># Compile previously extracted Neuron graphs</span>
-<span class="k">def</span> <span class="nf">_neuron_compile_extracted_graphs</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_neuron_compile_extracted_graphs</span><span class="p">():</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">libneuronxla.neuron_cc_cache</span> <span class="kn">import</span> <span class="n">CacheUrl</span>
-        <span class="kn">from</span> <span class="nn">libneuronxla.neuron_parallel_compile</span> <span class="kn">import</span> <span class="n">parallel_compile</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">libneuronxla.neuron_cc_cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">CacheUrl</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">libneuronxla.neuron_parallel_compile</span><span class="w"> </span><span class="kn">import</span> <span class="n">parallel_compile</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
             <span class="s2">&quot;libneuronxla must be installed to use Neuron parallel compilation.&quot;</span>
@@ -1514,10 +1514,10 @@ document.write(`
         <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_TorchAwsNeuronXLABackend</span><span class="p">(</span><span class="n">Backend</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_TorchAwsNeuronXLABackend</span><span class="p">(</span><span class="n">Backend</span><span class="p">):</span>
     <span class="n">unique_run_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">on_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_group</span><span class="p">:</span> <span class="n">WorkerGroup</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">:</span> <span class="n">TorchXLAConfig</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_group</span><span class="p">:</span> <span class="n">WorkerGroup</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">:</span> <span class="n">TorchXLAConfig</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Logic ran right before training is started.&quot;&quot;&quot;</span>
 
         <span class="c1"># On previous worker failure, we don&#39;t run graceful shutdown on workers.</span>
@@ -1527,7 +1527,7 @@ document.write(`
         <span class="c1"># Get master address and port from the first worker.</span>
         <span class="n">master_addr</span><span class="p">,</span> <span class="n">master_port</span> <span class="o">=</span> <span class="n">worker_group</span><span class="o">.</span><span class="n">execute_single</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">get_address_and_port</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">set_env_vars</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">set_env_vars</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MASTER_ADDR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">addr</span>
             <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MASTER_PORT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
             <span class="c1"># To trigger the xrt server</span>
@@ -1541,7 +1541,7 @@ document.write(`
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Extracting graphs for Neuron parallel compilation&quot;</span><span class="p">)</span>
             <span class="n">worker_group</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">_set_neuron_parallel_compile_env_vars</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_training_start</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_training_start</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">worker_group</span><span class="p">:</span> <span class="n">WorkerGroup</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">:</span> <span class="n">TorchXLAConfig</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1553,7 +1553,7 @@ document.write(`
         <span class="n">worker_group</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">_set_xla_env_vars</span><span class="p">)</span>
         <span class="n">worker_group</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">_setup_xla_torch_process_group</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_group</span><span class="p">:</span> <span class="n">WorkerGroup</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">:</span> <span class="n">TorchXLAConfig</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_group</span><span class="p">:</span> <span class="n">WorkerGroup</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">:</span> <span class="n">TorchXLAConfig</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Logic ran right after training is finished.</span>
 <span class="sd">        This is a sanity cleanup to kill xrt server, and to optionally</span>

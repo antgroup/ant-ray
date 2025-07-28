@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1425,11 +1425,11 @@ which runs the hyperparameter tuning workload by evaluating multiple hyperparame
 <h2>Basic usage<a class="headerlink" href="#basic-usage" title="Link to this heading">#</a></h2>
 <p>You can take an existing <a class="reference internal" href="../api/doc/ray.train.trainer.BaseTrainer.html#ray.train.trainer.BaseTrainer" title="ray.train.base_trainer.BaseTrainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code></a> and simply
 pass it into a <a class="reference internal" href="../../tune/api/doc/ray.tune.Tuner.html#ray.tune.Tuner" title="ray.tune.Tuner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuner</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray.tune</span>
-<span class="kn">import</span> <span class="nn">ray.train</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">Tuner</span>
-<span class="kn">from</span> <span class="nn">ray.train.xgboost</span> <span class="kn">import</span> <span class="n">XGBoostTrainer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.tune</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.xgboost</span><span class="w"> </span><span class="kn">import</span> <span class="n">XGBoostTrainer</span>
 
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@air-example-data/breast_cancer.csv&quot;</span><span class="p">)</span>
 
@@ -1467,8 +1467,8 @@ pass it into a <a class="reference internal" href="../../tune/api/doc/ray.tune.T
 <li><p>the amount of parallelism to use</p></li>
 </ul>
 <p>Here are some common configurations for <code class="code docutils literal notranslate"><span class="pre">TuneConfig</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">TuneConfig</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.bayesopt</span> <span class="kn">import</span> <span class="n">BayesOptSearch</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.bayesopt</span><span class="w"> </span><span class="kn">import</span> <span class="n">BayesOptSearch</span>
 
 <span class="n">tune_config</span> <span class="o">=</span> <span class="n">TuneConfig</span><span class="p">(</span>
     <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span>
@@ -1492,7 +1492,7 @@ This includes:</p>
 <li><p>integration with cloud storage</p></li>
 </ul>
 <p>Below we showcase some common configurations of <a class="reference internal" href="../../tune/api/doc/ray.tune.RunConfig.html#ray.tune.RunConfig" title="ray.tune.RunConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">ray.tune.RunConfig</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray.tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray.tune</span>
 
 <span class="n">run_config</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">tune</span><span class="o">.</span><span class="n">RunConfig</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;MyExperiment&quot;</span><span class="p">,</span>
@@ -1535,19 +1535,19 @@ not limited to:</p>
 <h2>Advanced Tuning<a class="headerlink" href="#advanced-tuning" title="Link to this heading">#</a></h2>
 <p>Tuners also offer the ability to tune over different data preprocessing steps and
 different training/validation datasets, as shown in the following snippet.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray.data</span>
-<span class="kn">import</span> <span class="nn">ray.tune</span>
-<span class="kn">from</span> <span class="nn">ray.data.preprocessors</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray.data</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.preprocessors</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardScaler</span>
 
 
-<span class="k">def</span> <span class="nf">get_dataset</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">():</span>
     <span class="n">ds1</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@air-example-data/breast_cancer.csv&quot;</span><span class="p">)</span>
     <span class="n">prep_v1</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">([</span><span class="s2">&quot;worst radius&quot;</span><span class="p">,</span> <span class="s2">&quot;worst area&quot;</span><span class="p">])</span>
     <span class="n">ds1</span> <span class="o">=</span> <span class="n">prep_v1</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ds1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ds1</span>
 
 
-<span class="k">def</span> <span class="nf">get_another_dataset</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_another_dataset</span><span class="p">():</span>
     <span class="n">ds2</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
         <span class="s2">&quot;s3://anonymous@air-example-data/breast_cancer_with_categorical.csv&quot;</span>
     <span class="p">)</span>

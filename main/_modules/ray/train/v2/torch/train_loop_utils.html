@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1392,16 +1392,16 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.train.v2.torch.train_loop_utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
-<span class="kn">from</span> <span class="nn">torch.nn.parallel</span> <span class="kn">import</span> <span class="n">DistributedDataParallel</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">packaging.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">Version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn.parallel</span><span class="w"> </span><span class="kn">import</span> <span class="n">DistributedDataParallel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DataLoader</span><span class="p">,</span>
     <span class="n">DistributedSampler</span><span class="p">,</span>
     <span class="n">IterableDataset</span><span class="p">,</span>
@@ -1409,15 +1409,15 @@ document.write(`
     <span class="n">SequentialSampler</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">ray.train.torch</span>
-<span class="kn">from</span> <span class="nn">ray._private.usage.usage_lib</span> <span class="kn">import</span> <span class="n">TagKey</span><span class="p">,</span> <span class="n">record_extra_usage_tag</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch.train_loop_utils</span> <span class="kn">import</span> <span class="n">_WrappedDataLoader</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train.torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.usage.usage_lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">TagKey</span><span class="p">,</span> <span class="n">record_extra_usage_tag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch.train_loop_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_WrappedDataLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">Version</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">Version</span><span class="p">(</span><span class="s2">&quot;1.11.0&quot;</span><span class="p">):</span>
     <span class="n">FullyShardedDataParallel</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">torch.distributed.fsdp</span> <span class="kn">import</span> <span class="n">FullyShardedDataParallel</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">torch.distributed.fsdp</span><span class="w"> </span><span class="kn">import</span> <span class="n">FullyShardedDataParallel</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1435,7 +1435,7 @@ document.write(`
 
 <div class="viewcode-block" id="prepare_model">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.torch.prepare_model.html#ray.train.torch.prepare_model">[docs]</a>
-<span class="k">def</span> <span class="nf">prepare_model</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_model</span><span class="p">(</span>
     <span class="n">model</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
     <span class="n">move_to_device</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">parallel_strategy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ddp&quot;</span><span class="p">,</span>
@@ -1522,7 +1522,7 @@ document.write(`
 <div class="viewcode-block" id="prepare_data_loader">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.torch.prepare_data_loader.html#ray.train.torch.prepare_data_loader">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">prepare_data_loader</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_data_loader</span><span class="p">(</span>
     <span class="n">data_loader</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">,</span>
     <span class="n">add_dist_sampler</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">move_to_device</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -1606,7 +1606,7 @@ document.write(`
         <span class="ow">and</span> <span class="n">add_dist_sampler</span>
     <span class="p">):</span>
 
-        <span class="k">def</span> <span class="nf">with_sampler</span><span class="p">(</span><span class="n">loader</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">with_sampler</span><span class="p">(</span><span class="n">loader</span><span class="p">):</span>
             <span class="c1"># Automatically set the DistributedSampler</span>
 
             <span class="c1"># If you&#39;re using a sampler, the DataLoader shuffle flag must be set to</span>
@@ -1658,24 +1658,24 @@ document.write(`
 
 
 <span class="nd">@Deprecated</span>
-<span class="k">def</span> <span class="nf">accelerate</span><span class="p">(</span><span class="n">amp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">accelerate</span><span class="p">(</span><span class="n">amp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span><span class="n">_TORCH_AMP_DEPRECATION_MESSAGE</span><span class="p">)</span>
 
 
 <span class="nd">@Deprecated</span>
-<span class="k">def</span> <span class="nf">prepare_optimizer</span><span class="p">(</span><span class="n">optimizer</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_optimizer</span><span class="p">(</span><span class="n">optimizer</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span><span class="n">_TORCH_AMP_DEPRECATION_MESSAGE</span><span class="p">)</span>
 
 
 <span class="nd">@Deprecated</span>
-<span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">backward</span><span class="p">(</span><span class="n">tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span><span class="n">_TORCH_AMP_DEPRECATION_MESSAGE</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="enable_reproducibility">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.torch.enable_reproducibility.html#ray.train.torch.enable_reproducibility">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">enable_reproducibility</span><span class="p">(</span><span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">enable_reproducibility</span><span class="p">(</span><span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Limits sources of nondeterministic behavior.</span>
 
 <span class="sd">    This function:</span>

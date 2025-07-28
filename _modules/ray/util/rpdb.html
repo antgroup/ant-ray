@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1396,38 +1396,38 @@ document.write(`
 <span class="c1"># https://github.com/ionelmc/python-remote-pdb/blob/07d563331c4ab9eb45731bb272b158816d98236e/src/remote_pdb.py</span>
 <span class="c1"># (BSD 2-Clause &quot;Simplified&quot; License)</span>
 
-<span class="kn">import</span> <span class="nn">errno</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">select</span>
-<span class="kn">import</span> <span class="nn">socket</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">traceback</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">pdb</span> <span class="kn">import</span> <span class="n">Pdb</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">errno</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">select</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pdb</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pdb</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
 
-<span class="kn">import</span> <span class="nn">setproctitle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">setproctitle</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray._private</span> <span class="kn">import</span> <span class="n">ray_constants</span>
-<span class="kn">from</span> <span class="nn">ray.experimental.internal_kv</span> <span class="kn">import</span> <span class="n">_internal_kv_del</span><span class="p">,</span> <span class="n">_internal_kv_put</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private</span><span class="w"> </span><span class="kn">import</span> <span class="n">ray_constants</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.internal_kv</span><span class="w"> </span><span class="kn">import</span> <span class="n">_internal_kv_del</span><span class="p">,</span> <span class="n">_internal_kv_put</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_cry</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">__stderr__</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_cry</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">__stderr__</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">stderr</span><span class="p">)</span>
     <span class="n">stderr</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
 
-<span class="k">class</span> <span class="nc">_LF2CRLF_FileWrapper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_LF2CRLF_FileWrapper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">connection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stream</span> <span class="o">=</span> <span class="n">fh</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">makefile</span><span class="p">(</span><span class="s2">&quot;rw&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">read</span> <span class="o">=</span> <span class="n">fh</span><span class="o">.</span><span class="n">read</span>
@@ -1444,36 +1444,36 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_send</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">sendall</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">encoding</span>
 
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">nl_rex</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">?</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">nl_rex</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">?</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">nl_rex</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">writelines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">nl_rex</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">?</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">writelines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">nl_rex</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">?</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)):</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">nl_rex</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_PdbWrap</span><span class="p">(</span><span class="n">Pdb</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_PdbWrap</span><span class="p">(</span><span class="n">Pdb</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap PDB to run a custom exit hook on continue.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exit_hook</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exit_hook</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_exit_hook</span> <span class="o">=</span> <span class="n">exit_hook</span>
         <span class="n">Pdb</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">do_continue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_continue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_exit_hook</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">Pdb</span><span class="o">.</span><span class="n">do_continue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
 
     <span class="n">do_c</span> <span class="o">=</span> <span class="n">do_cont</span> <span class="o">=</span> <span class="n">do_continue</span>
 
 
-<span class="k">class</span> <span class="nc">_RemotePdb</span><span class="p">(</span><span class="n">Pdb</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_RemotePdb</span><span class="p">(</span><span class="n">Pdb</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This will run pdb as a ephemeral telnet service. Once you connect no one</span>
 <span class="sd">    else can connect. On construction this object will block execution till a</span>
@@ -1486,7 +1486,7 @@ document.write(`
 
     <span class="n">active_instance</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">breakpoint_uuid</span><span class="p">,</span>
         <span class="n">host</span><span class="p">,</span>
@@ -1503,7 +1503,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_listen_socket</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ip_address</span> <span class="o">=</span> <span class="n">ip_address</span>
 
-    <span class="k">def</span> <span class="nf">listen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">listen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quiet</span><span class="p">:</span>
             <span class="n">_cry</span><span class="p">(</span>
                 <span class="s2">&quot;RemotePdb session open at </span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">, &quot;</span>
@@ -1536,7 +1536,7 @@ document.write(`
                 <span class="nb">setattr</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="p">)</span>
         <span class="n">_RemotePdb</span><span class="o">.</span><span class="n">active_instance</span> <span class="o">=</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">__restore</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__restore</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backup</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quiet</span><span class="p">:</span>
             <span class="n">_cry</span><span class="p">(</span><span class="s2">&quot;Restoring streams: </span><span class="si">%s</span><span class="s2"> ...&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">fh</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">backup</span><span class="p">:</span>
@@ -1544,20 +1544,20 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="n">_RemotePdb</span><span class="o">.</span><span class="n">active_instance</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">do_quit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_quit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__restore</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">Pdb</span><span class="o">.</span><span class="n">do_quit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
 
     <span class="n">do_q</span> <span class="o">=</span> <span class="n">do_exit</span> <span class="o">=</span> <span class="n">do_quit</span>
 
-    <span class="k">def</span> <span class="nf">do_continue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_continue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__restore</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">Pdb</span><span class="o">.</span><span class="n">do_continue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
 
     <span class="n">do_c</span> <span class="o">=</span> <span class="n">do_cont</span> <span class="o">=</span> <span class="n">do_continue</span>
 
-    <span class="k">def</span> <span class="nf">set_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">frame</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">frame</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_back</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1566,7 +1566,7 @@ document.write(`
             <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">errno</span> <span class="o">!=</span> <span class="n">errno</span><span class="o">.</span><span class="n">ECONNRESET</span><span class="p">:</span>
                 <span class="k">raise</span>
 
-    <span class="k">def</span> <span class="nf">post_mortem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traceback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_mortem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traceback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># See https://github.com/python/cpython/blob/</span>
         <span class="c1"># 022bc7572f061e1d1132a4db9d085b29707701e7/Lib/pdb.py#L1617</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1577,7 +1577,7 @@ document.write(`
             <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">errno</span> <span class="o">!=</span> <span class="n">errno</span><span class="o">.</span><span class="n">ECONNRESET</span><span class="p">:</span>
                 <span class="k">raise</span>
 
-    <span class="k">def</span> <span class="nf">do_remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;remote</span>
 <span class="sd">        Skip into the next remote call.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1598,7 +1598,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">handle</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">Pdb</span><span class="o">.</span><span class="n">do_continue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">do_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;get</span>
 <span class="sd">        Skip to where the current task returns to.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1610,7 +1610,7 @@ document.write(`
         <span class="k">return</span> <span class="n">Pdb</span><span class="o">.</span><span class="n">do_continue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_connect_ray_pdb</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_connect_ray_pdb</span><span class="p">(</span>
     <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">patch_stdstreams</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1677,7 +1677,7 @@ document.write(`
 <div class="viewcode-block" id="set_trace">
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.rpdb.set_trace.html#ray.util.rpdb.set_trace">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">set_trace</span><span class="p">(</span><span class="n">breakpoint_uuid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_trace</span><span class="p">(</span><span class="n">breakpoint_uuid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Interrupt the flow of the program and drop into the Ray debugger.</span>
 
 <span class="sd">    Can be used within a Ray task or actor.</span>
@@ -1701,7 +1701,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_driver_set_trace</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_driver_set_trace</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The breakpoint hook to use for the driver.</span>
 
 <span class="sd">    This disables Ray driver logs temporarily so that the PDB console is not</span>
@@ -1713,7 +1713,7 @@ document.write(`
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;*** Temporarily disabling Ray worker logs ***&quot;</span><span class="p">)</span>
         <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">_worker_logs_enabled</span> <span class="o">=</span> <span class="kc">False</span>
 
-        <span class="k">def</span> <span class="nf">enable_logging</span><span class="p">():</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">enable_logging</span><span class="p">():</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;*** Re-enabling Ray worker logs ***&quot;</span><span class="p">)</span>
             <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">_worker_logs_enabled</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -1722,11 +1722,11 @@ document.write(`
         <span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_is_ray_debugger_post_mortem_enabled</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_ray_debugger_post_mortem_enabled</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;RAY_DEBUG_POST_MORTEM&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;1&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_post_mortem</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_post_mortem</span><span class="p">():</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;RAY_DEBUG&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;1&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ray_debugpy</span><span class="o">.</span><span class="n">_post_mortem</span><span class="p">()</span>
 
@@ -1740,9 +1740,9 @@ document.write(`
     <span class="n">rdb</span><span class="o">.</span><span class="n">post_mortem</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_connect_pdb_client</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_connect_pdb_client</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;win32&quot;</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">msvcrt</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">msvcrt</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
     <span class="n">s</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
 

@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1392,22 +1392,22 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.registry</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">atexit</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">FunctionType</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">atexit</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray.cloudpickle</span> <span class="k">as</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">ray.experimental.internal_kv</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.cloudpickle</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.internal_kv</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_internal_kv_del</span><span class="p">,</span>
     <span class="n">_internal_kv_get</span><span class="p">,</span>
     <span class="n">_internal_kv_initialized</span><span class="p">,</span>
     <span class="n">_internal_kv_put</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.error</span> <span class="kn">import</span> <span class="n">TuneError</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.error</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 <span class="n">TRAINABLE_CLASS</span> <span class="o">=</span> <span class="s2">&quot;trainable_class&quot;</span>
 <span class="n">ENV_CREATOR</span> <span class="o">=</span> <span class="s2">&quot;env_creator&quot;</span>
@@ -1431,26 +1431,26 @@ document.write(`
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_has_trainable</span><span class="p">(</span><span class="n">trainable_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_has_trainable</span><span class="p">(</span><span class="n">trainable_name</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">_global_registry</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">TRAINABLE_CLASS</span><span class="p">,</span> <span class="n">trainable_name</span><span class="p">)</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">get_trainable_cls</span><span class="p">(</span><span class="n">trainable_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_trainable_cls</span><span class="p">(</span><span class="n">trainable_name</span><span class="p">):</span>
     <span class="n">validate_trainable</span><span class="p">(</span><span class="n">trainable_name</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_global_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">TRAINABLE_CLASS</span><span class="p">,</span> <span class="n">trainable_name</span><span class="p">)</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">validate_trainable</span><span class="p">(</span><span class="n">trainable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_trainable</span><span class="p">(</span><span class="n">trainable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_has_trainable</span><span class="p">(</span><span class="n">trainable_name</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_has_rllib_trainable</span><span class="p">(</span><span class="n">trainable_name</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">TuneError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown trainable: </span><span class="si">{</span><span class="n">trainable_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_has_rllib_trainable</span><span class="p">(</span><span class="n">trainable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_has_rllib_trainable</span><span class="p">(</span><span class="n">trainable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="c1"># Make sure everything rllib-related is registered.</span>
-        <span class="kn">from</span> <span class="nn">ray.rllib</span> <span class="kn">import</span> <span class="n">_register_all</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib</span><span class="w"> </span><span class="kn">import</span> <span class="n">_register_all</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">ModuleNotFoundError</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
 
@@ -1459,11 +1459,11 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">is_function_trainable</span><span class="p">(</span><span class="n">trainable</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_function_trainable</span><span class="p">(</span><span class="n">trainable</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if a given trainable is a function trainable.</span>
 <span class="sd">    Either the trainable has been wrapped as a FunctionTrainable class already,</span>
 <span class="sd">    or it&#39;s still a FunctionType/partial/callable.&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.trainable</span> <span class="kn">import</span> <span class="n">FunctionTrainable</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionTrainable</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trainable</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">trainable</span> <span class="o">=</span> <span class="n">get_trainable_cls</span><span class="p">(</span><span class="n">trainable</span><span class="p">)</span>
@@ -1484,7 +1484,7 @@ document.write(`
 <div class="viewcode-block" id="register_trainable">
 <a class="viewcode-back" href="../../../tune/api/internals.html#ray.tune.register_trainable">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">register_trainable</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">trainable</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span><span class="p">],</span> <span class="n">warn</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">register_trainable</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">trainable</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span><span class="p">],</span> <span class="n">warn</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Register a trainable function or class.</span>
 
 <span class="sd">    This enables a class or function to be accessed on every Ray process</span>
@@ -1497,7 +1497,7 @@ document.write(`
 <span class="sd">            automatically converted into a class during registration.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">from</span> <span class="nn">ray.tune.trainable</span> <span class="kn">import</span> <span class="n">Trainable</span><span class="p">,</span> <span class="n">wrap_function</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trainable</span><span class="p">,</span> <span class="n">wrap_function</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trainable</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Detected class for trainable.&quot;</span><span class="p">)</span>
@@ -1514,14 +1514,14 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_unregister_trainables</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_unregister_trainables</span><span class="p">():</span>
     <span class="n">_global_registry</span><span class="o">.</span><span class="n">unregister_all</span><span class="p">(</span><span class="n">TRAINABLE_CLASS</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="register_env">
 <a class="viewcode-back" href="../../../tune/api/internals.html#ray.tune.register_env">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">register_env</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">env_creator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">register_env</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">env_creator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Register a custom environment for use with RLlib.</span>
 
 <span class="sd">    This enables the environment to be accessed on every Ray process</span>
@@ -1538,12 +1538,12 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_unregister_envs</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_unregister_envs</span><span class="p">():</span>
     <span class="n">_global_registry</span><span class="o">.</span><span class="n">unregister_all</span><span class="p">(</span><span class="n">ENV_CREATOR</span><span class="p">)</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">register_input</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">input_creator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">register_input</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">input_creator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Register a custom input api for RLlib.</span>
 
 <span class="sd">    Args:</span>
@@ -1556,31 +1556,31 @@ document.write(`
     <span class="n">_global_registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">RLLIB_INPUT</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">input_creator</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_unregister_inputs</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_unregister_inputs</span><span class="p">():</span>
     <span class="n">_global_registry</span><span class="o">.</span><span class="n">unregister_all</span><span class="p">(</span><span class="n">RLLIB_INPUT</span><span class="p">)</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">registry_contains_input</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">registry_contains_input</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">_global_registry</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">RLLIB_INPUT</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">registry_get_input</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">registry_get_input</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">_global_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RLLIB_INPUT</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_unregister_all</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_unregister_all</span><span class="p">():</span>
     <span class="n">_unregister_inputs</span><span class="p">()</span>
     <span class="n">_unregister_envs</span><span class="p">()</span>
     <span class="n">_unregister_trainables</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_check_serializability</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_serializability</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
     <span class="n">_global_registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">TEST</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_make_key</span><span class="p">(</span><span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_key</span><span class="p">(</span><span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a binary key for the given category and key.</span>
 
 <span class="sd">    Args:</span>
@@ -1601,8 +1601,8 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_Registry</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Registry</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;If no prefix is given, use runtime context job ID.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_to_flush</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span> <span class="o">=</span> <span class="n">prefix</span>
@@ -1610,12 +1610,12 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_atexit_handler_registered</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_job_id</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span>
 
-    <span class="k">def</span> <span class="nf">_register_atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_register_atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atexit_handler_registered</span><span class="p">:</span>
             <span class="c1"># Already registered</span>
             <span class="k">return</span>
@@ -1627,14 +1627,14 @@ document.write(`
         <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">_unregister_all</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_atexit_handler_registered</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Registers the value with the global registry.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            PicklingError if unable to pickle to provided file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">category</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">KNOWN_CATEGORIES</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">TuneError</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneError</span>
 
             <span class="k">raise</span> <span class="n">TuneError</span><span class="p">(</span>
                 <span class="s2">&quot;Unknown category </span><span class="si">{}</span><span class="s2"> not among </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">KNOWN_CATEGORIES</span><span class="p">)</span>
@@ -1643,13 +1643,13 @@ document.write(`
         <span class="k">if</span> <span class="n">_internal_kv_initialized</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">flush_values</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">unregister</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unregister</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">_internal_kv_initialized</span><span class="p">():</span>
             <span class="n">_internal_kv_del</span><span class="p">(</span><span class="n">_make_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_to_flush</span><span class="o">.</span><span class="n">pop</span><span class="p">((</span><span class="n">category</span><span class="p">,</span> <span class="n">key</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">unregister_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unregister_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">remaining</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">cat</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registered</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">category</span> <span class="ow">and</span> <span class="n">category</span> <span class="o">==</span> <span class="n">cat</span><span class="p">:</span>
@@ -1658,14 +1658,14 @@ document.write(`
                 <span class="n">remaining</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">cat</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_registered</span> <span class="o">=</span> <span class="n">remaining</span>
 
-    <span class="k">def</span> <span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">_internal_kv_initialized</span><span class="p">():</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">_internal_kv_get</span><span class="p">(</span><span class="n">_make_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_flush</span>
 
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">_internal_kv_initialized</span><span class="p">():</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">_internal_kv_get</span><span class="p">(</span><span class="n">_make_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1676,7 +1676,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_to_flush</span><span class="p">[(</span><span class="n">category</span><span class="p">,</span> <span class="n">key</span><span class="p">)])</span>
 
-    <span class="k">def</span> <span class="nf">flush_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">flush_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_register_atexit</span><span class="p">()</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">key</span><span class="p">),</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_flush</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">_internal_kv_put</span><span class="p">(</span>
@@ -1690,22 +1690,22 @@ document.write(`
 <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">_post_init_hooks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_global_registry</span><span class="o">.</span><span class="n">flush_values</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_ParameterRegistry</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_ParameterRegistry</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">to_flush</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">references</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">to_flush</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
         <span class="k">if</span> <span class="n">ray</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ray</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_flush</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">references</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_flush</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">references</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>

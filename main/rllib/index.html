@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1443,8 +1443,8 @@ Install RLlib and <a class="reference external" href="https://pytorch.org">PyTor
 <p>This is all, you can now start coding against RLlib. Here is an example for running the <a class="reference internal" href="rllib-algorithms.html#ppo"><span class="std std-ref">PPO Algorithm</span></a> on the
 <a class="reference external" href="https://gymnasium.farama.org/environments/toy_text/taxi/">Taxi domain</a>.
 You first create a <code class="code docutils literal notranslate"><span class="pre">config</span></code> for the algorithm, which defines the <a class="reference internal" href="key-concepts.html#rllib-key-concepts-environments"><span class="std std-ref">RL environment</span></a> and any other needed settings and parameters.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.connectors.env_to_module</span> <span class="kn">import</span> <span class="n">FlattenObservations</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.env_to_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlattenObservations</span>
 
 <span class="c1"># Configure the algorithm.</span>
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
@@ -1463,7 +1463,7 @@ You first create a <code class="code docutils literal notranslate"><span class="
 One training iteration includes parallel, distributed sample collection by the
 <a class="reference internal" href="package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.html#ray.rllib.env.env_runner.EnvRunner" title="ray.rllib.env.env_runner.EnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvRunner</span></code></a> actors, followed by loss calculation
 on the collected data, and a model update step.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
 
 <span class="c1"># Build the algorithm.</span>
 <span class="n">algo</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">build_algo</span><span class="p">()</span>
@@ -1613,9 +1613,9 @@ click the dropdowns below:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pettingzoo[all]&quot;</span>
 </pre></div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.tune.registry</span> <span class="kn">import</span> <span class="n">register_env</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.wrappers.pettingzoo_env</span> <span class="kn">import</span> <span class="n">PettingZooEnv</span>
-<span class="kn">from</span> <span class="nn">pettingzoo.sisl</span> <span class="kn">import</span> <span class="n">waterworld_v4</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_env</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.wrappers.pettingzoo_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">PettingZooEnv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pettingzoo.sisl</span><span class="w"> </span><span class="kn">import</span> <span class="n">waterworld_v4</span>
 <span class="n">register_env</span><span class="p">(</span><span class="s2">&quot;env&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">PettingZooEnv</span><span class="p">(</span><span class="n">waterworld_v4</span><span class="o">.</span><span class="n">env</span><span class="p">()))</span>
 <span class="n">config</span><span class="o">.</span><span class="n">environment</span><span class="p">(</span><span class="s2">&quot;env&quot;</span><span class="p">)</span>
 </pre></div>
@@ -1625,8 +1625,8 @@ click the dropdowns below:</p>
 <tr class="row-even"><td><p class="sd-card-text"><strong>RLlib Multi-Agent</strong></p></td>
 </tr>
 <tr class="row-odd"><td><p class="sd-card-text"><a class="reference external" href="rllib-env.html#multi-agent-and-hierarchical">RLlib’s MultiAgentEnv API</a> <a class="inline-figure reference internal" href="../_images/multi-agent.svg"><img alt="multi_agent" class="inline-figure" src="../_images/multi-agent.svg" width="72" /></a></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.examples.envs.classes.multi_agent</span> <span class="kn">import</span> <span class="n">MultiAgentCartPole</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.examples.envs.classes.multi_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentCartPole</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 <span class="n">tune</span><span class="o">.</span><span class="n">register_env</span><span class="p">(</span><span class="s2">&quot;env&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">MultiAgentCartPole</span><span class="p">(</span><span class="n">cfg</span><span class="p">))</span>
 <span class="n">config</span><span class="o">.</span><span class="n">environment</span><span class="p">(</span><span class="s2">&quot;env&quot;</span><span class="p">,</span> <span class="n">env_config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;num_agents&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
 <span class="n">config</span><span class="o">.</span><span class="n">multi_agent</span><span class="p">(</span>

@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1395,24 +1395,24 @@ document.write(`
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
 
 <span class="c1"># __tutorial_imports_begin__</span>
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">optim</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
-<span class="kn">from</span> <span class="nn">ray.tune.examples.mnist_pytorch</span> <span class="kn">import</span> <span class="n">ConvNet</span><span class="p">,</span> <span class="n">get_data_loaders</span><span class="p">,</span> <span class="n">test_func</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers</span> <span class="kn">import</span> <span class="n">PopulationBasedTraining</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.examples.mnist_pytorch</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConvNet</span><span class="p">,</span> <span class="n">get_data_loaders</span><span class="p">,</span> <span class="n">test_func</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers</span><span class="w"> </span><span class="kn">import</span> <span class="n">PopulationBasedTraining</span>
 
 <span class="c1"># __tutorial_imports_end__</span>
 
 
 <span class="c1"># __train_begin__</span>
-<span class="k">def</span> <span class="nf">train_convnet</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_convnet</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="c1"># Create our data loaders, model, and optmizer.</span>
     <span class="n">step</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">train_loader</span><span class="p">,</span> <span class="n">test_loader</span> <span class="o">=</span> <span class="n">get_data_loaders</span><span class="p">()</span>
@@ -1460,7 +1460,7 @@ document.write(`
 <span class="c1"># __train_end__</span>
 
 
-<span class="k">def</span> <span class="nf">eval_best_model</span><span class="p">(</span><span class="n">results</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">ResultGrid</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">eval_best_model</span><span class="p">(</span><span class="n">results</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">ResultGrid</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Test the best model given output of tuner.fit().&quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="n">results</span><span class="o">.</span><span class="n">get_best_result</span><span class="p">()</span><span class="o">.</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">as_directory</span><span class="p">()</span> <span class="k">as</span> <span class="n">best_checkpoint_path</span><span class="p">:</span>
         <span class="n">best_model</span> <span class="o">=</span> <span class="n">ConvNet</span><span class="p">()</span>
@@ -1496,17 +1496,17 @@ document.write(`
     <span class="c1"># __pbt_end__</span>
 
     <span class="c1"># __tune_begin__</span>
-    <span class="k">class</span> <span class="nc">CustomStopper</span><span class="p">(</span><span class="n">tune</span><span class="o">.</span><span class="n">Stopper</span><span class="p">):</span>
-        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">CustomStopper</span><span class="p">(</span><span class="n">tune</span><span class="o">.</span><span class="n">Stopper</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span> <span class="o">=</span> <span class="kc">False</span>
 
-        <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
             <span class="n">max_iter</span> <span class="o">=</span> <span class="mi">5</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">smoke_test</span> <span class="k">else</span> <span class="mi">100</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;mean_accuracy&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.96</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span> <span class="ow">or</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;training_iteration&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">max_iter</span>
 
-        <span class="k">def</span> <span class="nf">stop_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">stop_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_stop</span>
 
     <span class="n">stopper</span> <span class="o">=</span> <span class="n">CustomStopper</span><span class="p">()</span>

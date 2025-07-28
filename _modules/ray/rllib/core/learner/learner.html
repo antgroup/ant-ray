@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,13 +1389,13 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.core.learner.learner</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">abc</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">import</span> <span class="nn">platform</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
     <span class="n">Collection</span><span class="p">,</span>
@@ -1409,37 +1409,37 @@ document.write(`
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.data.iterator</span> <span class="kn">import</span> <span class="n">DataIterator</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.connectors.learner.learner_connector_pipeline</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.iterator</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataIterator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.learner.learner_connector_pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LearnerConnectorPipeline</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">COMPONENT_METRICS_LOGGER</span><span class="p">,</span>
     <span class="n">COMPONENT_OPTIMIZER</span><span class="p">,</span>
     <span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span>
     <span class="n">DEFAULT_MODULE_ID</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.learner.training_data</span> <span class="kn">import</span> <span class="n">TrainingData</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.apis</span> <span class="kn">import</span> <span class="n">SelfSupervisedLossAPI</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module</span> <span class="kn">import</span> <span class="n">validate_module_id</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.learner.training_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.apis</span><span class="w"> </span><span class="kn">import</span> <span class="n">SelfSupervisedLossAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_module_id</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MultiRLModule</span><span class="p">,</span>
     <span class="n">MultiRLModuleSpec</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModule</span><span class="p">,</span> <span class="n">RLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.policy</span> <span class="kn">import</span> <span class="n">PolicySpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.sample_batch</span> <span class="kn">import</span> <span class="n">MultiAgentBatch</span><span class="p">,</span> <span class="n">SampleBatch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModule</span><span class="p">,</span> <span class="n">RLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">PolicySpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.sample_batch</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentBatch</span><span class="p">,</span> <span class="n">SampleBatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">override</span><span class="p">,</span>
     <span class="n">OverrideToImplementCustomLogic</span><span class="p">,</span>
     <span class="n">OverrideToImplementCustomLogic_CallToSuperRecommended</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.checkpoints</span> <span class="kn">import</span> <span class="n">Checkpointable</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.debug</span> <span class="kn">import</span> <span class="n">update_global_seed_if_necessary</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="n">Deprecated</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.framework</span> <span class="kn">import</span> <span class="n">try_import_tf</span><span class="p">,</span> <span class="n">try_import_torch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.checkpoints</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpointable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.debug</span><span class="w"> </span><span class="kn">import</span> <span class="n">update_global_seed_if_necessary</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">try_import_tf</span><span class="p">,</span> <span class="n">try_import_torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ALL_MODULES</span><span class="p">,</span>
     <span class="n">DATASET_NUM_ITERS_TRAINED</span><span class="p">,</span>
     <span class="n">DATASET_NUM_ITERS_TRAINED_LIFETIME</span><span class="p">,</span>
@@ -1451,15 +1451,15 @@ document.write(`
     <span class="n">MODULE_TRAIN_BATCH_SIZE_MEAN</span><span class="p">,</span>
     <span class="n">WEIGHTS_SEQ_NO</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics.metrics_logger</span> <span class="kn">import</span> <span class="n">MetricsLogger</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.minibatch_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.metrics_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsLogger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.minibatch_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MiniBatchDummyIterator</span><span class="p">,</span>
     <span class="n">MiniBatchCyclicIterator</span><span class="p">,</span>
     <span class="n">MiniBatchRayDataIterator</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.numpy</span> <span class="kn">import</span> <span class="n">convert_to_numpy</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.schedules.scheduler</span> <span class="kn">import</span> <span class="n">Scheduler</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert_to_numpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.schedules.scheduler</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scheduler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">EpisodeType</span><span class="p">,</span>
     <span class="n">LearningRateOrSchedule</span><span class="p">,</span>
     <span class="n">ModuleID</span><span class="p">,</span>
@@ -1472,10 +1472,10 @@ document.write(`
     <span class="n">StateDict</span><span class="p">,</span>
     <span class="n">TensorType</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 
 <span class="n">torch</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">try_import_torch</span><span class="p">()</span>
@@ -1497,7 +1497,7 @@ document.write(`
 <div class="viewcode-block" id="Learner">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Learner</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Learner</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for Learners.</span>
 
 <span class="sd">    This class will be used to train RLModules. It is responsible for defining the loss</span>
@@ -1610,7 +1610,7 @@ document.write(`
     <span class="n">framework</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">TOTAL_LOSS_KEY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;total_loss&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="s2">&quot;AlgorithmConfig&quot;</span><span class="p">,</span>
@@ -1670,7 +1670,7 @@ document.write(`
 <div class="viewcode-block" id="Learner.build">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.build.html#ray.rllib.core.learner.learner.Learner.build">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic_CallToSuperRecommended</span>
-    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the Learner.</span>
 
 <span class="sd">        This method should be called before the learner is used. It is responsible for</span>
@@ -1711,26 +1711,26 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">distributed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">distributed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether the learner is running in distributed mode.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">num_learners</span> <span class="o">&gt;</span> <span class="mi">1</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">module</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiRLModule</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">module</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiRLModule</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The MultiRLModule that is being trained.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span>
 
 <div class="viewcode-block" id="Learner.register_optimizer">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.register_optimizer.html#ray.rllib.core.learner.learner.Learner.register_optimizer">[docs]</a>
-    <span class="k">def</span> <span class="nf">register_optimizer</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_optimizer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span> <span class="o">=</span> <span class="n">ALL_MODULES</span><span class="p">,</span>
@@ -1808,7 +1808,7 @@ document.write(`
 <div class="viewcode-block" id="Learner.configure_optimizers">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.configure_optimizers.html#ray.rllib.core.learner.learner.Learner.configure_optimizers">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Configures, creates, and registers the optimizers for this Learner.</span>
 
 <span class="sd">        Optimizers are responsible for updating the model&#39;s parameters during training,</span>
@@ -1840,7 +1840,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.configure_optimizers_for_module.html#ray.rllib.core.learner.learner.Learner.configure_optimizers_for_module">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">configure_optimizers_for_module</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">configure_optimizers_for_module</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="s2">&quot;AlgorithmConfig&quot;</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Configures an optimizer for the given module_id.</span>
@@ -1863,7 +1863,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.compute_gradients.html#ray.rllib.core.learner.learner.Learner.compute_gradients">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">compute_gradients</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_gradients</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">loss_per_module</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">TensorType</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParamDict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the gradients based on the given losses.</span>
@@ -1886,7 +1886,7 @@ document.write(`
 <div class="viewcode-block" id="Learner.postprocess_gradients">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.postprocess_gradients.html#ray.rllib.core.learner.learner.Learner.postprocess_gradients">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">postprocess_gradients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gradients_dict</span><span class="p">:</span> <span class="n">ParamDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParamDict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">postprocess_gradients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gradients_dict</span><span class="p">:</span> <span class="n">ParamDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParamDict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies potential postprocessing operations on the gradients.</span>
 
 <span class="sd">        This method is called after gradients have been computed and modifies them</span>
@@ -1938,7 +1938,7 @@ document.write(`
 <div class="viewcode-block" id="Learner.postprocess_gradients_for_module">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.postprocess_gradients_for_module.html#ray.rllib.core.learner.learner.Learner.postprocess_gradients_for_module">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic_CallToSuperRecommended</span>
-    <span class="k">def</span> <span class="nf">postprocess_gradients_for_module</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">postprocess_gradients_for_module</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">,</span>
@@ -2015,7 +2015,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.apply_gradients.html#ray.rllib.core.learner.learner.Learner.apply_gradients">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">apply_gradients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gradients_dict</span><span class="p">:</span> <span class="n">ParamDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_gradients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gradients_dict</span><span class="p">:</span> <span class="n">ParamDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies the gradients to the MultiRLModule parameters.</span>
 
 <span class="sd">        Args:</span>
@@ -2028,7 +2028,7 @@ document.write(`
 
 <div class="viewcode-block" id="Learner.get_optimizer">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.get_optimizer.html#ray.rllib.core.learner.learner.Learner.get_optimizer">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_optimizer</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_optimizer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span> <span class="o">=</span> <span class="n">DEFAULT_MODULE_ID</span><span class="p">,</span>
         <span class="n">optimizer_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_OPTIMIZER</span><span class="p">,</span>
@@ -2070,7 +2070,7 @@ document.write(`
 
 <div class="viewcode-block" id="Learner.get_optimizers_for_module">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.get_optimizers_for_module.html#ray.rllib.core.learner.learner.Learner.get_optimizers_for_module">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_optimizers_for_module</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_optimizers_for_module</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span> <span class="o">=</span> <span class="n">ALL_MODULES</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optimizer</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of (optimizer_name, optimizer instance)-tuples for module_id.</span>
@@ -2098,7 +2098,7 @@ document.write(`
 
 <div class="viewcode-block" id="Learner.filter_param_dict_for_optimizer">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.filter_param_dict_for_optimizer.html#ray.rllib.core.learner.learner.Learner.filter_param_dict_for_optimizer">[docs]</a>
-    <span class="k">def</span> <span class="nf">filter_param_dict_for_optimizer</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_param_dict_for_optimizer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">:</span> <span class="n">ParamDict</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParamDict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reduces the given ParamDict to contain only parameters for given optimizer.</span>
@@ -2126,7 +2126,7 @@ document.write(`
 <div class="viewcode-block" id="Learner.get_param_ref">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.get_param_ref.html#ray.rllib.core.learner.learner.Learner.get_param_ref">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_param_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Param</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Hashable</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_param_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">Param</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Hashable</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a hashable reference to a trainable parameter.</span>
 
 <span class="sd">        This should be overridden in framework specific specialization. For example in</span>
@@ -2144,7 +2144,7 @@ document.write(`
 <div class="viewcode-block" id="Learner.get_parameters">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.get_parameters.html#ray.rllib.core.learner.learner.Learner.get_parameters">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">RLModule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Param</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">RLModule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Param</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the list of parameters of a module.</span>
 
 <span class="sd">        This should be overridden in framework specific learner. For example in torch it</span>
@@ -2159,7 +2159,7 @@ document.write(`
 
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">_convert_batch_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">MultiAgentBatch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiAgentBatch</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_batch_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">MultiAgentBatch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiAgentBatch</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts the elements of a MultiAgentBatch to Tensors on the correct device.</span>
 
 <span class="sd">        Args:</span>
@@ -2173,7 +2173,7 @@ document.write(`
 <div class="viewcode-block" id="Learner.add_module">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.add_module.html#ray.rllib.core.learner.learner.Learner.add_module">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic_CallToSuperRecommended</span>
-    <span class="k">def</span> <span class="nf">add_module</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_module</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">,</span>
@@ -2236,7 +2236,7 @@ document.write(`
 <div class="viewcode-block" id="Learner.remove_module">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.remove_module.html#ray.rllib.core.learner.learner.Learner.remove_module">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic_CallToSuperRecommended</span>
-    <span class="k">def</span> <span class="nf">remove_module</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_module</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2297,7 +2297,7 @@ document.write(`
 <div class="viewcode-block" id="Learner.should_module_be_updated">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.should_module_be_updated.html#ray.rllib.core.learner.learner.Learner.should_module_be_updated">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">should_module_be_updated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">,</span> <span class="n">multi_agent_batch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">should_module_be_updated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">,</span> <span class="n">multi_agent_batch</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns whether a module should be updated or not based on `self.config`.</span>
 
 <span class="sd">        Args:</span>
@@ -2321,7 +2321,7 @@ document.write(`
 <div class="viewcode-block" id="Learner.compute_losses">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.compute_losses.html#ray.rllib.core.learner.learner.Learner.compute_losses">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">compute_losses</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_losses</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fwd_out</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the loss(es) for the module being optimized.</span>
@@ -2377,7 +2377,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.compute_loss_for_module.html#ray.rllib.core.learner.learner.Learner.compute_loss_for_module">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">compute_loss_for_module</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_loss_for_module</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">,</span>
@@ -2411,7 +2411,7 @@ document.write(`
 
 <div class="viewcode-block" id="Learner.update">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.update.html#ray.rllib.core.learner.learner.Learner.update">[docs]</a>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">batch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MultiAgentBatch</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">batches</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">MultiAgentBatch</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2493,7 +2493,7 @@ document.write(`
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterator</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">iterator</span> <span class="o">=</span> <span class="n">training_data</span><span class="o">.</span><span class="n">data_iterators</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-            <span class="k">def</span> <span class="nf">_finalize_fn</span><span class="p">(</span><span class="n">_batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_finalize_fn</span><span class="p">(</span><span class="n">_batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
                 <span class="c1"># Note, the incoming batch is a dictionary with a numpy array</span>
                 <span class="c1"># holding the `MultiAgentBatch`.</span>
                 <span class="n">_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_batch_type</span><span class="p">(</span><span class="n">_batch</span><span class="p">[</span><span class="s2">&quot;batch&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
@@ -2607,7 +2607,7 @@ document.write(`
 
     <span class="nd">@OverrideToImplementCustomLogic</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">_update</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
@@ -2636,7 +2636,7 @@ document.write(`
 <div class="viewcode-block" id="Learner.get_state">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.get_state.html#ray.rllib.core.learner.learner.Learner.get_state">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">components</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2671,7 +2671,7 @@ document.write(`
 <div class="viewcode-block" id="Learner.set_state">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.set_state.html#ray.rllib.core.learner.learner.Learner.set_state">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_is_built</span><span class="p">()</span>
 
         <span class="n">weights_seq_no</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">WEIGHTS_SEQ_NO</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -2698,7 +2698,7 @@ document.write(`
 
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_ctor_args_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ctor_args_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="p">(),</span>  <span class="c1"># *args,</span>
             <span class="p">{</span>
@@ -2709,14 +2709,14 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_checkpointable_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_checkpointable_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_is_built</span><span class="p">(</span><span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="p">(</span><span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">),</span>
         <span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_make_batch_if_necessary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">training_data</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_batch_if_necessary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">training_data</span><span class="p">):</span>
         <span class="n">batch</span> <span class="o">=</span> <span class="n">training_data</span><span class="o">.</span><span class="n">batch</span>
 
         <span class="c1"># Call the learner connector on the given `episodes` (if we have one).</span>
@@ -2777,7 +2777,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">batch</span>
 
-    <span class="k">def</span> <span class="nf">_get_optimizer_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StateDict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_optimizer_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StateDict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the state of all optimizers currently registered in this Learner.</span>
 
 <span class="sd">        Returns:</span>
@@ -2785,7 +2785,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-    <span class="k">def</span> <span class="nf">_set_optimizer_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_optimizer_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the state of all optimizers currently registered in this Learner.</span>
 
 <span class="sd">        Args:</span>
@@ -2796,7 +2796,7 @@ document.write(`
 <div class="viewcode-block" id="Learner.before_gradient_based_update">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.before_gradient_based_update.html#ray.rllib.core.learner.learner.Learner.before_gradient_based_update">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic_CallToSuperRecommended</span>
-    <span class="k">def</span> <span class="nf">before_gradient_based_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">before_gradient_based_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Called before gradient-based updates are completed.</span>
 
 <span class="sd">        Should be overridden to implement custom preparation-, logging-, or</span>
@@ -2813,7 +2813,7 @@ document.write(`
 <div class="viewcode-block" id="Learner.after_gradient_based_update">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.after_gradient_based_update.html#ray.rllib.core.learner.learner.Learner.after_gradient_based_update">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic_CallToSuperRecommended</span>
-    <span class="k">def</span> <span class="nf">after_gradient_based_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">after_gradient_based_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Called after gradient-based updates are completed.</span>
 
 <span class="sd">        Should be overridden to implement custom cleanup-, logging-, or non-gradient-</span>
@@ -2846,7 +2846,7 @@ document.write(`
                 <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_set_slicing_by_batch_id</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_slicing_by_batch_id</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">MultiAgentBatch</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiAgentBatch</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Enables slicing by batch id in the given batch.</span>
@@ -2882,7 +2882,7 @@ document.write(`
 
 <div class="viewcode-block" id="Learner._make_module">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner._make_module.html#ray.rllib.core.learner.learner.Learner._make_module">[docs]</a>
-    <span class="k">def</span> <span class="nf">_make_module</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiRLModule</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_module</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultiRLModule</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct the multi-agent RL module for the learner.</span>
 
 <span class="sd">        This method uses `self._module_specs` or `self._module_obj` to construct the</span>
@@ -2914,7 +2914,7 @@ document.write(`
 
 <div class="viewcode-block" id="Learner.rl_module_is_compatible">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.rl_module_is_compatible.html#ray.rllib.core.learner.learner.Learner.rl_module_is_compatible">[docs]</a>
-    <span class="k">def</span> <span class="nf">rl_module_is_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">RLModule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rl_module_is_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">RLModule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check whether the given `module` is compatible with this Learner.</span>
 
 <span class="sd">        The default implementation checks the Learner-required APIs and whether the</span>
@@ -2932,7 +2932,7 @@ document.write(`
 <div class="viewcode-block" id="Learner.rl_module_required_apis">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.rl_module_required_apis.html#ray.rllib.core.learner.learner.Learner.rl_module_required_apis">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">rl_module_required_apis</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rl_module_required_apis</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the required APIs for an RLModule to be compatible with this Learner.</span>
 
 <span class="sd">        The returned values may or may not be used inside the `rl_module_is_compatible`</span>
@@ -2950,7 +2950,7 @@ document.write(`
 
 <div class="viewcode-block" id="Learner._check_registered_optimizer">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner._check_registered_optimizer.html#ray.rllib.core.learner.learner.Learner._check_registered_optimizer">[docs]</a>
-    <span class="k">def</span> <span class="nf">_check_registered_optimizer</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_registered_optimizer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Param</span><span class="p">],</span>
@@ -2968,7 +2968,7 @@ document.write(`
             <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_log_trainable_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_trainable_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Logs the number of trainable and non-trainable parameters to self.metrics.</span>
 
 <span class="sd">        Use MetricsLogger (self.metrics) tuple-keys:</span>
@@ -2979,7 +2979,7 @@ document.write(`
 
 <div class="viewcode-block" id="Learner._check_is_built">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner._check_is_built.html#ray.rllib.core.learner.learner.Learner._check_is_built">[docs]</a>
-    <span class="k">def</span> <span class="nf">_check_is_built</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_is_built</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -2990,7 +2990,7 @@ document.write(`
         <span class="k">return</span> <span class="kc">True</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_parameters</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_named_optimizers</span> <span class="o">=</span> <span class="p">{}</span>
@@ -2999,11 +2999,11 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">MetricsLogger</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_built</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">_args</span><span class="p">,</span> <span class="o">**</span><span class="n">_kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">_args</span><span class="p">,</span> <span class="o">**</span><span class="n">_kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">_args</span><span class="p">,</span> <span class="o">**</span><span class="n">_kwargs</span><span class="p">)</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">_get_tensor_variable</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_tensor_variable</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
         <span class="n">dtype</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3024,7 +3024,7 @@ document.write(`
 
     <span class="nd">@staticmethod</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">_get_optimizer_lr</span><span class="p">(</span><span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_optimizer_lr</span><span class="p">(</span><span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the current learning rate of the given local optimizer.</span>
 
 <span class="sd">        Args:</span>
@@ -3038,7 +3038,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner._set_optimizer_lr.html#ray.rllib.core.learner.learner.Learner._set_optimizer_lr">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">_set_optimizer_lr</span><span class="p">(</span><span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span><span class="p">,</span> <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_optimizer_lr</span><span class="p">(</span><span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span><span class="p">,</span> <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the learning rate of the given local optimizer.</span>
 
 <span class="sd">        Args:</span>
@@ -3051,16 +3051,16 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner._get_clip_function.html#ray.rllib.core.learner.learner.Learner._get_clip_function">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">_get_clip_function</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_clip_function</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the gradient clipping function to use.&quot;&quot;&quot;</span></div>
 
 
     <span class="nd">@staticmethod</span>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">_get_global_norm_function</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_global_norm_function</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the global norm function to use, given the framework.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_log_steps_trained_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">MultiAgentBatch</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_steps_trained_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">MultiAgentBatch</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Logs this iteration&#39;s steps trained, based on given `batch`.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">mid</span><span class="p">,</span> <span class="n">module_batch</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">policy_batches</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="c1"># Log weights seq no for this batch.</span>
@@ -3115,7 +3115,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner.update(batch=.., ..)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">update_from_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_from_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">):</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">batches_refs</span><span class="o">=</span><span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -3125,7 +3125,7 @@ document.write(`
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">batch</span><span class="o">=</span><span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner.update(episodes=.., ..)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">update_from_episodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">episodes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_from_episodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">episodes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">episodes</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">episodes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">episodes_refs</span><span class="o">=</span><span class="n">episodes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -3133,7 +3133,7 @@ document.write(`
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">episodes</span><span class="o">=</span><span class="n">episodes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Learner.compute_losses(...)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
 </pre></div>

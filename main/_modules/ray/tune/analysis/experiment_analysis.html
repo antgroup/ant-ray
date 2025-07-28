@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,32 +1392,32 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.analysis.experiment_analysis</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">io</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numbers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Number</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">pyarrow.fs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
 
-<span class="kn">from</span> <span class="nn">ray.air.constants</span> <span class="kn">import</span> <span class="n">EXPR_PROGRESS_FILE</span><span class="p">,</span> <span class="n">EXPR_RESULT_FILE</span><span class="p">,</span> <span class="n">TRAINING_ITERATION</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.storage</span> <span class="kn">import</span> <span class="n">_exists_at_fs_path</span><span class="p">,</span> <span class="n">get_fs_and_path</span>
-<span class="kn">from</span> <span class="nn">ray.tune.execution.experiment_state</span> <span class="kn">import</span> <span class="n">_find_newest_experiment_checkpoint</span>
-<span class="kn">from</span> <span class="nn">ray.tune.execution.tune_controller</span> <span class="kn">import</span> <span class="n">TuneController</span>
-<span class="kn">from</span> <span class="nn">ray.tune.experiment</span> <span class="kn">import</span> <span class="n">Trial</span>
-<span class="kn">from</span> <span class="nn">ray.tune.result</span> <span class="kn">import</span> <span class="n">CONFIG_PREFIX</span><span class="p">,</span> <span class="n">DEFAULT_METRIC</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils</span> <span class="kn">import</span> <span class="n">flatten_dict</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils.serialization</span> <span class="kn">import</span> <span class="n">TuneFunctionDecoder</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils.util</span> <span class="kn">import</span> <span class="n">is_nan</span><span class="p">,</span> <span class="n">is_nan_or_inf</span><span class="p">,</span> <span class="n">unflattened_lookup</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">EXPR_PROGRESS_FILE</span><span class="p">,</span> <span class="n">EXPR_RESULT_FILE</span><span class="p">,</span> <span class="n">TRAINING_ITERATION</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">_exists_at_fs_path</span><span class="p">,</span> <span class="n">get_fs_and_path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.experiment_state</span><span class="w"> </span><span class="kn">import</span> <span class="n">_find_newest_experiment_checkpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.tune_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneController</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result</span><span class="w"> </span><span class="kn">import</span> <span class="n">CONFIG_PREFIX</span><span class="p">,</span> <span class="n">DEFAULT_METRIC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils.serialization</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneFunctionDecoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_nan</span><span class="p">,</span> <span class="n">is_nan_or_inf</span><span class="p">,</span> <span class="n">unflattened_lookup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-    <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrame</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">pd</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1429,7 +1429,7 @@ document.write(`
 <div class="viewcode-block" id="ExperimentAnalysis">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.ExperimentAnalysis.html#ray.tune.ExperimentAnalysis">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ExperimentAnalysis</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExperimentAnalysis</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Analyze results from a Ray Train/Tune experiment.</span>
 
 <span class="sd">    To use this class, the run must store the history of reported metrics</span>
@@ -1449,7 +1449,7 @@ document.write(`
 <span class="sd">        trials: List of trials that can be accessed via `analysis.trials`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">experiment_checkpoint_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1501,7 +1501,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_trial_dataframes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_trial_dataframes</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_configs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_configs</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_load_trials</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_trials</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">]:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fs</span><span class="o">.</span><span class="n">open_input_stream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_experiment_json_fs_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">experiment_state</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readall</span><span class="p">(),</span> <span class="bp">cls</span><span class="o">=</span><span class="n">TuneFunctionDecoder</span><span class="p">)</span>
 
@@ -1522,7 +1522,7 @@ document.write(`
             <span class="n">trials</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trial</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">trials</span>
 
-    <span class="k">def</span> <span class="nf">_fetch_trial_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_trial_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
         <span class="n">force_dtype</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;trial_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">}</span>  <span class="c1"># Never convert trial_id to float.</span>
 
         <span class="c1"># If there were no reported results, there will be no files into a DataFrame</span>
@@ -1552,7 +1552,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">df</span>
 
-    <span class="k">def</span> <span class="nf">_fetch_trial_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_trial_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetches trial dataframes from files.</span>
 
 <span class="sd">        Returns:</span>
@@ -1580,7 +1580,7 @@ document.write(`
 
 <div class="viewcode-block" id="ExperimentAnalysis.get_all_configs">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.ExperimentAnalysis.get_all_configs.html#ray.tune.ExperimentAnalysis.get_all_configs">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_all_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns all trial hyperparameter configurations.</span>
 
 <span class="sd">        Args:</span>
@@ -1599,7 +1599,7 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">experiment_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">experiment_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Path pointing to the experiment directory on persistent storage.</span>
 
 <span class="sd">        This can point to a remote storage location (e.g. S3) or to a local</span>
@@ -1607,7 +1607,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_fs_path</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">best_trial</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Trial</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">best_trial</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Trial</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the best trial of the experiment</span>
 
 <span class="sd">        The best trial is determined by comparing the last trial results</span>
@@ -1626,7 +1626,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_best_trial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_metric</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_mode</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">best_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">best_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the config of the best trial of the experiment</span>
 
 <span class="sd">        The best trial is determined by comparing the last trial results</span>
@@ -1645,7 +1645,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_best_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_metric</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_mode</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">best_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Checkpoint</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">best_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Checkpoint</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the checkpoint path of the best trial of the experiment</span>
 
 <span class="sd">        The best trial is determined by comparing the last trial results</span>
@@ -1676,7 +1676,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">best_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">best_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the full result dataframe of the best trial of the experiment</span>
 
 <span class="sd">        The best trial is determined by comparing the last trial results</span>
@@ -1694,7 +1694,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trial_dataframes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">best_trial</span><span class="o">.</span><span class="n">trial_id</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">best_result</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">best_result</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the last result of the best trial of the experiment</span>
 
 <span class="sd">        The best trial is determined by comparing the last trial results</span>
@@ -1712,11 +1712,11 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_trial</span><span class="o">.</span><span class="n">last_result</span>
 
-    <span class="k">def</span> <span class="nf">_delimiter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_delimiter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TUNE_RESULT_DELIM&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">best_result_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">best_result_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the best result of the experiment as a pandas dataframe.</span>
 
 <span class="sd">        The best trial is determined by comparing the last trial results</span>
@@ -1735,12 +1735,12 @@ document.write(`
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">([</span><span class="n">best_result</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;trial_id&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the last result of the all trials of the experiment&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">trial</span><span class="o">.</span><span class="n">trial_id</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">last_result</span> <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">trials</span><span class="p">}</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">results_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">results_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all the last results as a pandas dataframe.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">pd</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1755,7 +1755,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trial_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trial_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;List of all dataframes of the trials.</span>
 
 <span class="sd">        Each dataframe is indexed by iterations and contains reported</span>
@@ -1765,7 +1765,7 @@ document.write(`
 
 <div class="viewcode-block" id="ExperimentAnalysis.dataframe">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.ExperimentAnalysis.dataframe.html#ray.tune.ExperimentAnalysis.dataframe">[docs]</a>
-    <span class="k">def</span> <span class="nf">dataframe</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dataframe</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a pandas.DataFrame object constructed from the trials.</span>
@@ -1805,7 +1805,7 @@ document.write(`
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rows</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_get_trial_checkpoints_with_metric</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_trial_checkpoints_with_metric</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Checkpoint</span><span class="p">,</span> <span class="n">Number</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all checkpoints and a specified metric of a trial.</span>
@@ -1837,7 +1837,7 @@ document.write(`
 
 <div class="viewcode-block" id="ExperimentAnalysis.get_best_checkpoint">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.ExperimentAnalysis.get_best_checkpoint.html#ray.tune.ExperimentAnalysis.get_best_checkpoint">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_best_checkpoint</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_best_checkpoint</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span>
         <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1880,7 +1880,7 @@ document.write(`
 
 <div class="viewcode-block" id="ExperimentAnalysis.get_best_trial">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.ExperimentAnalysis.get_best_trial.html#ray.tune.ExperimentAnalysis.get_best_trial">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_best_trial</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_best_trial</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1971,7 +1971,7 @@ document.write(`
 
 <div class="viewcode-block" id="ExperimentAnalysis.get_best_config">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.ExperimentAnalysis.get_best_config.html#ray.tune.ExperimentAnalysis.get_best_config">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_best_config</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_best_config</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2006,7 +2006,7 @@ document.write(`
 
 <div class="viewcode-block" id="ExperimentAnalysis.get_last_checkpoint">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.ExperimentAnalysis.get_last_checkpoint.html#ray.tune.ExperimentAnalysis.get_last_checkpoint">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_last_checkpoint</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_last_checkpoint</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;training_iteration&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;max&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Checkpoint</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the last checkpoint of the provided trial,</span>
@@ -2029,7 +2029,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_best_checkpoint</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">TRAINING_ITERATION</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_validate_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">metric</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_metric</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;No `metric` has been passed and  `default_metric` has &quot;</span>
@@ -2037,7 +2037,7 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">metric</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_metric</span>
 
-    <span class="k">def</span> <span class="nf">_validate_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">mode</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_mode</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;No `mode` has been passed and  `default_mode` has &quot;</span>
@@ -2047,7 +2047,7 @@ document.write(`
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;If set, `mode` has to be one of [min, max]&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">mode</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_mode</span>
 
-    <span class="k">def</span> <span class="nf">_retrieve_rows</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_retrieve_rows</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">assert</span> <span class="n">mode</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">]</span>
@@ -2074,14 +2074,14 @@ document.write(`
 
         <span class="k">return</span> <span class="n">rows</span>
 
-    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensure that trials are marked as stubs when pickling,</span>
 <span class="sd">        so that they can be loaded later without the trainable</span>
 <span class="sd">        being registered.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-        <span class="k">def</span> <span class="nf">make_stub_if_needed</span><span class="p">(</span><span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Trial</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">make_stub_if_needed</span><span class="p">(</span><span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Trial</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">trial</span><span class="o">.</span><span class="n">stub</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">trial</span>
             <span class="n">trial_copy</span> <span class="o">=</span> <span class="n">Trial</span><span class="p">(</span><span class="n">trial</span><span class="o">.</span><span class="n">trainable_name</span><span class="p">,</span> <span class="n">stub</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

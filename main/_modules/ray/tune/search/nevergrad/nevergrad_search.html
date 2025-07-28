@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1397,19 +1397,19 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.search.nevergrad.nevergrad_search</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">ray.tune.result</span> <span class="kn">import</span> <span class="n">DEFAULT_METRIC</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_METRIC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">UNDEFINED_METRIC_MODE</span><span class="p">,</span>
     <span class="n">UNDEFINED_SEARCH_SPACE</span><span class="p">,</span>
     <span class="n">UNRESOLVED_SEARCH_SPACE</span><span class="p">,</span>
     <span class="n">Searcher</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.sample</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.sample</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Categorical</span><span class="p">,</span>
     <span class="n">Domain</span><span class="p">,</span>
     <span class="n">Float</span><span class="p">,</span>
@@ -1417,13 +1417,13 @@ document.write(`
     <span class="n">LogUniform</span><span class="p">,</span>
     <span class="n">Quantized</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.variant_generator</span> <span class="kn">import</span> <span class="n">parse_spec_vars</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils.util</span> <span class="kn">import</span> <span class="n">flatten_dict</span><span class="p">,</span> <span class="n">unflatten_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.variant_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_spec_vars</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten_dict</span><span class="p">,</span> <span class="n">unflatten_dict</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">nevergrad</span> <span class="k">as</span> <span class="nn">ng</span>
-    <span class="kn">from</span> <span class="nn">nevergrad.optimization</span> <span class="kn">import</span> <span class="n">Optimizer</span>
-    <span class="kn">from</span> <span class="nn">nevergrad.optimization.base</span> <span class="kn">import</span> <span class="n">ConfiguredOptimizer</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">nevergrad</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ng</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">nevergrad.optimization</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optimizer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">nevergrad.optimization.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfiguredOptimizer</span>
 
     <span class="n">Parameter</span> <span class="o">=</span> <span class="n">ng</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">Parameter</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -1437,7 +1437,7 @@ document.write(`
 
 <div class="viewcode-block" id="NevergradSearch">
 <a class="viewcode-back" href="../../../../../tune/api/doc/ray.tune.search.nevergrad.NevergradSearch.html#ray.tune.search.nevergrad.NevergradSearch">[docs]</a>
-<span class="k">class</span> <span class="nc">NevergradSearch</span><span class="p">(</span><span class="n">Searcher</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NevergradSearch</span><span class="p">(</span><span class="n">Searcher</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Uses Nevergrad to optimize hyperparameters.</span>
 
 <span class="sd">    Nevergrad is an open source tool from Facebook for derivative free</span>
@@ -1520,7 +1520,7 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
             <span class="n">Union</span><span class="p">[</span><span class="n">Optimizer</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Optimizer</span><span class="p">],</span> <span class="n">ConfiguredOptimizer</span><span class="p">]</span>
@@ -1598,7 +1598,7 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nevergrad_opt</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_space</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup_nevergrad</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_setup_nevergrad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_nevergrad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opt_factory</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_nevergrad_opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opt_factory</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_space</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_optimizer_kwargs</span>
@@ -1645,7 +1645,7 @@ document.write(`
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_points_to_evaluate</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_nevergrad_opt</span><span class="o">.</span><span class="n">suggest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_points_to_evaluate</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">set_search_properties</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_search_properties</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="o">**</span><span class="n">spec</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nevergrad_opt</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_space</span><span class="p">:</span>
@@ -1661,7 +1661,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_nevergrad</span><span class="p">()</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nevergrad_opt</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="n">UNDEFINED_SEARCH_SPACE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -1691,7 +1691,7 @@ document.write(`
 
 <div class="viewcode-block" id="NevergradSearch.on_trial_complete">
 <a class="viewcode-back" href="../../../../../tune/api/doc/ray.tune.search.nevergrad.NevergradSearch.on_trial_complete.html#ray.tune.search.nevergrad.NevergradSearch.on_trial_complete">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_trial_complete</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_complete</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Notification for the completion of trial.</span>
@@ -1706,22 +1706,22 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_live_trial_mapping</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">trial_id</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_process_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="n">ng_trial_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_live_trial_mapping</span><span class="p">[</span><span class="n">trial_id</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nevergrad_opt</span><span class="o">.</span><span class="n">tell</span><span class="p">(</span><span class="n">ng_trial_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric_op</span> <span class="o">*</span> <span class="n">result</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_metric</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">save_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outputFile</span><span class="p">:</span>
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">save_object</span><span class="p">,</span> <span class="n">outputFile</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">inputFile</span><span class="p">:</span>
             <span class="n">save_object</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">inputFile</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">save_object</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">convert_search_space</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert_search_space</span><span class="p">(</span><span class="n">spec</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
         <span class="n">resolved_vars</span><span class="p">,</span> <span class="n">domain_vars</span><span class="p">,</span> <span class="n">grid_vars</span> <span class="o">=</span> <span class="n">parse_spec_vars</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">grid_vars</span><span class="p">:</span>
@@ -1734,7 +1734,7 @@ document.write(`
         <span class="n">spec</span> <span class="o">=</span> <span class="n">flatten_dict</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">prevent_delimiter</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">resolved_vars</span><span class="p">,</span> <span class="n">domain_vars</span><span class="p">,</span> <span class="n">grid_vars</span> <span class="o">=</span> <span class="n">parse_spec_vars</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">resolve_value</span><span class="p">(</span><span class="n">domain</span><span class="p">:</span> <span class="n">Domain</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">resolve_value</span><span class="p">(</span><span class="n">domain</span><span class="p">:</span> <span class="n">Domain</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Parameter</span><span class="p">:</span>
             <span class="n">sampler</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">get_sampler</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">Quantized</span><span class="p">):</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>

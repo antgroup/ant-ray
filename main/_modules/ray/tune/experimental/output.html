@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,37 +1392,37 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.experimental.output</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">numbers</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">textwrap</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numbers</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray._private.dict</span> <span class="kn">import</span> <span class="n">flatten_dict</span><span class="p">,</span> <span class="n">unflattened_lookup</span>
-<span class="kn">from</span> <span class="nn">ray._private.thirdparty.tabulate.tabulate</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.dict</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten_dict</span><span class="p">,</span> <span class="n">unflattened_lookup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.thirdparty.tabulate.tabulate</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DataRow</span><span class="p">,</span>
     <span class="n">Line</span><span class="p">,</span>
     <span class="n">TableFormat</span><span class="p">,</span>
     <span class="n">tabulate</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.air._internal.usage</span> <span class="kn">import</span> <span class="n">AirEntrypoint</span>
-<span class="kn">from</span> <span class="nn">ray.air.constants</span> <span class="kn">import</span> <span class="n">TRAINING_ITERATION</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
-<span class="kn">from</span> <span class="nn">ray.tune.callback</span> <span class="kn">import</span> <span class="n">Callback</span>
-<span class="kn">from</span> <span class="nn">ray.tune.experiment.trial</span> <span class="kn">import</span> <span class="n">Trial</span>
-<span class="kn">from</span> <span class="nn">ray.tune.result</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.usage</span><span class="w"> </span><span class="kn">import</span> <span class="n">AirEntrypoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRAINING_ITERATION</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.callback</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment.trial</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AUTO_RESULT_KEYS</span><span class="p">,</span>
     <span class="n">EPISODE_REWARD_MEAN</span><span class="p">,</span>
     <span class="n">MEAN_ACCURACY</span><span class="p">,</span>
@@ -1430,13 +1430,13 @@ document.write(`
     <span class="n">TIME_TOTAL_S</span><span class="p">,</span>
     <span class="n">TIMESTEPS_TOTAL</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.sample</span> <span class="kn">import</span> <span class="n">Domain</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils.log</span> <span class="kn">import</span> <span class="n">Verbosity</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.sample</span><span class="w"> </span><span class="kn">import</span> <span class="n">Domain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">Verbosity</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">rich</span>
-    <span class="kn">import</span> <span class="nn">rich.layout</span>
-    <span class="kn">import</span> <span class="nn">rich.live</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">rich</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">rich.layout</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">rich.live</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">rich</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -1493,19 +1493,19 @@ document.write(`
 <span class="p">]</span>
 
 
-<span class="k">class</span> <span class="nc">AirVerbosity</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AirVerbosity</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
     <span class="n">SILENT</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">DEFAULT</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">2</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
 
 <span class="n">IS_NOTEBOOK</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">in_notebook</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">get_air_verbosity</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_air_verbosity</span><span class="p">(</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">AirVerbosity</span><span class="p">,</span> <span class="n">Verbosity</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AirVerbosity</span><span class="p">]:</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;RAY_AIR_NEW_OUTPUT&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;0&quot;</span><span class="p">:</span>
@@ -1522,7 +1522,7 @@ document.write(`
     <span class="k">return</span> <span class="n">AirVerbosity</span><span class="p">(</span><span class="n">verbose_int</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_infer_params</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_infer_params</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">flat_config</span> <span class="o">=</span> <span class="n">flatten_dict</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">flat_config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1536,7 +1536,7 @@ document.write(`
     <span class="k">return</span> <span class="n">params</span>
 
 
-<span class="k">def</span> <span class="nf">_get_time_str</span><span class="p">(</span><span class="n">start_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">current_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_time_str</span><span class="p">(</span><span class="n">start_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">current_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get strings representing the current and elapsed time.</span>
 
 <span class="sd">    Args:</span>
@@ -1576,18 +1576,18 @@ document.write(`
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_time_dt</span><span class="si">:</span><span class="s2">%Y-%m-%d %H:%M:%S</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">running_for_str</span>
 
 
-<span class="k">def</span> <span class="nf">_get_trials_by_state</span><span class="p">(</span><span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_trials_by_state</span><span class="p">(</span><span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">]]:</span>
     <span class="n">trials_by_state</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trials</span><span class="p">:</span>
         <span class="n">trials_by_state</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">status</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">trials_by_state</span>
 
 
-<span class="k">def</span> <span class="nf">_get_trials_with_error</span><span class="p">(</span><span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_trials_with_error</span><span class="p">(</span><span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">]:</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trials</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">error_file</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_infer_user_metrics</span><span class="p">(</span><span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_infer_user_metrics</span><span class="p">(</span><span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Try to infer the metrics to print out.</span>
 
 <span class="sd">    By default, only the first 4 meaningful metrics in `last_result` will be</span>
@@ -1609,7 +1609,7 @@ document.write(`
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
 
-<span class="k">def</span> <span class="nf">_current_best_trial</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_current_best_trial</span><span class="p">(</span>
     <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1643,18 +1643,18 @@ document.write(`
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">_PerStatusTrialTableData</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_PerStatusTrialTableData</span><span class="p">:</span>
     <span class="n">trial_infos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
     <span class="n">more_info</span><span class="p">:</span> <span class="nb">str</span>
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">_TrialTableData</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_TrialTableData</span><span class="p">:</span>
     <span class="n">header</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">_PerStatusTrialTableData</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_max_len</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">max_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">wrap</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_max_len</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">max_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">wrap</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Abbreviate a string representation of an object to `max_len` characters.</span>
 
 <span class="sd">    For numbers, booleans and None, the original value will be returned for</span>
@@ -1684,7 +1684,7 @@ document.write(`
     <span class="k">return</span> <span class="n">result</span>
 
 
-<span class="k">def</span> <span class="nf">_get_trial_info</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_trial_info</span><span class="p">(</span>
     <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">param_keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">metric_keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the following information about a trial:</span>
@@ -1720,7 +1720,7 @@ document.write(`
     <span class="k">return</span> <span class="n">trial_info</span>
 
 
-<span class="k">def</span> <span class="nf">_get_trial_table_data_per_status</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_trial_table_data_per_status</span><span class="p">(</span>
     <span class="n">status</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span>
     <span class="n">param_keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
@@ -1757,7 +1757,7 @@ document.write(`
     <span class="k">return</span> <span class="n">_PerStatusTrialTableData</span><span class="p">(</span><span class="n">trial_infos</span><span class="p">,</span> <span class="n">more_info</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_trial_table_data</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_trial_table_data</span><span class="p">(</span>
     <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span>
     <span class="n">param_keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">metric_keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
@@ -1826,7 +1826,7 @@ document.write(`
     <span class="k">return</span> <span class="n">_TrialTableData</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">trial_data</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_best_trial_str</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_best_trial_str</span><span class="p">(</span>
     <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span>
     <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">):</span>
@@ -1843,7 +1843,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_render_table_item</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_render_table_item</span><span class="p">(</span>
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
     <span class="n">key</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">key</span>
@@ -1863,7 +1863,7 @@ document.write(`
         <span class="k">yield</span> <span class="n">key</span><span class="p">,</span> <span class="n">_max_len</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_dict_as_table_data</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_dict_as_table_data</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
     <span class="n">include</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Collection</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Collection</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1946,7 +1946,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_print_dict_as_table</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_print_dict_as_table</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
     <span class="n">header</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">include</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1974,7 +1974,7 @@ document.write(`
 
 <div class="viewcode-block" id="ProgressReporter">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experimental.output.ProgressReporter">[docs]</a>
-<span class="k">class</span> <span class="nc">ProgressReporter</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgressReporter</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Periodically prints out status update.&quot;&quot;&quot;</span>
 
     <span class="c1"># TODO: Make this configurable</span>
@@ -1985,7 +1985,7 @@ document.write(`
     <span class="n">_intermediate_result_verbosity</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_addressing_tmpl</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">verbosity</span><span class="p">:</span> <span class="n">AirVerbosity</span><span class="p">,</span>
         <span class="n">progress_metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2005,30 +2005,30 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_in_block</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">verbosity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AirVerbosity</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">verbosity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AirVerbosity</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span>
 
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">start_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_start_time</span> <span class="o">=</span> <span class="n">start_time</span>
 
-    <span class="k">def</span> <span class="nf">_start_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indicator</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_start_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indicator</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_in_block</span> <span class="o">!=</span> <span class="n">indicator</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_end_block</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_in_block</span> <span class="o">=</span> <span class="n">indicator</span>
 
-    <span class="k">def</span> <span class="nf">_end_block</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_end_block</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_in_block</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_in_block</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">on_experiment_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">],</span> <span class="o">**</span><span class="n">info</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_experiment_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">],</span> <span class="o">**</span><span class="n">info</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_end_block</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">experiment_started</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">experiment_started</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">experiment_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">experiment_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -2048,7 +2048,7 @@ document.write(`
             <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_time_heartbeat_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_time_heartbeat_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">current_time_str</span><span class="p">,</span> <span class="n">running_time_str</span> <span class="o">=</span> <span class="n">_get_time_str</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_start_time</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="p">)</span>
@@ -2056,17 +2056,17 @@ document.write(`
             <span class="sa">f</span><span class="s2">&quot;Current time: </span><span class="si">{</span><span class="n">current_time_str</span><span class="si">}</span><span class="s2">. Total running time: &quot;</span> <span class="o">+</span> <span class="n">running_time_str</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">print_heartbeat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_heartbeat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_heartbeat_threshold</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="k">if</span> <span class="n">force</span> <span class="ow">or</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_heartbeat_time</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_heartbeat_freq</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_print_heartbeat</span><span class="p">(</span><span class="n">trials</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_last_heartbeat_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_print_heartbeat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_print_heartbeat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-    <span class="k">def</span> <span class="nf">_print_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_print_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Only print result if a different result has been reported, or force=True&quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="ow">or</span> <span class="n">trial</span><span class="o">.</span><span class="n">last_result</span>
 
@@ -2083,12 +2083,12 @@ document.write(`
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_trial_last_printed_results</span><span class="p">[</span><span class="n">trial</span><span class="o">.</span><span class="n">trial_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">this_iter</span>
 
-    <span class="k">def</span> <span class="nf">_print_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_print_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">):</span>
         <span class="n">_print_dict_as_table</span><span class="p">(</span>
             <span class="n">trial</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_addressing_tmpl</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trial</span><span class="p">)</span><span class="si">}</span><span class="s2"> config&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_result</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_result</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span>
@@ -2107,7 +2107,7 @@ document.write(`
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_print_result</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_complete</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_complete</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_end_verbosity</span><span class="p">:</span>
@@ -2125,7 +2125,7 @@ document.write(`
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_print_result</span><span class="p">(</span><span class="n">trial</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_error</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_error</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">],</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span>
     <span class="p">):</span>
         <span class="n">curr_time_str</span><span class="p">,</span> <span class="n">running_time_str</span> <span class="o">=</span> <span class="n">_get_time_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_start_time</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
@@ -2142,12 +2142,12 @@ document.write(`
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_print_result</span><span class="p">(</span><span class="n">trial</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_recover</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_recover</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">],</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">on_trial_error</span><span class="p">(</span><span class="n">iteration</span><span class="o">=</span><span class="n">iteration</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="n">trials</span><span class="p">,</span> <span class="n">trial</span><span class="o">=</span><span class="n">trial</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_checkpoint</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_checkpoint</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span>
@@ -2172,7 +2172,7 @@ document.write(`
             <span class="sa">f</span><span class="s2">&quot;at: </span><span class="si">{</span><span class="n">loc</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_end_verbosity</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="n">has_config</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">trial</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
@@ -2191,7 +2191,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_detect_reporter</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_detect_reporter</span><span class="p">(</span>
     <span class="n">verbosity</span><span class="p">:</span> <span class="n">AirVerbosity</span><span class="p">,</span>
     <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">entrypoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AirEntrypoint</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2220,14 +2220,14 @@ document.write(`
 
 <div class="viewcode-block" id="TuneReporterBase">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experimental.output.TuneReporterBase">[docs]</a>
-<span class="k">class</span> <span class="nc">TuneReporterBase</span><span class="p">(</span><span class="n">ProgressReporter</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TuneReporterBase</span><span class="p">(</span><span class="n">ProgressReporter</span><span class="p">):</span>
     <span class="n">_heartbeat_threshold</span> <span class="o">=</span> <span class="n">AirVerbosity</span><span class="o">.</span><span class="n">DEFAULT</span>
     <span class="n">_wrap_headers</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">_intermediate_result_verbosity</span> <span class="o">=</span> <span class="n">AirVerbosity</span><span class="o">.</span><span class="n">VERBOSE</span>
     <span class="n">_start_end_verbosity</span> <span class="o">=</span> <span class="n">AirVerbosity</span><span class="o">.</span><span class="n">DEFAULT</span>
     <span class="n">_addressing_tmpl</span> <span class="o">=</span> <span class="s2">&quot;Trial </span><span class="si">{}</span><span class="s2">&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">verbosity</span><span class="p">:</span> <span class="n">AirVerbosity</span><span class="p">,</span>
         <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -2246,7 +2246,7 @@ document.write(`
             <span class="n">verbosity</span><span class="o">=</span><span class="n">verbosity</span><span class="p">,</span> <span class="n">progress_metrics</span><span class="o">=</span><span class="n">progress_metrics</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">start_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">total_samples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2255,7 +2255,7 @@ document.write(`
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">start_time</span><span class="o">=</span><span class="n">start_time</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_samples</span> <span class="o">=</span> <span class="n">total_samples</span>
 
-    <span class="k">def</span> <span class="nf">_get_overall_trial_progress_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_overall_trial_progress_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot; | &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">trials</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -2265,7 +2265,7 @@ document.write(`
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Trial status: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="c1"># TODO: Return a more structured type to share code with Jupyter flow.</span>
-    <span class="k">def</span> <span class="nf">_get_heartbeat</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_heartbeat</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="o">*</span><span class="n">sys_args</span><span class="p">,</span> <span class="n">force_full_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">_TrialTableData</span><span class="p">]:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -2297,15 +2297,15 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">trial_table_data</span>
 
-    <span class="k">def</span> <span class="nf">_print_heartbeat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="o">*</span><span class="n">sys_args</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_print_heartbeat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="o">*</span><span class="n">sys_args</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 
 <div class="viewcode-block" id="TuneTerminalReporter">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experimental.output.TuneTerminalReporter">[docs]</a>
-<span class="k">class</span> <span class="nc">TuneTerminalReporter</span><span class="p">(</span><span class="n">TuneReporterBase</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">experiment_started</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TuneTerminalReporter</span><span class="p">(</span><span class="n">TuneReporterBase</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">experiment_started</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">experiment_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">experiment_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -2341,7 +2341,7 @@ document.write(`
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_print_heartbeat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="o">*</span><span class="n">sys_args</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_print_heartbeat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="o">*</span><span class="n">sys_args</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_heartbeat_threshold</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="n">heartbeat_strs</span><span class="p">,</span> <span class="n">table_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_heartbeat</span><span class="p">(</span>
@@ -2407,14 +2407,14 @@ document.write(`
 
 <div class="viewcode-block" id="TrainReporter">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.experimental.output.TrainReporter">[docs]</a>
-<span class="k">class</span> <span class="nc">TrainReporter</span><span class="p">(</span><span class="n">ProgressReporter</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrainReporter</span><span class="p">(</span><span class="n">ProgressReporter</span><span class="p">):</span>
     <span class="c1"># the minimal verbosity threshold at which heartbeat starts getting printed.</span>
     <span class="n">_heartbeat_threshold</span> <span class="o">=</span> <span class="n">AirVerbosity</span><span class="o">.</span><span class="n">VERBOSE</span>
     <span class="n">_intermediate_result_verbosity</span> <span class="o">=</span> <span class="n">AirVerbosity</span><span class="o">.</span><span class="n">DEFAULT</span>
     <span class="n">_start_end_verbosity</span> <span class="o">=</span> <span class="n">AirVerbosity</span><span class="o">.</span><span class="n">DEFAULT</span>
     <span class="n">_addressing_tmpl</span> <span class="o">=</span> <span class="s2">&quot;Training&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_get_heartbeat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span> <span class="n">force_full_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_heartbeat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span> <span class="n">force_full_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="c1"># Training on iteration 1. Current time: 2023-03-22 15:29:25 (running for 00:00:03.24)  # noqa</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">trials</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span>
@@ -2431,10 +2431,10 @@ document.write(`
             <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Training on iteration </span><span class="si">{</span><span class="n">iter_num</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time_heartbeat_str</span><span class="p">]</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_print_heartbeat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_print_heartbeat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_heartbeat</span><span class="p">(</span><span class="n">trials</span><span class="p">,</span> <span class="n">force_full_output</span><span class="o">=</span><span class="n">force</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_result</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_result</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span>

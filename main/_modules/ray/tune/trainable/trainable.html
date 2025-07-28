@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,28 +1392,28 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.trainable.trainable</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">platform</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">redirect_stderr</span><span class="p">,</span> <span class="n">redirect_stdout</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">redirect_stderr</span><span class="p">,</span> <span class="n">redirect_stdout</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray.cloudpickle</span> <span class="k">as</span> <span class="nn">ray_pickle</span>
-<span class="kn">from</span> <span class="nn">ray.air._internal.util</span> <span class="kn">import</span> <span class="n">exception_cause</span><span class="p">,</span> <span class="n">skip_exceptions</span>
-<span class="kn">from</span> <span class="nn">ray.air.constants</span> <span class="kn">import</span> <span class="n">TIME_THIS_ITER_S</span><span class="p">,</span> <span class="n">TIMESTAMP</span><span class="p">,</span> <span class="n">TRAINING_ITERATION</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.checkpoint_manager</span> <span class="kn">import</span> <span class="n">_TrainingResult</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.storage</span> <span class="kn">import</span> <span class="n">StorageContext</span><span class="p">,</span> <span class="n">_exists_at_fs_path</span>
-<span class="kn">from</span> <span class="nn">ray.train.constants</span> <span class="kn">import</span> <span class="n">DEFAULT_STORAGE_PATH</span>
-<span class="kn">from</span> <span class="nn">ray.tune.execution.placement_groups</span> <span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
-<span class="kn">from</span> <span class="nn">ray.tune.result</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.cloudpickle</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ray_pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">exception_cause</span><span class="p">,</span> <span class="n">skip_exceptions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">TIME_THIS_ITER_S</span><span class="p">,</span> <span class="n">TIMESTAMP</span><span class="p">,</span> <span class="n">TRAINING_ITERATION</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.checkpoint_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">_TrainingResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">StorageContext</span><span class="p">,</span> <span class="n">_exists_at_fs_path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_STORAGE_PATH</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.placement_groups</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEBUG_METRICS</span><span class="p">,</span>
     <span class="n">DONE</span><span class="p">,</span>
     <span class="n">EPISODES_THIS_ITER</span><span class="p">,</span>
@@ -1431,13 +1431,13 @@ document.write(`
     <span class="n">TRIAL_ID</span><span class="p">,</span>
     <span class="n">TRIAL_INFO</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils</span> <span class="kn">import</span> <span class="n">UtilMonitor</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils.log</span> <span class="kn">import</span> <span class="n">disable_ipython</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils.util</span> <span class="kn">import</span> <span class="n">Tee</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">UtilMonitor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">disable_ipython</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tee</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1450,7 +1450,7 @@ document.write(`
 <div class="viewcode-block" id="Trainable">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.html#ray.tune.Trainable">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">Trainable</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Trainable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for trainable models, functions, etc.</span>
 
 <span class="sd">    A call to ``train()`` on a trainable will execute one logical iteration of</span>
@@ -1489,7 +1489,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trainable.__init__">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.__init__.html#ray.tune.Trainable.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">logger_creator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="s2">&quot;Logger&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># Deprecated (2.7)</span>
@@ -1568,7 +1568,7 @@ document.write(`
 <div class="viewcode-block" id="Trainable.default_resource_request">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.default_resource_request.html#ray.tune.Trainable.default_resource_request">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">default_resource_request</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default_resource_request</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PlacementGroupFactory</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Provides a static resource requirement for the given configuration.</span>
@@ -1596,7 +1596,7 @@ document.write(`
 <div class="viewcode-block" id="Trainable.resource_help">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.resource_help.html#ray.tune.Trainable.resource_help">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">resource_help</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resource_help</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a help string for configuring this trainable&#39;s resources.</span>
 
 <span class="sd">        Args:</span>
@@ -1605,12 +1605,12 @@ document.write(`
         <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
 
 
-    <span class="k">def</span> <span class="nf">get_current_ip_pid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_current_ip_pid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_ip</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Trainable.get_auto_filled_metrics">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.get_auto_filled_metrics.html#ray.tune.Trainable.get_auto_filled_metrics">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_auto_filled_metrics</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_auto_filled_metrics</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">now</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">time_this_iter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1646,7 +1646,7 @@ document.write(`
         <span class="k">return</span> <span class="n">autofilled</span></div>
 
 
-    <span class="k">def</span> <span class="nf">is_actor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_actor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">actor_id</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">global_worker</span><span class="o">.</span><span class="n">actor_id</span>
             <span class="k">return</span> <span class="n">actor_id</span> <span class="o">!=</span> <span class="n">actor_id</span><span class="o">.</span><span class="n">nil</span><span class="p">()</span>
@@ -1656,7 +1656,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trainable.train_buffered">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.train_buffered.html#ray.tune.Trainable.train_buffered">[docs]</a>
-    <span class="k">def</span> <span class="nf">train_buffered</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer_time_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">max_buffer_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">train_buffered</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer_time_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">max_buffer_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs multiple iterations of training.</span>
 
 <span class="sd">        Calls ``train()`` internally. Collects and combines multiple results.</span>
@@ -1699,7 +1699,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trainable.train">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.train.html#ray.tune.Trainable.train">[docs]</a>
-    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs one logical iteration of training.</span>
 
 <span class="sd">        Calls ``step()`` internally. Subclasses should override ``step()``</span>
@@ -1740,7 +1740,7 @@ document.write(`
             <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">skipped</span> <span class="o">=</span> <span class="n">skip_exceptions</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">skipped</span> <span class="kn">from</span> <span class="nn">exception_cause</span><span class="p">(</span><span class="n">skipped</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">skipped</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exception_cause</span><span class="p">(</span><span class="n">skipped</span><span class="p">)</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">dict</span><span class="p">),</span> <span class="s2">&quot;step() needs to return a dict.&quot;</span>
 
@@ -1811,7 +1811,7 @@ document.write(`
         <span class="k">return</span> <span class="n">result</span></div>
 
 
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;iteration&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iteration</span><span class="p">,</span>
             <span class="s2">&quot;timesteps_total&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timesteps_total</span><span class="p">,</span>
@@ -1821,7 +1821,7 @@ document.write(`
             <span class="s2">&quot;ray_version&quot;</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">_report_class_trainable_checkpoint</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_report_class_trainable_checkpoint</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">checkpoint_dict_or_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_TrainingResult</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Report a checkpoint saved via Trainable.save_checkpoint.</span>
@@ -1880,7 +1880,7 @@ document.write(`
 <div class="viewcode-block" id="Trainable.save">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.save.html#ray.tune.Trainable.save">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_TrainingResult</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_TrainingResult</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Saves the current model state to a checkpoint.</span>
 
 <span class="sd">        Subclasses should override ``save_checkpoint()`` instead to save state.</span>
@@ -1923,7 +1923,7 @@ document.write(`
 <div class="viewcode-block" id="Trainable.restore">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.restore.html#ray.tune.Trainable.restore">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;ray.tune.Checkpoint&quot;</span><span class="p">,</span> <span class="n">_TrainingResult</span><span class="p">]</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Restores training state from a given model checkpoint.</span>
@@ -1998,7 +1998,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trainable.export_model">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.export_model.html#ray.tune.Trainable.export_model">[docs]</a>
-    <span class="k">def</span> <span class="nf">export_model</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_model</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">export_formats</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span> <span class="n">export_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Exports model based on export_formats.</span>
@@ -2023,7 +2023,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trainable.reset">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.reset.html#ray.tune.Trainable.reset">[docs]</a>
-    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_config</span><span class="p">,</span> <span class="n">logger_creator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">storage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_config</span><span class="p">,</span> <span class="n">logger_creator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">storage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets trial for use with new config.</span>
 
 <span class="sd">        Subclasses should override reset_config() to actually</span>
@@ -2074,7 +2074,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trainable.reset_config">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.reset_config.html#ray.tune.Trainable.reset_config">[docs]</a>
-    <span class="k">def</span> <span class="nf">reset_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets configuration without restarting the trial.</span>
 
 <span class="sd">        This method is optional, but can be implemented to speed up algorithms</span>
@@ -2091,7 +2091,7 @@ document.write(`
         <span class="k">return</span> <span class="kc">False</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_create_logger</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_logger</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">logger_creator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="s2">&quot;Logger&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2106,7 +2106,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_result_logger</span> <span class="o">=</span> <span class="n">logger_creator</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_logdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_logger</span><span class="o">.</span><span class="n">logdir</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.tune.logger</span> <span class="kn">import</span> <span class="n">UnifiedLogger</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">UnifiedLogger</span>
 
             <span class="n">logdir_prefix</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">_%H-%M-%S&quot;</span><span class="p">)</span>
             <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">try_to_create_directory</span><span class="p">(</span><span class="n">DEFAULT_STORAGE_PATH</span><span class="p">)</span>
@@ -2115,7 +2115,7 @@ document.write(`
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_result_logger</span> <span class="o">=</span> <span class="n">UnifiedLogger</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logdir</span><span class="p">,</span> <span class="n">loggers</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_open_logfiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stdout_file</span><span class="p">,</span> <span class="n">stderr_file</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_open_logfiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stdout_file</span><span class="p">,</span> <span class="n">stderr_file</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create loggers. Open stdout and stderr logfiles.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">stdout_file</span><span class="p">:</span>
             <span class="n">stdout_path</span> <span class="o">=</span> <span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_logdir</span><span class="p">)</span> <span class="o">/</span> <span class="n">stdout_file</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
@@ -2141,7 +2141,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_stderr_logging_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
             <span class="n">ray</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stderr_logging_handler</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_close_logfiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_close_logfiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Close stdout and stderr logfiles.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stderr_logging_handler</span><span class="p">:</span>
             <span class="n">ray</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">removeHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stderr_logging_handler</span><span class="p">)</span>
@@ -2159,7 +2159,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trainable.stop">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.stop.html#ray.tune.Trainable.stop">[docs]</a>
-    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Releases all resources used by this trainable.</span>
 
 <span class="sd">        Calls ``Trainable.cleanup`` internally. Subclasses should override</span>
@@ -2176,7 +2176,7 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">logdir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">logdir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Directory of the results and checkpoints for this Trainable.</span>
 
 <span class="sd">        Note that the current working directory will also be changed to this.</span>
@@ -2184,7 +2184,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logdir</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trial_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trial_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Trial name for the corresponding trial of this Trainable.</span>
 
 <span class="sd">        This is not set if not using Tune.</span>
@@ -2201,7 +2201,7 @@ document.write(`
             <span class="k">return</span> <span class="s2">&quot;default&quot;</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trial_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trial_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Trial ID for the corresponding trial of this Trainable.</span>
 
 <span class="sd">        This is not set if not using Tune.</span>
@@ -2218,7 +2218,7 @@ document.write(`
             <span class="k">return</span> <span class="s2">&quot;default&quot;</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trial_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PlacementGroupFactory</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trial_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PlacementGroupFactory</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Resources currently assigned to the trial of this Trainable.</span>
 
 <span class="sd">        This is not set if not using Tune.</span>
@@ -2235,7 +2235,7 @@ document.write(`
             <span class="k">return</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Current training iteration.</span>
 
 <span class="sd">        This value is automatically incremented every time `train()` is called</span>
@@ -2245,7 +2245,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iteration</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">training_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">training_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Current training iteration (same as `self.iteration`).</span>
 
 <span class="sd">        This value is automatically incremented every time `train()` is called</span>
@@ -2256,14 +2256,14 @@ document.write(`
 
 <div class="viewcode-block" id="Trainable.get_config">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.get_config.html#ray.tune.Trainable.get_config">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns configuration passed in by Tune.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span></div>
 
 
 <div class="viewcode-block" id="Trainable.step">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.step.html#ray.tune.Trainable.step">[docs]</a>
-    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Subclasses should override this to implement train().</span>
 
 <span class="sd">        The return value will be automatically passed to the loggers. Users</span>
@@ -2283,7 +2283,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trainable.save_checkpoint">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.save_checkpoint.html#ray.tune.Trainable.save_checkpoint">[docs]</a>
-    <span class="k">def</span> <span class="nf">save_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Subclasses should override this to implement ``save()``.</span>
 
 <span class="sd">        Warning:</span>
@@ -2323,7 +2323,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trainable.load_checkpoint">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.load_checkpoint.html#ray.tune.Trainable.load_checkpoint">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Subclasses should override this to implement restore().</span>
 
 <span class="sd">        Warning:</span>
@@ -2378,7 +2378,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trainable.setup">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.setup.html#ray.tune.Trainable.setup">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Subclasses should override this for custom initialization.</span>
 
 <span class="sd">        .. versionadded:: 0.8.7</span>
@@ -2393,7 +2393,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trainable.log_result">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.log_result.html#ray.tune.Trainable.log_result">[docs]</a>
-    <span class="k">def</span> <span class="nf">log_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Subclasses can optionally override this to customize logging.</span>
 
 <span class="sd">        The logging here is done on the worker process rather than</span>
@@ -2409,7 +2409,7 @@ document.write(`
 
 <div class="viewcode-block" id="Trainable.cleanup">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Trainable.cleanup.html#ray.tune.Trainable.cleanup">[docs]</a>
-    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Subclasses should override this for any cleanup on stop.</span>
 
 <span class="sd">        If any Ray actors are launched in the Trainable (i.e., with a RLlib</span>
@@ -2426,7 +2426,7 @@ document.write(`
         <span class="k">pass</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_export_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">export_formats</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">export_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">export_formats</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">export_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Subclasses should override this to export model.</span>
 
 <span class="sd">        Args:</span>
@@ -2438,7 +2438,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">_implements_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_implements_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span></div>
 
 </pre></div>

@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1441,20 +1441,20 @@ from <code class="code docutils literal notranslate"><span class="pre">reset()</
 outputs dictionaries, one for observations, one for rewards, etc..in which agent IDs map
 In each such multi-agent dictionary, agent IDs map to the respective individual agent’s observation/reward/etc..</p>
 <p>Here is a first draft of an example :py:class`~ray.rllib.env.multi_agent_env.MultiAgentEnv` implementation:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.env.multi_agent_env</span> <span class="kn">import</span> <span class="n">MultiAgentEnv</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.multi_agent_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentEnv</span>
 
-<span class="k">class</span> <span class="nc">MyMultiAgentEnv</span><span class="p">(</span><span class="n">MultiAgentEnv</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyMultiAgentEnv</span><span class="p">(</span><span class="n">MultiAgentEnv</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="o">...</span>
 
-    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="o">...</span>
         <span class="c1"># return observation dict and infos dict.</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;agent_1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">obs</span> <span class="n">of</span> <span class="n">agent_1</span><span class="p">],</span> <span class="s2">&quot;agent_2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">obs</span> <span class="n">of</span> <span class="n">agent_2</span><span class="p">]},</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_dict</span><span class="p">):</span>
         <span class="c1"># return observation dict, rewards dict, termination/truncation dicts, and infos dict</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;agent_1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">obs</span> <span class="n">of</span> <span class="n">agent_1</span><span class="p">]},</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span> <span class="o">...</span>
 </pre></div>
@@ -1466,7 +1466,7 @@ code. Your env decides, which agents start after an episode reset, which agents 
 terminate the episode early, and which agents stay in the episode until the entire episode ends.</p>
 <p>To define, which agent IDs might even show up in your episodes, set the <code class="code docutils literal notranslate"><span class="pre">self.possible_agents</span></code> attribute to a list of
 all possible agent ID.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
     <span class="o">...</span>
     <span class="c1"># Define all agent IDs that might even show up in your episodes.</span>
@@ -1478,7 +1478,7 @@ all possible agent ID.</p>
 you also need to permanently adjust the <code class="code docutils literal notranslate"><span class="pre">self.agents</span></code> attribute throughout the course of your episode.
 If - on the other hand - all agent IDs are static throughout your episodes, you can set <code class="code docutils literal notranslate"><span class="pre">self.agents</span></code> to be the same
 as <code class="code docutils literal notranslate"><span class="pre">self.possible_agents</span></code> and don’t change its value throughout the rest of your code:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
     <span class="o">...</span>
     <span class="c1"># If your agents never change throughout the episode, set</span>
@@ -1495,12 +1495,12 @@ as <code class="code docutils literal notranslate"><span class="pre">self.possib
 <p>Next, you should set the observation- and action-spaces of each (possible) agent ID in your constructor.
 Use the <code class="code docutils literal notranslate"><span class="pre">self.observation_spaces</span></code> and <code class="code docutils literal notranslate"><span class="pre">self.action_spaces</span></code> attributes to define dictionaries mapping
 agent IDs to the individual agents’ spaces. For example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="o">...</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="o">...</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">observation_spaces</span> <span class="o">=</span> <span class="p">{</span>
@@ -1519,7 +1519,7 @@ spaces, and you don’t want to create very large spaces dicts, you can also ove
 <a class="reference internal" href="package_ref/env/multi_agent_env.html#ray.rllib.env.multi_agent_env.MultiAgentEnv.get_observation_space" title="ray.rllib.env.multi_agent_env.MultiAgentEnv.get_observation_space"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_observation_space()</span></code></a> and
 <a class="reference internal" href="package_ref/env/multi_agent_env.html#ray.rllib.env.multi_agent_env.MultiAgentEnv.get_action_space" title="ray.rllib.env.multi_agent_env.MultiAgentEnv.get_action_space"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_action_space()</span></code></a> methods and implement the mapping logic
 from agent ID to space yourself. For example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">agent_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;robot_&quot;</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">gym</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">Box</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="p">(</span><span class="mi">84</span><span class="p">,</span> <span class="mi">84</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">agent_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;decision_maker&quot;</span><span class="p">):</span>
@@ -1537,7 +1537,7 @@ you have to return observations and infos from <code class="code docutils litera
 from <code class="code docutils literal notranslate"><span class="pre">step()</span></code>, however, instead of individual values, these all have to be dictionaries mapping agent IDs to the respective
 individual agents’ values.</p>
 <p>Let’s take a look at an example <code class="code docutils literal notranslate"><span class="pre">reset()</span></code> implementation first:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="o">...</span>
     <span class="k">return</span> <span class="p">{</span>
         <span class="s2">&quot;agent_1&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span>
@@ -1607,12 +1607,12 @@ the actions “Rock”, “Paper”, or “Scissors”. After each move, the act
 Rock beats Scissors, Paper beats Rock, and Scissors beats Paper. The player winning the move receives
 a +1 reward, the losing player -1.</p>
 <p>Here is the initial class scaffold for your Rock-Paper-Scissors Game:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.env.multi_agent_env</span> <span class="kn">import</span> <span class="n">MultiAgentEnv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.multi_agent_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentEnv</span>
 
 
-<span class="k">class</span> <span class="nc">RockPaperScissors</span><span class="p">(</span><span class="n">MultiAgentEnv</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RockPaperScissors</span><span class="p">(</span><span class="n">MultiAgentEnv</span><span class="p">):</span>
     <span class="s2">&quot;&quot;&quot;Two-player environment for the famous rock paper scissors game.</span>
 
 </pre></div>
@@ -1643,7 +1643,7 @@ a +1 reward, the losing player -1.</p>
 </pre></div>
 </div>
 <p>Next, you can implement the constructor of your class:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">agents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">possible_agents</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;player1&quot;</span><span class="p">,</span> <span class="s2">&quot;player2&quot;</span><span class="p">]</span>
@@ -1664,7 +1664,7 @@ that the agents don’t change over the course of an episode and stay fixed at <
 expected to act simultaneously in the next <code class="code docutils literal notranslate"><span class="pre">step()</span></code> call) and reset a <code class="code docutils literal notranslate"><span class="pre">num_moves</span></code> counter
 that keeps track of the number of moves being played in order to terminate the episode after exactly
 10 timesteps (10 actions by either player):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_moves</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="c1"># The first observation should not matter (none of the agents has moved yet).</span>
@@ -1680,7 +1680,7 @@ that keeps track of the number of moves being played in order to terminate the e
 the opponent just chose), the rewards (+1 or -1 according to the winner/loser rules explained above),
 and the termination dict (you set the special <code class="code docutils literal notranslate"><span class="pre">__all__</span></code> agent ID to <code class="code docutils literal notranslate"><span class="pre">True</span></code> iff the number of moves
 has reached 10). The truncateds- and infos dicts always remain empty:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_dict</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_moves</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="n">move1</span> <span class="o">=</span> <span class="n">action_dict</span><span class="p">[</span><span class="s2">&quot;player1&quot;</span><span class="p">]</span>
@@ -1722,13 +1722,13 @@ place a piece on an already occupied field results in the board not changing at 
 moving player receiving a -5 reward as a penalty (in the original game, this move is
 simply not allowed and therefor can never happen).</p>
 <p>Here is your initial class scaffold for the Tic-Tac-Toe game:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.env.multi_agent_env</span> <span class="kn">import</span> <span class="n">MultiAgentEnv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.multi_agent_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentEnv</span>
 
 
-<span class="k">class</span> <span class="nc">TicTacToe</span><span class="p">(</span><span class="n">MultiAgentEnv</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TicTacToe</span><span class="p">(</span><span class="n">MultiAgentEnv</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A two-player game in which any player tries to complete one row in a 3x3 field.</span>
 
 <span class="sd">    The observation space is Box(0.0, 1.0, (9,)), where each index represents a distinct</span>
@@ -1754,7 +1754,7 @@ simply not allowed and therefor can never happen).</p>
 <p>In your constructor, make sure you define all possible agent IDs that can ever show up
 in your game (“player1” and “player2”), the currently active agent IDs (same as all
 possible agents), and each agent’s observation- and action space.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="c1"># Define the agents in the game.</span>
@@ -1783,7 +1783,7 @@ possible agents), and each agent’s observation- and action space.</p>
 pick a random start player, and return this start player’s first observation.
 Note that you don’t return the other player’s observation as this player isn’t
 acting next.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="p">[</span>
             <span class="mi">0</span><span class="p">,</span>
             <span class="mi">0</span><span class="p">,</span>
@@ -1812,7 +1812,7 @@ observation, because that’s the player you want to act next.</p>
 Did the current player win (the opponent lost)?
 Did the current player place a piece on an already occupied field (gets penalized)?
 Is the game done because the board is full (both agents receive 0 reward)?</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_dict</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_dict</span><span class="p">):</span>
         <span class="n">action</span> <span class="o">=</span> <span class="n">action_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_player</span><span class="p">]</span>
 
         <span class="c1"># Create a rewards-dict (containing the rewards of the agent that just acted).</span>
@@ -1888,7 +1888,7 @@ or to specialized multi-agent policies that implement centralized training, but
 decentralized execution.</p>
 <p>You can use the <a class="reference internal" href="package_ref/env/multi_agent_env.html#ray.rllib.env.multi_agent_env.MultiAgentEnv.with_agent_groups" title="ray.rllib.env.multi_agent_env.MultiAgentEnv.with_agent_groups"><code class="xref py py-meth docutils literal notranslate"><span class="pre">with_agent_groups()</span></code></a>
 method to define these groups:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="nf">with_agent_groups</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span><span class="w"> </span><span class="nf">with_agent_groups</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">groups</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">AgentID</span><span class="p">]],</span>
         <span class="n">obs_space</span><span class="p">:</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1935,7 +1935,7 @@ method to define these groups:</p>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="kn">from</span> <span class="nn">ray.rllib.env.wrappers.group_agents_wrapper</span> <span class="kn">import</span> \
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.wrappers.group_agents_wrapper</span><span class="w"> </span><span class="kn">import</span> \
             <span class="n">GroupAgentsWrapper</span>
         <span class="k">return</span> <span class="n">GroupAgentsWrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">obs_space</span><span class="p">,</span> <span class="n">act_space</span><span class="p">)</span>
 
@@ -1954,11 +1954,11 @@ various third-party APIs and libraries to implement custom multi-agent envs.</p>
 <p><a class="reference external" href="https://pettingzoo.farama.org">PettingZoo</a> offers a repository of over 50 diverse
 multi-agent environments, directly compatible with RLlib through the built-in
 <code class="xref py py-class docutils literal notranslate"><span class="pre">PettingZooEnv</span></code> wrapper:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pettingzoo.butterfly</span> <span class="kn">import</span> <span class="n">pistonball_v6</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pettingzoo.butterfly</span><span class="w"> </span><span class="kn">import</span> <span class="n">pistonball_v6</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.wrappers.pettingzoo_env</span> <span class="kn">import</span> <span class="n">PettingZooEnv</span>
-<span class="kn">from</span> <span class="nn">ray.tune.registry</span> <span class="kn">import</span> <span class="n">register_env</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.wrappers.pettingzoo_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">PettingZooEnv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_env</span>
 
 <span class="n">register_env</span><span class="p">(</span>
     <span class="s2">&quot;pistonball&quot;</span><span class="p">,</span>
@@ -1981,11 +1981,11 @@ for an end-to-env example with the <a class="reference external" href="https://p
 designed for research and development in multi-agent reinforcement learning, game theory, and decision-making.
 The API is directly compatible with RLlib through the built-in
 <code class="xref py py-class docutils literal notranslate"><span class="pre">PettingZooEnv</span></code> wrapper:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyspiel</span>  <span class="c1"># pip install open_spiel</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyspiel</span>  <span class="c1"># pip install open_spiel</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.wrappers.open_spiel</span> <span class="kn">import</span> <span class="n">OpenSpielEnv</span>
-<span class="kn">from</span> <span class="nn">ray.tune.registry</span> <span class="kn">import</span> <span class="n">register_env</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.wrappers.open_spiel</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenSpielEnv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_env</span>
 
 <span class="n">register_env</span><span class="p">(</span>
     <span class="s2">&quot;open_spiel_env&quot;</span><span class="p">,</span>
@@ -2003,9 +2003,9 @@ of OpenSpiel trained by an RLlib algorithm, using a self-play strategy.</p>
 <h2>Running actual Training Experiments with a MultiAgentEnv<a class="headerlink" href="#running-actual-training-experiments-with-a-multiagentenv" title="Link to this heading">#</a></h2>
 <p>If all agents use the same algorithm class to train their policies, configure
 multi-agent training as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithm.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModuleSpec</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithm.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">PPOConfig</span><span class="p">()</span>
@@ -2035,7 +2035,7 @@ multi-agent training as follows:</p>
 </div>
 <p>To exclude certain policies from being updated, use the <code class="docutils literal notranslate"><span class="pre">config.multi_agent(policies_to_train=[..])</span></code> config setting.
 This allows running in multi-agent environments with a mix of non-learning and learning policies:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">policy_mapping_fn</span><span class="p">(</span><span class="n">agent_id</span><span class="p">,</span> <span class="n">episode</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">policy_mapping_fn</span><span class="p">(</span><span class="n">agent_id</span><span class="p">,</span> <span class="n">episode</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">agent_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">agent_id</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># 0 (player1) or 1 (player2)</span>
     <span class="k">return</span> <span class="s2">&quot;learning_policy&quot;</span> <span class="k">if</span> <span class="n">episode</span><span class="o">.</span><span class="n">id_</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="n">agent_idx</span> <span class="k">else</span> <span class="s2">&quot;random_policy&quot;</span>
 

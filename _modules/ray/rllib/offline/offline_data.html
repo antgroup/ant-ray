@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,23 +1389,23 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.offline.offline_data</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span> <span class="nn">pyarrow.fs</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">types</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core</span> <span class="kn">import</span> <span class="n">COMPONENT_RL_MODULE</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env</span> <span class="kn">import</span> <span class="n">INPUT_ENV_SPACES</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.offline.offline_prelearner</span> <span class="kn">import</span> <span class="n">OfflinePreLearner</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils</span> <span class="kn">import</span> <span class="n">force_list</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">COMPONENT_RL_MODULE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env</span><span class="w"> </span><span class="kn">import</span> <span class="n">INPUT_ENV_SPACES</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.offline.offline_prelearner</span><span class="w"> </span><span class="kn">import</span> <span class="n">OfflinePreLearner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">force_list</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">OverrideToImplementCustomLogic</span><span class="p">,</span>
     <span class="n">OverrideToImplementCustomLogic_CallToSuperRecommended</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1413,11 +1413,11 @@ document.write(`
 <div class="viewcode-block" id="OfflineData">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.offline.offline_data.OfflineData.html#ray.rllib.offline.offline_data.OfflineData">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">OfflineData</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OfflineData</span><span class="p">:</span>
 <div class="viewcode-block" id="OfflineData.__init__">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.offline.offline_data.OfflineData.__init__.html#ray.rllib.offline.offline_data.OfflineData.__init__">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic_CallToSuperRecommended</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AlgorithmConfig</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AlgorithmConfig</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_multi_agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">is_multi_agent</span>
@@ -1452,13 +1452,13 @@ document.write(`
         <span class="c1"># this filesystem is specifically needed, if a session has to be created</span>
         <span class="c1"># with the cloud provider.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filesystem</span> <span class="o">==</span> <span class="s2">&quot;gcs&quot;</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">gcsfs</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">gcsfs</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">filesystem_object</span> <span class="o">=</span> <span class="n">gcsfs</span><span class="o">.</span><span class="n">GCSFileSystem</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">filesystem_kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">filesystem</span> <span class="o">==</span> <span class="s2">&quot;s3&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">filesystem_object</span> <span class="o">=</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">filesystem_kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">filesystem</span> <span class="o">==</span> <span class="s2">&quot;abs&quot;</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">adlfs</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">adlfs</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">filesystem_object</span> <span class="o">=</span> <span class="n">adlfs</span><span class="o">.</span><span class="n">AzureBlobFileSystem</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">filesystem_kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filesystem</span><span class="p">,</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">):</span>
@@ -1513,7 +1513,7 @@ document.write(`
 <div class="viewcode-block" id="OfflineData.sample">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.offline.offline_data.OfflineData.sample.html#ray.rllib.offline.offline_data.OfflineData.sample">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">return_iterator</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1653,14 +1653,14 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">default_map_batches_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default_map_batches_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;concurrency&quot;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">num_learners</span><span class="p">),</span>
             <span class="s2">&quot;zero_copy_batch&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">default_iter_batches_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default_iter_batches_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;prefetch_batches&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
         <span class="p">}</span></div>

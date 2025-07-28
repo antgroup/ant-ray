@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,40 +1389,40 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.air.integrations.wandb</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">enum</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">urllib</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
-<span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">ModuleType</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numbers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Number</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModuleType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pyarrow.fs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">logger</span>
-<span class="kn">from</span> <span class="nn">ray._private.utils</span> <span class="kn">import</span> <span class="n">load_class</span>
-<span class="kn">from</span> <span class="nn">ray.air._internal</span> <span class="kn">import</span> <span class="n">usage</span> <span class="k">as</span> <span class="n">air_usage</span>
-<span class="kn">from</span> <span class="nn">ray.air.constants</span> <span class="kn">import</span> <span class="n">TRAINING_ITERATION</span>
-<span class="kn">from</span> <span class="nn">ray.air.util.node</span> <span class="kn">import</span> <span class="n">_force_on_current_node</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.session</span> <span class="kn">import</span> <span class="n">get_session</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.syncer</span> <span class="kn">import</span> <span class="n">DEFAULT_SYNC_TIMEOUT</span>
-<span class="kn">from</span> <span class="nn">ray.tune.experiment</span> <span class="kn">import</span> <span class="n">Trial</span>
-<span class="kn">from</span> <span class="nn">ray.tune.logger</span> <span class="kn">import</span> <span class="n">LoggerCallback</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils</span> <span class="kn">import</span> <span class="n">flatten_dict</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
-<span class="kn">from</span> <span class="nn">ray.util.queue</span> <span class="kn">import</span> <span class="n">Queue</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_class</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal</span><span class="w"> </span><span class="kn">import</span> <span class="n">usage</span> <span class="k">as</span> <span class="n">air_usage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRAINING_ITERATION</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.util.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">_force_on_current_node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_session</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.syncer</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_SYNC_TIMEOUT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggerCallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.queue</span><span class="w"> </span><span class="kn">import</span> <span class="n">Queue</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">wandb</span>
-    <span class="kn">from</span> <span class="nn">wandb.sdk.data_types.base_types.wb_value</span> <span class="kn">import</span> <span class="n">WBValue</span>
-    <span class="kn">from</span> <span class="nn">wandb.sdk.data_types.image</span> <span class="kn">import</span> <span class="n">Image</span>
-    <span class="kn">from</span> <span class="nn">wandb.sdk.data_types.video</span> <span class="kn">import</span> <span class="n">Video</span>
-    <span class="kn">from</span> <span class="nn">wandb.sdk.lib.disabled</span> <span class="kn">import</span> <span class="n">RunDisabled</span>
-    <span class="kn">from</span> <span class="nn">wandb.util</span> <span class="kn">import</span> <span class="n">json_dumps_safer</span>
-    <span class="kn">from</span> <span class="nn">wandb.wandb_run</span> <span class="kn">import</span> <span class="n">Run</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">wandb.sdk.data_types.base_types.wb_value</span><span class="w"> </span><span class="kn">import</span> <span class="n">WBValue</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">wandb.sdk.data_types.image</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">wandb.sdk.data_types.video</span><span class="w"> </span><span class="kn">import</span> <span class="n">Video</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">wandb.sdk.lib.disabled</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunDisabled</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">wandb.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">json_dumps_safer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">wandb.wandb_run</span><span class="w"> </span><span class="kn">import</span> <span class="n">Run</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">wandb</span> <span class="o">=</span> <span class="n">json_dumps_safer</span> <span class="o">=</span> <span class="n">Run</span> <span class="o">=</span> <span class="n">RunDisabled</span> <span class="o">=</span> <span class="n">WBValue</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -1453,7 +1453,7 @@ document.write(`
 <div class="viewcode-block" id="setup_wandb">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.air.integrations.wandb.setup_wandb.html#ray.air.integrations.wandb.setup_wandb">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">setup_wandb</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_wandb</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">api_key_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1541,7 +1541,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_setup_wandb</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_setup_wandb</span><span class="p">(</span>
     <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">trial_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1594,7 +1594,7 @@ document.write(`
     <span class="k">return</span> <span class="n">run</span>
 
 
-<span class="k">def</span> <span class="nf">_is_allowed_type</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_allowed_type</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return True if type is allowed for logging to wandb&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">Number</span><span class="p">)</span>
@@ -1603,7 +1603,7 @@ document.write(`
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="n">Number</span><span class="p">,</span> <span class="n">WBValue</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">_clean_log</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_clean_log</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
     <span class="c1"># Fixes https://github.com/ray-project/ray/issues/10631</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_clean_log</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
@@ -1660,7 +1660,7 @@ document.write(`
         <span class="k">return</span> <span class="n">fallback</span>
 
 
-<span class="k">def</span> <span class="nf">_get_wandb_project</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_wandb_project</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get W&amp;B project from environment variable or external hook if not passed</span>
 <span class="sd">    as and argument.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">(</span>
@@ -1685,7 +1685,7 @@ document.write(`
     <span class="k">return</span> <span class="n">project</span>
 
 
-<span class="k">def</span> <span class="nf">_set_api_key</span><span class="p">(</span><span class="n">api_key_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_api_key</span><span class="p">(</span><span class="n">api_key_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set WandB API key from `wandb_config`. Will pop the</span>
 <span class="sd">    `api_key_file` and `api_key` keys from `wandb_config` parameter.</span>
 
@@ -1733,7 +1733,7 @@ document.write(`
         <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_run_wandb_process_run_info_hook</span><span class="p">(</span><span class="n">run</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_wandb_process_run_info_hook</span><span class="p">(</span><span class="n">run</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run external hook to process information about wandb run&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">WANDB_PROCESS_RUN_INFO_HOOK</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1744,13 +1744,13 @@ document.write(`
             <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_QueueItem</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_QueueItem</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">END</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
     <span class="n">RESULT</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
     <span class="n">CHECKPOINT</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
 
 
-<span class="k">class</span> <span class="nc">_WandbLoggingActor</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_WandbLoggingActor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Wandb assumes that each trial&#39;s information should be logged from a</span>
 <span class="sd">    separate process. We use Ray actors as forking multiprocessing</span>
@@ -1765,7 +1765,7 @@ document.write(`
 <span class="sd">    - If it&#39;s a checkpoint object, it will be saved using ``wandb.log_artifact()``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">logdir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">,</span>
@@ -1774,7 +1774,7 @@ document.write(`
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="kn">import</span> <span class="nn">wandb</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_wandb</span> <span class="o">=</span> <span class="n">wandb</span>
 
@@ -1788,7 +1788,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_trial_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logdir</span> <span class="o">=</span> <span class="n">logdir</span>
 
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Since we&#39;re running in a separate process already, use threads.</span>
         <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;WANDB_START_METHOD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;thread&quot;</span>
         <span class="n">run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wandb</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
@@ -1816,14 +1816,14 @@ document.write(`
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Failed to log result to w&amp;b: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wandb</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_handle_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">artifact</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wandb</span><span class="o">.</span><span class="n">Artifact</span><span class="p">(</span>
             <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;checkpoint_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_trial_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;model&quot;</span>
         <span class="p">)</span>
         <span class="n">artifact</span><span class="o">.</span><span class="n">add_dir</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wandb</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="n">artifact</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_handle_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]:</span>
         <span class="n">config_update</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">log</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">flat_result</span> <span class="o">=</span> <span class="n">flatten_dict</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
@@ -1845,7 +1845,7 @@ document.write(`
 <div class="viewcode-block" id="WandbLoggerCallback">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.air.integrations.wandb.WandbLoggerCallback.html#ray.air.integrations.wandb.WandbLoggerCallback">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">WandbLoggerCallback</span><span class="p">(</span><span class="n">LoggerCallback</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WandbLoggerCallback</span><span class="p">(</span><span class="n">LoggerCallback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;WandbLoggerCallback</span>
 
 <span class="sd">    Weights and biases (https://www.wandb.ai/) is a tool for experiment</span>
@@ -1930,7 +1930,7 @@ document.write(`
 
     <span class="n">_logger_actor_cls</span> <span class="o">=</span> <span class="n">_WandbLoggingActor</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">project</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">group</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1974,7 +1974,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_logging_future_to_trial</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">,</span> <span class="s2">&quot;Trial&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_trial_queues</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">Queue</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api_key_file</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_key_path</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key_path</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="p">)</span>
@@ -1989,7 +1989,7 @@ document.write(`
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">WANDB_GROUP_ENV_VAR</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">WANDB_GROUP_ENV_VAR</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">log_trial_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">trial</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="n">config</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;callbacks&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># Remove callbacks</span>
@@ -2033,7 +2033,7 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_start_logging_actor</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">exclude_results</span><span class="p">,</span> <span class="o">**</span><span class="n">wandb_init_kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_start_logging_actor</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_start_logging_actor</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">exclude_results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">**</span><span class="n">wandb_init_kwargs</span>
     <span class="p">):</span>
         <span class="c1"># Reuse actor if one already exists.</span>
@@ -2073,17 +2073,17 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_trial_logging_futures</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span> <span class="o">=</span> <span class="n">logging_future</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logging_future_to_trial</span><span class="p">[</span><span class="n">logging_future</span><span class="p">]</span> <span class="o">=</span> <span class="n">trial</span>
 
-    <span class="k">def</span> <span class="nf">_signal_logging_actor_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_signal_logging_actor_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_trial_queues</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">_QueueItem</span><span class="o">.</span><span class="n">END</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">log_trial_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">trial</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial_logging_actors</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_trial_start</span><span class="p">(</span><span class="n">trial</span><span class="p">)</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="n">_clean_log</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_trial_queues</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">_QueueItem</span><span class="o">.</span><span class="n">RESULT</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">log_trial_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">upload_checkpoints</span> <span class="ow">and</span> <span class="n">trial</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">:</span>
             <span class="n">checkpoint_root</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trial</span><span class="o">.</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">filesystem</span><span class="p">,</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">LocalFileSystem</span><span class="p">):</span>
@@ -2092,17 +2092,17 @@ document.write(`
             <span class="k">if</span> <span class="n">checkpoint_root</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_trial_queues</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">_QueueItem</span><span class="o">.</span><span class="n">CHECKPOINT</span><span class="p">,</span> <span class="n">checkpoint_root</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">log_trial_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">failed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">failed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_signal_logging_actor_stop</span><span class="p">(</span><span class="n">trial</span><span class="o">=</span><span class="n">trial</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_logging_actors</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_cleanup_logging_actor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cleanup_logging_actor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial_queues</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial_logging_futures</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span>
         <span class="n">ray</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_trial_logging_actors</span><span class="p">[</span><span class="n">trial</span><span class="p">])</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial_logging_actors</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_cleanup_logging_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">kill_on_timeout</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cleanup_logging_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">kill_on_timeout</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Clean up logging actors that have finished uploading to wandb.</span>
 <span class="sd">        Waits for `timeout` seconds to collect finished logging actors.</span>
 
@@ -2128,13 +2128,13 @@ document.write(`
 
 <div class="viewcode-block" id="WandbLoggerCallback.on_experiment_end">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.air.integrations.wandb.WandbLoggerCallback.on_experiment_end.html#ray.air.integrations.wandb.WandbLoggerCallback.on_experiment_end">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_experiment_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">],</span> <span class="o">**</span><span class="n">info</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_experiment_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">],</span> <span class="o">**</span><span class="n">info</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Wait for the actors to finish their call to `wandb.finish`.</span>
 <span class="sd">        This includes uploading all logs + artifacts to wandb.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_logging_actors</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_upload_timeout</span><span class="p">,</span> <span class="n">kill_on_timeout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">ray</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_trial_logging_actors</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_signal_logging_actor_stop</span><span class="p">(</span><span class="n">trial</span><span class="o">=</span><span class="n">trial</span><span class="p">)</span>

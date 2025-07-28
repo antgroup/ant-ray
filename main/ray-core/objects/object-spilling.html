@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1410,8 +1410,8 @@ document.write(`
 <h2>Single node<a class="headerlink" href="#single-node" title="Link to this heading">#</a></h2>
 <p>Ray uses object spilling by default. Without any setting, objects are spilled to <code class="code docutils literal notranslate"><span class="pre">[temp_folder]/spill</span></code>. On Linux and MacOS, the <code class="code docutils literal notranslate"><span class="pre">temp_folder</span></code> is <code class="code docutils literal notranslate"><span class="pre">/tmp</span></code> by default.</p>
 <p>To configure the directory where objects are spilled to, use:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
     <span class="n">_system_config</span><span class="o">=</span><span class="p">{</span>
@@ -1424,8 +1424,8 @@ document.write(`
 </div>
 <p>You can also specify multiple directories for spilling to spread the IO load and disk space
 usage across multiple physical devices if needed (e.g., SSD devices):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
     <span class="n">_system_config</span><span class="o">=</span><span class="p">{</span>
@@ -1453,8 +1453,8 @@ usage across multiple physical devices if needed (e.g., SSD devices):</p>
 <p>To optimize the performance, it is recommended to use an SSD instead of an HDD when using object spilling for memory-intensive workloads.</p>
 </div>
 <p>If you are using an HDD, it is recommended that you specify a large buffer size (&gt; 1MB) to reduce IO requests during spilling.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
     <span class="n">_system_config</span><span class="o">=</span><span class="p">{</span>
@@ -1474,8 +1474,8 @@ usage across multiple physical devices if needed (e.g., SSD devices):</p>
 <p>To prevent running out of disk space, local object spilling will throw <code class="docutils literal notranslate"><span class="pre">OutOfDiskError</span></code> if the disk utilization exceeds the predefined threshold.
 If multiple physical devices are used, any physical device’s over-usage will trigger the <code class="docutils literal notranslate"><span class="pre">OutOfDiskError</span></code>.
 The default threshold is 0.95 (95%). You can adjust the threshold by setting <code class="docutils literal notranslate"><span class="pre">local_fs_capacity_threshold</span></code>, or set it to 1 to disable the protection.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
     <span class="n">_system_config</span><span class="o">=</span><span class="p">{</span>
@@ -1495,8 +1495,8 @@ The default threshold is 0.95 (95%). You can adjust the threshold by setting <co
 </pre></div>
 </div>
 <p>To enable object spilling to remote storage (any URI supported by <a class="reference external" href="https://pypi.org/project/smart-open/">smart_open</a>):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>  <span class="kn">import</span> <span class="nn">json</span>
-  <span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>  <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+  <span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
   <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
       <span class="n">_system_config</span><span class="o">=</span><span class="p">{</span>
@@ -1517,8 +1517,8 @@ The default threshold is 0.95 (95%). You can adjust the threshold by setting <co
 </div>
 <p>It is recommended that you specify a large buffer size (&gt; 1MB) to reduce IO requests during spilling.</p>
 <p>Spilling to multiple remote storages is also supported.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>  <span class="kn">import</span> <span class="nn">json</span>
-  <span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>  <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+  <span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
   <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
       <span class="n">_system_config</span><span class="o">=</span><span class="p">{</span>

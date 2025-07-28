@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,45 +1389,45 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.core.rl_module.rl_module</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">abc</span>
-<span class="kn">import</span> <span class="nn">dataclasses</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.core</span> <span class="kn">import</span> <span class="n">DEFAULT_MODULE_ID</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.columns</span> <span class="kn">import</span> <span class="n">Columns</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.models.specs.typing</span> <span class="kn">import</span> <span class="n">SpecType</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.default_model_config</span> <span class="kn">import</span> <span class="n">DefaultModelConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.models.distributions</span> <span class="kn">import</span> <span class="n">Distribution</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_MODULE_ID</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.columns</span><span class="w"> </span><span class="kn">import</span> <span class="n">Columns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.models.specs.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.default_model_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultModelConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.models.distributions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Distribution</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">override</span><span class="p">,</span>
     <span class="n">OverrideToImplementCustomLogic</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.checkpoints</span> <span class="kn">import</span> <span class="n">Checkpointable</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.checkpoints</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpointable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Deprecated</span><span class="p">,</span>
     <span class="n">DEPRECATED_VALUE</span><span class="p">,</span>
     <span class="n">deprecation_warning</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.framework</span> <span class="kn">import</span> <span class="n">try_import_torch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.serialization</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">try_import_torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.serialization</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">gym_space_from_dict</span><span class="p">,</span>
     <span class="n">gym_space_to_dict</span><span class="p">,</span>
     <span class="n">serialize_type</span><span class="p">,</span>
     <span class="n">deserialize_type</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">StateDict</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">StateDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">MultiRLModule</span><span class="p">,</span>
         <span class="n">MultiRLModuleSpec</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.core.models.catalog</span> <span class="kn">import</span> <span class="n">Catalog</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.models.catalog</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;ray.rllib&quot;</span><span class="p">)</span>
 <span class="n">torch</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">try_import_torch</span><span class="p">()</span>
@@ -1437,7 +1437,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.html#ray.rllib.core.rl_module.multi_rl_module.RLModuleSpec">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">RLModuleSpec</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RLModuleSpec</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Utility spec class to make constructing RLModules (in single-agent case) easier.</span>
 
 <span class="sd">    Args:</span>
@@ -1474,7 +1474,7 @@ document.write(`
     <span class="c1"># Deprecated field.</span>
     <span class="n">model_config_dict</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_config_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">deprecation_warning</span><span class="p">(</span>
                 <span class="n">old</span><span class="o">=</span><span class="s2">&quot;RLModuleSpec(model_config_dict=..)&quot;</span><span class="p">,</span>
@@ -1484,7 +1484,7 @@ document.write(`
 
 <div class="viewcode-block" id="RLModuleSpec.build">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.build.html#ray.rllib.core.rl_module.multi_rl_module.RLModuleSpec.build">[docs]</a>
-    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RLModule&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RLModule&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the RLModule from this spec.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">module_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;RLModule class is not set.&quot;</span><span class="p">)</span>
@@ -1510,8 +1510,8 @@ document.write(`
 
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_module</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="s2">&quot;RLModule&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RLModuleSpec&quot;</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="n">MultiRLModule</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_module</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="s2">&quot;RLModule&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RLModuleSpec&quot;</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiRLModule</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">MultiRLModule</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;MultiRLModule cannot be converted to RLModuleSpec.&quot;</span><span class="p">)</span>
@@ -1546,7 +1546,7 @@ document.write(`
 
 <div class="viewcode-block" id="RLModuleSpec.to_dict">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.to_dict.html#ray.rllib.core.rl_module.multi_rl_module.RLModuleSpec.to_dict">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a serialized representation of the spec.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;module_class&quot;</span><span class="p">:</span> <span class="n">serialize_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module_class</span><span class="p">),</span>
@@ -1564,7 +1564,7 @@ document.write(`
 <div class="viewcode-block" id="RLModuleSpec.from_dict">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.from_dict.html#ray.rllib.core.rl_module.multi_rl_module.RLModuleSpec.from_dict">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a single agent RLModule spec from a serialized representation.&quot;&quot;&quot;</span>
         <span class="n">module_class</span> <span class="o">=</span> <span class="n">deserialize_type</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;module_class&quot;</span><span class="p">])</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1597,7 +1597,7 @@ document.write(`
 
 <div class="viewcode-block" id="RLModuleSpec.update">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.update.html#ray.rllib.core.rl_module.multi_rl_module.RLModuleSpec.update">[docs]</a>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">override</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">override</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates this spec with the given other spec. Works like dict.update().</span>
 
 <span class="sd">        Args:</span>
@@ -1632,9 +1632,9 @@ document.write(`
 
 <div class="viewcode-block" id="RLModuleSpec.as_multi_rl_module_spec">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.as_multi_rl_module_spec.html#ray.rllib.core.rl_module.multi_rl_module.RLModuleSpec.as_multi_rl_module_spec">[docs]</a>
-    <span class="k">def</span> <span class="nf">as_multi_rl_module_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiRLModuleSpec&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_multi_rl_module_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiRLModuleSpec&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a MultiRLModuleSpec (`self` under DEFAULT_MODULE_ID key).&quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
 
         <span class="k">return</span> <span class="n">MultiRLModuleSpec</span><span class="p">(</span>
             <span class="n">rl_module_specs</span><span class="o">=</span><span class="p">{</span><span class="n">DEFAULT_MODULE_ID</span><span class="p">:</span> <span class="bp">self</span><span class="p">},</span>
@@ -1642,7 +1642,7 @@ document.write(`
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_get_model_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_model_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">dataclasses</span><span class="o">.</span><span class="n">asdict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_config</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">is_dataclass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_config</span><span class="p">)</span>
@@ -1653,7 +1653,7 @@ document.write(`
         <span class="n">new</span><span class="o">=</span><span class="s2">&quot;RLModule(*, observation_space=.., action_space=.., ....)&quot;</span><span class="p">,</span>
         <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_rl_module_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_rl_module_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">RLModuleConfig</span><span class="p">(</span>
             <span class="n">observation_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">,</span>
             <span class="n">action_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="p">,</span>
@@ -1668,7 +1668,7 @@ document.write(`
 <div class="viewcode-block" id="RLModule">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.html#ray.rllib.core.rl_module.multi_rl_module.RLModule">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RLModule</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RLModule</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for RLlib modules.</span>
 
 <span class="sd">    Subclasses should call `super().__init__(observation_space=.., action_space=..,</span>
@@ -1797,7 +1797,7 @@ document.write(`
 
     <span class="n">STATE_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;module_state&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">config</span><span class="o">=</span><span class="n">DEPRECATED_VALUE</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1881,7 +1881,7 @@ document.write(`
 <div class="viewcode-block" id="RLModule.setup">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.setup.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.setup">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets up the components of the module.</span>
 
 <span class="sd">        This is called automatically during the __init__ method of this class,</span>
@@ -1895,7 +1895,7 @@ document.write(`
 <div class="viewcode-block" id="RLModule.get_exploration_action_dist_cls">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.get_exploration_action_dist_cls.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.get_exploration_action_dist_cls">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">get_exploration_action_dist_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Distribution</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_exploration_action_dist_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Distribution</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the action distribution class for this RLModule used for exploration.</span>
 
 <span class="sd">        This class is used to create action distributions from outputs of the</span>
@@ -1913,7 +1913,7 @@ document.write(`
 <div class="viewcode-block" id="RLModule.get_inference_action_dist_cls">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.get_inference_action_dist_cls.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.get_inference_action_dist_cls">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">get_inference_action_dist_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Distribution</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_inference_action_dist_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Distribution</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the action distribution class for this RLModule used for inference.</span>
 
 <span class="sd">        This class is used to create action distributions from outputs of the forward</span>
@@ -1931,7 +1931,7 @@ document.write(`
 <div class="viewcode-block" id="RLModule.get_train_action_dist_cls">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.get_train_action_dist_cls.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.get_train_action_dist_cls">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">get_train_action_dist_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Distribution</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_train_action_dist_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">Distribution</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the action distribution class for this RLModule used for training.</span>
 
 <span class="sd">        This class is used to get the correct action distribution class to be used by</span>
@@ -1949,7 +1949,7 @@ document.write(`
 <div class="viewcode-block" id="RLModule._forward">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule._forward.html#ray.rllib.core.rl_module.multi_rl_module.RLModule._forward">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generic forward pass method, used in all phases of training and evaluation.</span>
 
 <span class="sd">        If you need a more nuanced distinction between forward passes in the different</span>
@@ -1974,7 +1974,7 @@ document.write(`
 
 <div class="viewcode-block" id="RLModule.forward_inference">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.forward_inference.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.forward_inference">[docs]</a>
-    <span class="k">def</span> <span class="nf">forward_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;DO NOT OVERRIDE! Forward-pass during evaluation, called from the sampler.</span>
 
 <span class="sd">        This method should not be overridden. Override the `self._forward_inference()`</span>
@@ -1995,7 +1995,7 @@ document.write(`
 <div class="viewcode-block" id="RLModule._forward_inference">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule._forward_inference.html#ray.rllib.core.rl_module.multi_rl_module.RLModule._forward_inference">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">_forward_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward-pass used for action computation without exploration behavior.</span>
 
 <span class="sd">        Override this method only, if you need specific behavior for non-exploratory</span>
@@ -2010,7 +2010,7 @@ document.write(`
 
 <div class="viewcode-block" id="RLModule.forward_exploration">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.forward_exploration.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.forward_exploration">[docs]</a>
-    <span class="k">def</span> <span class="nf">forward_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;DO NOT OVERRIDE! Forward-pass during exploration, called from the sampler.</span>
 
 <span class="sd">        This method should not be overridden. Override the `self._forward_exploration()`</span>
@@ -2031,7 +2031,7 @@ document.write(`
 <div class="viewcode-block" id="RLModule._forward_exploration">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule._forward_exploration.html#ray.rllib.core.rl_module.multi_rl_module.RLModule._forward_exploration">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">_forward_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward-pass used for action computation with exploration behavior.</span>
 
 <span class="sd">        Override this method only, if you need specific behavior for exploratory</span>
@@ -2046,7 +2046,7 @@ document.write(`
 
 <div class="viewcode-block" id="RLModule.forward_train">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.forward_train.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.forward_train">[docs]</a>
-    <span class="k">def</span> <span class="nf">forward_train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward_train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;DO NOT OVERRIDE! Forward-pass during training called from the learner.</span>
 
 <span class="sd">        This method should not be overridden. Override the `self._forward_train()`</span>
@@ -2073,7 +2073,7 @@ document.write(`
 <div class="viewcode-block" id="RLModule._forward_train">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule._forward_train.html#ray.rllib.core.rl_module.multi_rl_module.RLModule._forward_train">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">_forward_train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward-pass used before the loss computation (training).</span>
 
 <span class="sd">        Override this method only, if you need specific behavior and outputs for your</span>
@@ -2088,7 +2088,7 @@ document.write(`
 <div class="viewcode-block" id="RLModule.get_initial_state">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.get_initial_state.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.get_initial_state">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">get_initial_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_initial_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the initial state of the RLModule, in case this is a stateful module.</span>
 
 <span class="sd">        Returns:</span>
@@ -2101,7 +2101,7 @@ document.write(`
 <div class="viewcode-block" id="RLModule.is_stateful">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.is_stateful.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.is_stateful">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">is_stateful</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_stateful</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;By default, returns False if the initial state is an empty dict (or None).</span>
 
 <span class="sd">        By default, RLlib assumes that the module is non-recurrent, if the initial</span>
@@ -2120,7 +2120,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.get_state.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.get_state">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">components</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2147,12 +2147,12 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.set_state.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.set_state">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">pass</span></div>
 
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_ctor_args_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ctor_args_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="p">(),</span>  <span class="c1"># *args</span>
             <span class="p">{</span>
@@ -2169,9 +2169,9 @@ document.write(`
 
 <div class="viewcode-block" id="RLModule.as_multi_rl_module">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.as_multi_rl_module.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.as_multi_rl_module">[docs]</a>
-    <span class="k">def</span> <span class="nf">as_multi_rl_module</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiRLModule&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_multi_rl_module</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiRLModule&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a multi-agent wrapper around this module.&quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="n">MultiRLModule</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiRLModule</span>
 
         <span class="n">multi_rl_module</span> <span class="o">=</span> <span class="n">MultiRLModule</span><span class="p">(</span>
             <span class="n">rl_module_specs</span><span class="o">=</span><span class="p">{</span><span class="n">DEFAULT_MODULE_ID</span><span class="p">:</span> <span class="n">RLModuleSpec</span><span class="o">.</span><span class="n">from_module</span><span class="p">(</span><span class="bp">self</span><span class="p">)}</span>
@@ -2181,7 +2181,7 @@ document.write(`
 
 <div class="viewcode-block" id="RLModule.unwrapped">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.unwrapped.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.unwrapped">[docs]</a>
-    <span class="k">def</span> <span class="nf">unwrapped</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RLModule&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unwrapped</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;RLModule&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the underlying module if this module is a wrapper.</span>
 
 <span class="sd">        An example of a wrapped is the TorchDDPRLModule class, which wraps</span>
@@ -2193,41 +2193,41 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
-    <span class="k">def</span> <span class="nf">output_specs_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_specs_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">Columns</span><span class="o">.</span><span class="n">ACTION_DIST_INPUTS</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">output_specs_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_specs_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">Columns</span><span class="o">.</span><span class="n">ACTION_DIST_INPUTS</span><span class="p">]</span>
 
 <div class="viewcode-block" id="RLModule.output_specs_train">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.output_specs_train.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.output_specs_train">[docs]</a>
-    <span class="k">def</span> <span class="nf">output_specs_train</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_specs_train</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the output specs of the forward_train method.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{}</span></div>
 
 
 <div class="viewcode-block" id="RLModule.input_specs_inference">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.input_specs_inference.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.input_specs_inference">[docs]</a>
-    <span class="k">def</span> <span class="nf">input_specs_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">input_specs_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the input specs of the forward_inference method.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_input_specs</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="RLModule.input_specs_exploration">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.input_specs_exploration.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.input_specs_exploration">[docs]</a>
-    <span class="k">def</span> <span class="nf">input_specs_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">input_specs_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the input specs of the forward_exploration method.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_input_specs</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="RLModule.input_specs_train">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.input_specs_train.html#ray.rllib.core.rl_module.multi_rl_module.RLModule.input_specs_train">[docs]</a>
-    <span class="k">def</span> <span class="nf">input_specs_train</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">input_specs_train</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the input specs of the forward_train method.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_input_specs</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_default_input_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_default_input_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the default input specs.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">Columns</span><span class="o">.</span><span class="n">OBS</span><span class="p">]</span></div>
 
@@ -2240,7 +2240,7 @@ document.write(`
     <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">RLModuleConfig</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RLModuleConfig</span><span class="p">:</span>
     <span class="n">observation_space</span><span class="p">:</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">action_space</span><span class="p">:</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">inference_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -2248,7 +2248,7 @@ document.write(`
     <span class="n">model_config_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
     <span class="n">catalog_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;Catalog&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Catalog&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Catalog&quot;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog_class</span><span class="p">(</span>
                 <span class="n">observation_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">,</span>
@@ -2257,7 +2257,7 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">catalog_class_path</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">serialize_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">catalog_class</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog_class</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
         <span class="p">)</span>
@@ -2271,7 +2271,7 @@ document.write(`
         <span class="p">}</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
         <span class="n">catalog_class</span> <span class="o">=</span> <span class="p">(</span>
             <span class="kc">None</span>
             <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;catalog_class_path&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span>

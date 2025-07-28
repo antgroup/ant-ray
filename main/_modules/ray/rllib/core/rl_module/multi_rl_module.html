@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,11 +1389,11 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.core.rl_module.multi_rl_module</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">dataclasses</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">pprint</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
     <span class="n">Collection</span><span class="p">,</span>
@@ -1409,29 +1409,29 @@ document.write(`
     <span class="n">ValuesView</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.core.models.specs.typing</span> <span class="kn">import</span> <span class="n">SpecType</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModule</span><span class="p">,</span> <span class="n">RLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils</span> <span class="kn">import</span> <span class="n">force_list</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.models.specs.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModule</span><span class="p">,</span> <span class="n">RLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">force_list</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">override</span><span class="p">,</span>
     <span class="n">OverrideToImplementCustomLogic</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.checkpoints</span> <span class="kn">import</span> <span class="n">Checkpointable</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.checkpoints</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpointable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Deprecated</span><span class="p">,</span>
     <span class="n">DEPRECATED_VALUE</span><span class="p">,</span>
     <span class="n">deprecation_warning</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.serialization</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.serialization</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">gym_space_from_dict</span><span class="p">,</span>
     <span class="n">gym_space_to_dict</span><span class="p">,</span>
     <span class="n">serialize_type</span><span class="p">,</span>
     <span class="n">deserialize_type</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">ModuleID</span><span class="p">,</span> <span class="n">StateDict</span><span class="p">,</span> <span class="n">T</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModuleID</span><span class="p">,</span> <span class="n">StateDict</span><span class="p">,</span> <span class="n">T</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;ray.rllib&quot;</span><span class="p">)</span>
 
@@ -1439,7 +1439,7 @@ document.write(`
 <div class="viewcode-block" id="MultiRLModule">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModule">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">MultiRLModule</span><span class="p">(</span><span class="n">RLModule</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiRLModule</span><span class="p">(</span><span class="n">RLModule</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for an RLModule that contains n sub-RLModules.</span>
 
 <span class="sd">    This class holds a mapping from ModuleID to underlying RLModules. It provides</span>
@@ -1466,7 +1466,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiRLModule.__init__">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.__init__.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">config</span><span class="o">=</span><span class="n">DEPRECATED_VALUE</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1534,7 +1534,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.setup.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.setup">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">RLModule</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets up the underlying, individual RLModules.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rl_modules</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># Make sure all individual RLModules have the same framework OR framework=None.</span>
@@ -1549,7 +1549,7 @@ document.write(`
 
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">RLModule</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_forward</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
@@ -1580,7 +1580,7 @@ document.write(`
         <span class="p">}</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">RLModule</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_forward_inference</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_inference</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward-pass used for action computation without exploration behavior.</span>
@@ -1598,7 +1598,7 @@ document.write(`
         <span class="p">}</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">RLModule</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_forward_exploration</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_exploration</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward-pass used for action computation with exploration behavior.</span>
@@ -1616,7 +1616,7 @@ document.write(`
         <span class="p">}</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">RLModule</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_forward_train</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_train</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward-pass used before the loss computation (training).</span>
@@ -1635,7 +1635,7 @@ document.write(`
 
     <span class="nd">@OverrideToImplementCustomLogic</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">RLModule</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_initial_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_initial_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="c1"># TODO (sven): Replace by call to `self.foreach_module`, but only if this method</span>
         <span class="c1">#  supports returning dicts.</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1645,7 +1645,7 @@ document.write(`
 
     <span class="nd">@OverrideToImplementCustomLogic</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">RLModule</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">is_stateful</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_stateful</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="n">initial_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_initial_state</span><span class="p">()</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">initial_state</span><span class="p">,</span> <span class="nb">dict</span><span class="p">),</span> <span class="p">(</span>
             <span class="s2">&quot;The initial state of an RLModule must be a dict, but is &quot;</span>
@@ -1655,7 +1655,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiRLModule.add_module">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.add_module.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.add_module">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_module</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_module</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">,</span>
         <span class="n">module</span><span class="p">:</span> <span class="n">RLModule</span><span class="p">,</span>
@@ -1676,7 +1676,7 @@ document.write(`
 <span class="sd">                Warnings are raised if the module id is not valid according to the</span>
 <span class="sd">                logic of ``validate_module_id()``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module</span> <span class="kn">import</span> <span class="n">validate_module_id</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_module_id</span>
 
         <span class="n">validate_module_id</span><span class="p">(</span><span class="n">module_id</span><span class="p">)</span>
 
@@ -1710,7 +1710,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiRLModule.remove_module">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.remove_module.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.remove_module">[docs]</a>
-    <span class="k">def</span> <span class="nf">remove_module</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_module</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">raise_err_if_not_found</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Removes a module at runtime from the multi-agent module.</span>
@@ -1731,7 +1731,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiRLModule.foreach_module">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.foreach_module.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.foreach_module">[docs]</a>
-    <span class="k">def</span> <span class="nf">foreach_module</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">foreach_module</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">RLModule</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">T</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1760,11 +1760,11 @@ document.write(`
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">ret_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns whether the given `item` (ModuleID) is present in self.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rl_modules</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RLModule</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RLModule</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the RLModule with the given module ID.</span>
 
 <span class="sd">        Args:</span>
@@ -1781,7 +1781,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiRLModule.get">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.get.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.get">[docs]</a>
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">,</span>
         <span class="n">default</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RLModule</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1802,36 +1802,36 @@ document.write(`
 
 <div class="viewcode-block" id="MultiRLModule.items">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.items.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.items">[docs]</a>
-    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ItemsView</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">RLModule</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ItemsView</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">RLModule</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an ItemsView over the module IDs in this MultiRLModule.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rl_modules</span><span class="o">.</span><span class="n">items</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="MultiRLModule.keys">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.keys.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.keys">[docs]</a>
-    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KeysView</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KeysView</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a KeysView over the module IDs in this MultiRLModule.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rl_modules</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="MultiRLModule.values">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.values.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.values">[docs]</a>
-    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ValuesView</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ValuesView</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a ValuesView over the module IDs in this MultiRLModule.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rl_modules</span><span class="o">.</span><span class="n">values</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of RLModules within this MultiRLModule.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rl_modules</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;MARL(</span><span class="si">{</span><span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rl_modules</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
 
 <div class="viewcode-block" id="MultiRLModule.get_state">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.get_state.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.get_state">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">RLModule</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">components</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1854,7 +1854,7 @@ document.write(`
 <div class="viewcode-block" id="MultiRLModule.set_state">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">RLModule</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the state of the multi-agent module.</span>
 
 <span class="sd">        It is assumed that the state_dict is a mapping from module IDs to the</span>
@@ -1874,7 +1874,7 @@ document.write(`
 
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_ctor_args_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ctor_args_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="p">(),</span>  <span class="c1"># *args</span>
             <span class="p">{</span>
@@ -1888,23 +1888,23 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_checkpointable_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Checkpointable</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_checkpointable_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Checkpointable</span><span class="p">]]:</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rl_modules</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">RLModule</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">output_specs_train</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_specs_train</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[]</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">RLModule</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">output_specs_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_specs_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[]</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">RLModule</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">output_specs_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_specs_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[]</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">RLModule</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_default_input_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_default_input_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpecType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;MultiRLModule should not check the input specs.</span>
 
 <span class="sd">        The underlying single-agent RLModules will check the input specs.</span>
@@ -1914,7 +1914,7 @@ document.write(`
 <div class="viewcode-block" id="MultiRLModule.as_multi_rl_module">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.as_multi_rl_module.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.as_multi_rl_module">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">RLModule</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">as_multi_rl_module</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiRLModule&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_multi_rl_module</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiRLModule&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self in order to match `RLModule.as_multi_rl_module()` behavior.</span>
 
 <span class="sd">        This method is overridden to avoid double wrapping.</span>
@@ -1926,7 +1926,7 @@ document.write(`
 
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_check_module_specs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">rl_module_specs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">RLModuleSpec</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_module_specs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">rl_module_specs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">RLModuleSpec</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks the individual RLModuleSpecs for validity.</span>
 
 <span class="sd">        Args:</span>
@@ -1939,7 +1939,7 @@ document.write(`
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rl_module_spec</span><span class="p">,</span> <span class="n">RLModuleSpec</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Module </span><span class="si">{</span><span class="n">module_id</span><span class="si">}</span><span class="s2"> is not a RLModuleSpec object.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_check_module_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_module_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">module_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rl_modules</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Module with module_id </span><span class="si">{</span><span class="n">module_id</span><span class="si">}</span><span class="s2"> not found. &quot;</span>
@@ -1952,7 +1952,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
 <span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
-<span class="k">class</span> <span class="nc">MultiRLModuleSpec</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiRLModuleSpec</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A utility spec class to make it constructing MultiRLModules easier.</span>
 
 <span class="sd">    Users can extend this class to modify the behavior of base class. For example to</span>
@@ -1997,7 +1997,7 @@ document.write(`
     <span class="c1"># Deprecated: Do not use anymore.</span>
     <span class="n">module_specs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">RLModuleSpec</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">RLModuleSpec</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">module_specs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">deprecation_warning</span><span class="p">(</span>
                 <span class="n">old</span><span class="o">=</span><span class="s2">&quot;MultiRLModuleSpec(module_specs=..)&quot;</span><span class="p">,</span>
@@ -2023,7 +2023,7 @@ document.write(`
 <div class="viewcode-block" id="MultiRLModuleSpec.build">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.build.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.build">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RLModule</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RLModule</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds either the MultiRLModule or a (single) sub-RLModule under `module_id`.</span>
 
 <span class="sd">        Args:</span>
@@ -2067,7 +2067,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiRLModuleSpec.add_modules">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.add_modules.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.add_modules">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_modules</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_modules</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">module_specs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">RLModuleSpec</span><span class="p">],</span>
         <span class="n">override</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -2095,7 +2095,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiRLModuleSpec.remove_modules">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.remove_modules.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.remove_modules">[docs]</a>
-    <span class="k">def</span> <span class="nf">remove_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_ids</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">Collection</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_ids</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">Collection</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Removes the provided ModuleIDs from this MultiRLModuleSpec.</span>
 
 <span class="sd">        Args:</span>
@@ -2108,7 +2108,7 @@ document.write(`
 <div class="viewcode-block" id="MultiRLModuleSpec.from_module">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.from_module.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.from_module">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">MultiRLModule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiRLModuleSpec&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">MultiRLModule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiRLModuleSpec&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a MultiRLModuleSpec from a MultiRLModule.</span>
 
 <span class="sd">        Args:</span>
@@ -2136,7 +2136,7 @@ document.write(`
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_check_before_build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_before_build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rl_module_specs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;When build() is called on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">, the `rl_module_specs` &quot;</span>
@@ -2146,7 +2146,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiRLModuleSpec.to_dict">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.to_dict.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.to_dict">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts the MultiRLModuleSpec to a dictionary.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;multi_rl_module_class&quot;</span><span class="p">:</span> <span class="n">serialize_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">multi_rl_module_class</span><span class="p">),</span>
@@ -2164,7 +2164,7 @@ document.write(`
 <div class="viewcode-block" id="MultiRLModuleSpec.from_dict">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.from_dict.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.from_dict">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiRLModuleSpec&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiRLModuleSpec&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a MultiRLModuleSpec from a dictionary.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">MultiRLModuleSpec</span><span class="p">(</span>
             <span class="n">multi_rl_module_class</span><span class="o">=</span><span class="n">deserialize_type</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;multi_rl_module_class&quot;</span><span class="p">]),</span>
@@ -2183,7 +2183,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiRLModuleSpec.update">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.update.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.update">[docs]</a>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;MultiRLModuleSpec&quot;</span><span class="p">,</span> <span class="n">RLModuleSpec</span><span class="p">],</span>
         <span class="n">override</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -2220,16 +2220,16 @@ document.write(`
 
 <div class="viewcode-block" id="MultiRLModuleSpec.as_multi_rl_module_spec">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.as_multi_rl_module_spec.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.as_multi_rl_module_spec">[docs]</a>
-    <span class="k">def</span> <span class="nf">as_multi_rl_module_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiRLModuleSpec&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_multi_rl_module_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiRLModuleSpec&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns self in order to match `RLModuleSpec.as_multi_rl_module_spec()`.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns whether the given `item` (ModuleID) is present in self.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rl_module_specs</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RLModuleSpec</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RLModuleSpec</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the RLModuleSpec under the ModuleID.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rl_module_specs</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
 
@@ -2238,22 +2238,22 @@ document.write(`
         <span class="s2">&quot;module2: [RLModuleSpec], ..}, inference_only=..)&quot;</span><span class="p">,</span>
         <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_multi_rl_module_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_multi_rl_module_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;MultiRLModuleSpec.as_multi_rl_module_spec()&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">as_multi_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_multi_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;MultiRLModuleSpec.get_multi_rl_module_config&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_marl_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_marl_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">pass</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span>
         <span class="n">new</span><span class="o">=</span><span class="s2">&quot;MultiRLModule(*, observation_space=.., action_space=.., ....)&quot;</span><span class="p">,</span>
         <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_rl_module_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_rl_module_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">MultiRLModuleConfig</span><span class="p">(</span>
             <span class="n">inference_only</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inference_only</span><span class="p">,</span>
             <span class="n">modules</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rl_module_specs</span><span class="p">,</span>
@@ -2267,11 +2267,11 @@ document.write(`
     <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
-<span class="k">class</span> <span class="nc">MultiRLModuleConfig</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiRLModuleConfig</span><span class="p">:</span>
     <span class="n">inference_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">modules</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">RLModuleSpec</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;inference_only&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inference_only</span><span class="p">,</span>
             <span class="s2">&quot;modules&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -2281,7 +2281,7 @@ document.write(`
         <span class="p">}</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiRLModuleConfig&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MultiRLModuleConfig&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">inference_only</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;inference_only&quot;</span><span class="p">],</span>
             <span class="n">modules</span><span class="o">=</span><span class="p">{</span>
@@ -2290,7 +2290,7 @@ document.write(`
             <span class="p">},</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
 </pre></div>
 

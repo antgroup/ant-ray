@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,15 +1389,15 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data.datasource.partitioning</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">posixpath</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">posixpath</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span>
 
 
 <span class="n">PartitionDataType</span> <span class="o">=</span> <span class="n">Type</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]]</span>
@@ -1406,7 +1406,7 @@ document.write(`
 <div class="viewcode-block" id="PartitionStyle">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.PartitionStyle.html#ray.data.datasource.PartitionStyle">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">PartitionStyle</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PartitionStyle</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Supported dataset partition styles.</span>
 
 <span class="sd">    Inherits from `str` to simplify plain text serialization/deserialization.</span>
@@ -1430,7 +1430,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.Partitioning.html#ray.data.datasource.Partitioning">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Partitioning</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Partitioning</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Partition scheme used to describe path-based partitions.</span>
 
 <span class="sd">    Path-based partition formats embed all partition keys and values directly in</span>
@@ -1487,7 +1487,7 @@ document.write(`
     <span class="c1">#: Filesystem that will be used for partition path file I/O.</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">base_dir</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
@@ -1498,20 +1498,20 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_resolved_filesystem</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">normalized_base_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">normalized_base_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the base directory normalized for compatibility with a filesystem.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized_base_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_base_dir</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized_base_dir</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">resolved_filesystem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolved_filesystem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the filesystem resolved for compatibility with a base directory.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved_filesystem</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_base_dir</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved_filesystem</span>
 
-    <span class="k">def</span> <span class="nf">_normalize_base_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_normalize_base_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalizes the partition base directory for compatibility with the</span>
 <span class="sd">        given filesystem.</span>
 
@@ -1519,7 +1519,7 @@ document.write(`
 <span class="sd">        base directory is correctly discovered at the root of all partitioned file</span>
 <span class="sd">        paths.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.data.datasource.path_util</span> <span class="kn">import</span> <span class="n">_resolve_paths_and_filesystem</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.path_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">_resolve_paths_and_filesystem</span>
 
         <span class="n">paths</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolved_filesystem</span> <span class="o">=</span> <span class="n">_resolve_paths_and_filesystem</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">base_dir</span><span class="p">,</span>
@@ -1538,7 +1538,7 @@ document.write(`
 <div class="viewcode-block" id="PathPartitionParser">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.PathPartitionParser.html#ray.data.datasource.PathPartitionParser">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">PathPartitionParser</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PathPartitionParser</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Partition parser for path-based partition formats.</span>
 
 <span class="sd">    Path-based partition formats embed all partition keys and values directly in</span>
@@ -1571,7 +1571,7 @@ document.write(`
 <div class="viewcode-block" id="PathPartitionParser.of">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.PathPartitionParser.of.html#ray.data.datasource.PathPartitionParser.of">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">of</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">of</span><span class="p">(</span>
         <span class="n">style</span><span class="p">:</span> <span class="n">PartitionStyle</span> <span class="o">=</span> <span class="n">PartitionStyle</span><span class="o">.</span><span class="n">HIVE</span><span class="p">,</span>
         <span class="n">base_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">field_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1604,7 +1604,7 @@ document.write(`
 
 <div class="viewcode-block" id="PathPartitionParser.__init__">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.PathPartitionParser.__init__.html#ray.data.datasource.PathPartitionParser.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partitioning</span><span class="p">:</span> <span class="n">Partitioning</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partitioning</span><span class="p">:</span> <span class="n">Partitioning</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a path-based partition parser.</span>
 
 <span class="sd">        Args:</span>
@@ -1638,7 +1638,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_scheme</span> <span class="o">=</span> <span class="n">partitioning</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parses partition keys and values from a single file path.</span>
 
 <span class="sd">        Args:</span>
@@ -1659,11 +1659,11 @@ document.write(`
         <span class="k">return</span> <span class="n">partitions</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">scheme</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Partitioning</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scheme</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Partitioning</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the partitioning for this parser.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scheme</span>
 
-    <span class="k">def</span> <span class="nf">_dir_path_trim_base</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_dir_path_trim_base</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Trims the normalized base directory and returns the directory path.</span>
 
 <span class="sd">        Returns None if the path does not start with the normalized base directory.</span>
@@ -1674,7 +1674,7 @@ document.write(`
         <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scheme</span><span class="o">.</span><span class="n">normalized_base_dir</span><span class="p">)</span> <span class="p">:]</span>
         <span class="k">return</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_parse_hive_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_hive_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Hive partition path parser.</span>
 
 <span class="sd">        Returns a dictionary mapping partition keys to values given a hive-style</span>
@@ -1698,7 +1698,7 @@ document.write(`
                     <span class="p">)</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kv_pairs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_parse_dir_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_dir_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Directory partition path parser.</span>
 
 <span class="sd">        Returns a dictionary mapping directory partition keys to values from a</span>
@@ -1730,7 +1730,7 @@ document.write(`
 <div class="viewcode-block" id="PathPartitionFilter">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.PathPartitionFilter.html#ray.data.datasource.PathPartitionFilter">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">PathPartitionFilter</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PathPartitionFilter</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Partition filter for path-based partition formats.</span>
 
 <span class="sd">    Used to explicitly keep or reject files based on a custom filter function that</span>
@@ -1740,7 +1740,7 @@ document.write(`
 <div class="viewcode-block" id="PathPartitionFilter.of">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.PathPartitionFilter.of.html#ray.data.datasource.PathPartitionFilter.of">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">of</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">of</span><span class="p">(</span>
         <span class="n">filter_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="nb">bool</span><span class="p">],</span>
         <span class="n">style</span><span class="p">:</span> <span class="n">PartitionStyle</span> <span class="o">=</span> <span class="n">PartitionStyle</span><span class="o">.</span><span class="n">HIVE</span><span class="p">,</span>
         <span class="n">base_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1801,7 +1801,7 @@ document.write(`
 
 <div class="viewcode-block" id="PathPartitionFilter.__init__">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.PathPartitionFilter.__init__.html#ray.data.datasource.PathPartitionFilter.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path_partition_parser</span><span class="p">:</span> <span class="n">PathPartitionParser</span><span class="p">,</span>
         <span class="n">filter_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="nb">bool</span><span class="p">],</span>
@@ -1826,7 +1826,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_filter_fn</span> <span class="o">=</span> <span class="n">filter_fn</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns all paths that pass this partition scheme&#39;s partition filter.</span>
 
 <span class="sd">        If no partition filter is set, then returns all input paths. If a base</span>
@@ -1854,13 +1854,13 @@ document.write(`
         <span class="k">return</span> <span class="n">filtered_paths</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">parser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PathPartitionParser</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PathPartitionParser</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the path partition parser for this filter.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parser</span></div>
 
 
 
-<span class="k">def</span> <span class="nf">_cast_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="n">PartitionDataType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_cast_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="n">PartitionDataType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">data_type</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">data_type</span> <span class="ow">is</span> <span class="nb">float</span><span class="p">:</span>

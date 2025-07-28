@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1389,11 +1389,11 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.cross_language</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">Language</span>
-<span class="kn">from</span> <span class="nn">ray._raylet</span> <span class="kn">import</span> <span class="n">CppFunctionDescriptor</span><span class="p">,</span> <span class="n">JavaFunctionDescriptor</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">Language</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._raylet</span><span class="w"> </span><span class="kn">import</span> <span class="n">CppFunctionDescriptor</span><span class="p">,</span> <span class="n">JavaFunctionDescriptor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;java_function&quot;</span><span class="p">,</span>
@@ -1405,14 +1405,14 @@ document.write(`
 <div class="viewcode-block" id="java_function">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.cross_language.java_function.html#ray.cross_language.java_function">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">java_function</span><span class="p">(</span><span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">function_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">java_function</span><span class="p">(</span><span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">function_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a Java function.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        class_name: Java class name.</span>
 <span class="sd">        function_name: Java function name.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">ray.remote_function</span> <span class="kn">import</span> <span class="n">RemoteFunction</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.remote_function</span><span class="w"> </span><span class="kn">import</span> <span class="n">RemoteFunction</span>
 
     <span class="k">return</span> <span class="n">RemoteFunction</span><span class="p">(</span>
         <span class="n">Language</span><span class="o">.</span><span class="n">JAVA</span><span class="p">,</span>
@@ -1424,13 +1424,13 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">cpp_function</span><span class="p">(</span><span class="n">function_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cpp_function</span><span class="p">(</span><span class="n">function_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a Cpp function.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        function_name: Cpp function name.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">ray.remote_function</span> <span class="kn">import</span> <span class="n">RemoteFunction</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.remote_function</span><span class="w"> </span><span class="kn">import</span> <span class="n">RemoteFunction</span>
 
     <span class="k">return</span> <span class="n">RemoteFunction</span><span class="p">(</span>
         <span class="n">Language</span><span class="o">.</span><span class="n">CPP</span><span class="p">,</span>
@@ -1443,13 +1443,13 @@ document.write(`
 <div class="viewcode-block" id="java_actor_class">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.cross_language.java_actor_class.html#ray.cross_language.java_actor_class">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">java_actor_class</span><span class="p">(</span><span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">java_actor_class</span><span class="p">(</span><span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a Java actor class.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        class_name: Java class name.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">ray.actor</span> <span class="kn">import</span> <span class="n">ActorClass</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.actor</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActorClass</span>
 
     <span class="k">return</span> <span class="n">ActorClass</span><span class="o">.</span><span class="n">_ray_from_function_descriptor</span><span class="p">(</span>
         <span class="n">Language</span><span class="o">.</span><span class="n">JAVA</span><span class="p">,</span>
@@ -1460,14 +1460,14 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">cpp_actor_class</span><span class="p">(</span><span class="n">create_function_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cpp_actor_class</span><span class="p">(</span><span class="n">create_function_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a Cpp actor class.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        create_function_name: Create cpp class function name.</span>
 <span class="sd">        class_name: Cpp class name.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">ray.actor</span> <span class="kn">import</span> <span class="n">ActorClass</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.actor</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActorClass</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;create func=&quot;</span><span class="p">,</span> <span class="n">create_function_name</span><span class="p">,</span> <span class="s2">&quot;class_name=&quot;</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ActorClass</span><span class="o">.</span><span class="n">_ray_from_function_descriptor</span><span class="p">(</span>
@@ -1477,7 +1477,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_format_args</span><span class="p">(</span><span class="n">worker</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_format_args</span><span class="p">(</span><span class="n">worker</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Format args for various languages.</span>
 
 <span class="sd">    Args:</span>
@@ -1500,7 +1500,7 @@ document.write(`
     <span class="k">return</span> <span class="n">args</span>
 
 
-<span class="k">def</span> <span class="nf">_get_function_descriptor_for_actor_method</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_function_descriptor_for_actor_method</span><span class="p">(</span>
     <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">actor_creation_function_descriptor</span><span class="p">,</span> <span class="n">method_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">signature</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get function descriptor for cross language actor method call.</span>

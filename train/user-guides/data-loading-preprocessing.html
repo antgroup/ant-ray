@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1434,11 +1434,11 @@ Key advantages include:</p>
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-0">
 PyTorch</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
 
 <span class="c1"># Set this to True to use GPU.</span>
 <span class="c1"># If False, do CPU training instead of GPU training.</span>
@@ -1450,14 +1450,14 @@ PyTorch</label><div class="sd-tab-content docutils">
 <span class="hll"><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">from_items</span><span class="p">([{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">]}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">200</span><span class="p">)])</span>
 </span>
 <span class="c1"># Step 2: Preprocess your Ray Dataset.</span>
-<span class="k">def</span> <span class="nf">increment</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">increment</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
     <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="n">batch</span>
 
 <span class="hll"><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">train_dataset</span><span class="o">.</span><span class="n">map_batches</span><span class="p">(</span><span class="n">increment</span><span class="p">)</span>
 </span>
 
-<span class="k">def</span> <span class="nf">train_func</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_func</span><span class="p">():</span>
     <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">16</span>
 
     <span class="c1"># Step 4: Access the dataset shard for the training worker via</span>
@@ -1496,13 +1496,13 @@ PyTorch</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-1">
 PyTorch Lightning</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
 
 <span class="c1"># Create the train and validation datasets.</span>
 <span class="hll"><span class="n">train_data</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./train.csv&quot;</span><span class="p">)</span>
 </span><span class="hll"><span class="n">val_data</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./validation.csv&quot;</span><span class="p">)</span>
 </span>
-<span class="k">def</span> <span class="nf">train_func_per_worker</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_func_per_worker</span><span class="p">():</span>
     <span class="c1"># Access Ray datsets in your train_func via ``get_dataset_shard``.</span>
     <span class="c1"># Ray Data shards all datasets across workers by default.</span>
 <span class="hll">    <span class="n">train_ds</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">get_dataset_shard</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
@@ -1538,8 +1538,8 @@ PyTorch Lightning</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-2" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-2">
 HuggingFace Transformers</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray.train</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train</span>
 
 <span class="o">...</span>
 
@@ -1547,7 +1547,7 @@ HuggingFace Transformers</label><div class="sd-tab-content docutils">
 <span class="hll"><span class="n">train_data</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">from_huggingface</span><span class="p">(</span><span class="n">hf_train_ds</span><span class="p">)</span>
 </span><span class="hll"><span class="n">eval_data</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">from_huggingface</span><span class="p">(</span><span class="n">hf_eval_ds</span><span class="p">)</span>
 </span>
-<span class="k">def</span> <span class="nf">train_func</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_func</span><span class="p">():</span>
     <span class="c1"># Access Ray datsets in your train_func via ``get_dataset_shard``.</span>
     <span class="c1"># Ray Data shards all datasets across workers by default.</span>
 <span class="hll">    <span class="n">train_ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">get_dataset_shard</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
@@ -1708,17 +1708,17 @@ can cause errors due to the Dataset not being serializable.</p>
 <p>By default, Ray Train splits all datasets across workers using <a class="reference internal" href="../../data/api/doc/ray.data.Dataset.streaming_split.html#ray.data.Dataset.streaming_split" title="ray.data.Dataset.streaming_split"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.streaming_split</span></code></a>. Each worker sees a disjoint subset of the data, instead of iterating over the entire dataset.</p>
 <p>If want to customize which datasets are split, pass in a <a class="reference internal" href="../api/doc/ray.train.DataConfig.html#ray.train.DataConfig" title="ray.train.DataConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataConfig</span></code></a> to the Trainer constructor.</p>
 <p>For example, to split only the training dataset, do the following:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span>
     <span class="s2">&quot;s3://anonymous@ray-example-data/sms_spam_collection_subset.txt&quot;</span>
 <span class="p">)</span>
 <span class="n">train_ds</span><span class="p">,</span> <span class="n">val_ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">train_test_split</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">train_loop_per_worker</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_loop_per_worker</span><span class="p">():</span>
     <span class="c1"># Get the sharded training dataset</span>
     <span class="n">train_ds</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">get_dataset_shard</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
@@ -1747,20 +1747,20 @@ can cause errors due to the Dataset not being serializable.</p>
 <p>For use cases not covered by the default config class, you can also fully customize exactly how your input datasets are split. Define a custom <a class="reference internal" href="../api/doc/ray.train.DataConfig.html#ray.train.DataConfig" title="ray.train.DataConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataConfig</span></code></a> class (DeveloperAPI). The <a class="reference internal" href="../api/doc/ray.train.DataConfig.html#ray.train.DataConfig" title="ray.train.DataConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataConfig</span></code></a> class is responsible for that shared setup and splitting of data across nodes.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Note that this example class is doing the same thing as the basic DataConfig</span>
 <span class="c1"># implementation included with Ray Train.</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">DataConfig</span><span class="p">,</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.data</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataIterator</span><span class="p">,</span> <span class="n">NodeIdStr</span>
-<span class="kn">from</span> <span class="nn">ray.actor</span> <span class="kn">import</span> <span class="n">ActorHandle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataConfig</span><span class="p">,</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataIterator</span><span class="p">,</span> <span class="n">NodeIdStr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.actor</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActorHandle</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span>
     <span class="s2">&quot;s3://anonymous@ray-example-data/sms_spam_collection_subset.txt&quot;</span>
 <span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">train_loop_per_worker</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_loop_per_worker</span><span class="p">():</span>
     <span class="c1"># Get an iterator to the dataset we passed in below.</span>
     <span class="n">it</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">get_dataset_shard</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
@@ -1768,8 +1768,8 @@ can cause errors due to the Dataset not being serializable.</p>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Do some training on batch&quot;</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">MyCustomDataConfig</span><span class="p">(</span><span class="n">DataConfig</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyCustomDataConfig</span><span class="p">(</span><span class="n">DataConfig</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">datasets</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">],</span>
         <span class="n">world_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1814,7 +1814,7 @@ can cause errors due to the Dataset not being serializable.</p>
 <h2>Enabling reproducibility<a class="headerlink" href="#enabling-reproducibility" title="Link to this heading">#</a></h2>
 <p>When developing or hyperparameter tuning models, reproducibility is important during data ingest so that data ingest does not affect model quality. Follow these three steps to enable reproducibility:</p>
 <p><strong>Step 1:</strong> Enable deterministic execution in Ray Datasets by setting the <code class="code docutils literal notranslate"><span class="pre">preserve_order</span></code> flag in the <a class="reference internal" href="../../data/api/data_context.html#ray.data.DataContext" title="ray.data.context.DataContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataContext</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="c1"># Preserve ordering in Ray Datasets for reproducibility.</span>
 <span class="n">ctx</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataContext</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span>
@@ -1842,14 +1842,14 @@ Ray Data operations such as <code class="code docutils literal notranslate"><spa
 </div>
 <p>For tabular data, use Ray Data <a class="reference internal" href="../../data/api/preprocessor.html#preprocessor-ref"><span class="std std-ref">preprocessors</span></a>, which implement common data preprocessing operations.
 You can use this with Ray Train Trainers by applying them on the dataset before passing the dataset into a Trainer. For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tempfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemporaryDirectory</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
-<span class="kn">from</span> <span class="nn">ray.data.preprocessors</span> <span class="kn">import</span> <span class="n">Concatenator</span><span class="p">,</span> <span class="n">StandardScaler</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.preprocessors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Concatenator</span><span class="p">,</span> <span class="n">StandardScaler</span>
 
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@air-example-data/breast_cancer.csv&quot;</span><span class="p">)</span>
 
@@ -1864,7 +1864,7 @@ You can use this with Ray Train Trainers by applying them on the dataset before 
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">concatenator</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">train_loop_per_worker</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_loop_per_worker</span><span class="p">():</span>
     <span class="n">context</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">())</span>  <span class="c1"># prints {&quot;preprocessor_pkl&quot;: ...}</span>
 
@@ -1903,16 +1903,16 @@ You can use this with Ray Train Trainers by applying them on the dataset before 
 <p>While iterating over a dataset for training, you can increase <code class="docutils literal notranslate"><span class="pre">prefetch_batches</span></code> in <a class="reference internal" href="../../data/api/doc/ray.data.DataIterator.iter_batches.html#ray.data.DataIterator.iter_batches" title="ray.data.DataIterator.iter_batches"><code class="xref py py-meth docutils literal notranslate"><span class="pre">iter_batches</span></code></a> or <a class="reference internal" href="../../data/api/doc/ray.data.DataIterator.iter_torch_batches.html#ray.data.DataIterator.iter_torch_batches" title="ray.data.DataIterator.iter_torch_batches"><code class="xref py py-meth docutils literal notranslate"><span class="pre">iter_torch_batches</span></code></a> to further increase performance. While training on the current batch, this approach launches background threads to fetch and process the next <code class="docutils literal notranslate"><span class="pre">N</span></code> batches.</p>
 <p>This approach can help if training is bottlenecked on cross-node data transfer or on last-mile preprocessing such as converting batches to tensors or executing <code class="docutils literal notranslate"><span class="pre">collate_fn</span></code>. However, increasing <code class="docutils literal notranslate"><span class="pre">prefetch_batches</span></code> leads to more data that needs to be held in heap memory. By default, <code class="docutils literal notranslate"><span class="pre">prefetch_batches</span></code> is set to 1.</p>
 <p>For example, the following code prefetches 10 batches at a time for each training worker:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">train</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span>
     <span class="s2">&quot;s3://anonymous@ray-example-data/sms_spam_collection_subset.txt&quot;</span>
 <span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">train_loop_per_worker</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_loop_per_worker</span><span class="p">():</span>
     <span class="c1"># Get an iterator to the dataset we passed in below.</span>
     <span class="n">it</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">get_dataset_shard</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
@@ -1937,15 +1937,15 @@ You can use this with Ray Train Trainers by applying them on the dataset before 
 <span id="dataset-cache-performance"></span><h3>Caching the preprocessed dataset<a class="headerlink" href="#caching-the-preprocessed-dataset" title="Link to this heading">#</a></h3>
 <p>If your preprocessed Dataset is small enough to fit in Ray object store memory (by default this is 30% of total cluster RAM), <em>materialize</em> the preprocessed dataset in Ray’s built-in object store, by calling <a class="reference internal" href="../../data/api/doc/ray.data.Dataset.materialize.html#ray.data.Dataset.materialize" title="ray.data.Dataset.materialize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">materialize()</span></code></a> on the preprocessed dataset. This method tells Ray Data to compute the entire preprocessed and pin it in the Ray object store memory. As a result, when iterating over the dataset repeatedly, the preprocessing operations do not need to be re-run. However, if the preprocessed data is too large to fit into Ray object store memory, this approach will greatly decreases performance as data needs to be spilled to and read back from disk.</p>
 <p>Transformations that you want to run per-epoch, such as randomization, should go after the materialize call.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="c1"># Load the data.</span>
 <span class="n">train_ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/iris.parquet&quot;</span><span class="p">)</span>
 
 <span class="c1"># Define a preprocessing function.</span>
-<span class="k">def</span> <span class="nf">normalize_length</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">normalize_length</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     <span class="n">new_col</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;sepal.length&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;sepal.length&quot;</span><span class="p">])</span>
     <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;normalized.sepal.length&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_col</span>
     <span class="k">del</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;sepal.length&quot;</span><span class="p">]</span>
@@ -1960,7 +1960,7 @@ You can use this with Ray Train Trainers by applying them on the dataset before 
 <span class="n">train_ds</span> <span class="o">=</span> <span class="n">train_ds</span><span class="o">.</span><span class="n">materialize</span><span class="p">()</span>
 
 <span class="c1"># Dummy augmentation transform.</span>
-<span class="k">def</span> <span class="nf">augment_data</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">augment_data</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">batch</span>
 
 <span class="c1"># Add per-epoch preprocessing. Transformations that you want to run per-epoch, such</span>

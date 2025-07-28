@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1392,17 +1392,17 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.util.placement_group</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray._private.auto_init_hook</span> <span class="kn">import</span> <span class="n">auto_init_ray</span>
-<span class="kn">from</span> <span class="nn">ray._private.client_mode_hook</span> <span class="kn">import</span> <span class="n">client_mode_should_convert</span><span class="p">,</span> <span class="n">client_mode_wrap</span>
-<span class="kn">from</span> <span class="nn">ray._private.utils</span> <span class="kn">import</span> <span class="n">hex_to_binary</span><span class="p">,</span> <span class="n">get_ray_doc_version</span>
-<span class="kn">from</span> <span class="nn">ray._raylet</span> <span class="kn">import</span> <span class="n">PlacementGroupID</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
-<span class="kn">from</span> <span class="nn">ray.util.scheduling_strategies</span> <span class="kn">import</span> <span class="n">PlacementGroupSchedulingStrategy</span>
-<span class="kn">import</span> <span class="nn">ray._private.ray_constants</span> <span class="k">as</span> <span class="nn">ray_constants</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.auto_init_hook</span><span class="w"> </span><span class="kn">import</span> <span class="n">auto_init_ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.client_mode_hook</span><span class="w"> </span><span class="kn">import</span> <span class="n">client_mode_should_convert</span><span class="p">,</span> <span class="n">client_mode_wrap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">hex_to_binary</span><span class="p">,</span> <span class="n">get_ray_doc_version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._raylet</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroupID</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.scheduling_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroupSchedulingStrategy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray._private.ray_constants</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ray_constants</span>
 
 <span class="n">bundle_reservation_check</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -1419,13 +1419,13 @@ document.write(`
 <span class="c1"># if we define this method inside ready method, this function is</span>
 <span class="c1"># exported whenever ready is called, which can impact performance,</span>
 <span class="c1"># https://github.com/ray-project/ray/issues/6240.</span>
-<span class="k">def</span> <span class="nf">_export_bundle_reservation_check_method_if_needed</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_export_bundle_reservation_check_method_if_needed</span><span class="p">():</span>
     <span class="k">global</span> <span class="n">bundle_reservation_check</span>
     <span class="k">if</span> <span class="n">bundle_reservation_check</span><span class="p">:</span>
         <span class="k">return</span>
 
     <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">bundle_reservation_check_func</span><span class="p">(</span><span class="n">placement_group</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bundle_reservation_check_func</span><span class="p">(</span><span class="n">placement_group</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">placement_group</span>
 
     <span class="n">bundle_reservation_check</span> <span class="o">=</span> <span class="n">bundle_reservation_check_func</span>
@@ -1434,14 +1434,14 @@ document.write(`
 <div class="viewcode-block" id="PlacementGroup">
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.placement_group.PlacementGroup.html#ray.util.PlacementGroup">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">PlacementGroup</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlacementGroup</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A handle to a placement group.&quot;&quot;&quot;</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">empty</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="s2">&quot;PlacementGroup&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">empty</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="s2">&quot;PlacementGroup&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">PlacementGroup</span><span class="p">(</span><span class="n">PlacementGroupID</span><span class="o">.</span><span class="n">nil</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="nb">id</span><span class="p">:</span> <span class="s2">&quot;ray._raylet.PlacementGroupID&quot;</span><span class="p">,</span>
         <span class="n">bundle_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1450,12 +1450,12 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">bundle_cache</span> <span class="o">=</span> <span class="n">bundle_cache</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">is_nil</span><span class="p">()</span>
 
 <div class="viewcode-block" id="PlacementGroup.ready">
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.placement_group.PlacementGroup.ready.html#ray.util.PlacementGroup.ready">[docs]</a>
-    <span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ray._raylet.ObjectRef&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ray._raylet.ObjectRef&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an ObjectRef to check ready status.</span>
 
 <span class="sd">        This API runs a small dummy task to wait for placement group creation.</span>
@@ -1490,7 +1490,7 @@ document.write(`
 
 <div class="viewcode-block" id="PlacementGroup.wait">
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.placement_group.PlacementGroup.wait.html#ray.util.PlacementGroup.wait">[docs]</a>
-    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Wait for the placement group to be ready within the specified time.</span>
 <span class="sd">        Args:</span>
 <span class="sd">             timeout_seconds(float|int): Timeout in seconds.</span>
@@ -1501,32 +1501,32 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">bundle_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bundle_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;List[Dict]: Return bundles belonging to this placement group.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fill_bundle_cache_if_needed</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_cache</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">bundle_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bundle_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fill_bundle_cache_if_needed</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_cache</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_fill_bundle_cache_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fill_bundle_cache_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_cache</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bundle_cache</span> <span class="o">=</span> <span class="n">_get_bundle_cache</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">PlacementGroup</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span>
 
-    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span></div>
 
 
 
 <span class="nd">@client_mode_wrap</span>
-<span class="k">def</span> <span class="nf">_call_placement_group_ready</span><span class="p">(</span><span class="n">pg_id</span><span class="p">:</span> <span class="n">PlacementGroupID</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_call_placement_group_ready</span><span class="p">(</span><span class="n">pg_id</span><span class="p">:</span> <span class="n">PlacementGroupID</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="n">worker</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">global_worker</span>
     <span class="n">worker</span><span class="o">.</span><span class="n">check_connected</span><span class="p">()</span>
 
@@ -1534,7 +1534,7 @@ document.write(`
 
 
 <span class="nd">@client_mode_wrap</span>
-<span class="k">def</span> <span class="nf">_get_bundle_cache</span><span class="p">(</span><span class="n">pg_id</span><span class="p">:</span> <span class="n">PlacementGroupID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_bundle_cache</span><span class="p">(</span><span class="n">pg_id</span><span class="p">:</span> <span class="n">PlacementGroupID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
     <span class="n">worker</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">global_worker</span>
     <span class="n">worker</span><span class="o">.</span><span class="n">check_connected</span><span class="p">()</span>
 
@@ -1547,7 +1547,7 @@ document.write(`
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.placement_group.html#ray.util.placement_group">[docs]</a>
 <span class="nd">@PublicAPI</span>
 <span class="nd">@client_mode_wrap</span>
-<span class="k">def</span> <span class="nf">placement_group</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">placement_group</span><span class="p">(</span>
     <span class="n">bundles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
     <span class="n">strategy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;PACK&quot;</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -1630,7 +1630,7 @@ document.write(`
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.remove_placement_group.html#ray.util.remove_placement_group">[docs]</a>
 <span class="nd">@PublicAPI</span>
 <span class="nd">@client_mode_wrap</span>
-<span class="k">def</span> <span class="nf">remove_placement_group</span><span class="p">(</span><span class="n">placement_group</span><span class="p">:</span> <span class="n">PlacementGroup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_placement_group</span><span class="p">(</span><span class="n">placement_group</span><span class="p">:</span> <span class="n">PlacementGroup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Asynchronously remove placement group.</span>
 
 <span class="sd">    Args:</span>
@@ -1648,7 +1648,7 @@ document.write(`
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.placement_group.get_placement_group.html#ray.util.get_placement_group">[docs]</a>
 <span class="nd">@PublicAPI</span>
 <span class="nd">@client_mode_wrap</span>
-<span class="k">def</span> <span class="nf">get_placement_group</span><span class="p">(</span><span class="n">placement_group_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlacementGroup</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_placement_group</span><span class="p">(</span><span class="n">placement_group_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlacementGroup</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a placement group object with a global name.</span>
 
 <span class="sd">    Returns:</span>
@@ -1677,7 +1677,7 @@ document.write(`
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.placement_group_table.html#ray.util.placement_group_table">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
 <span class="nd">@client_mode_wrap</span>
-<span class="k">def</span> <span class="nf">placement_group_table</span><span class="p">(</span><span class="n">placement_group</span><span class="p">:</span> <span class="n">PlacementGroup</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">placement_group_table</span><span class="p">(</span><span class="n">placement_group</span><span class="p">:</span> <span class="n">PlacementGroup</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the state of the placement group from GCS.</span>
 
 <span class="sd">    Args:</span>
@@ -1694,7 +1694,7 @@ document.write(`
 <div class="viewcode-block" id="get_current_placement_group">
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.get_current_placement_group.html#ray.util.get_current_placement_group">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">get_current_placement_group</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PlacementGroup</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_current_placement_group</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PlacementGroup</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the current placement group which a task or actor is using.</span>
 
 <span class="sd">    It returns None if there&#39;s no current placement group for the worker.</span>
@@ -1741,7 +1741,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">check_placement_group_index</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_placement_group_index</span><span class="p">(</span>
     <span class="n">placement_group</span><span class="p">:</span> <span class="n">PlacementGroup</span><span class="p">,</span> <span class="n">bundle_index</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">assert</span> <span class="n">placement_group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -1759,7 +1759,7 @@ document.write(`
         <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">validate_placement_group</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_placement_group</span><span class="p">(</span>
     <span class="n">bundles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
     <span class="n">strategy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;PACK&quot;</span><span class="p">,</span>
     <span class="n">lifetime</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1806,7 +1806,7 @@ document.write(`
         <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_validate_bundles</span><span class="p">(</span><span class="n">bundles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_bundles</span><span class="p">(</span><span class="n">bundles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validates each bundle and raises a ValueError if any bundle is invalid.&quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -1853,7 +1853,7 @@ document.write(`
             <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_valid_resource_shape</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">bundle_specs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_valid_resource_shape</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">bundle_specs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    If the resource shape cannot fit into every</span>
 <span class="sd">    bundle spec, return False</span>
@@ -1874,7 +1874,7 @@ document.write(`
     <span class="k">return</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">_validate_resource_shape</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_resource_shape</span><span class="p">(</span>
     <span class="n">placement_group</span><span class="p">,</span> <span class="n">resources</span><span class="p">,</span> <span class="n">placement_resources</span><span class="p">,</span> <span class="n">task_or_actor_repr</span>
 <span class="p">):</span>
     <span class="n">bundles</span> <span class="o">=</span> <span class="n">placement_group</span><span class="o">.</span><span class="n">bundle_specs</span>
@@ -1903,7 +1903,7 @@ document.write(`
         <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_configure_placement_group_based_on_context</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_configure_placement_group_based_on_context</span><span class="p">(</span>
     <span class="n">placement_group_capture_child_tasks</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">bundle_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">resources</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>

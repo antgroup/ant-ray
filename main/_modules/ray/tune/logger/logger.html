@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,21 +1392,21 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.logger.logger</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">abc</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Type</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Type</span>
 
-<span class="kn">import</span> <span class="nn">pyarrow</span>
-<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
 
-<span class="kn">from</span> <span class="nn">ray.air._internal.json</span> <span class="kn">import</span> <span class="n">SafeFallbackEncoder</span>
-<span class="kn">from</span> <span class="nn">ray.tune.callback</span> <span class="kn">import</span> <span class="n">Callback</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.json</span><span class="w"> </span><span class="kn">import</span> <span class="n">SafeFallbackEncoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.callback</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.experiment.trial</span> <span class="kn">import</span> <span class="n">Trial</span>  <span class="c1"># noqa: F401</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment.trial</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trial</span>  <span class="c1"># noqa: F401</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1426,7 +1426,7 @@ document.write(`
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Logger</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Logger</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Logging interface for ray.tune.</span>
 
 <span class="sd">    By default, the UnifiedLogger implementation is used which logs results in</span>
@@ -1439,31 +1439,31 @@ document.write(`
 <span class="sd">        trial: Trial object for the logger to access.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">logdir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">logdir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logdir</span> <span class="o">=</span> <span class="n">logdir</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trial</span> <span class="o">=</span> <span class="n">trial</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">on_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Given a result, appends it to the existing log.&quot;&quot;&quot;</span>
 
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-    <span class="k">def</span> <span class="nf">update_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the config for logger.&quot;&quot;&quot;</span>
 
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Releases all resources used by this logger.&quot;&quot;&quot;</span>
 
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Flushes all disk writes to storage.&quot;&quot;&quot;</span>
 
         <span class="k">pass</span>
@@ -1472,7 +1472,7 @@ document.write(`
 <div class="viewcode-block" id="LoggerCallback">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.logger.LoggerCallback.html#ray.tune.logger.LoggerCallback">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">LoggerCallback</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LoggerCallback</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for experiment-level logger callbacks</span>
 
 <span class="sd">    This base class defines a general interface for logging events,</span>
@@ -1486,7 +1486,7 @@ document.write(`
 
 <div class="viewcode-block" id="LoggerCallback.log_trial_start">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.logger.LoggerCallback.log_trial_start.html#ray.tune.logger.LoggerCallback.log_trial_start">[docs]</a>
-    <span class="k">def</span> <span class="nf">log_trial_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle logging when a trial starts.</span>
 
 <span class="sd">        Args:</span>
@@ -1497,7 +1497,7 @@ document.write(`
 
 <div class="viewcode-block" id="LoggerCallback.log_trial_restore">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.logger.LoggerCallback.log_trial_restore.html#ray.tune.logger.LoggerCallback.log_trial_restore">[docs]</a>
-    <span class="k">def</span> <span class="nf">log_trial_restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle logging when a trial restores.</span>
 
 <span class="sd">        Args:</span>
@@ -1508,7 +1508,7 @@ document.write(`
 
 <div class="viewcode-block" id="LoggerCallback.log_trial_save">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.logger.LoggerCallback.log_trial_save.html#ray.tune.logger.LoggerCallback.log_trial_save">[docs]</a>
-    <span class="k">def</span> <span class="nf">log_trial_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle logging when a trial saves a checkpoint.</span>
 
 <span class="sd">        Args:</span>
@@ -1519,7 +1519,7 @@ document.write(`
 
 <div class="viewcode-block" id="LoggerCallback.log_trial_result">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.logger.LoggerCallback.log_trial_result.html#ray.tune.logger.LoggerCallback.log_trial_result">[docs]</a>
-    <span class="k">def</span> <span class="nf">log_trial_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle logging when a trial reports a result.</span>
 
 <span class="sd">        Args:</span>
@@ -1531,7 +1531,7 @@ document.write(`
 
 <div class="viewcode-block" id="LoggerCallback.log_trial_end">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.logger.LoggerCallback.log_trial_end.html#ray.tune.logger.LoggerCallback.log_trial_end">[docs]</a>
-    <span class="k">def</span> <span class="nf">log_trial_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">failed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">failed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle logging when a trial ends.</span>
 
 <span class="sd">        Args:</span>
@@ -1542,7 +1542,7 @@ document.write(`
         <span class="k">pass</span></div>
 
 
-    <span class="k">def</span> <span class="nf">on_trial_result</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_result</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">],</span>
@@ -1552,32 +1552,32 @@ document.write(`
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_trial_result</span><span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_start</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_start</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">],</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_trial_start</span><span class="p">(</span><span class="n">trial</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_restore</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_restore</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">],</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_trial_restore</span><span class="p">(</span><span class="n">trial</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_save</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_save</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">],</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_trial_save</span><span class="p">(</span><span class="n">trial</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_complete</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_complete</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">],</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_trial_end</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">failed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_error</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_error</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">],</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log_trial_end</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">failed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_restore_from_remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_restore_from_remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">trial</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">:</span>
             <span class="c1"># If there&#39;s no checkpoint, there&#39;s no logging artifacts to restore</span>
             <span class="c1"># since we&#39;re starting from scratch.</span>
@@ -1601,7 +1601,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">LegacyLoggerCallback</span><span class="p">(</span><span class="n">LoggerCallback</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LegacyLoggerCallback</span><span class="p">(</span><span class="n">LoggerCallback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Supports logging to trial-specific `Logger` classes.</span>
 
 <span class="sd">    Previously, Ray Tune logging was handled via `Logger` classes that have</span>
@@ -1615,11 +1615,11 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger_classes</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Logger</span><span class="p">]]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger_classes</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Logger</span><span class="p">]]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger_classes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">logger_classes</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_class_trial_loggers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Logger</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">Logger</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">log_trial_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
         <span class="n">trial</span><span class="o">.</span><span class="n">init_local_path</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">logger_class</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger_classes</span><span class="p">:</span>
@@ -1629,36 +1629,36 @@ document.write(`
                 <span class="n">trial_loggers</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span> <span class="o">=</span> <span class="n">logger</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_class_trial_loggers</span><span class="p">[</span><span class="n">logger_class</span><span class="p">]</span> <span class="o">=</span> <span class="n">trial_loggers</span>
 
-    <span class="k">def</span> <span class="nf">log_trial_restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">logger_class</span><span class="p">,</span> <span class="n">trial_loggers</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_trial_loggers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">trial_loggers</span><span class="p">:</span>
                 <span class="n">trial_loggers</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">log_trial_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">logger_class</span><span class="p">,</span> <span class="n">trial_loggers</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_trial_loggers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">trial_loggers</span><span class="p">:</span>
                 <span class="n">trial_loggers</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">log_trial_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">logger_class</span><span class="p">,</span> <span class="n">trial_loggers</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_trial_loggers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">trial_loggers</span><span class="p">:</span>
                 <span class="n">trial_loggers</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span><span class="o">.</span><span class="n">on_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">log_trial_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">failed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">failed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">logger_class</span><span class="p">,</span> <span class="n">trial_loggers</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_trial_loggers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">trial_loggers</span><span class="p">:</span>
                 <span class="n">trial_loggers</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 
-<span class="k">class</span> <span class="nc">_RayDumper</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">SafeDumper</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">represent_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">flow_style</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_RayDumper</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">SafeDumper</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">represent_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">flow_style</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">_SEQUENCE_LEN_FLOW_STYLE</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">represent_sequence</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">flow_style</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">represent_sequence</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">flow_style</span><span class="o">=</span><span class="n">flow_style</span><span class="p">)</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">pretty_print</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pretty_print</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">exclude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># drop config from pretty print</span>
     <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">hist_stats</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># drop hist_stats from pretty print</span>

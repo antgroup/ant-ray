@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1441,7 +1441,7 @@ attempts to make a good tradeoff for most jobs.</p>
 <p>Ray Data attempts to bound block sizes between 1 MiB and 128 MiB. To change the block
 size range, configure the <code class="docutils literal notranslate"><span class="pre">target_min_block_size</span></code> and  <code class="docutils literal notranslate"><span class="pre">target_max_block_size</span></code>
 attributes of <a class="reference internal" href="api/data_context.html#ray.data.DataContext" title="ray.data.context.DataContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataContext</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ctx</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataContext</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span>
 <span class="n">ctx</span><span class="o">.</span><span class="n">target_min_block_size</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
@@ -1455,7 +1455,7 @@ attributes of <a class="reference internal" href="api/data_context.html#ray.data
 dynamically splits the block into smaller blocks.</p>
 <p>To change the size at which Ray Data splits blocks, configure
 <code class="docutils literal notranslate"><span class="pre">MAX_SAFE_BLOCK_SIZE_FACTOR</span></code>. The default value is 1.5.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">MAX_SAFE_BLOCK_SIZE_FACTOR</span> <span class="o">=</span> <span class="mf">1.5</span>
 </pre></div>
@@ -1495,11 +1495,11 @@ operator actually launches tasks to read the data.</p>
 operator. This prevents unnecessary serialization between map operators.</p>
 <p>To add custom optimization rules, implement a class that extends <code class="docutils literal notranslate"><span class="pre">Rule</span></code> and configure
 <code class="docutils literal notranslate"><span class="pre">DEFAULT_LOGICAL_RULES</span></code> or <code class="docutils literal notranslate"><span class="pre">DEFAULT_PHYSICAL_RULES</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.logical.interfaces</span> <span class="kn">import</span> <span class="n">Rule</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.logical.interfaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rule</span>
 
-<span class="k">class</span> <span class="nc">CustomRule</span><span class="p">(</span><span class="n">Rule</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plan</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomRule</span><span class="p">(</span><span class="n">Rule</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plan</span><span class="p">):</span>
         <span class="o">...</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">_internal</span><span class="o">.</span><span class="n">logical</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">DEFAULT_LOGICAL_RULES</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CustomRule</span><span class="p">)</span>
@@ -1587,11 +1587,11 @@ placement group. To use current placement group resources specifically for Ray D
 <span id="datasets-tune"></span><h3>Ray Data and Tune<a class="headerlink" href="#ray-data-and-tune" title="Link to this heading">#</a></h3>
 <p>When using Ray Data in conjunction with <a class="reference internal" href="../tune/index.html#tune-main"><span class="std std-ref">Ray Tune</span></a>, it’s important to ensure there are enough free CPUs for Ray Data to run on. By default, Tune tries to fully utilize cluster CPUs. This can prevent Ray Data from scheduling tasks, reducing performance or causing workloads to hang.</p>
 <p>To ensure CPU resources are always available for Ray Data execution, limit the number of concurrent Tune trials with the <code class="docutils literal notranslate"><span class="pre">max_concurrent_trials</span></code> Tune option.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 <span class="c1"># This workload will use spare cluster resources for execution.</span>
-<span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
     <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="c1"># Create a cluster with 4 CPU slots available.</span>

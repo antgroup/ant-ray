@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,43 +1389,43 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.callbacks.callbacks</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">gc</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">platform</span>
-<span class="kn">import</span> <span class="nn">tracemalloc</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tracemalloc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModule</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.base_env</span> <span class="kn">import</span> <span class="n">BaseEnv</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.env_context</span> <span class="kn">import</span> <span class="n">EnvContext</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.evaluation.episode_v2</span> <span class="kn">import</span> <span class="n">EpisodeV2</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy</span> <span class="kn">import</span> <span class="n">Policy</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.sample_batch</span> <span class="kn">import</span> <span class="n">SampleBatch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.base_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseEnv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.env_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.evaluation.episode_v2</span><span class="w"> </span><span class="kn">import</span> <span class="n">EpisodeV2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Policy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.sample_batch</span><span class="w"> </span><span class="kn">import</span> <span class="n">SampleBatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">OldAPIStack</span><span class="p">,</span>
     <span class="n">override</span><span class="p">,</span>
     <span class="n">OverrideToImplementCustomLogic</span><span class="p">,</span>
     <span class="n">PublicAPI</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics.metrics_logger</span> <span class="kn">import</span> <span class="n">MetricsLogger</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">AgentID</span><span class="p">,</span> <span class="n">EnvType</span><span class="p">,</span> <span class="n">EpisodeType</span><span class="p">,</span> <span class="n">PolicyID</span>
-<span class="kn">from</span> <span class="nn">ray.tune.callback</span> <span class="kn">import</span> <span class="n">_CallbackMeta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.metrics_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsLogger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentID</span><span class="p">,</span> <span class="n">EnvType</span><span class="p">,</span> <span class="n">EpisodeType</span><span class="p">,</span> <span class="n">PolicyID</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.callback</span><span class="w"> </span><span class="kn">import</span> <span class="n">_CallbackMeta</span>
 
 <span class="c1"># Import psutil after ray so the packaged version is used.</span>
-<span class="kn">import</span> <span class="nn">psutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm</span> <span class="kn">import</span> <span class="n">Algorithm</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.env.env_runner</span> <span class="kn">import</span> <span class="n">EnvRunner</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.env.env_runner_group</span> <span class="kn">import</span> <span class="n">EnvRunnerGroup</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm</span><span class="w"> </span><span class="kn">import</span> <span class="n">Algorithm</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.env_runner</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvRunner</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.env_runner_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvRunnerGroup</span>
 
 
 <div class="viewcode-block" id="RLlibCallback">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.html#ray.rllib.callbacks.callbacks.RLlibCallback">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">RLlibCallback</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">_CallbackMeta</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RLlibCallback</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">_CallbackMeta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for RLlib callbacks (similar to Keras callbacks).</span>
 
 <span class="sd">    These callbacks can be used for custom metrics and custom postprocessing.</span>
@@ -1438,7 +1438,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_algorithm_init">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">on_algorithm_init</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_algorithm_init</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">algorithm</span><span class="p">:</span> <span class="s2">&quot;Algorithm&quot;</span><span class="p">,</span>
@@ -1462,7 +1462,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_train_result">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_train_result.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_train_result">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">on_train_result</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_result</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">algorithm</span><span class="p">:</span> <span class="s2">&quot;Algorithm&quot;</span><span class="p">,</span>
@@ -1486,7 +1486,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_evaluate_start">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_evaluate_start.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_evaluate_start">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">on_evaluate_start</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_evaluate_start</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">algorithm</span><span class="p">:</span> <span class="s2">&quot;Algorithm&quot;</span><span class="p">,</span>
@@ -1509,7 +1509,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_evaluate_end">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_evaluate_end.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_evaluate_end">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">on_evaluate_end</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_evaluate_end</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">algorithm</span><span class="p">:</span> <span class="s2">&quot;Algorithm&quot;</span><span class="p">,</span>
@@ -1535,7 +1535,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_env_runners_recreated">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_env_runners_recreated.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_env_runners_recreated">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">on_env_runners_recreated</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_env_runners_recreated</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">algorithm</span><span class="p">:</span> <span class="s2">&quot;Algorithm&quot;</span><span class="p">,</span>
@@ -1600,7 +1600,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_checkpoint_loaded">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_checkpoint_loaded.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_checkpoint_loaded">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">on_checkpoint_loaded</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_checkpoint_loaded</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">algorithm</span><span class="p">:</span> <span class="s2">&quot;Algorithm&quot;</span><span class="p">,</span>
@@ -1620,7 +1620,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_environment_created">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_environment_created.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_environment_created">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">on_environment_created</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_environment_created</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">env_runner</span><span class="p">:</span> <span class="s2">&quot;EnvRunner&quot;</span><span class="p">,</span>
@@ -1653,7 +1653,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_episode_created">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_created.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_created">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">on_episode_created</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_episode_created</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="c1"># TODO (sven): Deprecate Episode/EpisodeV2 with new API stack.</span>
@@ -1703,7 +1703,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_episode_start">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_start.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_start">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">on_episode_start</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_episode_start</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">episode</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">EpisodeType</span><span class="p">,</span> <span class="n">EpisodeV2</span><span class="p">],</span>
@@ -1748,7 +1748,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_episode_step">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_step.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_step">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">on_episode_step</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_episode_step</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">episode</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">EpisodeType</span><span class="p">,</span> <span class="n">EpisodeV2</span><span class="p">],</span>
@@ -1794,7 +1794,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_episode_end">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">on_episode_end</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_episode_end</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">episode</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">EpisodeType</span><span class="p">,</span> <span class="n">EpisodeV2</span><span class="p">],</span>
@@ -1857,7 +1857,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_sample_end">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="nf">on_sample_end</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_sample_end</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">env_runner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;EnvRunner&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1884,7 +1884,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_sub_environment_created">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_sub_environment_created.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_sub_environment_created">[docs]</a>
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">on_sub_environment_created</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_sub_environment_created</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">worker</span><span class="p">:</span> <span class="s2">&quot;EnvRunner&quot;</span><span class="p">,</span>
@@ -1916,7 +1916,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_postprocess_trajectory">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_postprocess_trajectory.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_postprocess_trajectory">[docs]</a>
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">on_postprocess_trajectory</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_postprocess_trajectory</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">worker</span><span class="p">:</span> <span class="s2">&quot;EnvRunner&quot;</span><span class="p">,</span>
@@ -1954,7 +1954,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_create_policy">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_create_policy.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_create_policy">[docs]</a>
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">on_create_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">policy_id</span><span class="p">:</span> <span class="n">PolicyID</span><span class="p">,</span> <span class="n">policy</span><span class="p">:</span> <span class="n">Policy</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_create_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">policy_id</span><span class="p">:</span> <span class="n">PolicyID</span><span class="p">,</span> <span class="n">policy</span><span class="p">:</span> <span class="n">Policy</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Callback run whenever a new policy is added to an algorithm.</span>
 
 <span class="sd">        Args:</span>
@@ -1967,7 +1967,7 @@ document.write(`
 <div class="viewcode-block" id="RLlibCallback.on_learn_on_batch">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_learn_on_batch.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_learn_on_batch">[docs]</a>
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">on_learn_on_batch</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_learn_on_batch</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">policy</span><span class="p">:</span> <span class="n">Policy</span><span class="p">,</span> <span class="n">train_batch</span><span class="p">:</span> <span class="n">SampleBatch</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Called at the beginning of Policy.learn_on_batch().</span>
@@ -1992,7 +1992,7 @@ document.write(`
 
 
     <span class="c1"># Deprecated, use `on_env_runners_recreated`, instead.</span>
-    <span class="k">def</span> <span class="nf">on_workers_recreated</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_workers_recreated</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">algorithm</span><span class="p">,</span>
@@ -2007,7 +2007,7 @@ document.write(`
 
 <div class="viewcode-block" id="MemoryTrackingCallbacks">
 <a class="viewcode-back" href="../../../../rllib/rllib-dev.html#ray.rllib.callbacks.callbacks.MemoryTrackingCallbacks">[docs]</a>
-<span class="k">class</span> <span class="nc">MemoryTrackingCallbacks</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MemoryTrackingCallbacks</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;MemoryTrackingCallbacks can be used to trace and track memory usage</span>
 <span class="sd">    in rollout workers.</span>
 
@@ -2028,14 +2028,14 @@ document.write(`
 <span class="sd">        a significant slowdown in execution speed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="c1"># Will track the top 10 lines where memory is allocated</span>
         <span class="n">tracemalloc</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">on_episode_end</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_episode_end</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">episode</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">EpisodeType</span><span class="p">,</span> <span class="n">EpisodeV2</span><span class="p">],</span>

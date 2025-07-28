@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/autodoc_pydantic.css" />
@@ -1389,14 +1389,14 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.llm._internal.serve.configs.server_models</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">pydantic</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.configs.error_handling</span> <span class="kn">import</span> <span class="n">TooManyStoppingSequences</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.configs.error_handling</span><span class="w"> </span><span class="kn">import</span> <span class="n">TooManyStoppingSequences</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Dict</span><span class="p">,</span>
     <span class="n">List</span><span class="p">,</span>
@@ -1408,8 +1408,8 @@ document.write(`
     <span class="n">Sequence</span><span class="p">,</span>
     <span class="n">Set</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BaseModel</span><span class="p">,</span>
     <span class="n">ConfigDict</span><span class="p">,</span>
     <span class="n">Field</span><span class="p">,</span>
@@ -1419,25 +1419,25 @@ document.write(`
     <span class="n">model_validator</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">ray.llm._internal.common.base_pydantic</span> <span class="kn">import</span> <span class="n">BaseModelExtended</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.common.utils.cloud_utils</span> <span class="kn">import</span> <span class="n">CloudMirrorConfig</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.utils</span> <span class="kn">import</span> <span class="n">try_import</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.common.base_pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModelExtended</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.common.utils.cloud_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">CloudMirrorConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">try_import</span>
 
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.observability.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
-<span class="kn">import</span> <span class="nn">ray.util.accelerators.accelerators</span> <span class="k">as</span> <span class="nn">accelerators</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.config</span> <span class="kn">import</span> <span class="n">DeploymentConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.observability.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.util.accelerators.accelerators</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">accelerators</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentConfig</span>
 
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.configs.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.configs.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_MULTIPLEX_DOWNLOAD_TIMEOUT_S</span><span class="p">,</span>
     <span class="n">DEFAULT_MULTIPLEX_DOWNLOAD_TRIES</span><span class="p">,</span>
     <span class="n">MAX_NUM_STOPPING_SEQUENCES</span><span class="p">,</span>
     <span class="n">ENABLE_WORKER_PROCESS_SETUP_HOOK</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.configs.prompt_formats</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.configs.prompt_formats</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Prompt</span><span class="p">,</span>
     <span class="n">HuggingFacePromptFormat</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.configs.openai_api_models_patch</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.configs.openai_api_models_patch</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ErrorResponse</span><span class="p">,</span>
     <span class="n">ResponseFormatType</span><span class="p">,</span>
 <span class="p">)</span>
@@ -1452,7 +1452,7 @@ document.write(`
 <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">ServeMultiplexConfig</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ServeMultiplexConfig</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
     <span class="n">max_num_models_per_replica</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The maximum number of models to be loaded on each replica.&quot;</span>
     <span class="p">)</span>
@@ -1466,18 +1466,18 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">InputModality</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">InputModality</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
     <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;text&quot;</span>
     <span class="n">image</span> <span class="o">=</span> <span class="s2">&quot;image&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">LLMEngine</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LLMEngine</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Enum that represents an LLMEngine.&quot;&quot;&quot;</span>
 
     <span class="n">vLLM</span> <span class="o">=</span> <span class="s2">&quot;vLLM&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">JSONModeOptions</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JSONModeOptions</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
     <span class="n">num_processes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The number of background processes for each replica.&quot;</span><span class="p">,</span>
@@ -1487,7 +1487,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">LoraConfig</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LoraConfig</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
     <span class="n">dynamic_lora_loading_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Cloud storage path where LoRA adapter weights are stored.&quot;</span><span class="p">,</span>
@@ -1511,7 +1511,7 @@ document.write(`
 <div class="viewcode-block" id="LoraConfig.validate_dynamic_lora_loading_path">
 <a class="viewcode-back" href="../../../../../../serve/api/doc/ray.serve.llm.LoraConfig.html#ray.serve.llm.LoraConfig.validate_dynamic_lora_loading_path">[docs]</a>
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;dynamic_lora_loading_path&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">validate_dynamic_lora_loading_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_dynamic_lora_loading_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">value</span>
 
@@ -1524,7 +1524,7 @@ document.write(`
 
 
 
-<span class="k">class</span> <span class="nc">ModelLoadingConfig</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelLoadingConfig</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
     <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The ID that should be used by end users to access this model.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
@@ -1547,7 +1547,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">LLMConfig</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LLMConfig</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
     <span class="c1"># model_config is a Pydantic setting. This setting merges with</span>
     <span class="c1"># model_configs in parent classes.</span>
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span>
@@ -1610,7 +1610,7 @@ document.write(`
         <span class="n">default_factory</span><span class="o">=</span><span class="n">HuggingFacePromptFormat</span>
     <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_infer_supports_vision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id_or_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_infer_supports_vision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id_or_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Called in llm node initializer together with other transformers calls. It</span>
 <span class="sd">        loads the model config from huggingface and sets the supports_vision</span>
 <span class="sd">        attribute based on whether the config has `vision_config`. All LVM models has</span>
@@ -1619,7 +1619,7 @@ document.write(`
         <span class="n">hf_config</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">PretrainedConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_id_or_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_supports_vision</span> <span class="o">=</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">hf_config</span><span class="p">,</span> <span class="s2">&quot;vision_config&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_set_model_architecture</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_model_architecture</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model_id_or_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">model_architecture</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1638,7 +1638,7 @@ document.write(`
 
 <div class="viewcode-block" id="LLMConfig.apply_checkpoint_info">
 <a class="viewcode-back" href="../../../../../../serve/api/doc/ray.serve.llm.LLMConfig.html#ray.serve.llm.LLMConfig.apply_checkpoint_info">[docs]</a>
-    <span class="k">def</span> <span class="nf">apply_checkpoint_info</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_checkpoint_info</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">model_id_or_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">trust_remote_code</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the checkpoint info to the model config.&quot;&quot;&quot;</span>
@@ -1651,19 +1651,19 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">supports_vision</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">supports_vision</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supports_vision</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">model_architecture</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model_architecture</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_architecture</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">prompt_format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HuggingFacePromptFormat</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prompt_format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HuggingFacePromptFormat</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_format</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">input_modality</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">input_modality</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the input modality of the model. There could be more types in the</span>
 <span class="sd">        future. Right now assumes if the model doesn&#39;t support version, it&#39;ll be text.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1673,17 +1673,17 @@ document.write(`
         <span class="k">return</span> <span class="n">InputModality</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">value</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">model_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_loading_config</span><span class="o">.</span><span class="n">model_id</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">max_request_context_length</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_request_context_length</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_model_len&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LLMConfig.validate_accelerator_type">
 <a class="viewcode-back" href="../../../../../../serve/api/doc/ray.serve.llm.LLMConfig.html#ray.serve.llm.LLMConfig.validate_accelerator_type">[docs]</a>
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;accelerator_type&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">validate_accelerator_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_accelerator_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="c1"># Ensure A10 is converted to A10G.</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;A10&quot;</span><span class="p">:</span>
             <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;A10G&quot;</span>
@@ -1697,32 +1697,32 @@ document.write(`
 <div class="viewcode-block" id="LLMConfig.validate_llm_engine">
 <a class="viewcode-back" href="../../../../../../serve/api/doc/ray.serve.llm.LLMConfig.html#ray.serve.llm.LLMConfig.validate_llm_engine">[docs]</a>
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;llm_engine&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">validate_llm_engine</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_llm_engine</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates the llm_engine string value.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Validate the engine</span>
             <span class="n">LLMEngine</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported engine: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported engine: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="k">return</span> <span class="n">value</span></div>
 
 
 <div class="viewcode-block" id="LLMConfig.validate_deployment_config">
 <a class="viewcode-back" href="../../../../../../serve/api/doc/ray.serve.llm.LLMConfig.html#ray.serve.llm.LLMConfig.validate_deployment_config">[docs]</a>
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;deployment_config&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">validate_deployment_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_deployment_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates the deployment config dictionary.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">DeploymentConfig</span><span class="p">(</span><span class="o">**</span><span class="n">value</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid deployment config: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid deployment config: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
         <span class="k">return</span> <span class="n">value</span></div>
 
 
 <div class="viewcode-block" id="LLMConfig.multiplex_config">
 <a class="viewcode-back" href="../../../../../../serve/api/doc/ray.serve.llm.LLMConfig.html#ray.serve.llm.LLMConfig.multiplex_config">[docs]</a>
-    <span class="k">def</span> <span class="nf">multiplex_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ServeMultiplexConfig</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">multiplex_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ServeMultiplexConfig</span><span class="p">:</span>
         <span class="n">multiplex_config</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lora_config</span><span class="p">:</span>
             <span class="n">multiplex_config</span> <span class="o">=</span> <span class="n">ServeMultiplexConfig</span><span class="p">(</span>
@@ -1735,13 +1735,13 @@ document.write(`
 
 <div class="viewcode-block" id="LLMConfig.get_engine_config">
 <a class="viewcode-back" href="../../../../../../serve/api/doc/ray.serve.llm.LLMConfig.html#ray.serve.llm.LLMConfig.get_engine_config">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_engine_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_engine_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the engine config for the given LLM config.</span>
 
 <span class="sd">        LLMConfig not only has engine config but also deployment config, etc.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm_engine</span> <span class="o">==</span> <span class="n">LLMEngine</span><span class="o">.</span><span class="n">vLLM</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.llm._internal.serve.deployments.llm.vllm.vllm_models</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.deployments.llm.vllm.vllm_models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
                 <span class="n">VLLMEngineConfig</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -1752,7 +1752,7 @@ document.write(`
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported engine: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">llm_engine</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_set_deployment_placement_options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_deployment_placement_options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="n">deployment_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deployment_config</span>
         <span class="n">engine_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_engine_config</span><span class="p">()</span>
 
@@ -1798,13 +1798,13 @@ document.write(`
 
         <span class="k">return</span> <span class="n">deployment_config</span>
 
-    <span class="k">def</span> <span class="nf">_get_deployment_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_deployment_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">unsanitized_deployment_name</span> <span class="o">=</span> <span class="n">name_prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span>
         <span class="k">return</span> <span class="n">unsanitized_deployment_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;--&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LLMConfig.get_serve_options">
 <a class="viewcode-back" href="../../../../../../serve/api/doc/ray.serve.llm.LLMConfig.html#ray.serve.llm.LLMConfig.get_serve_options">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_serve_options</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_serve_options</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">name_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1860,7 +1860,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_is_yaml_file</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_yaml_file</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="n">yaml_extensions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.yml&quot;</span><span class="p">,</span> <span class="s2">&quot;.yaml&quot;</span><span class="p">,</span> <span class="s2">&quot;.json&quot;</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">yaml_extensions</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
@@ -1868,7 +1868,7 @@ document.write(`
     <span class="k">return</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">_parse_path_args</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">LLMConfig</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_path_args</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">LLMConfig</span><span class="p">]:</span>
     <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span>
         <span class="n">path</span>
     <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Could not load model from </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">, as it does not exist.&quot;</span>
@@ -1891,7 +1891,7 @@ document.write(`
         <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">parse_args</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_args</span><span class="p">(</span>
     <span class="n">args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LLMConfig</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">LLMConfig</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">LLMConfig</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse the input args and return a standardized list of LLMConfig objects</span>
@@ -1923,7 +1923,7 @@ document.write(`
                         <span class="sa">f</span><span class="s2">&quot;Could not parse string as yaml. If you are &quot;</span>
                         <span class="s2">&quot;specifying a path, make sure it exists and can be &quot;</span>
                         <span class="sa">f</span><span class="s2">&quot;reached. raw_model: </span><span class="si">{</span><span class="n">raw_model</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">llm_config</span> <span class="o">=</span> <span class="n">LLMConfig</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">raw_model</span><span class="p">)</span>
@@ -1935,14 +1935,14 @@ document.write(`
     <span class="k">return</span> <span class="n">models</span>
 
 
-<span class="k">class</span> <span class="nc">LLMServingArgs</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LLMServingArgs</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">llm_configs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LLMConfig</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A list of LLMConfigs, or paths to LLMConfigs, to run.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
 <div class="viewcode-block" id="LLMServingArgs.parse_args">
 <a class="viewcode-back" href="../../../../../../serve/api/doc/ray.serve.llm.LLMServingArgs.html#ray.serve.llm.LLMServingArgs.parse_args">[docs]</a>
-    <span class="k">def</span> <span class="nf">parse_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;LLMServingArgs&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;LLMServingArgs&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts this LLMServingArgs object into an DeployArgs object.&quot;&quot;&quot;</span>
 
         <span class="n">llm_configs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1964,7 +1964,7 @@ document.write(`
 <span class="n">TModel</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TModel&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;Model&quot;</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">ModelData</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelData</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">protected_namespaces</span><span class="o">=</span><span class="nb">tuple</span><span class="p">())</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
@@ -1974,30 +1974,30 @@ document.write(`
     <span class="n">rayllm_metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">model_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rayllm_metadata</span><span class="p">[</span><span class="s2">&quot;engine_config&quot;</span><span class="p">][</span><span class="s2">&quot;model_type&quot;</span><span class="p">]</span>
 
 
-<span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Model</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ModelData</span><span class="p">]</span>
     <span class="nb">object</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;list&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">list</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TModel</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TModel</span><span class="p">:</span>
         <span class="k">pass</span>
 
 
-<span class="k">class</span> <span class="nc">FinishReason</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FinishReason</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
     <span class="n">LENGTH</span> <span class="o">=</span> <span class="s2">&quot;length&quot;</span>
     <span class="n">STOP</span> <span class="o">=</span> <span class="s2">&quot;stop&quot;</span>
     <span class="n">ERROR</span> <span class="o">=</span> <span class="s2">&quot;error&quot;</span>
     <span class="n">CANCELLED</span> <span class="o">=</span> <span class="s2">&quot;cancelled&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_vllm_finish_reason</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_vllm_finish_reason</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">finish_reason</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;FinishReason&quot;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">finish_reason</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2011,7 +2011,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">STOP</span>
 
 
-<span class="k">class</span> <span class="nc">DiskMultiplexConfig</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DiskMultiplexConfig</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
     <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">max_total_tokens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
     <span class="n">local_path</span><span class="p">:</span> <span class="nb">str</span>
@@ -2020,23 +2020,23 @@ document.write(`
     <span class="n">lora_assigned_int_id</span><span class="p">:</span> <span class="nb">int</span>
 
 
-<span class="k">class</span> <span class="nc">ComputedPropertyMixin</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ComputedPropertyMixin</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Include properties in the dict and json representations of the model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Replace with pydantic.computed_field once it&#39;s available</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_properties</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_properties</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">prop</span> <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">prop</span><span class="p">),</span> <span class="nb">property</span><span class="p">)]</span>
 
-    <span class="k">def</span> <span class="nf">model_dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model_dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
             <span class="p">{</span><span class="n">prop</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span> <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_properties</span><span class="p">()}</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 
-    <span class="k">def</span> <span class="nf">model_dump_json</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model_dump_json</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
@@ -2048,20 +2048,20 @@ document.write(`
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 
 
-<span class="k">class</span> <span class="nc">LogProb</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogProb</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">logprob</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">token</span><span class="p">:</span> <span class="nb">str</span>
     <span class="nb">bytes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
 
 
-<span class="k">class</span> <span class="nc">LogProbs</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogProbs</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">token</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">logprob</span><span class="p">:</span> <span class="nb">float</span>
     <span class="nb">bytes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
     <span class="n">top_logprobs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LogProb</span><span class="p">]</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">logprobs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LogProb</span><span class="p">],</span> <span class="n">top_logprobs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">logprobs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LogProb</span><span class="p">],</span> <span class="n">top_logprobs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">logprobs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;logprobs must be a non-empty list&quot;</span>
         <span class="n">token</span> <span class="o">=</span> <span class="n">logprobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">token</span>
         <span class="n">logprob</span> <span class="o">=</span> <span class="n">logprobs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">logprob</span>
@@ -2071,7 +2071,7 @@ document.write(`
         <span class="k">return</span> <span class="n">ret</span>
 
 
-<span class="k">class</span> <span class="nc">LLMRawResponse</span><span class="p">(</span><span class="n">ComputedPropertyMixin</span><span class="p">,</span> <span class="n">BaseModelExtended</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LLMRawResponse</span><span class="p">(</span><span class="n">ComputedPropertyMixin</span><span class="p">,</span> <span class="n">BaseModelExtended</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The response from a query to a RayLLM Model.</span>
 
 <span class="sd">    Args:</span>
@@ -2103,7 +2103,7 @@ document.write(`
 
     <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">text_or_error_or_finish_reason</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">text_or_error_or_finish_reason</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;generated_text&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
             <span class="ow">and</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
@@ -2115,7 +2115,7 @@ document.write(`
         <span class="k">return</span> <span class="n">values</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">merge_stream</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">responses</span><span class="p">:</span> <span class="s2">&quot;LLMRawResponse&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;LLMRawResponse&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">merge_stream</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">responses</span><span class="p">:</span> <span class="s2">&quot;LLMRawResponse&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;LLMRawResponse&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Merge a stream of responses into a single response.</span>
 
@@ -2195,20 +2195,20 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">total_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">total_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">generation_time</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessing_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessing_time</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generation_time</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">num_total_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_total_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_input_tokens</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_generated_tokens</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">num_total_tokens_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_total_tokens_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_input_tokens_batch</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">num_generated_tokens_batch</span> <span class="ow">or</span> <span class="mi">0</span>
@@ -2216,29 +2216,29 @@ document.write(`
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;LLMRawResponse&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;LLMRawResponse&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="p">,)</span>
 
 
-<span class="k">class</span> <span class="nc">BatchedLLMRawResponse</span><span class="p">(</span><span class="n">LLMRawResponse</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BatchedLLMRawResponse</span><span class="p">(</span><span class="n">LLMRawResponse</span><span class="p">):</span>
     <span class="c1"># Same as LLMRawResponse, but persists the individual responses</span>
     <span class="c1"># that were batched together to produce this response.</span>
 
     <span class="n">_individual_responses</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">LLMRawResponse</span><span class="p">]]</span> <span class="o">=</span> <span class="n">PrivateAttr</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">merge_stream</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">responses</span><span class="p">:</span> <span class="n">LLMRawResponse</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMRawResponse</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">merge_stream</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">responses</span><span class="p">:</span> <span class="n">LLMRawResponse</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMRawResponse</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">responses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">responses</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">merge_stream</span><span class="p">(</span><span class="o">*</span><span class="n">responses</span><span class="p">)</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">_individual_responses</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">responses</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">LLMRawResponse</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">LLMRawResponse</span><span class="p">]:</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_individual_responses</span> <span class="ow">or</span> <span class="p">[])</span>
 
 
-<span class="k">def</span> <span class="nf">merge_dicts</span><span class="p">(</span><span class="n">base</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_dicts</span><span class="p">(</span><span class="n">base</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Merge overwrite into base. Modify base inplace.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2255,7 +2255,7 @@ document.write(`
     <span class="k">return</span> <span class="n">base</span>
 
 
-<span class="k">class</span> <span class="nc">SamplingParams</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SamplingParams</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
 <span class="sd">        max_tokens: The maximum number of tokens to generate. Defaults to inf.</span>
@@ -2301,14 +2301,14 @@ document.write(`
     <span class="n">best_of</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">response_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ResponseFormatType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">model_dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model_dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;exclude&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;exclude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ignored_fields</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">validate_stopping_sequences</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_stopping_sequences</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">values</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">values</span>
 
@@ -2322,7 +2322,7 @@ document.write(`
         <span class="k">return</span> <span class="n">unique_val</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_prompt</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">ModelT</span><span class="p">],</span> <span class="n">prompt</span><span class="p">:</span> <span class="n">Prompt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModelT</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_prompt</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">ModelT</span><span class="p">],</span> <span class="n">prompt</span><span class="p">:</span> <span class="n">Prompt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModelT</span><span class="p">:</span>
         <span class="c1"># Extract parameters object from prompt</span>
         <span class="n">generate_kwargs</span> <span class="o">=</span> <span class="n">prompt</span><span class="o">.</span><span class="n">parameters</span> <span class="ow">or</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">generate_kwargs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
@@ -2334,7 +2334,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">generate_kwargs</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">GenerationRequest</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GenerationRequest</span><span class="p">(</span><span class="n">BaseModelExtended</span><span class="p">):</span>
     <span class="n">prompt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
     <span class="n">request_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
     <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">SamplingParams</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">SamplingParams</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>

@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,39 +1389,39 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.utils.checkpoints</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">abc</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">packaging</span> <span class="kn">import</span> <span class="n">version</span>
-<span class="kn">import</span> <span class="nn">pathlib</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">MappingProxyType</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">packaging</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">MappingProxyType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">pyarrow.fs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray.cloudpickle</span> <span class="k">as</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.cloudpickle</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">COMPONENT_LEARNER</span><span class="p">,</span>
     <span class="n">COMPONENT_LEARNER_GROUP</span><span class="p">,</span>
     <span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils</span> <span class="kn">import</span> <span class="n">force_list</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.actor_manager</span> <span class="kn">import</span> <span class="n">FaultTolerantActorManager</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">force_list</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.actor_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">FaultTolerantActorManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">OldAPIStack</span><span class="p">,</span>
     <span class="n">OverrideToImplementCustomLogic_CallToSuperRecommended</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.serialization</span> <span class="kn">import</span> <span class="n">NOT_SERIALIZABLE</span><span class="p">,</span> <span class="n">serialize_type</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">StateDict</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils.file_transfer</span> <span class="kn">import</span> <span class="n">sync_dir_between_nodes</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">log_once</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.serialization</span><span class="w"> </span><span class="kn">import</span> <span class="n">NOT_SERIALIZABLE</span><span class="p">,</span> <span class="n">serialize_type</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">StateDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils.file_transfer</span><span class="w"> </span><span class="kn">import</span> <span class="n">sync_dir_between_nodes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_once</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1453,7 +1453,7 @@ document.write(`
 <div class="viewcode-block" id="Checkpointable">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.utils.checkpoints.Checkpointable.html#ray.rllib.offline.offline_env_runner.Checkpointable">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Checkpointable</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Checkpointable</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for a component of RLlib that can be checkpointed to disk.</span>
 
 <span class="sd">    Subclasses must implement the following APIs:</span>
@@ -1485,7 +1485,7 @@ document.write(`
 
 <div class="viewcode-block" id="Checkpointable.save_to_path">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.utils.checkpoints.Checkpointable.save_to_path.html#ray.rllib.offline.offline_env_runner.Checkpointable.save_to_path">[docs]</a>
-    <span class="k">def</span> <span class="nf">save_to_path</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_to_path</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1538,7 +1538,7 @@ document.write(`
 
         <span class="c1"># If no path is given create a local temporary directory.</span>
         <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">uuid</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 
             <span class="c1"># Get the location of the temporary directory on the OS.</span>
             <span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">())</span>
@@ -1608,8 +1608,8 @@ document.write(`
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">FaultTolerantActorManager</span><span class="p">):</span>
                 <span class="n">actor_to_use</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">healthy_actor_ids</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 
-                <span class="k">def</span> <span class="nf">_get_ip</span><span class="p">(</span><span class="n">_</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-                    <span class="kn">import</span> <span class="nn">ray</span>
+                <span class="k">def</span><span class="w"> </span><span class="nf">_get_ip</span><span class="p">(</span><span class="n">_</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                    <span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
                     <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_node_ip_address</span><span class="p">()</span>
 
@@ -1649,8 +1649,8 @@ document.write(`
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># Save the checkpoint to the temporary directory on the worker.</span>
-                    <span class="k">def</span> <span class="nf">_save</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">_state</span><span class="o">=</span><span class="n">comp_state_ref</span><span class="p">,</span> <span class="n">_use_msgpack</span><span class="o">=</span><span class="n">use_msgpack</span><span class="p">):</span>
-                        <span class="kn">import</span> <span class="nn">tempfile</span>
+                    <span class="k">def</span><span class="w"> </span><span class="nf">_save</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">_state</span><span class="o">=</span><span class="n">comp_state_ref</span><span class="p">,</span> <span class="n">_use_msgpack</span><span class="o">=</span><span class="n">use_msgpack</span><span class="p">):</span>
+                        <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
                         <span class="c1"># Create a temporary directory on the worker.</span>
                         <span class="n">tmpdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
@@ -1679,8 +1679,8 @@ document.write(`
                     <span class="p">)</span>
 
                     <span class="c1"># Remove the temporary directory on the worker.</span>
-                    <span class="k">def</span> <span class="nf">_rmdir</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">_dir</span><span class="o">=</span><span class="n">worker_temp_dir</span><span class="p">):</span>
-                        <span class="kn">import</span> <span class="nn">shutil</span>
+                    <span class="k">def</span><span class="w"> </span><span class="nf">_rmdir</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">_dir</span><span class="o">=</span><span class="n">worker_temp_dir</span><span class="p">):</span>
+                        <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
 
                         <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">_dir</span><span class="p">)</span>
 
@@ -1718,7 +1718,7 @@ document.write(`
 
 <div class="viewcode-block" id="Checkpointable.restore_from_path">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.utils.checkpoints.Checkpointable.restore_from_path.html#ray.rllib.offline.offline_env_runner.Checkpointable.restore_from_path">[docs]</a>
-    <span class="k">def</span> <span class="nf">restore_from_path</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore_from_path</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1812,7 +1812,7 @@ document.write(`
 <div class="viewcode-block" id="Checkpointable.from_checkpoint">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.utils.checkpoints.Checkpointable.from_checkpoint.html#ray.rllib.offline.offline_env_runner.Checkpointable.from_checkpoint">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_checkpoint</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_checkpoint</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">],</span>
         <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1903,7 +1903,7 @@ document.write(`
 <div class="viewcode-block" id="Checkpointable.get_state">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.utils.checkpoints.Checkpointable.get_state.html#ray.rllib.offline.offline_env_runner.Checkpointable.get_state">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">components</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1938,7 +1938,7 @@ document.write(`
 <div class="viewcode-block" id="Checkpointable.set_state">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.utils.checkpoints.Checkpointable.set_state.html#ray.rllib.offline.offline_env_runner.Checkpointable.set_state">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the implementing class&#39; state to the given state dict.</span>
 
 <span class="sd">        If component keys are missing in `state`, these components of the implementing</span>
@@ -1953,7 +1953,7 @@ document.write(`
 <div class="viewcode-block" id="Checkpointable.get_ctor_args_and_kwargs">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.utils.checkpoints.Checkpointable.get_ctor_args_and_kwargs.html#ray.rllib.offline.offline_env_runner.Checkpointable.get_ctor_args_and_kwargs">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_ctor_args_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ctor_args_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the args/kwargs used to create `self` from its constructor.</span>
 
 <span class="sd">        Returns:</span>
@@ -1965,7 +1965,7 @@ document.write(`
 <div class="viewcode-block" id="Checkpointable.get_metadata">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.utils.checkpoints.Checkpointable.get_metadata.html#ray.rllib.offline.offline_env_runner.Checkpointable.get_metadata">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic_CallToSuperRecommended</span>
-    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns JSON writable metadata further describing the implementing class.</span>
 
 <span class="sd">        Note that this metadata is NOT part of any state and is thus NOT needed to</span>
@@ -1986,7 +1986,7 @@ document.write(`
 
 <div class="viewcode-block" id="Checkpointable.get_checkpointable_components">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.utils.checkpoints.Checkpointable.get_checkpointable_components.html#ray.rllib.offline.offline_env_runner.Checkpointable.get_checkpointable_components">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_checkpointable_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Checkpointable&quot;</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_checkpointable_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Checkpointable&quot;</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the implementing class&#39;s own Checkpointable subcomponents.</span>
 
 <span class="sd">        Returns:</span>
@@ -1998,7 +1998,7 @@ document.write(`
         <span class="k">return</span> <span class="p">[]</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_check_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">not_components</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">not_components</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="n">comp_list</span> <span class="o">=</span> <span class="n">force_list</span><span class="p">(</span><span class="n">components</span><span class="p">)</span>
         <span class="n">not_comp_list</span> <span class="o">=</span> <span class="n">force_list</span><span class="p">(</span><span class="n">not_components</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span>
@@ -2009,7 +2009,7 @@ document.write(`
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">_get_subcomponents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">components</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_subcomponents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">components</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">components</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
@@ -2021,7 +2021,7 @@ document.write(`
 
         <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">subcomponents</span> <span class="k">else</span> <span class="n">subcomponents</span>
 
-    <span class="k">def</span> <span class="nf">_restore_all_subcomponents_from_path</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_restore_all_subcomponents_from_path</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">filesystem</span><span class="p">,</span> <span class="n">only_comp_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
         <span class="k">for</span> <span class="n">comp_name</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_checkpointable_components</span><span class="p">():</span>
@@ -2056,15 +2056,15 @@ document.write(`
                 <span class="n">head_node_ip</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_node_ip_address</span><span class="p">()</span>
                 <span class="n">all_healthy_actors</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">healthy_actor_ids</span><span class="p">()</span>
 
-                <span class="k">def</span> <span class="nf">_restore</span><span class="p">(</span>
+                <span class="k">def</span><span class="w"> </span><span class="nf">_restore</span><span class="p">(</span>
                     <span class="n">w</span><span class="p">,</span>
                     <span class="n">_kwargs</span><span class="o">=</span><span class="n">MappingProxyType</span><span class="p">(</span><span class="n">kwargs</span><span class="p">),</span>
                     <span class="n">_path</span><span class="o">=</span><span class="n">comp_dir</span><span class="p">,</span>
                     <span class="n">_head_ip</span><span class="o">=</span><span class="n">head_node_ip</span><span class="p">,</span>
                     <span class="n">_comp_arg</span><span class="o">=</span><span class="n">comp_arg</span><span class="p">,</span>
                 <span class="p">):</span>
-                    <span class="kn">import</span> <span class="nn">ray</span>
-                    <span class="kn">import</span> <span class="nn">tempfile</span>
+                    <span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+                    <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
                     <span class="n">worker_node_ip</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_node_ip_address</span><span class="p">()</span>
                     <span class="c1"># If the worker is on the same node as the head, load the checkpoint</span>
@@ -2092,19 +2092,19 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_exists_at_fs_path</span><span class="p">(</span><span class="n">fs</span><span class="p">:</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_exists_at_fs_path</span><span class="p">(</span><span class="n">fs</span><span class="p">:</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns `True` if the path can be found in the filesystem.&quot;&quot;&quot;</span>
     <span class="n">valid</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_file_info</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">valid</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">FileType</span><span class="o">.</span><span class="n">NotFound</span>
 
 
-<span class="k">def</span> <span class="nf">_is_dir</span><span class="p">(</span><span class="n">file_info</span><span class="p">:</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">FileInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_dir</span><span class="p">(</span><span class="n">file_info</span><span class="p">:</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">FileInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns `True`, if the file info is from a directory.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">file_info</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">FileType</span><span class="o">.</span><span class="n">Directory</span>
 
 
 <span class="nd">@OldAPIStack</span>
-<span class="k">def</span> <span class="nf">get_checkpoint_info</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_checkpoint_info</span><span class="p">(</span>
     <span class="n">checkpoint</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Checkpoint</span><span class="p">],</span>
     <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
@@ -2303,7 +2303,7 @@ document.write(`
 
 
 <span class="nd">@OldAPIStack</span>
-<span class="k">def</span> <span class="nf">convert_to_msgpack_checkpoint</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_to_msgpack_checkpoint</span><span class="p">(</span>
     <span class="n">checkpoint</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Checkpoint</span><span class="p">],</span>
     <span class="n">msgpack_checkpoint_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -2321,9 +2321,9 @@ document.write(`
 <span class="sd">        The directory in which the msgpack checkpoint has been created. Note that</span>
 <span class="sd">        this is the same as `msgpack_checkpoint_dir`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.algorithms</span> <span class="kn">import</span> <span class="n">Algorithm</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module</span> <span class="kn">import</span> <span class="n">validate_module_id</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">Algorithm</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_module_id</span>
 
     <span class="c1"># Try to import msgpack and msgpack_numpy.</span>
     <span class="n">msgpack</span> <span class="o">=</span> <span class="n">try_import_msgpack</span><span class="p">(</span><span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -2395,7 +2395,7 @@ document.write(`
 
 
 <span class="nd">@OldAPIStack</span>
-<span class="k">def</span> <span class="nf">convert_to_msgpack_policy_checkpoint</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_to_msgpack_policy_checkpoint</span><span class="p">(</span>
     <span class="n">policy_checkpoint</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Checkpoint</span><span class="p">],</span>
     <span class="n">msgpack_checkpoint_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -2413,7 +2413,7 @@ document.write(`
 <span class="sd">        The directory in which the msgpack checkpoint has been created. Note that</span>
 <span class="sd">        this is the same as `msgpack_checkpoint_dir`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.policy.policy</span> <span class="kn">import</span> <span class="n">Policy</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Policy</span>
 
     <span class="n">policy</span> <span class="o">=</span> <span class="n">Policy</span><span class="o">.</span><span class="n">from_checkpoint</span><span class="p">(</span><span class="n">policy_checkpoint</span><span class="p">)</span>
 
@@ -2433,7 +2433,7 @@ document.write(`
 <div class="viewcode-block" id="try_import_msgpack">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.utils.checkpoints.try_import_msgpack.html#ray.rllib.offline.offline_env_runner.try_import_msgpack">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">try_import_msgpack</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">try_import_msgpack</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Tries importing msgpack and msgpack_numpy and returns the patched msgpack module.</span>
 
 <span class="sd">    Returns None if error is False and msgpack or msgpack_numpy is not installed.</span>
@@ -2449,8 +2449,8 @@ document.write(`
 <span class="sd">        ImportError: If error=True and msgpack/msgpack_numpy is not installed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">msgpack</span>
-        <span class="kn">import</span> <span class="nn">msgpack_numpy</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">msgpack</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">msgpack_numpy</span>
 
         <span class="c1"># Make msgpack_numpy look like msgpack.</span>
         <span class="n">msgpack_numpy</span><span class="o">.</span><span class="n">patch</span><span class="p">()</span>

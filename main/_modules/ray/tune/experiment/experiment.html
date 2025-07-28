@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,15 +1392,15 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.experiment.experiment</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">pprint</span> <span class="k">as</span> <span class="nn">pp</span>
-<span class="kn">import</span> <span class="nn">traceback</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">pickle</span> <span class="kn">import</span> <span class="n">PicklingError</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pickle</span><span class="w"> </span><span class="kn">import</span> <span class="n">PicklingError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -1413,27 +1413,27 @@ document.write(`
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.exceptions</span> <span class="kn">import</span> <span class="n">RpcError</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">CheckpointConfig</span><span class="p">,</span> <span class="n">SyncConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.storage</span> <span class="kn">import</span> <span class="n">StorageContext</span>
-<span class="kn">from</span> <span class="nn">ray.train.constants</span> <span class="kn">import</span> <span class="n">DEFAULT_STORAGE_PATH</span>
-<span class="kn">from</span> <span class="nn">ray.tune.error</span> <span class="kn">import</span> <span class="n">TuneError</span>
-<span class="kn">from</span> <span class="nn">ray.tune.registry</span> <span class="kn">import</span> <span class="n">is_function_trainable</span><span class="p">,</span> <span class="n">register_trainable</span>
-<span class="kn">from</span> <span class="nn">ray.tune.stopper</span> <span class="kn">import</span> <span class="n">CombinedStopper</span><span class="p">,</span> <span class="n">FunctionStopper</span><span class="p">,</span> <span class="n">Stopper</span><span class="p">,</span> <span class="n">TimeoutStopper</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">RpcError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">CheckpointConfig</span><span class="p">,</span> <span class="n">SyncConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">StorageContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_STORAGE_PATH</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.error</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_function_trainable</span><span class="p">,</span> <span class="n">register_trainable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.stopper</span><span class="w"> </span><span class="kn">import</span> <span class="n">CombinedStopper</span><span class="p">,</span> <span class="n">FunctionStopper</span><span class="p">,</span> <span class="n">Stopper</span><span class="p">,</span> <span class="n">TimeoutStopper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pyarrow.fs</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
 
-    <span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.experiment</span> <span class="kn">import</span> <span class="n">Trial</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trial</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_validate_log_to_file</span><span class="p">(</span><span class="n">log_to_file</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_log_to_file</span><span class="p">(</span><span class="n">log_to_file</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate ``tune.RunConfig``&#39;s ``log_to_file`` parameter. Return</span>
 <span class="sd">    validated relative stdout and stderr filenames.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">log_to_file</span><span class="p">:</span>
@@ -1464,7 +1464,7 @@ document.write(`
 <div class="viewcode-block" id="Experiment">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Experiment.html#ray.tune.Experiment">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Experiment</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Experiment</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracks experiment specifications.</span>
 
 <span class="sd">    Implicitly registers the Trainable if needed. The args here take</span>
@@ -1495,7 +1495,7 @@ document.write(`
     <span class="n">PUBLIC_KEYS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;stop&quot;</span><span class="p">,</span> <span class="s2">&quot;num_samples&quot;</span><span class="p">,</span> <span class="s2">&quot;time_budget_s&quot;</span><span class="p">}</span>
     <span class="n">_storage_context_cls</span> <span class="o">=</span> <span class="n">StorageContext</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">run</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span><span class="p">],</span>
@@ -1641,7 +1641,7 @@ document.write(`
 <div class="viewcode-block" id="Experiment.from_json">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Experiment.from_json.html#ray.tune.Experiment.from_json">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">spec</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">spec</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates an Experiment object from JSON.</span>
 
 <span class="sd">        Args:</span>
@@ -1683,7 +1683,7 @@ document.write(`
 <div class="viewcode-block" id="Experiment.get_trainable_name">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Experiment.get_trainable_name.html#ray.tune.Experiment.get_trainable_name">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_trainable_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">run_object</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_trainable_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">run_object</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get Trainable name.</span>
 
 <span class="sd">        Args:</span>
@@ -1697,7 +1697,7 @@ document.write(`
 <span class="sd">        Raises:</span>
 <span class="sd">            TuneError: if ``run_object`` passed in is invalid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.tune.search.sample</span> <span class="kn">import</span> <span class="n">Domain</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.sample</span><span class="w"> </span><span class="kn">import</span> <span class="n">Domain</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">run_object</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">run_object</span><span class="p">,</span> <span class="n">Domain</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">run_object</span>
@@ -1729,7 +1729,7 @@ document.write(`
 <div class="viewcode-block" id="Experiment.register_if_needed">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.Experiment.register_if_needed.html#ray.tune.Experiment.register_if_needed">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">register_if_needed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">run_object</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_if_needed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">run_object</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Registers Trainable or Function at runtime.</span>
 
 <span class="sd">        Assumes already registered if run_object is a string.</span>
@@ -1743,7 +1743,7 @@ document.write(`
 <span class="sd">        Returns:</span>
 <span class="sd">            A string representing the trainable identifier.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.tune.search.sample</span> <span class="kn">import</span> <span class="n">Domain</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.sample</span><span class="w"> </span><span class="kn">import</span> <span class="n">Domain</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">run_object</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">run_object</span>
@@ -1761,49 +1761,49 @@ document.write(`
                 <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">-If the error is typing-related, try removing &quot;</span>
                 <span class="s2">&quot;the type annotations and try again.&quot;</span>
             <span class="p">)</span>
-            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">extra_msg</span><span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">extra_msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
         <span class="k">return</span> <span class="n">name</span></div>
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">stopper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stopper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stopper</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">local_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">local_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">experiment_driver_staging_path</span>
 
     <span class="nd">@property</span>
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="s2">&quot;Replaced by `local_path`&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">local_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">local_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># TODO(justinvyu): [Deprecated] Remove in 2.11.</span>
         <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s2">&quot;Use `local_path` instead of `local_dir`.&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">remote_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remote_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">experiment_fs_path</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_path</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_path</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">checkpoint_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;checkpoint_config&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="s2">&quot;Replaced by `local_path`&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">checkpoint_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># TODO(justinvyu): [Deprecated] Remove in 2.11.</span>
         <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s2">&quot;Use `local_path` instead of `checkpoint_dir`.&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">run_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a string representing the trainable identifier.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_identifier</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">public_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">public_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the spec dict with only the public-facing keys.</span>
 
 <span class="sd">        Intended to be used for passing information to callbacks,</span>
@@ -1813,7 +1813,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_convert_to_experiment_list</span><span class="p">(</span><span class="n">experiments</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Experiment</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Experiment</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_convert_to_experiment_list</span><span class="p">(</span><span class="n">experiments</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Experiment</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Experiment</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Produces a list of Experiment objects.</span>
 
 <span class="sd">    Converts input from dict, single experiment, or list of</span>

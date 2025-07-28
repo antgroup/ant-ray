@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,18 +1389,18 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.air.integrations.comet</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
-<span class="kn">import</span> <span class="nn">pyarrow.fs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
 
-<span class="kn">from</span> <span class="nn">ray.tune.experiment</span> <span class="kn">import</span> <span class="n">Trial</span>
-<span class="kn">from</span> <span class="nn">ray.tune.logger</span> <span class="kn">import</span> <span class="n">LoggerCallback</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils</span> <span class="kn">import</span> <span class="n">flatten_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggerCallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten_dict</span>
 
 
-<span class="k">def</span> <span class="nf">_import_comet</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_import_comet</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Try importing comet_ml.</span>
 
 <span class="sd">    Used to check if comet_ml is installed and, otherwise, pass an informative</span>
@@ -1410,7 +1410,7 @@ document.write(`
         <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;COMET_DISABLE_AUTO_LOGGING&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">comet_ml</span>  <span class="c1"># noqa: F401</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">comet_ml</span>  <span class="c1"># noqa: F401</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;pip install &#39;comet-ml&#39; to use CometLoggerCallback&quot;</span><span class="p">)</span>
 
@@ -1419,7 +1419,7 @@ document.write(`
 
 <div class="viewcode-block" id="CometLoggerCallback">
 <a class="viewcode-back" href="../../../../tune/examples/tune-comet.html#ray.air.integrations.comet.CometLoggerCallback">[docs]</a>
-<span class="k">class</span> <span class="nc">CometLoggerCallback</span><span class="p">(</span><span class="n">LoggerCallback</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CometLoggerCallback</span><span class="p">(</span><span class="n">LoggerCallback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;CometLoggerCallback for logging Tune results to Comet.</span>
 
 <span class="sd">    Comet (https://comet.ml/site/) is a tool to manage and optimize the</span>
@@ -1492,7 +1492,7 @@ document.write(`
 
     <span class="n">_episode_results</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;hist_stats/episode_reward&quot;</span><span class="p">,</span> <span class="s2">&quot;hist_stats/episode_lengths&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">online</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1516,13 +1516,13 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_to_other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_other_results</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_to_episodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_episode_results</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_configure_experiment_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_configure_experiment_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Disable the specific autologging features that cause throttling.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exclude_autolog</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">option</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">experiment_kwargs</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">_check_key_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_key_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if key argument is equal to item argument or starts with item and</span>
 <span class="sd">        a forward slash. Used for parsing trial result dictionary into ignored</span>
@@ -1532,7 +1532,7 @@ document.write(`
 
 <div class="viewcode-block" id="CometLoggerCallback.log_trial_start">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.air.integrations.comet.CometLoggerCallback.log_trial_start.html#ray.air.integrations.comet.CometLoggerCallback.log_trial_start">[docs]</a>
-    <span class="k">def</span> <span class="nf">log_trial_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize an Experiment (or OfflineExperiment if self.online=False)</span>
 <span class="sd">        and start logging to Comet.</span>
@@ -1542,8 +1542,8 @@ document.write(`
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_import_comet</span><span class="p">()</span>  <span class="c1"># is this necessary?</span>
-        <span class="kn">from</span> <span class="nn">comet_ml</span> <span class="kn">import</span> <span class="n">Experiment</span><span class="p">,</span> <span class="n">OfflineExperiment</span>
-        <span class="kn">from</span> <span class="nn">comet_ml.config</span> <span class="kn">import</span> <span class="n">set_global_experiment</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">comet_ml</span><span class="w"> </span><span class="kn">import</span> <span class="n">Experiment</span><span class="p">,</span> <span class="n">OfflineExperiment</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">comet_ml.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_global_experiment</span>
 
         <span class="k">if</span> <span class="n">trial</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial_experiments</span><span class="p">:</span>
             <span class="n">experiment_cls</span> <span class="o">=</span> <span class="n">Experiment</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">online</span> <span class="k">else</span> <span class="n">OfflineExperiment</span>
@@ -1565,7 +1565,7 @@ document.write(`
 
 <div class="viewcode-block" id="CometLoggerCallback.log_trial_result">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.air.integrations.comet.CometLoggerCallback.log_trial_result.html#ray.air.integrations.comet.CometLoggerCallback.log_trial_result">[docs]</a>
-    <span class="k">def</span> <span class="nf">log_trial_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log the current result of a Trial upon each iteration.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1615,7 +1615,7 @@ document.write(`
             <span class="n">experiment</span><span class="o">.</span><span class="n">log_curve</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)),</span> <span class="n">y</span><span class="o">=</span><span class="n">v</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">log_trial_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">):</span>
         <span class="n">comet_ml</span> <span class="o">=</span> <span class="n">_import_comet</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_checkpoints</span> <span class="ow">and</span> <span class="n">trial</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">:</span>
@@ -1649,11 +1649,11 @@ document.write(`
 
             <span class="n">experiment</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="n">artifact</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">log_trial_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">failed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_trial_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">failed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_trial_experiments</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial_experiments</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">trial</span><span class="p">,</span> <span class="n">experiment</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial_experiments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">experiment</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_trial_experiments</span> <span class="o">=</span> <span class="p">{}</span></div>

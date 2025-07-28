@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1446,14 +1446,14 @@ of the API is to apply as many data transformations as possible on-the-fly prior
 <h2>Example: Training an expert policy<a class="headerlink" href="#example-training-an-expert-policy" title="Link to this heading">#</a></h2>
 <p>In this example you train a PPO agent on the <code class="docutils literal notranslate"><span class="pre">CartPole-v1</span></code> environment until it reaches an episode mean return of <code class="docutils literal notranslate"><span class="pre">450.0</span></code>. You checkpoint
 this agent and then use its policy to record expert data to local disk.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.default_model_config</span> <span class="kn">import</span> <span class="n">DefaultModelConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.default_model_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultModelConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ENV_RUNNER_RESULTS</span><span class="p">,</span>
     <span class="n">EVALUATION_RESULTS</span><span class="p">,</span>
     <span class="n">EPISODE_RETURN_MEAN</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 <span class="c1"># Configure the PPO algorithm.</span>
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
@@ -1521,14 +1521,14 @@ example to record expert data to disk, which is later utilized for offline train
 example you store experiences directly in RLlib’s <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> objects with no more than
 <code class="docutils literal notranslate"><span class="pre">25</span></code> episode objects per Parquet file. Altogether you run 10 evaluation runs, which should result in <code class="docutils literal notranslate"><span class="pre">500</span></code> recorded episodes from the expert policy.
 You use these data in the next example to train a new policy through Offline RL that should reach a return of <code class="docutils literal notranslate"><span class="pre">450.0</span></code> when playing <code class="docutils literal notranslate"><span class="pre">CartPole-v1</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">COMPONENT_LEARNER_GROUP</span><span class="p">,</span>
     <span class="n">COMPONENT_LEARNER</span><span class="p">,</span>
     <span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span>
     <span class="n">DEFAULT_MODULE_ID</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module</span> <span class="kn">import</span> <span class="n">RLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span>
 
 <span class="c1"># Store recording data under the following path.</span>
 <span class="n">data_path</span> <span class="o">=</span> <span class="s2">&quot;/tmp/docs_rllib_offline_recording&quot;</span>
@@ -1632,8 +1632,8 @@ leading to differences in write operation counts. As a result, the second number
 <h2>Example: Training on previously saved experiences<a class="headerlink" href="#example-training-on-previously-saved-experiences" title="Link to this heading">#</a></h2>
 <p>In this example you are using behavior cloning with the previously recorded Parquet data from your expert policy playing <code class="docutils literal notranslate"><span class="pre">CartPole-v1</span></code>. The
 data needs to be linked in the configuration of the algorithm (through the <code class="docutils literal notranslate"><span class="pre">input_</span></code> attribute).</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.bc</span> <span class="kn">import</span> <span class="n">BCConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.bc</span><span class="w"> </span><span class="kn">import</span> <span class="n">BCConfig</span>
 
 <span class="c1"># Setup the config for behavior cloning.</span>
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
@@ -1733,8 +1733,8 @@ through a specified schema that organizes the expert data. The API default schem
 <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.SCHEMA.html#ray.rllib.offline.offline_prelearner.SCHEMA" title="ray.rllib.offline.offline_prelearner.SCHEMA"><code class="xref py py-data docutils literal notranslate"><span class="pre">SCHEMA</span></code></a>.</p>
 <p>Lets consider a simple example in which your expert data is stored with the schema: <code class="docutils literal notranslate"><span class="pre">(o_t,</span> <span class="pre">a_t,</span> <span class="pre">r_t,</span> <span class="pre">o_tp1,</span> <span class="pre">d_t,</span> <span class="pre">i_t,</span> <span class="pre">logprobs_t)</span></code>. In this case
 you provide this schema as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.bc</span> <span class="kn">import</span> <span class="n">BCConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.columns</span> <span class="kn">import</span> <span class="n">Columns</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.bc</span><span class="w"> </span><span class="kn">import</span> <span class="n">BCConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.columns</span><span class="w"> </span><span class="kn">import</span> <span class="n">Columns</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">BCConfig</span><span class="p">()</span>
@@ -1774,14 +1774,14 @@ chunks, this can’t be done with chunks arriving in some scrambled order.</p>
 <p>If you require full trajectories you can transform your tabular data into <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> objects and store these in Parquet format. The next example shows
 how to do this.
 First, you store experiences of the preceding trained expert policy in tabular format (note the <code class="code docutils literal notranslate"><span class="pre">output_write_episodes=False</span></code> setting below to activate tabular data output):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">COMPONENT_LEARNER_GROUP</span><span class="p">,</span>
     <span class="n">COMPONENT_LEARNER</span><span class="p">,</span>
     <span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span>
     <span class="n">DEFAULT_MODULE_ID</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module</span> <span class="kn">import</span> <span class="n">RLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span>
 
 <span class="c1"># Set up a path for the tabular data records.</span>
 <span class="n">tabular_data_path</span> <span class="o">=</span> <span class="s2">&quot;tmp/docs_rllib_offline_recording_tabular&quot;</span>
@@ -1849,7 +1849,7 @@ First, you store experiences of the preceding trained expert policy in tabular f
 </div>
 <p>You may have noticed that recording data in tabular format takes significantly longer than recording in episode format. This slower performance is due to the additional post-processing
 required to convert episode data into a columnar format. To confirm that the recorded data is now in columnar format, you can print its schema:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">data</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span>
 
 <span class="c1"># Read the tabular data into a Ray dataset.</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">tabular_data_path</span><span class="p">)</span>
@@ -1879,14 +1879,14 @@ required to convert episode data into a columnar format. To confirm that the rec
 </div>
 <p>If your expert data is given in columnar format and you need to train on full expert trajectories you can follow the code in the following example to convert
 your own data into RLlib’s <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> objects:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">msgpack</span>
-<span class="kn">import</span> <span class="nn">msgpack_numpy</span> <span class="k">as</span> <span class="nn">mnp</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">msgpack</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">msgpack_numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mnp</span>
 
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">data</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.single_agent_episode</span> <span class="kn">import</span> <span class="n">SingleAgentEpisode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.single_agent_episode</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleAgentEpisode</span>
 
 <span class="c1"># Load the dataset with the tabular data.</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">tabular_data_path</span><span class="p">)</span>
@@ -1972,11 +1972,11 @@ your own data into RLlib’s <a class="reference internal" href="package_ref/env
 <p>If you have expert data previously recorded using RLlib’s old API stack, it can be seamlessly utilized in the new stack’s Offline RL API by setting <code class="docutils literal notranslate"><span class="pre">input_read_sample_batches=True</span></code>. Alternatively,
 you can convert your <code class="docutils literal notranslate"><span class="pre">SampleBatch</span></code> recordings into <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> format using RLlib’s
 <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner" title="ray.rllib.offline.offline_prelearner.OfflinePreLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflinePreLearner</span></code></a> as demonstrated below:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">msgpack</span>
-<span class="kn">import</span> <span class="nn">msgpack_numpy</span> <span class="k">as</span> <span class="nn">mnp</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">msgpack</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">msgpack_numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mnp</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">data</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.offline.offline_prelearner</span> <span class="kn">import</span> <span class="n">OfflinePreLearner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.offline.offline_prelearner</span><span class="w"> </span><span class="kn">import</span> <span class="n">OfflinePreLearner</span>
 
 <span class="c1"># Set up the data path to your `SampleBatch` expert data.</span>
 <span class="n">data_path</span> <span class="o">=</span> <span class="o">...</span>
@@ -2081,7 +2081,7 @@ or folders, or simply specify a single folder to read recursively from.</p>
 </div>
 <p>This configuration allows RLlib to read data recursively from any folder beneath the specified path. If you are using a filesystem for GCS (for instance, due to authentication requirements),
 use the following syntax:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyarrow.fs</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
 
 <span class="c1"># Define the PyArrow filesystem</span>
 <span class="n">gcs</span> <span class="o">=</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">GcsFilesystem</span><span class="p">(</span>
@@ -2179,8 +2179,8 @@ critical for balancing these trade-offs and maximizing throughput.</p>
 <p>If your data is in <strong>Parquet</strong> format (the recommended offline data format for RLlib), you can leverage data pruning to optimize performance. <a class="reference internal" href="../data/data.html#data"><span class="std std-ref">Ray Data</span></a> supports pruning in its <a class="reference internal" href="../data/api/doc/ray.data.read_parquet.html#ray.data.read_parquet" title="ray.data.read_parquet"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_parquet()</span></code></a> method through projection pushdown (column filtering) and filter pushdown (row filtering). These filters are applied directly during file
 scans, reducing the amount of unnecessary data loaded into memory.</p>
 <p>For instance, if you only require specific columns from your offline data (for example, to avoid loading the <code class="docutils literal notranslate"><span class="pre">infos</span></code> column):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.columns</span> <span class="kn">import</span> <span class="n">Columns</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.columns</span><span class="w"> </span><span class="kn">import</span> <span class="n">Columns</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -2202,10 +2202,10 @@ scans, reducing the amount of unnecessary data loaded into memory.</p>
 </pre></div>
 </div>
 <p>Similarly, if you only require specific rows from your dataset, you can apply pushdown filters as shown below:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyarrow.dataset</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.dataset</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.columns</span> <span class="kn">import</span> <span class="n">Columns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.columns</span><span class="w"> </span><span class="kn">import</span> <span class="n">Columns</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -2234,7 +2234,7 @@ object spilling to disk or even Out-Of-Memory (see <a class="reference internal"
 <p>Internally, the <strong>Post-Processing (PreLearner)</strong> layer is defined by a <a class="reference internal" href="../data/api/doc/ray.data.Dataset.map_batches.html#ray.data.Dataset.map_batches" title="ray.data.Dataset.map_batches"><code class="xref py py-meth docutils literal notranslate"><span class="pre">map_batches()</span></code></a> operation that starts an <code class="xref py py-class docutils literal notranslate"><span class="pre">_ActorPool</span></code>. Each actor in this pool runs an <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner" title="ray.rllib.offline.offline_prelearner.OfflinePreLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflinePreLearner</span></code></a>
 instances to transform batches on their way from disk to RLlib’s <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a>. Obviously, the size of this <code class="xref py py-class docutils literal notranslate"><span class="pre">_ActorPool</span></code> defines the throughput of this layer and needs to be fine-tuned in regard to the previous layer’s
 throughput to avoid backpressure. You can use the <code class="docutils literal notranslate"><span class="pre">concurrency</span></code> in RLlib’s <code class="docutils literal notranslate"><span class="pre">map_batches_kwargs</span></code> parameter to define this pool size:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -2255,7 +2255,7 @@ in the <strong>Post-Processing (Pre-Learner)</strong> stage. This means the thro
 in severe cases, object spilling or Out-Of-Memory (OOM) errors - can’t always be entirely avoided.</p>
 </div>
 <p>You can also enable auto-scaling in your <strong>Post-Processing (PreLearner)</strong> by providing an interval instead of a straight number:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -2286,7 +2286,7 @@ or in the <code class="docutils literal notranslate"><span class="pre">ray_remot
 <code class="xref py py-class docutils literal notranslate"><span class="pre">RLModule</span></code> is applied, which you can accelerate by running on a GPU.</p>
 </div>
 <p>As an example, to provide each of your <code class="docutils literal notranslate"><span class="pre">4</span></code> <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner" title="ray.rllib.offline.offline_prelearner.OfflinePreLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflinePreLearner</span></code></a> in the <strong>Post-Processing (PreLearner)</strong> <code class="docutils literal notranslate"><span class="pre">2</span></code> CPUs you can use the following syntax:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -2313,7 +2313,7 @@ data row. All incoming data is converted into <a class="reference internal" href
 <a class="reference internal image-reference" href="../_images/docs_rllib_offline_prelearner.svg"><img alt="The OfflinePreLearner converts and buffers episodes before sampling the batches used in learning." class="align-left" src="../_images/docs_rllib_offline_prelearner.svg" width="500" /></a>
 <p>Achieving an optimal balance between data ingestion efficiency and sampling variation in your streaming pipeline is crucial. Consider the following example: suppose each <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> has a length of <code class="docutils literal notranslate"><span class="pre">100</span></code> timesteps, and your <code class="code docutils literal notranslate"><span class="pre">train_batch_size_per_learner</span></code> is configured to be <code class="docutils literal notranslate"><span class="pre">1000</span></code>.
 Each <code class="xref py py-class docutils literal notranslate"><span class="pre">EpisodeReplayBuffer</span></code> instance is set with a capacity of <code class="docutils literal notranslate"><span class="pre">1000</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -2337,7 +2337,7 @@ Each <code class="xref py py-class docutils literal notranslate"><span class="pr
 </div>
 <p>If you configure <code class="code docutils literal notranslate"><span class="pre">input_read_batch_size</span></code> to <code class="docutils literal notranslate"><span class="pre">10</span></code> as shown in the code, each of the <code class="docutils literal notranslate"><span class="pre">10</span></code> <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> fit into the buffer, enabling sampling across a wide variety of timesteps from multiple episodes. This results in high sampling variation. Now, consider the case where the buffer
 capacity is reduced to <code class="docutils literal notranslate"><span class="pre">500</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -2362,7 +2362,7 @@ capacity is reduced to <code class="docutils literal notranslate"><span class="p
 <p>With the same <code class="code docutils literal notranslate"><span class="pre">input_read_batch_size</span></code>, only <code class="docutils literal notranslate"><span class="pre">5</span></code> <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> can be buffered at a time, causing inefficiencies as more data is read than can be retained for sampling.</p>
 <p>In another scenario, if each <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> still has a length of <code class="docutils literal notranslate"><span class="pre">100</span></code> timesteps and the <code class="code docutils literal notranslate"><span class="pre">train_batch_size_per_learner</span></code> is set to <code class="docutils literal notranslate"><span class="pre">4000</span></code> timesteps as in the code below, the buffer holds <code class="docutils literal notranslate"><span class="pre">10</span></code> <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> instances. This configuration
 results in lower sampling variation because many timesteps are repeatedly sampled, reducing diversity across training batches. These examples highlight the importance of tuning these parameters to balance data ingestion and sampling diversity in your offline streaming pipeline effectively.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -2411,7 +2411,7 @@ number of <a class="reference internal" href="package_ref/doc/ray.rllib.core.lea
 Offline Data pipeline can supply data at a rate sufficient to match the increased training capacity. RLlib’s Offline API offers powerful scalability at its final layer by utilizing <a class="reference internal" href="../data/api/doc/ray.data.Dataset.streaming_split.html#ray.data.Dataset.streaming_split" title="ray.data.Dataset.streaming_split"><code class="xref py py-class docutils literal notranslate"><span class="pre">streaming_split</span></code></a>. This functionality divides the data stream into multiple substreams, which are then processed by individual
 <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> instances, enabling efficient parallel consumption and enhancing overall throughput.</p>
 <p>For example to set the number of learners to <code class="docutils literal notranslate"><span class="pre">4</span></code>, you use the following syntax:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -2425,7 +2425,7 @@ Offline Data pipeline can supply data at a rate sufficient to match the increase
 already utilizes GPUs and performance still remains an issue, consider scaling up by either adding more GPUs to each <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> to increase GPU memory and computational capacity (set <code class="code docutils literal notranslate"><span class="pre">config.learners(num_gpus_per_learner=...)</span></code>), or by adding additional <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> workers to further distribute the workload (by setting <code class="code docutils literal notranslate"><span class="pre">config.learners(num_learners=...)</span></code>). Additionally, ensure that data
 throughput and upstream components are optimized to keep the learners fully utilized, as insufficient upstream capacity can bottleneck the training process.</p>
 <p>To provide your learners with more compute use <code class="docutils literal notranslate"><span class="pre">num_gpus_per_learner</span></code> or <code class="docutils literal notranslate"><span class="pre">num_cpus_per_learner</span></code> as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -2441,9 +2441,9 @@ scheduling can significantly influence the performance of your Offline Data pipe
 <p>In such scenarios, you can improve data locality by changing RLlib’s default scheduling strategy from <code class="docutils literal notranslate"><span class="pre">&quot;PACK&quot;</span></code> to <code class="docutils literal notranslate"><span class="pre">&quot;SPREAD&quot;</span></code>. This strategy distributes the <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> actors across the cluster, allowing <code class="code docutils literal notranslate"><span class="pre">Ray</span> <span class="pre">Data</span> <span class="pre">&lt;data&gt;</span></code> to take advantage of locality-aware bundle selection, which can improve efficiency.</p>
 <p>Here is an example of how you can change the scheduling strategy:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;Just for show-casing, don&#39;t run.&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">data</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config.AlgorithmConfig</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config.AlgorithmConfig</span>
 
 <span class="c1"># Configure a &quot;SPREAD&quot; scheduling strategy for learners.</span>
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;TRAIN_ENABLE_WORKER_SPREAD_ENV&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
@@ -2486,7 +2486,7 @@ scheduling can significantly influence the performance of your Offline Data pipe
 <h4>Batch size<a class="headerlink" href="#batch-size" title="Link to this heading">#</a></h4>
 <p>Batch size is one of the simplest parameters to adjust for optimizing performance in RLlib’s new Offline RL API. Small batch sizes may under-utilize hardware, leading to inefficiencies, while overly large batch sizes can exceed memory limits. In a streaming pipeline, the selected batch size impacts how data is partitioned and processed across parallel workers. Larger
 batch sizes reduce the overhead of frequent task coordination, but if they exceed hardware constraints, they can slow down the entire pipeline. You can configure the training batch size using the <code class="code docutils literal notranslate"><span class="pre">train_batch_size_per_learner</span></code> attribute as shown below.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -2503,7 +2503,7 @@ batch sizes reduce the overhead of frequent task coordination, but if they excee
 <p>Batch prefetching allows you to control data consumption on the downstream side of your offline data pipeline. The primary goal is to ensure that learners remain active, maintaining a continuous flow of data. This is achieved by preparing the next batch while the learner processes the current one. Prefetching determines how many batches are kept ready for learners
 and should be tuned based on the time required to produce the next batch and the learner’s update speed. Prefetching too many batches can lead to memory inefficiencies and, in some cases, backpressure in upstream tasks.</p>
 <p>You can configure batch prefetching in the <code class="code docutils literal notranslate"><span class="pre">iter_batches_kwargs</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -2528,7 +2528,7 @@ in iterating over data output of the streaming pipeline, while the latter define
 implementation - lead to stale training data. This happens because some data transformations rely on the same <a class="reference internal" href="package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.html#ray.rllib.core.rl_module.rl_module.RLModule" title="ray.rllib.core.rl_module.rl_module.RLModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">RLModule</span></code></a> that the <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> instances are training on. The number of iterations per sub-stream is controlled by the attribute
 <code class="xref py py-class docutils literal notranslate"><span class="pre">dataset_num_iters_per_learner</span></code>, which has a default value of <code class="docutils literal notranslate"><span class="pre">None</span></code>, meaning it runs one epoch on the sub-stream.</p>
 <p>You can modify this value as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -2568,7 +2568,7 @@ it relies on fully prepared batches containing <code class="code docutils litera
 </ol>
 <p>Below is the example code snippet from <a class="reference external" href="https://github.com/ray-project/ray/blob/master/rllib/algorithms/marwil">RLlib’s MARWIL algorithm</a> demonstrating this setup:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">build_learner_connector</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_learner_connector</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">input_observation_space</span><span class="p">,</span>
     <span class="n">input_action_space</span><span class="p">,</span>
@@ -2608,7 +2608,7 @@ it relies on fully prepared batches containing <code class="code docutils litera
 <h4>Define a primer LearnerConnector pipeline<a class="headerlink" href="#define-a-primer-learnerconnector-pipeline" title="Link to this heading">#</a></h4>
 <p>There are multiple ways to customize the <code class="xref py py-class docutils literal notranslate"><span class="pre">LearnerConnectorPipeline</span></code>. One approach, as demonstrated above, is to override the <code class="code docutils literal notranslate"><span class="pre">build_learner_connector</span></code> method in the <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>. Alternatively, you can directly define a custom <code class="xref py py-class docutils literal notranslate"><span class="pre">ConnectorV2</span></code> piece to the
 <code class="xref py py-class docutils literal notranslate"><span class="pre">LearnerConnectorPipeline</span></code> by utilizing the <code class="code docutils literal notranslate"><span class="pre">learner_connector</span></code> attribute:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">_make_learner_connector</span><span class="p">(</span><span class="n">input_observation_space</span><span class="p">,</span> <span class="n">input_action_space</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_make_learner_connector</span><span class="p">(</span><span class="n">input_observation_space</span><span class="p">,</span> <span class="n">input_action_space</span><span class="p">):</span>
     <span class="c1"># Create the learner connector.</span>
     <span class="k">return</span> <span class="n">CustomLearnerConnector</span><span class="p">(</span>
         <span class="n">parameter_1</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
@@ -2636,22 +2636,22 @@ steps). If your goal is to modify data further along in the <code class="xref py
 this data is appropriately structured and sorted into <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> objects, you can override the <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner._map_to_episodes.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner._map_to_episodes" title="ray.rllib.offline.offline_prelearner.OfflinePreLearner._map_to_episodes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_map_to_episodes()</span></code></a> static method.</p>
 <p>For more extensive customization, you can rewrite the <code class="code docutils literal notranslate"><span class="pre">__call__</span></code> method to define custom transformation steps, implement a unique <code class="xref py py-class docutils literal notranslate"><span class="pre">LearnerConnectorPipeline</span></code>, and construct <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiAgentBatch</span></code> instances for the <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a>.</p>
 <p>The following example demonstrates how to use a custom <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner" title="ray.rllib.offline.offline_prelearner.OfflinePreLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflinePreLearner</span></code></a> to process text data and construct training batches:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">data</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.single_agent_episode</span> <span class="kn">import</span> <span class="n">SingleAgentEpisode</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.offline.offline_prelearner</span> <span class="kn">import</span> <span class="n">OfflinePreLearner</span><span class="p">,</span> <span class="n">SCHEMA</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">override</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">EpisodeType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.single_agent_episode</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleAgentEpisode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.offline.offline_prelearner</span><span class="w"> </span><span class="kn">import</span> <span class="n">OfflinePreLearner</span><span class="p">,</span> <span class="n">SCHEMA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">EpisodeType</span>
 
-<span class="k">class</span> <span class="nc">TextOfflinePreLearner</span><span class="p">(</span><span class="n">OfflinePreLearner</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TextOfflinePreLearner</span><span class="p">(</span><span class="n">OfflinePreLearner</span><span class="p">):</span>
 
     <span class="nd">@staticmethod</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">OfflinePreLearner</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_map_to_episodes</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_map_to_episodes</span><span class="p">(</span>
         <span class="n">is_multi_agent</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>
         <span class="n">schema</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">SCHEMA</span><span class="p">,</span>
@@ -2747,35 +2747,35 @@ this data is appropriately structured and sorted into <a class="reference intern
 <p>The preceding example illustrates the flexibility of RLlib’s Offline RL API for custom data transformation. In this case, a customized <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner" title="ray.rllib.offline.offline_prelearner.OfflinePreLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflinePreLearner</span></code></a> processes a batch of text data - organized as sentences - and converts each sentence into a <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a>. The static method returns a dictionary containing a list of these
 <a class="reference internal" href="package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode" title="ray.rllib.env.single_agent_episode.SingleAgentEpisode"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAgentEpisode</span></code></a> instances. Similarly, you can extend this functionality by overriding the <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.__call__.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner.__call__" title="ray.rllib.offline.offline_prelearner.OfflinePreLearner.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__call__()</span></code></a> method. For instance, you could implement a <code class="xref py py-class docutils literal notranslate"><span class="pre">ray.rllib.connectors.learner.learner_connector_pipeline.LearnerConnectorPipeline</span></code> that stacks multiple observations (for example, tokens) together. This can be achieved using RLlib’s
 <code class="xref py py-class docutils literal notranslate"><span class="pre">FrameStackingLearner</span></code> and is shown in the example below.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">data</span>
-<span class="kn">from</span> <span class="nn">ray.actor</span> <span class="kn">import</span> <span class="n">ActorHandle</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.bc.bc_catalog</span> <span class="kn">import</span> <span class="n">BCCatalog</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.bc.torch.default_bc_torch_rl_module</span> <span class="kn">import</span> <span class="n">DefaultBCTorchRLModule</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.connectors.common</span> <span class="kn">import</span> <span class="n">AddObservationsFromEpisodesToBatch</span><span class="p">,</span> <span class="n">BatchIndividualItems</span><span class="p">,</span> <span class="n">NumpyToTensor</span><span class="p">,</span> <span class="n">AgentToModuleMapping</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.connectors.learner.add_columns_from_episodes_to_train_batch</span> <span class="kn">import</span> <span class="n">AddColumnsFromEpisodesToTrainBatch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.connectors.learner.frame_stacking</span> <span class="kn">import</span> <span class="n">FrameStackingLearner</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.connectors.learner.learner_connector_pipeline</span> <span class="kn">import</span> <span class="n">LearnerConnectorPipeline</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.learner.learner</span> <span class="kn">import</span> <span class="n">Learner</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.default_model_config</span> <span class="kn">import</span> <span class="n">DefaultModelConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.single_agent_episode</span> <span class="kn">import</span> <span class="n">SingleAgentEpisode</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.sample_batch</span> <span class="kn">import</span> <span class="n">MultiAgentBatch</span><span class="p">,</span> <span class="n">SampleBatch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.offline.offline_prelearner</span> <span class="kn">import</span> <span class="n">OfflinePreLearner</span><span class="p">,</span> <span class="n">SCHEMA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.actor</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActorHandle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.bc.bc_catalog</span><span class="w"> </span><span class="kn">import</span> <span class="n">BCCatalog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.bc.torch.default_bc_torch_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultBCTorchRLModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">AddObservationsFromEpisodesToBatch</span><span class="p">,</span> <span class="n">BatchIndividualItems</span><span class="p">,</span> <span class="n">NumpyToTensor</span><span class="p">,</span> <span class="n">AgentToModuleMapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.learner.add_columns_from_episodes_to_train_batch</span><span class="w"> </span><span class="kn">import</span> <span class="n">AddColumnsFromEpisodesToTrainBatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.learner.frame_stacking</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameStackingLearner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.learner.learner_connector_pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearnerConnectorPipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.learner.learner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Learner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.default_model_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultModelConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.single_agent_episode</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleAgentEpisode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.sample_batch</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentBatch</span><span class="p">,</span> <span class="n">SampleBatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.offline.offline_prelearner</span><span class="w"> </span><span class="kn">import</span> <span class="n">OfflinePreLearner</span><span class="p">,</span> <span class="n">SCHEMA</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">override</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">EpisodeType</span><span class="p">,</span> <span class="n">ModuleID</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">EpisodeType</span><span class="p">,</span> <span class="n">ModuleID</span>
 
-<span class="k">class</span> <span class="nc">TextOfflinePreLearner</span><span class="p">(</span><span class="n">OfflinePreLearner</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TextOfflinePreLearner</span><span class="p">(</span><span class="n">OfflinePreLearner</span><span class="p">):</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">OfflinePreLearner</span><span class="p">)</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="s2">&quot;AlgorithmConfig&quot;</span><span class="p">,</span>
         <span class="n">learner</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Learner</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">ActorHandle</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2821,7 +2821,7 @@ this data is appropriately structured and sorted into <a class="reference intern
         <span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">OfflinePreLearner</span><span class="p">)</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">EpisodeType</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">EpisodeType</span><span class="p">]]:</span>
 
         <span class="c1"># Convert raw data to episodes.</span>
         <span class="n">episodes</span> <span class="o">=</span> <span class="n">TextOfflinePreLearner</span><span class="o">.</span><span class="n">_map_to_episodes</span><span class="p">(</span>
@@ -2860,7 +2860,7 @@ this data is appropriately structured and sorted into <a class="reference intern
 
     <span class="nd">@staticmethod</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">OfflinePreLearner</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_map_to_episodes</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_map_to_episodes</span><span class="p">(</span>
         <span class="n">is_multi_agent</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>
         <span class="n">schema</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">SCHEMA</span><span class="p">,</span>
@@ -2974,7 +2974,7 @@ this data is appropriately structured and sorted into <a class="reference intern
 </div>
 <p>The ability to fully customize the <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner" title="ray.rllib.offline.offline_prelearner.OfflinePreLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflinePreLearner</span></code></a> empowers you to design tailored data transformation workflows. This includes defining a specific learner connector pipeline and implementing raw data mapping, enabling multi-step processing of text data from its raw format to a <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiAgentBatch</span></code>.</p>
 <p>To integrate your custom <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner" title="ray.rllib.offline.offline_prelearner.OfflinePreLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflinePreLearner</span></code></a>, simply specify it within your <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig" title="ray.rllib.algorithms.algorithm_config.AlgorithmConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AlgorithmConfig</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">AlgorithmConfig</span><span class="p">()</span>
@@ -2999,23 +2999,23 @@ pipeline to a high degree. Study carefully the <a class="reference internal" hre
 <li><p>The <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_data.OfflineData.sample.html#ray.rllib.offline.offline_data.OfflineData.sample" title="ray.rllib.offline.offline_data.OfflineData.sample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sample()</span></code></a> method that defines the data mapping and batch iteration.</p></li>
 </ul>
 <p>For example consider overriding the <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_data.OfflineData.__init__.html#ray.rllib.offline.offline_data.OfflineData.__init__" title="ray.rllib.offline.offline_data.OfflineData.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a> method, if you have some foundational data transformations as for example transforming image files into numpy arrays.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">io</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">data</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.offline.offline_data</span> <span class="kn">import</span> <span class="n">OfflineData</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.offline.offline_prelearner</span> <span class="kn">import</span> <span class="n">OfflinePreLearner</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.offline.offline_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">OfflineData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.offline.offline_prelearner</span><span class="w"> </span><span class="kn">import</span> <span class="n">OfflinePreLearner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">ImageOfflineData</span><span class="p">(</span><span class="n">OfflineData</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ImageOfflineData</span><span class="p">(</span><span class="n">OfflineData</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class overrides `OfflineData` to read in raw image data.</span>
 
 <span class="sd">    The image data is from Ray Data`s S3 example bucket, namely</span>
@@ -3035,7 +3035,7 @@ pipeline to a high degree. Study carefully the <a class="reference internal" hre
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">OfflineData</span><span class="p">)</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AlgorithmConfig</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AlgorithmConfig</span><span class="p">):</span>
 
         <span class="c1"># Set class attributes.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
@@ -3047,7 +3047,7 @@ pipeline to a high degree. Study carefully the <a class="reference internal" hre
         <span class="bp">self</span><span class="o">.</span><span class="n">data_is_mapped</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># Define your function to map images to numpy arrays.</span>
-        <span class="k">def</span> <span class="nf">map_to_numpy</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">map_to_numpy</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
             <span class="c1"># Convert to byte stream.</span>
             <span class="n">bytes_stream</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;bytes&quot;</span><span class="p">])</span>
             <span class="c1"># Convert to image.</span>
@@ -3075,24 +3075,24 @@ pipeline to a high degree. Study carefully the <a class="reference internal" hre
 </pre></div>
 </div>
 <p>In the code example provided, you define a custom <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_data.OfflineData.html#ray.rllib.offline.offline_data.OfflineData" title="ray.rllib.offline.offline_data.OfflineData"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflineData</span></code></a> class to handle the reading and preprocessing of image data, converting it from a binary encoding format into <code class="code docutils literal notranslate"><span class="pre">numpy</span></code> arrays. Additionally, you implement a custom <a class="reference internal" href="package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner" title="ray.rllib.offline.offline_prelearner.OfflinePreLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">OfflinePreLearner</span></code></a> to process this data further, transforming it into a learner-ready <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiAgentBatch</span></code> format.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">ray.actor</span> <span class="kn">import</span> <span class="n">ActorHandle</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.learner.learner</span> <span class="kn">import</span> <span class="n">Learner</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.single_agent_episode</span> <span class="kn">import</span> <span class="n">SingleAgentEpisode</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.offline.offline_prelearner</span> <span class="kn">import</span> <span class="n">OfflinePreLearner</span><span class="p">,</span> <span class="n">SCHEMA</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">override</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">EpisodeType</span><span class="p">,</span> <span class="n">ModuleID</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.actor</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActorHandle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.learner.learner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Learner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.single_agent_episode</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleAgentEpisode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.offline.offline_prelearner</span><span class="w"> </span><span class="kn">import</span> <span class="n">OfflinePreLearner</span><span class="p">,</span> <span class="n">SCHEMA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">EpisodeType</span><span class="p">,</span> <span class="n">ModuleID</span>
 
 
-<span class="k">class</span> <span class="nc">ImageOfflinePreLearner</span><span class="p">(</span><span class="n">OfflinePreLearner</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ImageOfflinePreLearner</span><span class="p">(</span><span class="n">OfflinePreLearner</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class transforms image data to `MultiAgentBatch`es.</span>
 
 <span class="sd">    While the `ImageOfflineData` class transforms raw image</span>
@@ -3108,7 +3108,7 @@ pipeline to a high degree. Study carefully the <a class="reference internal" hre
 <span class="sd">    overriding the `OfflinePreLearner`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="s2">&quot;AlgorithmConfig&quot;</span><span class="p">,</span>
         <span class="n">learner</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Learner</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">ActorHandle</span><span class="p">]],</span>
@@ -3137,7 +3137,7 @@ pipeline to a high degree. Study carefully the <a class="reference internal" hre
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">OfflinePreLearner</span><span class="p">)</span>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_map_to_episodes</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_map_to_episodes</span><span class="p">(</span>
         <span class="n">is_multi_agent</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>
         <span class="n">schema</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">SCHEMA</span><span class="p">,</span>
@@ -3222,16 +3222,16 @@ pipeline to a high degree. Study carefully the <a class="reference internal" hre
 <span class="sd">Batch: {&#39;batch&#39;: [MultiAgentBatch({}, env_steps=3)]}</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.bc</span> <span class="kn">import</span> <span class="n">BCConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.bc.bc_catalog</span> <span class="kn">import</span> <span class="n">BCCatalog</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.bc.torch.bc_torch_rl_module</span> <span class="kn">import</span> <span class="n">BCTorchRLModule</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModuleSpec</span><span class="p">,</span> <span class="n">DefaultModelConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.examples.offline_rl.classes.image_offline_data</span> <span class="kn">import</span> <span class="n">ImageOfflineData</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.examples.offline_rl.classes.image_offline_prelearner</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.bc</span><span class="w"> </span><span class="kn">import</span> <span class="n">BCConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.bc.bc_catalog</span><span class="w"> </span><span class="kn">import</span> <span class="n">BCCatalog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.bc.torch.bc_torch_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">BCTorchRLModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span><span class="p">,</span> <span class="n">DefaultModelConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.examples.offline_rl.classes.image_offline_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageOfflineData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.examples.offline_rl.classes.image_offline_prelearner</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ImageOfflinePreLearner</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -3311,7 +3311,7 @@ pipeline to a high degree. Study carefully the <a class="reference internal" hre
 <section id="input-api">
 <h2>Input API<a class="headerlink" href="#input-api" title="Link to this heading">#</a></h2>
 <p>You can configure experience input for an agent using the following options:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">offline_data</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">offline_data</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="c1"># Specify how to generate experiences:</span>
@@ -3470,7 +3470,7 @@ pipeline to a high degree. Study carefully the <a class="reference internal" hre
 <section id="output-api">
 <h2>Output API<a class="headerlink" href="#output-api" title="Link to this heading">#</a></h2>
 <p>You can configure experience output for an agent using the following options:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">offline_data</span><span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">offline_data</span><span class="p">(</span>
     <span class="c1"># Specify where experiences should be saved:</span>
     <span class="c1"># - None: don&#39;t save any experiences</span>
     <span class="c1"># - a path/URI to save to a custom output directory (for example, &quot;s3://bckt/&quot;)</span>

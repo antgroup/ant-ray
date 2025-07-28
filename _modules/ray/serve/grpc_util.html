@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,17 +1389,17 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.serve.grpc_util</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">import</span> <span class="nn">grpc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">grpc</span>
 
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 
 <div class="viewcode-block" id="RayServegRPCContext">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.html#ray.serve.grpc_util.RayServegRPCContext">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RayServegRPCContext</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayServegRPCContext</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Context manager to set and get gRPC context.</span>
 
 <span class="sd">    This class implements most of the methods from ServicerContext</span>
@@ -1407,7 +1407,7 @@ document.write(`
 <span class="sd">    serializable and can be passed with the request to be used on the deployment.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grpc_context</span><span class="p">:</span> <span class="n">grpc</span><span class="o">.</span><span class="n">_cython</span><span class="o">.</span><span class="n">cygrpc</span><span class="o">.</span><span class="n">_ServicerContext</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grpc_context</span><span class="p">:</span> <span class="n">grpc</span><span class="o">.</span><span class="n">_cython</span><span class="o">.</span><span class="n">cygrpc</span><span class="o">.</span><span class="n">_ServicerContext</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_auth_context</span> <span class="o">=</span> <span class="n">grpc_context</span><span class="o">.</span><span class="n">auth_context</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_code</span> <span class="o">=</span> <span class="n">grpc_context</span><span class="o">.</span><span class="n">code</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_details</span> <span class="o">=</span> <span class="n">grpc_context</span><span class="o">.</span><span class="n">details</span><span class="p">()</span>
@@ -1424,7 +1424,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayServegRPCContext.auth_context">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.auth_context.html#ray.serve.grpc_util.RayServegRPCContext.auth_context">[docs]</a>
-    <span class="k">def</span> <span class="nf">auth_context</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">auth_context</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the auth context for the call.</span>
 
 <span class="sd">        Returns:</span>
@@ -1435,7 +1435,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayServegRPCContext.code">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.code.html#ray.serve.grpc_util.RayServegRPCContext.code">[docs]</a>
-    <span class="k">def</span> <span class="nf">code</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">code</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Accesses the value to be used as status code upon RPC completion.</span>
 
 <span class="sd">        Returns:</span>
@@ -1446,7 +1446,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayServegRPCContext.details">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.details.html#ray.serve.grpc_util.RayServegRPCContext.details">[docs]</a>
-    <span class="k">def</span> <span class="nf">details</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">details</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Accesses the value to be used as detail string upon RPC completion.</span>
 
 <span class="sd">        Returns:</span>
@@ -1457,7 +1457,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayServegRPCContext.invocation_metadata">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.invocation_metadata.html#ray.serve.grpc_util.RayServegRPCContext.invocation_metadata">[docs]</a>
-    <span class="k">def</span> <span class="nf">invocation_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">invocation_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Accesses the metadata sent by the client.</span>
 
 <span class="sd">        Returns:</span>
@@ -1468,7 +1468,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayServegRPCContext.peer">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.peer.html#ray.serve.grpc_util.RayServegRPCContext.peer">[docs]</a>
-    <span class="k">def</span> <span class="nf">peer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">peer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Identifies the peer that invoked the RPC being serviced.</span>
 
 <span class="sd">        Returns:</span>
@@ -1480,7 +1480,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayServegRPCContext.peer_identities">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.peer_identities.html#ray.serve.grpc_util.RayServegRPCContext.peer_identities">[docs]</a>
-    <span class="k">def</span> <span class="nf">peer_identities</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">peer_identities</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets one or more peer identity(s).</span>
 
 <span class="sd">        Equivalent to</span>
@@ -1495,7 +1495,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayServegRPCContext.peer_identity_key">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.peer_identity_key.html#ray.serve.grpc_util.RayServegRPCContext.peer_identity_key">[docs]</a>
-    <span class="k">def</span> <span class="nf">peer_identity_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">peer_identity_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The auth property used to identify the peer.</span>
 
 <span class="sd">        For example, &quot;x509_common_name&quot; or &quot;x509_subject_alternative_name&quot; are</span>
@@ -1508,12 +1508,12 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_peer_identity_key</span></div>
 
 
-    <span class="k">def</span> <span class="nf">trailing_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trailing_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trailing_metadata</span>
 
 <div class="viewcode-block" id="RayServegRPCContext.set_code">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.set_code.html#ray.serve.grpc_util.RayServegRPCContext.set_code">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the value to be used as status code upon RPC completion.</span>
 
 <span class="sd">        This method need not be called by method implementations if they wish</span>
@@ -1527,7 +1527,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayServegRPCContext.set_compression">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.set_compression.html#ray.serve.grpc_util.RayServegRPCContext.set_compression">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_compression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compression</span><span class="p">:</span> <span class="n">grpc</span><span class="o">.</span><span class="n">Compression</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_compression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compression</span><span class="p">:</span> <span class="n">grpc</span><span class="o">.</span><span class="n">Compression</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the compression algorithm to be used for the entire call.</span>
 
 <span class="sd">        Args:</span>
@@ -1539,7 +1539,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayServegRPCContext.set_details">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.set_details.html#ray.serve.grpc_util.RayServegRPCContext.set_details">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">details</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">details</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the value to be used as detail string upon RPC completion.</span>
 
 <span class="sd">        This method need not be called by method implementations if they have</span>
@@ -1552,7 +1552,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_details</span> <span class="o">=</span> <span class="n">details</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_request_id_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_request_id_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
         <span class="c1"># Request id metadata should be carried over to the trailing metadata and passed</span>
         <span class="c1"># back to the request client. This function helps pick it out if it exists.</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trailing_metadata</span><span class="p">:</span>
@@ -1562,7 +1562,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayServegRPCContext.set_trailing_metadata">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.set_trailing_metadata.html#ray.serve.grpc_util.RayServegRPCContext.set_trailing_metadata">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_trailing_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trailing_metadata</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_trailing_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trailing_metadata</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the trailing metadata for the RPC.</span>
 
 <span class="sd">        Sets the trailing metadata to be sent upon completion of the RPC.</span>
@@ -1580,7 +1580,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_trailing_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_id_metadata</span><span class="p">()</span> <span class="o">+</span> <span class="n">trailing_metadata</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_set_on_grpc_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grpc_context</span><span class="p">:</span> <span class="n">grpc</span><span class="o">.</span><span class="n">_cython</span><span class="o">.</span><span class="n">cygrpc</span><span class="o">.</span><span class="n">_ServicerContext</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_on_grpc_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grpc_context</span><span class="p">:</span> <span class="n">grpc</span><span class="o">.</span><span class="n">_cython</span><span class="o">.</span><span class="n">cygrpc</span><span class="o">.</span><span class="n">_ServicerContext</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Serve&#39;s internal method to set attributes on the gRPC context.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_code</span><span class="p">:</span>
             <span class="n">grpc_context</span><span class="o">.</span><span class="n">set_code</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_code</span><span class="p">)</span>

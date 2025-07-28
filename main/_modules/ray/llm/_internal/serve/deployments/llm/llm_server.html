@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../../_static/autodoc_pydantic.css" />
@@ -1389,27 +1389,27 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.llm._internal.serve.deployments.llm.llm_server</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">AsyncGenerator</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncGenerator</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="c1"># Third-party imports</span>
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">PydanticValidationError</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray._common.utils</span> <span class="kn">import</span> <span class="n">import_attr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">PydanticValidationError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._common.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">import_attr</span>
 
 <span class="c1"># Local imports</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.configs.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.configs.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_HEALTH_CHECK_PERIOD_S</span><span class="p">,</span>
     <span class="n">DEFAULT_HEALTH_CHECK_TIMEOUT_S</span><span class="p">,</span>
     <span class="n">ENGINE_START_TIMEOUT_S</span><span class="p">,</span>
     <span class="n">RAYLLM_VLLM_ENGINE_CLS_ENV</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.configs.error_handling</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.configs.error_handling</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ValidationErrorWithPydantic</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.configs.openai_api_models</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.configs.openai_api_models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ChatCompletionLogProb</span><span class="p">,</span>
     <span class="n">ChatCompletionLogProbs</span><span class="p">,</span>
     <span class="n">ChatCompletionLogProbsContent</span><span class="p">,</span>
@@ -1429,97 +1429,97 @@ document.write(`
     <span class="n">LLMCompletionsResponse</span><span class="p">,</span>
     <span class="n">UsageInfo</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.configs.openai_api_models_patch</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.configs.openai_api_models_patch</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ErrorResponse</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.configs.prompt_formats</span> <span class="kn">import</span> <span class="n">Message</span><span class="p">,</span> <span class="n">Prompt</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.configs.server_models</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.configs.prompt_formats</span><span class="w"> </span><span class="kn">import</span> <span class="n">Message</span><span class="p">,</span> <span class="n">Prompt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.configs.server_models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DiskMultiplexConfig</span><span class="p">,</span>
     <span class="n">LLMConfig</span><span class="p">,</span>
     <span class="n">LLMRawResponse</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.deployments.llm.image_retriever</span> <span class="kn">import</span> <span class="n">ImageRetriever</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.deployments.llm.multiplex.lora_model_loader</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.deployments.llm.image_retriever</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageRetriever</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.deployments.llm.multiplex.lora_model_loader</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LoraModelLoader</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.deployments.llm.vllm.vllm_engine</span> <span class="kn">import</span> <span class="n">VLLMEngine</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.deployments.llm.vllm.vllm_models</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.deployments.llm.vllm.vllm_engine</span><span class="w"> </span><span class="kn">import</span> <span class="n">VLLMEngine</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.deployments.llm.vllm.vllm_models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">VLLMGenerationRequest</span><span class="p">,</span>
     <span class="n">VLLMSamplingParams</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.deployments.utils.error_handling_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.deployments.utils.error_handling_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">StreamingErrorHandler</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.deployments.utils.server_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.deployments.utils.server_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_model_request_id</span><span class="p">,</span>
     <span class="n">get_response_for_error</span><span class="p">,</span>
     <span class="n">get_serve_request_id</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.observability.logging</span> <span class="kn">import</span> <span class="n">get_logger</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.observability.usage_telemetry.usage</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.observability.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.observability.usage_telemetry.usage</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">push_telemetry_report_for_all_models</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_LLMServerBase</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_LLMServerBase</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is the common interface between all the llm deployment. All llm deployments</span>
 <span class="sd">    need to implement an async constructor, an async predict, and check_health method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">llm_config</span><span class="p">:</span> <span class="n">LLMConfig</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">llm_config</span><span class="p">:</span> <span class="n">LLMConfig</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor takes in an LLMConfig object and start the underlying engine.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_llm_config</span> <span class="o">=</span> <span class="n">llm_config</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ChatCompletionRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMChatResponse</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ChatCompletionRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMChatResponse</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Inferencing to the engine for chat, and return the response as LLMChatResponse.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">completions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">CompletionRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMCompletionsResponse</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">completions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">CompletionRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMCompletionsResponse</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Inferencing to the engine for completion api, and return the response as LLMCompletionsResponse.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">check_health</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">check_health</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check the health of the replica. Does not return anything. Raise error when</span>
 <span class="sd">        the engine is dead and needs to be restarted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">llm_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMConfig</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">llm_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMConfig</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_llm_config</span>
 
 
-<span class="k">class</span> <span class="nc">ResponsePostprocessor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResponsePostprocessor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metrics_wrapper</span> <span class="o">=</span> <span class="n">StreamingErrorHandler</span><span class="p">()</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">handle_failure</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">handle_failure</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">gen</span><span class="p">:</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">LLMRawResponse</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">LLMRawResponse</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="k">async</span> <span class="k">for</span> <span class="n">llm_response</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics_wrapper</span><span class="o">.</span><span class="n">handle_failure</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">gen</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">llm_response</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">merge_stream</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">merge_stream</span><span class="p">(</span>
         <span class="n">response_stream</span><span class="p">:</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">LLMRawResponse</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMRawResponse</span><span class="p">:</span>
         <span class="n">responses</span> <span class="o">=</span> <span class="p">[</span><span class="n">resp</span> <span class="k">async</span> <span class="k">for</span> <span class="n">resp</span> <span class="ow">in</span> <span class="n">response_stream</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">LLMRawResponse</span><span class="o">.</span><span class="n">merge_stream</span><span class="p">(</span><span class="o">*</span><span class="n">responses</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_chat_completions_wrapper</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_chat_completions_wrapper</span><span class="p">(</span>
         <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">generator</span><span class="p">:</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">LLMRawResponse</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ChatCompletionStreamResponse</span><span class="p">,</span> <span class="n">ErrorResponse</span><span class="p">],</span> <span class="kc">None</span><span class="p">]:</span>
@@ -1640,7 +1640,7 @@ document.write(`
             <span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_completions_wrapper</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_completions_wrapper</span><span class="p">(</span>
         <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">generator</span><span class="p">:</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">LLMRawResponse</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">CompletionStreamResponse</span><span class="p">,</span> <span class="n">ErrorResponse</span><span class="p">],</span> <span class="kc">None</span><span class="p">]:</span>
@@ -1704,7 +1704,7 @@ document.write(`
 
             <span class="k">yield</span> <span class="n">get_response_for_error</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">request_id</span><span class="p">)</span><span class="o">.</span><span class="n">error</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">process_chat</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">process_chat</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">gen</span><span class="p">:</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">LLMRawResponse</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">stream</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMChatResponse</span><span class="p">:</span>
         <span class="n">gen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_failure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">gen</span><span class="o">=</span><span class="n">gen</span><span class="p">)</span>
@@ -1765,7 +1765,7 @@ document.write(`
                 <span class="n">usage</span><span class="o">=</span><span class="n">usage</span><span class="p">,</span>
             <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">process_completions</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">process_completions</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">gen</span><span class="p">:</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">LLMRawResponse</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">stream</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMCompletionsResponse</span><span class="p">:</span>
         <span class="n">gen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_failure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">gen</span><span class="o">=</span><span class="n">gen</span><span class="p">)</span>
@@ -1803,13 +1803,13 @@ document.write(`
             <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">LLMServer</span><span class="p">(</span><span class="n">_LLMServerBase</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LLMServer</span><span class="p">(</span><span class="n">_LLMServerBase</span><span class="p">):</span>
     <span class="n">_default_engine_cls</span> <span class="o">=</span> <span class="n">VLLMEngine</span>
     <span class="n">_default_image_retriever_cls</span> <span class="o">=</span> <span class="n">ImageRetriever</span>
 
 <div class="viewcode-block" id="LLMServer.__init__">
 <a class="viewcode-back" href="../../../../../../../serve/api/doc/ray.serve.llm.LLMServer.__init__.html#ray.serve.llm.LLMServer.__init__">[docs]</a>
-    <span class="k">async</span> <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">llm_config</span><span class="p">:</span> <span class="n">LLMConfig</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1866,7 +1866,7 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_get_engine_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VLLMEngine</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_engine_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VLLMEngine</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper to load the engine class from the environment variable if existed</span>
 <span class="sd">        else it will fallback to the default engine class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1882,7 +1882,7 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_engine_cls</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_start_engine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_start_engine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
         <span class="c1"># Push telemetry reports for the model in the current deployment.</span>
@@ -1891,7 +1891,7 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_llm_config</span><span class="o">.</span><span class="n">model_architecture</span><span class="p">:</span>
             <span class="n">push_telemetry_report_for_all_models</span><span class="p">(</span><span class="n">all_models</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_llm_config</span><span class="p">])</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_predict</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_predict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">prompt</span><span class="p">:</span> <span class="n">Prompt</span><span class="p">,</span>
@@ -1947,13 +1947,13 @@ document.write(`
             <span class="c1"># Wrap the PydanticValidationError in a ValidationErrorWithPydantic</span>
             <span class="c1"># so that it can be used in a RayActorError</span>
             <span class="c1"># See https://github.com/ray-project/ray/issues/43401</span>
-            <span class="k">raise</span> <span class="n">ValidationErrorWithPydantic</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+            <span class="k">raise</span> <span class="n">ValidationErrorWithPydantic</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
         <span class="k">async</span> <span class="k">for</span> <span class="n">llm_response</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">vllm_request</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">llm_response</span>
 
 <div class="viewcode-block" id="LLMServer.chat">
 <a class="viewcode-back" href="../../../../../../../serve/api/doc/ray.serve.llm.LLMServer.chat.html#ray.serve.llm.LLMServer.chat">[docs]</a>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ChatCompletionRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMChatResponse</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ChatCompletionRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMChatResponse</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs a chat request to the vllm engine, and return the response.</span>
 
 <span class="sd">        Args:</span>
@@ -1976,7 +1976,7 @@ document.write(`
 
 <div class="viewcode-block" id="LLMServer.completions">
 <a class="viewcode-back" href="../../../../../../../serve/api/doc/ray.serve.llm.LLMServer.completions.html#ray.serve.llm.LLMServer.completions">[docs]</a>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">completions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">CompletionRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMCompletionsResponse</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">completions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">CompletionRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LLMCompletionsResponse</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs a completion request to the vllm engine, and return the response.</span>
 
 <span class="sd">        Args:</span>
@@ -2000,25 +2000,25 @@ document.write(`
 
 <div class="viewcode-block" id="LLMServer.check_health">
 <a class="viewcode-back" href="../../../../../../../serve/api/doc/ray.serve.llm.LLMServer.check_health.html#ray.serve.llm.LLMServer.check_health">[docs]</a>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">check_health</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">check_health</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the health of the vllm engine.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">check_health</span><span class="p">()</span></div>
 
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lora_model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DiskMultiplexConfig</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_load_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lora_model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DiskMultiplexConfig</span><span class="p">:</span>
         <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_downloader</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span>
             <span class="n">lora_model_id</span><span class="o">=</span><span class="n">lora_model_id</span><span class="p">,</span>
             <span class="n">llm_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_llm_config</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_disk_lora_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lora_model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DiskMultiplexConfig</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_disk_lora_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lora_model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DiskMultiplexConfig</span><span class="p">:</span>
         <span class="n">disk_lora_model</span><span class="p">:</span> <span class="n">DiskMultiplexConfig</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">lora_model_id</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">disk_lora_model</span>
 
 <div class="viewcode-block" id="LLMServer.as_deployment">
 <a class="viewcode-back" href="../../../../../../../serve/api/doc/ray.serve.llm.LLMServer.as_deployment.html#ray.serve.llm.LLMServer.as_deployment">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">as_deployment</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_deployment</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">deployment_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">serve</span><span class="o">.</span><span class="n">Deployment</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the LLMServer to a Ray Serve deployment.</span>
@@ -2053,7 +2053,7 @@ document.write(`
     <span class="n">health_check_period_s</span><span class="o">=</span><span class="n">DEFAULT_HEALTH_CHECK_PERIOD_S</span><span class="p">,</span>
     <span class="n">health_check_timeout_s</span><span class="o">=</span><span class="n">DEFAULT_HEALTH_CHECK_TIMEOUT_S</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="k">class</span> <span class="nc">LLMDeployment</span><span class="p">(</span><span class="n">LLMServer</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LLMDeployment</span><span class="p">(</span><span class="n">LLMServer</span><span class="p">):</span>
     <span class="c1"># Note (genesu): We are separating the LLMServer and LLMDeployment just</span>
     <span class="c1"># to give developers an ability to test the implementation outside the Ray Serve.</span>
     <span class="c1"># But in practice we should always test the LLMDeployment class as a Serve</span>

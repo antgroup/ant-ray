@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1441,7 +1441,7 @@ after termination.</p>
 <p>If all nodes in a Ray cluster have access to cloud storage, e.g. AWS S3 or Google Cloud Storage (GCS),
 then all experiment outputs can be saved in a shared cloud bucket.</p>
 <p>We can configure cloud storage by telling Ray Tune to <strong>upload to a remote</strong> <code class="docutils literal notranslate"><span class="pre">storage_path</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 <span class="n">tuner</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
     <span class="n">trainable</span><span class="p">,</span>
@@ -1467,7 +1467,7 @@ URI, rather than the local experiment directory on the head node. See <a class="
 <p>If all Ray nodes have access to a network filesystem, e.g. AWS EFS or Google Cloud Filestore,
 they can all write experiment outputs to this directory.</p>
 <p>All we need to do is <strong>set the shared network filesystem as the path to save results</strong>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 <span class="n">tuner</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
     <span class="n">trainable</span><span class="p">,</span>
@@ -1489,7 +1489,7 @@ they can all write experiment outputs to this directory.</p>
 local filesystem as the default storage location for checkpoints and other artifacts.
 Results are saved to <code class="docutils literal notranslate"><span class="pre">~/ray_results</span></code> in a sub-directory with a unique auto-generated name by default,
 unless you customize this with <code class="docutils literal notranslate"><span class="pre">storage_path</span></code> and <code class="docutils literal notranslate"><span class="pre">name</span></code> in <a class="reference internal" href="../api/doc/ray.tune.RunConfig.html#ray.tune.RunConfig" title="ray.tune.RunConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">RunConfig</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 <span class="n">tuner</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
     <span class="n">trainable</span><span class="p">,</span>
@@ -1527,10 +1527,10 @@ See <a class="reference internal" href="tune-trial-checkpoints.html#tune-persist
 <p>Let’s assume that you’re running this example script from your Ray cluster’s head node.</p>
 <p>In the example below, <code class="docutils literal notranslate"><span class="pre">my_trainable</span></code> is a Tune <a class="reference internal" href="../api/trainable.html#trainable-docs"><span class="std std-ref">trainable</span></a>
 that implements saving and loading checkpoints.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">your_module</span> <span class="kn">import</span> <span class="n">my_trainable</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">your_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">my_trainable</span>
 
 
 <span class="n">tuner</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
@@ -1558,7 +1558,7 @@ that implements saving and loading checkpoints.</p>
 <p>In this example, trial checkpoints will be saved to: <code class="docutils literal notranslate"><span class="pre">s3://my-checkpoints-bucket/path/my-tune-exp/&lt;trial_name&gt;/checkpoint_&lt;step&gt;</span></code></p>
 <p id="tune-syncing-restore-from-uri">If this run stopped for any reason (ex: user CTRL+C, terminated due to out of memory issues),
 you can resume it any time starting from the experiment state saved in the cloud:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 <span class="n">tuner</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span>
     <span class="s2">&quot;s3://my-checkpoints-bucket/path/my-tune-exp&quot;</span><span class="p">,</span>
     <span class="n">trainable</span><span class="o">=</span><span class="n">my_trainable</span><span class="p">,</span>

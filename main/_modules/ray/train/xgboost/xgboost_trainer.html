@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,20 +1392,20 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.train.xgboost.xgboost_trainer</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">xgboost</span>
-<span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xgboost</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">packaging.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">Version</span>
 
-<span class="kn">import</span> <span class="nn">ray.train</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
-<span class="kn">from</span> <span class="nn">ray.train.constants</span> <span class="kn">import</span> <span class="n">TRAIN_DATASET_KEY</span>
-<span class="kn">from</span> <span class="nn">ray.train.trainer</span> <span class="kn">import</span> <span class="n">GenDataset</span>
-<span class="kn">from</span> <span class="nn">ray.train.xgboost</span> <span class="kn">import</span> <span class="n">RayTrainReportCallback</span><span class="p">,</span> <span class="n">XGBoostConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.xgboost.v2</span> <span class="kn">import</span> <span class="n">XGBoostTrainer</span> <span class="k">as</span> <span class="n">SimpleXGBoostTrainer</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRAIN_DATASET_KEY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.trainer</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.xgboost</span><span class="w"> </span><span class="kn">import</span> <span class="n">RayTrainReportCallback</span><span class="p">,</span> <span class="n">XGBoostConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.xgboost.v2</span><span class="w"> </span><span class="kn">import</span> <span class="n">XGBoostTrainer</span> <span class="k">as</span> <span class="n">SimpleXGBoostTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1420,7 +1420,7 @@ document.write(`
 <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_xgboost_train_fn_per_worker</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_xgboost_train_fn_per_worker</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
     <span class="n">label_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">num_boost_round</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1477,7 +1477,7 @@ document.write(`
 <div class="viewcode-block" id="XGBoostTrainer">
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.xgboost.xgboost_trainer.XGBoostTrainer.html#ray.train.xgboost.xgboost_trainer.XGBoostTrainer">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">XGBoostTrainer</span><span class="p">(</span><span class="n">SimpleXGBoostTrainer</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">XGBoostTrainer</span><span class="p">(</span><span class="n">SimpleXGBoostTrainer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A Trainer for distributed data-parallel XGBoost training.</span>
 
 <span class="sd">    Example</span>
@@ -1587,7 +1587,7 @@ document.write(`
     <span class="n">_handles_checkpoint_freq</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">_handles_checkpoint_at_end</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">train_loop_per_worker</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
             <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">],</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Dict</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span>
@@ -1645,7 +1645,7 @@ document.write(`
             <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_legacy_train_fn_per_worker</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_legacy_train_fn_per_worker</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">xgboost_train_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
         <span class="n">run_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ray</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">RunConfig</span><span class="p">],</span>
@@ -1708,7 +1708,7 @@ document.write(`
 <div class="viewcode-block" id="XGBoostTrainer.get_model">
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.xgboost.xgboost_trainer.XGBoostTrainer.get_model.html#ray.train.xgboost.xgboost_trainer.XGBoostTrainer.get_model">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">checkpoint</span><span class="p">:</span> <span class="n">Checkpoint</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xgboost</span><span class="o">.</span><span class="n">Booster</span><span class="p">:</span>

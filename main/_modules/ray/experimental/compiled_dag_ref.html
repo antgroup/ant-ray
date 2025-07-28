@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,20 +1389,20 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.experimental.compiled_dag_ref</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GetTimeoutError</span><span class="p">,</span>
     <span class="n">RayChannelError</span><span class="p">,</span>
     <span class="n">RayChannelTimeoutError</span><span class="p">,</span>
     <span class="n">RayTaskError</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 
-<span class="k">def</span> <span class="nf">_process_return_vals</span><span class="p">(</span><span class="n">return_vals</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">return_single_output</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_process_return_vals</span><span class="p">(</span><span class="n">return_vals</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">return_single_output</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Process return values for return to the DAG caller. Any exceptions found in</span>
 <span class="sd">    return_vals will be raised. If return_single_output=True, it indicates that</span>
@@ -1427,7 +1427,7 @@ document.write(`
 <div class="viewcode-block" id="CompiledDAGRef">
 <a class="viewcode-back" href="../../../ray-core/compiled-graph/doc/ray.experimental.compiled_dag_ref.CompiledDAGRef.html#ray.experimental.compiled_dag_ref.CompiledDAGRef">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">CompiledDAGRef</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CompiledDAGRef</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A reference to a compiled DAG execution result.</span>
 
@@ -1442,7 +1442,7 @@ document.write(`
 
 <div class="viewcode-block" id="CompiledDAGRef.__init__">
 <a class="viewcode-back" href="../../../ray-core/compiled-graph/doc/ray.experimental.compiled_dag_ref.CompiledDAGRef.__init__.html#ray.experimental.compiled_dag_ref.CompiledDAGRef.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dag</span><span class="p">:</span> <span class="s2">&quot;ray.experimental.CompiledDAG&quot;</span><span class="p">,</span>
         <span class="n">execution_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1472,23 +1472,23 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_dag_output_channels</span> <span class="o">=</span> <span class="n">dag</span><span class="o">.</span><span class="n">dag_output_channels</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;CompiledDAGRef(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dag</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span><span class="si">}</span><span class="s2">, &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;execution_index=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_execution_index</span><span class="si">}</span><span class="s2">, &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;channel_index=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_channel_index</span><span class="si">}</span><span class="s2">)&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CompiledDAGRef cannot be copied.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CompiledDAGRef cannot be deep copied.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CompiledDAGRef cannot be pickled.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># If the dag is already teardown, it should do nothing.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dag</span><span class="o">.</span><span class="n">is_teardown</span><span class="p">:</span>
             <span class="k">return</span>
@@ -1499,7 +1499,7 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_dag</span><span class="o">.</span><span class="n">_delete_execution_results</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_execution_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channel_index</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ray_get_called</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;ray.get() can only be called once &quot;</span>
@@ -1534,11 +1534,11 @@ document.write(`
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
                     <span class="s2">&quot;Timed out when getting the actor execution loop exception. &quot;</span>
                     <span class="s2">&quot;This should not happen, please file a GitHub issue.&quot;</span>
-                <span class="p">)</span> <span class="kn">from</span> <span class="nn">timeout_error</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">timeout_error</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">execution_error</span><span class="p">:</span>
                 <span class="c1"># Use &#39;from None&#39; to suppress the context of the original</span>
                 <span class="c1"># channel error, which is not useful to the user.</span>
-                <span class="k">raise</span> <span class="n">execution_error</span> <span class="kn">from</span> <span class="kc">None</span>
+                <span class="k">raise</span> <span class="n">execution_error</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">channel_error</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
@@ -1548,7 +1548,7 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">CompiledDAGFuture</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CompiledDAGFuture</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A reference to a compiled DAG execution result, when executed with asyncio.</span>
 <span class="sd">    This differs from CompiledDAGRef in that `await` must be called on the</span>
@@ -1563,7 +1563,7 @@ document.write(`
 <span class="sd">    4. CompiledDAGFuture cannot be passed as an argument to another task.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dag</span><span class="p">:</span> <span class="s2">&quot;ray.experimental.CompiledDAG&quot;</span><span class="p">,</span>
         <span class="n">execution_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1575,23 +1575,23 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_fut</span> <span class="o">=</span> <span class="n">fut</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_channel_index</span> <span class="o">=</span> <span class="n">channel_index</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;CompiledDAGFuture(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dag</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span><span class="si">}</span><span class="s2">, &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;execution_index=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_execution_index</span><span class="si">}</span><span class="s2">, &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;channel_index=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_channel_index</span><span class="si">}</span><span class="s2">)&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CompiledDAGFuture cannot be copied.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CompiledDAGFuture cannot be deep copied.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CompiledDAGFuture cannot be pickled.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__await__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__await__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fut</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;CompiledDAGFuture can only be awaited upon once, and it has &quot;</span>
@@ -1614,7 +1614,7 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">_process_return_vals</span><span class="p">(</span><span class="n">return_vals</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dag</span><span class="o">.</span><span class="n">is_teardown</span><span class="p">:</span>
             <span class="k">return</span>
 

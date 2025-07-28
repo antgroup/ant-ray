@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,11 +1389,11 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.dag.context</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 <span class="c1"># The context singleton on this process.</span>
 <span class="n">_default_context</span><span class="p">:</span> <span class="s2">&quot;Optional[DAGContext]&quot;</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1427,7 +1427,7 @@ document.write(`
 <a class="viewcode-back" href="../../../ray-core/compiled-graph/doc/ray.dag.context.DAGContext.html#ray.dag.context.DAGContext">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">DAGContext</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DAGContext</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Global settings for Ray DAG.</span>
 
 <span class="sd">    You can configure parameters in the DAGContext by setting the environment</span>
@@ -1476,7 +1476,7 @@ document.write(`
     <span class="n">max_buffered_results</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_MAX_BUFFERED_RESULTS</span>
     <span class="n">overlap_gpu_communication</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">DEFAULT_OVERLAP_GPU_COMMUNICATION</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_iteration_timeout</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_timeout</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;RAY_CGRAPH_read_iteration_timeout_s &quot;</span>
@@ -1487,7 +1487,7 @@ document.write(`
 <div class="viewcode-block" id="DAGContext.get_current">
 <a class="viewcode-back" href="../../../ray-core/compiled-graph/doc/ray.dag.context.DAGContext.get_current.html#ray.dag.context.DAGContext.get_current">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">get_current</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="s2">&quot;DAGContext&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_current</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="s2">&quot;DAGContext&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get or create a singleton context.</span>
 
 <span class="sd">        If the context has not yet been created in this process, it will be</span>

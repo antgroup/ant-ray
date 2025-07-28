@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1410,7 +1410,7 @@ which is a <a class="reference internal" href="../../ray-core/key-concepts.html#
 <p>The main interface to control parallelism in your training code is to set the
 number of workers. This can be done by passing the <code class="docutils literal notranslate"><span class="pre">num_workers</span></code> attribute to
 the <a class="reference internal" href="../api/doc/ray.train.ScalingConfig.html#ray.train.ScalingConfig" title="ray.train.ScalingConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScalingConfig</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
 
 <span class="n">scaling_config</span> <span class="o">=</span> <span class="n">ScalingConfig</span><span class="p">(</span>
     <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span>
@@ -1423,7 +1423,7 @@ the <a class="reference internal" href="../api/doc/ray.train.ScalingConfig.html#
 <p>To use GPUs, pass <code class="docutils literal notranslate"><span class="pre">use_gpu=True</span></code> to the <a class="reference internal" href="../api/doc/ray.train.ScalingConfig.html#ray.train.ScalingConfig" title="ray.train.ScalingConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">ScalingConfig</span></code></a>.
 This will request one GPU per training worker. In the example below, training will
 run on 8 GPUs (8 workers, each using one GPU).</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
 
 <span class="n">scaling_config</span> <span class="o">=</span> <span class="n">ScalingConfig</span><span class="p">(</span>
     <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
@@ -1437,12 +1437,12 @@ run on 8 GPUs (8 workers, each using one GPU).</p>
 in your training function so that the GPUs can be detected and used
 (e.g. <code class="docutils literal notranslate"><span class="pre">CUDA_VISIBLE_DEVICES</span></code>).</p>
 <p>You can get the associated devices with <a class="reference internal" href="../api/doc/ray.train.torch.get_device.html#ray.train.torch.get_device" title="ray.train.torch.get_device"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ray.train.torch.get_device()</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span><span class="p">,</span> <span class="n">get_device</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span><span class="p">,</span> <span class="n">get_device</span>
 
 
-<span class="k">def</span> <span class="nf">train_func</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_func</span><span class="p">():</span>
     <span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
 
     <span class="n">device</span> <span class="o">=</span> <span class="n">get_device</span><span class="p">()</span>
@@ -1465,12 +1465,12 @@ in your training function so that the GPUs can be detected and used
 you can specify <code class="code docutils literal notranslate"><span class="pre">resources_per_worker={&quot;GPU&quot;:</span> <span class="pre">2}</span></code> in the <code class="code docutils literal notranslate"><span class="pre">ScalingConfig</span></code> if you want to
 assign 2 GPUs for each worker.</p>
 <p>You can get a list of associated devices with <a class="reference internal" href="../api/doc/ray.train.torch.get_devices.html#ray.train.torch.get_devices" title="ray.train.torch.get_devices"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ray.train.torch.get_devices()</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span><span class="p">,</span> <span class="n">get_device</span><span class="p">,</span> <span class="n">get_devices</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span><span class="p">,</span> <span class="n">get_device</span><span class="p">,</span> <span class="n">get_devices</span>
 
 
-<span class="k">def</span> <span class="nf">train_func</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_func</span><span class="p">():</span>
     <span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
 
     <span class="n">device</span> <span class="o">=</span> <span class="n">get_device</span><span class="p">()</span>
@@ -1518,7 +1518,7 @@ or is able to autoscale to fulfill the request.</p>
 for communicating tensors across workers. By default Ray Train will use NCCL when <code class="docutils literal notranslate"><span class="pre">use_gpu=True</span></code> and Gloo otherwise.</p>
 <p>If you explicitly want to override this setting, you can configure a <a class="reference internal" href="../api/doc/ray.train.torch.TorchConfig.html#ray.train.torch.TorchConfig" title="ray.train.torch.TorchConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">TorchConfig</span></code></a>
 and pass it into the <a class="reference internal" href="../api/doc/ray.train.torch.TorchTrainer.html#ray.train.torch.TorchTrainer" title="ray.train.torch.TorchTrainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">TorchTrainer</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchConfig</span><span class="p">,</span> <span class="n">TorchTrainer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchConfig</span><span class="p">,</span> <span class="n">TorchTrainer</span>
 
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">TorchTrainer</span><span class="p">(</span>
     <span class="n">train_func</span><span class="p">,</span>
@@ -1539,7 +1539,7 @@ that are used for communicating between GPUs by setting the
 environment variable.</p>
 <p>To ensure that the environment variable is set for all training workers, you can pass it
 in a <a class="reference internal" href="../../ray-core/handling-dependencies.html#runtime-environments"><span class="std std-ref">Ray runtime environment</span></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">runtime_env</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;env_vars&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;NCCL_SOCKET_IFNAME&quot;</span><span class="p">:</span> <span class="s2">&quot;ens5&quot;</span><span class="p">}}</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">runtime_env</span><span class="o">=</span><span class="n">runtime_env</span><span class="p">)</span>
@@ -1554,7 +1554,7 @@ in a <a class="reference internal" href="../../ray-core/handling-dependencies.ht
 <p>If you want to allocate more than one CPU or GPU per training worker, or if you
 defined <a class="reference internal" href="../../ray-core/configure.html#cluster-resources"><span class="std std-ref">custom cluster resources</span></a>, set
 the <code class="docutils literal notranslate"><span class="pre">resources_per_worker</span></code> attribute:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
 
 <span class="n">scaling_config</span> <span class="o">=</span> <span class="n">ScalingConfig</span><span class="p">(</span>
     <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
@@ -1573,7 +1573,7 @@ the <code class="docutils literal notranslate"><span class="pre">resources_per_w
 </div>
 <p>You can also instruct Ray Train to use fractional GPUs. In that case, multiple workers
 will be assigned the same CUDA device.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
 
 <span class="n">scaling_config</span> <span class="o">=</span> <span class="n">ScalingConfig</span><span class="p">(</span>
     <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
@@ -1600,7 +1600,7 @@ Per default, a trainer uses 1 CPU. If you have a cluster with 8 CPUs and want
 to start 4 training workers a 2 CPUs, this will not work, as the total number
 of required CPUs will be 9 (4 * 2 + 1). In that case, you can specify the trainer
 resources to use 0 CPUs:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">ScalingConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalingConfig</span>
 
 <span class="n">scaling_config</span> <span class="o">=</span> <span class="n">ScalingConfig</span><span class="p">(</span>
     <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>

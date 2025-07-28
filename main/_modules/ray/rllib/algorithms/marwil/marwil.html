@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,31 +1389,31 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.algorithms.marwil.marwil</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm</span> <span class="kn">import</span> <span class="n">Algorithm</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span><span class="p">,</span> <span class="n">NotProvided</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.connectors.common</span> <span class="kn">import</span> <span class="n">TensorToNumpy</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.connectors.learner</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm</span><span class="w"> </span><span class="kn">import</span> <span class="n">Algorithm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span><span class="p">,</span> <span class="n">NotProvided</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorToNumpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.learner</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AddObservationsFromEpisodesToBatch</span><span class="p">,</span>
     <span class="n">AddOneTsToEpisodesAndTruncate</span><span class="p">,</span>
     <span class="n">AddNextObservationsFromEpisodesToTrainBatch</span><span class="p">,</span>
     <span class="n">GeneralAdvantageEstimation</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.learner.learner</span> <span class="kn">import</span> <span class="n">Learner</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.learner.training_data</span> <span class="kn">import</span> <span class="n">TrainingData</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.rl_module</span> <span class="kn">import</span> <span class="n">RLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.execution.rollout_ops</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.learner.learner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Learner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.learner.training_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.execution.rollout_ops</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">synchronous_parallel_sample</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.execution.train_ops</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.execution.train_ops</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">multi_gpu_train_one_step</span><span class="p">,</span>
     <span class="n">train_one_step</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.policy</span> <span class="kn">import</span> <span class="n">Policy</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">OldAPIStack</span><span class="p">,</span> <span class="n">override</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="n">deprecation_warning</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Policy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">OldAPIStack</span><span class="p">,</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="n">deprecation_warning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LEARNER_RESULTS</span><span class="p">,</span>
     <span class="n">LEARNER_UPDATE_TIMER</span><span class="p">,</span>
     <span class="n">NUM_AGENT_STEPS_SAMPLED</span><span class="p">,</span>
@@ -1423,17 +1423,17 @@ document.write(`
     <span class="n">SYNCH_WORKER_WEIGHTS_TIMER</span><span class="p">,</span>
     <span class="n">TIMERS</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">EnvType</span><span class="p">,</span>
     <span class="n">ResultDict</span><span class="p">,</span>
     <span class="n">RLModuleSpecType</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span>
 
 
 <div class="viewcode-block" id="MARWILConfig">
 <a class="viewcode-back" href="../../../../../rllib/rllib-algorithms.html#ray.rllib.algorithms.bc.bc.MARWILConfig">[docs]</a>
-<span class="k">class</span> <span class="nc">MARWILConfig</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MARWILConfig</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines a configuration class from which a MARWIL Algorithm can be built.</span>
 
 <span class="sd">    .. testcode::</span>
@@ -1546,7 +1546,7 @@ document.write(`
 <span class="sd">        tuner.fit()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_class</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_class</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes a MARWILConfig instance.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exploration_config</span> <span class="o">=</span> <span class="p">{</span>
             <span class="c1"># The Exploration class to use. In the simplest case, this is the name</span>
@@ -1605,7 +1605,7 @@ document.write(`
 <div class="viewcode-block" id="MARWILConfig.training">
 <a class="viewcode-back" href="../../../../../rllib/rllib-algorithms.html#ray.rllib.algorithms.bc.bc.MARWILConfig.training">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">training</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">training</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">beta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
@@ -1655,9 +1655,9 @@ document.write(`
 
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_default_rl_module_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RLModuleSpecType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_rl_module_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RLModuleSpecType</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">framework_str</span> <span class="o">==</span> <span class="s2">&quot;torch&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo.torch.default_ppo_torch_rl_module</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo.torch.default_ppo_torch_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
                 <span class="n">DefaultPPOTorchRLModule</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -1669,9 +1669,9 @@ document.write(`
             <span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_default_learner_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="s2">&quot;Learner&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_learner_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="s2">&quot;Learner&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">framework_str</span> <span class="o">==</span> <span class="s2">&quot;torch&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.marwil.torch.marwil_torch_learner</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.marwil.torch.marwil_torch_learner</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
                 <span class="n">MARWILTorchLearner</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -1683,7 +1683,7 @@ document.write(`
             <span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">evaluation</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluation</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MARWILConfig&quot;</span><span class="p">:</span>
@@ -1701,14 +1701,14 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">offline_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MARWILConfig&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">offline_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MARWILConfig&quot;</span><span class="p">:</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">offline_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># Check, if the passed in class incorporates the `OfflinePreLearner`</span>
         <span class="c1"># interface.</span>
         <span class="k">if</span> <span class="s2">&quot;prelearner_class&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.offline.offline_data</span> <span class="kn">import</span> <span class="n">OfflinePreLearner</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.offline.offline_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">OfflinePreLearner</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prelearner_class&quot;</span><span class="p">),</span> <span class="n">OfflinePreLearner</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1721,7 +1721,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EnvType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">logger_creator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">Logger</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1738,7 +1738,7 @@ document.write(`
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">logger_creator</span><span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">build_learner_connector</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_learner_connector</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">input_observation_space</span><span class="p">,</span>
         <span class="n">input_action_space</span><span class="p">,</span>
@@ -1779,7 +1779,7 @@ document.write(`
         <span class="k">return</span> <span class="n">pipeline</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Call super&#39;s validation method.</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 
@@ -1809,41 +1809,41 @@ document.write(`
             <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_model_auto_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_model_auto_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_model_auto_keys</span> <span class="o">|</span> <span class="p">{</span><span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="s2">&quot;vf_share_layers&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span></div>
 
 
 
-<span class="k">class</span> <span class="nc">MARWIL</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MARWIL</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_default_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfig</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfig</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">MARWILConfig</span><span class="p">()</span>
 
     <span class="nd">@classmethod</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_default_policy_class</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_policy_class</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AlgorithmConfig</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Policy</span><span class="p">]]:</span>
         <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;framework&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;torch&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.marwil.marwil_torch_policy</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.marwil.marwil_torch_policy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
                 <span class="n">MARWILTorchPolicy</span><span class="p">,</span>
             <span class="p">)</span>
 
             <span class="k">return</span> <span class="n">MARWILTorchPolicy</span>
         <span class="k">elif</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;framework&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;tf&quot;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.marwil.marwil_tf_policy</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.marwil.marwil_tf_policy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
                 <span class="n">MARWILTF1Policy</span><span class="p">,</span>
             <span class="p">)</span>
 
             <span class="k">return</span> <span class="n">MARWILTF1Policy</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.marwil.marwil_tf_policy</span> <span class="kn">import</span> <span class="n">MARWILTF2Policy</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.marwil.marwil_tf_policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">MARWILTF2Policy</span>
 
             <span class="k">return</span> <span class="n">MARWILTF2Policy</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements training logic for the new stack</span>
 
 <span class="sd">        Note, this includes so far training with the `OfflineData`</span>
@@ -1891,7 +1891,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">merge_and_log_n_dicts</span><span class="p">(</span><span class="n">learner_results</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">LEARNER_RESULTS</span><span class="p">)</span>
 
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">_training_step_old_api_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultDict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_training_step_old_api_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultDict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements training step for the old stack.</span>
 
 <span class="sd">        Note, there is no hybrid stack anymore. If you need to use `RLModule`s,</span>

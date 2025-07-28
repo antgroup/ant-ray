@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,15 +1389,15 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.utils.metrics.metrics_logger</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">tree</span>  <span class="c1"># pip install dm_tree</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tree</span>  <span class="c1"># pip install dm_tree</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.utils</span> <span class="kn">import</span> <span class="n">force_tuple</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics.stats</span> <span class="kn">import</span> <span class="n">Stats</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.framework</span> <span class="kn">import</span> <span class="n">try_import_tf</span><span class="p">,</span> <span class="n">try_import_torch</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">force_tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stats</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">try_import_tf</span><span class="p">,</span> <span class="n">try_import_torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="n">_</span><span class="p">,</span> <span class="n">tf</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">try_import_tf</span><span class="p">()</span>
 <span class="n">torch</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">try_import_torch</span><span class="p">()</span>
@@ -1407,7 +1407,7 @@ document.write(`
 <div class="viewcode-block" id="MetricsLogger">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">MetricsLogger</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MetricsLogger</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A generic class collecting and processing metrics in RL training and evaluation.</span>
 
 <span class="sd">    This class represents the main API used by all of RLlib&#39;s components (internal and</span>
@@ -1498,7 +1498,7 @@ document.write(`
 
 <div class="viewcode-block" id="MetricsLogger.__init__">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.__init__.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes a MetricsLogger instance.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tensor_mode</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1513,7 +1513,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_threading_lock</span> <span class="o">=</span> <span class="n">_DummyRLock</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True, if `key` can be found in self.stats.</span>
 
 <span class="sd">        Args:</span>
@@ -1527,7 +1527,7 @@ document.write(`
 
 <div class="viewcode-block" id="MetricsLogger.peek">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek">[docs]</a>
-    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">peek</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1610,7 +1610,7 @@ document.write(`
 <div class="viewcode-block" id="MetricsLogger.peek_results">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek_results.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek_results">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">peek_results</span><span class="p">(</span><span class="n">results</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">peek_results</span><span class="p">(</span><span class="n">results</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Performs `peek()` on any leaf element of an arbitrarily nested Stats struct.</span>
 
 <span class="sd">        Args:</span>
@@ -1627,7 +1627,7 @@ document.write(`
 
 <div class="viewcode-block" id="MetricsLogger.log_value">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value">[docs]</a>
-    <span class="k">def</span> <span class="nf">log_value</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_value</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span>
         <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -1778,7 +1778,7 @@ document.write(`
 
 <div class="viewcode-block" id="MetricsLogger.log_dict">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict">[docs]</a>
-    <span class="k">def</span> <span class="nf">log_dict</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_dict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">stats_dict</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1868,7 +1868,7 @@ document.write(`
 
         <span class="n">prefix_key</span> <span class="o">=</span> <span class="n">force_tuple</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_map</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">stat_or_value</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_map</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">stat_or_value</span><span class="p">):</span>
             <span class="n">extended_key</span> <span class="o">=</span> <span class="n">prefix_key</span> <span class="o">+</span> <span class="n">force_tuple</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span>
@@ -1886,7 +1886,7 @@ document.write(`
 
 <div class="viewcode-block" id="MetricsLogger.merge_and_log_n_dicts">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts">[docs]</a>
-    <span class="k">def</span> <span class="nf">merge_and_log_n_dicts</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">merge_and_log_n_dicts</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">stats_dicts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2108,7 +2108,7 @@ document.write(`
 
 <div class="viewcode-block" id="MetricsLogger.log_time">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time">[docs]</a>
-    <span class="k">def</span> <span class="nf">log_time</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_time</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2192,7 +2192,7 @@ document.write(`
 
 <div class="viewcode-block" id="MetricsLogger.reduce">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce">[docs]</a>
-    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reduce</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2306,7 +2306,7 @@ document.write(`
         <span class="c1"># throw an error).</span>
         <span class="n">PATH</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">def</span> <span class="nf">_reduce</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="n">Stats</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_reduce</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="n">Stats</span><span class="p">):</span>
             <span class="k">nonlocal</span> <span class="n">PATH</span>
             <span class="n">PATH</span> <span class="o">=</span> <span class="n">path</span>
             <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
@@ -2344,7 +2344,7 @@ document.write(`
 
 <div class="viewcode-block" id="MetricsLogger.activate_tensor_mode">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.activate_tensor_mode.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.activate_tensor_mode">[docs]</a>
-    <span class="k">def</span> <span class="nf">activate_tensor_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">activate_tensor_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Switches to tensor-mode, in which in-graph tensors can be logged.</span>
 
 <span class="sd">        Should be used before calling in-graph/copmiled functions, for example loss</span>
@@ -2364,7 +2364,7 @@ document.write(`
 
 <div class="viewcode-block" id="MetricsLogger.deactivate_tensor_mode">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.deactivate_tensor_mode.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.deactivate_tensor_mode">[docs]</a>
-    <span class="k">def</span> <span class="nf">deactivate_tensor_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">deactivate_tensor_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Switches off tensor-mode.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensor_mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tensor_mode</span> <span class="o">=</span> <span class="kc">False</span>
@@ -2377,7 +2377,7 @@ document.write(`
 
 <div class="viewcode-block" id="MetricsLogger.tensors_to_numpy">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.tensors_to_numpy.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.tensors_to_numpy">[docs]</a>
-    <span class="k">def</span> <span class="nf">tensors_to_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor_metrics</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tensors_to_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor_metrics</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts all previously logged and returned tensors back to numpy values.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">tensor_metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_in_stats</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
@@ -2386,12 +2386,12 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">tensor_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tensor_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tensor_mode</span>
 
 <div class="viewcode-block" id="MetricsLogger.set_value">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.set_value.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.set_value">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_value</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span>
         <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -2466,7 +2466,7 @@ document.write(`
 
 <div class="viewcode-block" id="MetricsLogger.reset">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reset.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reset">[docs]</a>
-    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets all data stored in this MetricsLogger.</span>
 
 <span class="sd">        .. testcode::</span>
@@ -2487,7 +2487,7 @@ document.write(`
 
 <div class="viewcode-block" id="MetricsLogger.delete">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.delete.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.delete">[docs]</a>
-    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">key</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">key_error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">key</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">key_error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Deletes the given `key` from this metrics logger&#39;s stats.</span>
 
 <span class="sd">        Args:</span>
@@ -2503,7 +2503,7 @@ document.write(`
 
 <div class="viewcode-block" id="MetricsLogger.get_state">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.get_state.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.get_state">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the current state of `self` as a dict.</span>
 
 <span class="sd">        Note that the state is merely the combination of all states of the individual</span>
@@ -2511,7 +2511,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">stats_dict</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="k">def</span> <span class="nf">_map</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">stats</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_map</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">stats</span><span class="p">):</span>
             <span class="c1"># Convert keys to strings for msgpack-friendliness.</span>
             <span class="n">stats_dict</span><span class="p">[</span><span class="s2">&quot;--&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">get_state</span><span class="p">()</span>
 
@@ -2523,7 +2523,7 @@ document.write(`
 
 <div class="viewcode-block" id="MetricsLogger.set_state">
 <a class="viewcode-back" href="../../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.set_state.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.set_state">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the state of `self` to the given `state`.</span>
 
 <span class="sd">        Args:</span>
@@ -2534,14 +2534,14 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">_set_key</span><span class="p">(</span><span class="n">flat_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">),</span> <span class="n">Stats</span><span class="o">.</span><span class="n">from_state</span><span class="p">(</span><span class="n">stats_state</span><span class="p">))</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_check_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># `value` is a tensor -&gt; Log it in our keys set.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensor_mode</span> <span class="ow">and</span> <span class="p">(</span>
             <span class="p">(</span><span class="n">torch</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">is_tensor</span><span class="p">(</span><span class="n">value</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="n">tf</span> <span class="ow">and</span> <span class="n">tf</span><span class="o">.</span><span class="n">is_tensor</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
         <span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_tensor_keys</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_key_in_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_key</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stats</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_key_in_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_key</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stats</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">flat_key</span> <span class="o">=</span> <span class="n">force_tuple</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">flat_key</span><span class="p">))</span>
         <span class="n">_dict</span> <span class="o">=</span> <span class="n">stats</span> <span class="k">if</span> <span class="n">stats</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">flat_key</span><span class="p">:</span>
@@ -2550,7 +2550,7 @@ document.write(`
             <span class="n">_dict</span> <span class="o">=</span> <span class="n">_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_get_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_key</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stats</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_error</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_key</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stats</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_error</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">flat_key</span> <span class="o">=</span> <span class="n">force_tuple</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">flat_key</span><span class="p">))</span>
         <span class="n">_dict</span> <span class="o">=</span> <span class="n">stats</span> <span class="k">if</span> <span class="n">stats</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">flat_key</span><span class="p">:</span>
@@ -2563,7 +2563,7 @@ document.write(`
                     <span class="k">return</span> <span class="p">{}</span>
         <span class="k">return</span> <span class="n">_dict</span>
 
-    <span class="k">def</span> <span class="nf">_set_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_key</span><span class="p">,</span> <span class="n">stats</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_key</span><span class="p">,</span> <span class="n">stats</span><span class="p">):</span>
         <span class="n">flat_key</span> <span class="o">=</span> <span class="n">force_tuple</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">flat_key</span><span class="p">))</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_threading_lock</span><span class="p">:</span>
@@ -2580,7 +2580,7 @@ document.write(`
                     <span class="n">_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="n">_dict</span> <span class="o">=</span> <span class="n">_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_del_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_key</span><span class="p">,</span> <span class="n">key_error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_del_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_key</span><span class="p">,</span> <span class="n">key_error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">flat_key</span> <span class="o">=</span> <span class="n">force_tuple</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">flat_key</span><span class="p">))</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_threading_lock</span><span class="p">:</span>
@@ -2602,17 +2602,17 @@ document.write(`
 
 
 
-<span class="k">class</span> <span class="nc">_DummyRLock</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">acquire</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_DummyRLock</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">acquire</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
         <span class="k">pass</span>
 </pre></div>
 

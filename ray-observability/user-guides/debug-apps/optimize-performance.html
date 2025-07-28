@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1452,7 +1452,7 @@ as well as some known problems. If you encounter other problems, <a class="refer
 <span id="ray-core-timeline"></span><h2>Visualizing Tasks with Ray Timeline<a class="headerlink" href="#visualizing-tasks-with-ray-timeline" title="Link to this heading">#</a></h2>
 <p>View <a class="reference internal" href="../../getting-started.html#dashboard-timeline"><span class="std std-ref">how to use Ray Timeline in the Dashboard</span></a> for more details.</p>
 <p>Instead of using Dashboard UI to download the tracing file, you can also export the tracing file as a JSON file by running <code class="docutils literal notranslate"><span class="pre">ray</span> <span class="pre">timeline</span></code> from the command line or <code class="docutils literal notranslate"><span class="pre">ray.timeline</span></code> from the Python API.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
@@ -1505,14 +1505,14 @@ execution time of all function calls made within the profiled code.</p>
 changes to your application code (given that each section of the code you want
 to profile is defined as its own function). To use cProfile, add an import
 statement, then replace calls to the loop functions as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cProfile</span>  <span class="c1"># Added import statement</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">cProfile</span>  <span class="c1"># Added import statement</span>
 
-<span class="k">def</span> <span class="nf">ex1</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ex1</span><span class="p">():</span>
     <span class="n">list1</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
         <span class="n">list1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">remote</span><span class="p">()))</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
     <span class="n">cProfile</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;ex1()&#39;</span><span class="p">)</span>  <span class="c1"># Modified call to ex1</span>
     <span class="n">cProfile</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;ex2()&#39;</span><span class="p">)</span>
@@ -1564,18 +1564,18 @@ let’s create a new example and loop over five calls to a remote function
 seconds:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Our actor</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Sleeper</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Sleeper</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sleepValue</span> <span class="o">=</span> <span class="mf">0.5</span>
 
     <span class="c1"># Equivalent to func(), but defined within an actor</span>
-    <span class="k">def</span> <span class="nf">actor_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">actor_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sleepValue</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Recalling the suboptimality of <code class="docutils literal notranslate"><span class="pre">ex1</span></code>, let’s first see what happens if we
 attempt to perform all five <code class="docutils literal notranslate"><span class="pre">actor_func()</span></code> calls within a single actor:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">ex4</span><span class="p">():</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">ex4</span><span class="p">():</span>
     <span class="c1"># This is suboptimal in Ray, and should only be used for the sake of this example</span>
     <span class="n">actor_example</span> <span class="o">=</span> <span class="n">Sleeper</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
 
@@ -1588,7 +1588,7 @@ attempt to perform all five <code class="docutils literal notranslate"><span cla
 </pre></div>
 </div>
 <p>We enable cProfile on this example as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
     <span class="n">cProfile</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;ex4()&#39;</span><span class="p">)</span>
 
@@ -1631,7 +1631,7 @@ that each call to <code class="docutils literal notranslate"><span class="pre">a
 create five <code class="docutils literal notranslate"><span class="pre">Sleeper</span></code> actors. That way, we are creating five workers
 that can run in parallel, instead of creating a single worker that
 can only handle one call to <code class="docutils literal notranslate"><span class="pre">actor_func()</span></code> at a time.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">ex4</span><span class="p">():</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">ex4</span><span class="p">():</span>
     <span class="c1"># Modified to create five separate Sleepers</span>
     <span class="n">five_actors</span> <span class="o">=</span> <span class="p">[</span><span class="n">Sleeper</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
 

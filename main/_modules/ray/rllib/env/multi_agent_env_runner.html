@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,38 +1389,38 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.env.multi_agent_env_runner</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">DefaultDict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">DefaultDict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.callbacks.utils</span> <span class="kn">import</span> <span class="n">make_callback</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.callbacks.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_callback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">COMPONENT_ENV_TO_MODULE_CONNECTOR</span><span class="p">,</span>
     <span class="n">COMPONENT_MODULE_TO_ENV_CONNECTOR</span><span class="p">,</span>
     <span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.columns</span> <span class="kn">import</span> <span class="n">Columns</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="n">MultiRLModule</span><span class="p">,</span> <span class="n">MultiRLModuleSpec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.env_context</span> <span class="kn">import</span> <span class="n">EnvContext</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.env_runner</span> <span class="kn">import</span> <span class="n">EnvRunner</span><span class="p">,</span> <span class="n">ENV_STEP_FAILURE</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.multi_agent_env</span> <span class="kn">import</span> <span class="n">MultiAgentEnv</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.multi_agent_episode</span> <span class="kn">import</span> <span class="n">MultiAgentEpisode</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.vector.vector_multi_agent_env</span> <span class="kn">import</span> <span class="n">VectorMultiAgentEnv</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.vector.registration</span> <span class="kn">import</span> <span class="n">make_vec</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.utils</span> <span class="kn">import</span> <span class="n">_gym_env_creator</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils</span> <span class="kn">import</span> <span class="n">force_list</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">override</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.checkpoints</span> <span class="kn">import</span> <span class="n">Checkpointable</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="n">Deprecated</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.framework</span> <span class="kn">import</span> <span class="n">get_device</span><span class="p">,</span> <span class="n">try_import_torch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.columns</span><span class="w"> </span><span class="kn">import</span> <span class="n">Columns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiRLModule</span><span class="p">,</span> <span class="n">MultiRLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.env_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.env_runner</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvRunner</span><span class="p">,</span> <span class="n">ENV_STEP_FAILURE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.multi_agent_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentEnv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.multi_agent_episode</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentEpisode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.vector.vector_multi_agent_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">VectorMultiAgentEnv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.vector.registration</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_vec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_gym_env_creator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">force_list</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.checkpoints</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpointable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_device</span><span class="p">,</span> <span class="n">try_import_torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ENV_TO_MODULE_CONNECTOR</span><span class="p">,</span>
     <span class="n">EPISODE_DURATION_SEC_MEAN</span><span class="p">,</span>
     <span class="n">EPISODE_LEN_MAX</span><span class="p">,</span>
@@ -1443,10 +1443,10 @@ document.write(`
     <span class="n">TIME_BETWEEN_SAMPLING</span><span class="p">,</span>
     <span class="n">WEIGHTS_SEQ_NO</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.pre_checks.env</span> <span class="kn">import</span> <span class="n">check_multiagent_environments</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">EpisodeID</span><span class="p">,</span> <span class="n">ModelWeights</span><span class="p">,</span> <span class="n">ResultDict</span><span class="p">,</span> <span class="n">StateDict</span>
-<span class="kn">from</span> <span class="nn">ray.tune.registry</span> <span class="kn">import</span> <span class="n">ENV_CREATOR</span><span class="p">,</span> <span class="n">_global_registry</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.pre_checks.env</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_multiagent_environments</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">EpisodeID</span><span class="p">,</span> <span class="n">ModelWeights</span><span class="p">,</span> <span class="n">ResultDict</span><span class="p">,</span> <span class="n">StateDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">ENV_CREATOR</span><span class="p">,</span> <span class="n">_global_registry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="n">torch</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">try_import_torch</span><span class="p">()</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;ray.rllib&quot;</span><span class="p">)</span>
@@ -1457,13 +1457,13 @@ document.write(`
 <div class="viewcode-block" id="MultiAgentEnvRunner">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env_runner.html#ray.rllib.env.multi_agent_env_runner.MultiAgentEnvRunner">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">MultiAgentEnvRunner</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">,</span> <span class="n">Checkpointable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiAgentEnvRunner</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">,</span> <span class="n">Checkpointable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The genetic environment runner for the multi-agent case.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="MultiAgentEnvRunner.__init__">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env_runner.html#ray.rllib.env.multi_agent_env_runner.MultiAgentEnvRunner.__init__">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">)</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AlgorithmConfig</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">AlgorithmConfig</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes a MultiAgentEnvRunner instance.</span>
 
 <span class="sd">        Args:</span>
@@ -1538,7 +1538,7 @@ document.write(`
 <div class="viewcode-block" id="MultiAgentEnvRunner.sample">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env_runner.html#ray.rllib.env.multi_agent_env_runner.MultiAgentEnvRunner.sample">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">num_timesteps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1643,7 +1643,7 @@ document.write(`
         <span class="k">return</span> <span class="n">samples</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_sample</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">num_timesteps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1922,7 +1922,7 @@ document.write(`
         <span class="c1"># Return collected episode data.</span>
         <span class="k">return</span> <span class="n">done_episodes_to_return</span> <span class="o">+</span> <span class="n">ongoing_episodes_to_return</span>
 
-    <span class="k">def</span> <span class="nf">_reset_envs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">episodes</span><span class="p">,</span> <span class="n">shared_data</span><span class="p">,</span> <span class="n">explore</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reset_envs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">episodes</span><span class="p">,</span> <span class="n">shared_data</span><span class="p">,</span> <span class="n">explore</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">env_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_envs</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_new_episode</span><span class="p">(</span><span class="n">env_index</span><span class="p">,</span> <span class="n">episodes</span><span class="p">)</span>
 
@@ -1960,7 +1960,7 @@ document.write(`
 <div class="viewcode-block" id="MultiAgentEnvRunner.get_spaces">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env_runner.html#ray.rllib.env.multi_agent_env_runner.MultiAgentEnvRunner.get_spaces">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_spaces</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_spaces</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Return the already agent-to-module translated spaces from our connector</span>
         <span class="c1"># pipeline.</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -1974,7 +1974,7 @@ document.write(`
 <div class="viewcode-block" id="MultiAgentEnvRunner.get_metrics">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env_runner.html#ray.rllib.env.multi_agent_env_runner.MultiAgentEnvRunner.get_metrics">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultDict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultDict</span><span class="p">:</span>
         <span class="c1"># Compute per-episode metrics (only on already completed episodes).</span>
         <span class="k">for</span> <span class="n">eps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_done_episodes_for_metrics</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">eps</span><span class="o">.</span><span class="n">is_done</span>
@@ -2034,7 +2034,7 @@ document.write(`
 
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">components</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2073,7 +2073,7 @@ document.write(`
         <span class="k">return</span> <span class="n">state</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">COMPONENT_ENV_TO_MODULE_CONNECTOR</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_env_to_module</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">COMPONENT_ENV_TO_MODULE_CONNECTOR</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">COMPONENT_MODULE_TO_ENV_CONNECTOR</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
@@ -2107,14 +2107,14 @@ document.write(`
             <span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_ctor_args_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ctor_args_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="p">(),</span>  <span class="c1"># *args</span>
             <span class="p">{</span><span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">},</span>  <span class="c1"># **kwargs</span>
         <span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="n">Checkpointable</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
             <span class="p">{</span>
@@ -2124,7 +2124,7 @@ document.write(`
         <span class="k">return</span> <span class="n">metadata</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Checkpointable</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_checkpointable_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_checkpointable_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="p">(</span><span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">),</span>
             <span class="p">(</span><span class="n">COMPONENT_ENV_TO_MODULE_CONNECTOR</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_to_module</span><span class="p">),</span>
@@ -2132,7 +2132,7 @@ document.write(`
         <span class="p">]</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">assert_healthy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">assert_healthy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks that self.__init__() has been completed properly.</span>
 
 <span class="sd">        Ensures that the instances has a `MultiRLModule` and an</span>
@@ -2147,7 +2147,7 @@ document.write(`
 <div class="viewcode-block" id="MultiAgentEnvRunner.make_env">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env_runner.html#ray.rllib.env.multi_agent_env_runner.MultiAgentEnvRunner.make_env">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">make_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># If an env already exists, try closing it first (to allow it to properly</span>
         <span class="c1"># cleanup).</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -2258,7 +2258,7 @@ document.write(`
 <div class="viewcode-block" id="MultiAgentEnvRunner.make_module">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env_runner.html#ray.rllib.env.multi_agent_env_runner.MultiAgentEnvRunner.make_module">[docs]</a>
     <span class="nd">@override</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">make_module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">module_spec</span><span class="p">:</span> <span class="n">MultiRLModuleSpec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_multi_rl_module_spec</span><span class="p">(</span>
                 <span class="n">env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="p">,</span> <span class="n">spaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_spaces</span><span class="p">(),</span> <span class="n">inference_only</span><span class="o">=</span><span class="kc">True</span>
@@ -2285,17 +2285,17 @@ document.write(`
 
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">EnvRunner</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Note, `MultiAgentEnv` inherits `close()`-method from `gym.Env`.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_setup_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_done_episodes_for_metrics</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">MultiAgentEpisode</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ongoing_episodes_for_metrics</span><span class="p">:</span> <span class="n">DefaultDict</span><span class="p">[</span>
             <span class="n">EpisodeID</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">MultiAgentEpisode</span><span class="p">]</span>
         <span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_new_episode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_index</span><span class="p">,</span> <span class="n">episodes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_new_episode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_index</span><span class="p">,</span> <span class="n">episodes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">episodes</span> <span class="o">=</span> <span class="n">episodes</span> <span class="k">if</span> <span class="n">episodes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_episodes</span>
         <span class="n">episodes</span><span class="p">[</span><span class="n">env_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">MultiAgentEpisode</span><span class="p">(</span>
             <span class="n">observation_space</span><span class="o">=</span><span class="p">{</span>
@@ -2310,7 +2310,7 @@ document.write(`
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_make_on_episode_callback</span><span class="p">(</span><span class="s2">&quot;on_episode_created&quot;</span><span class="p">,</span> <span class="n">env_index</span><span class="p">,</span> <span class="n">episodes</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_make_on_episode_callback</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_on_episode_callback</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">which</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">episodes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">MultiAgentEpisode</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
         <span class="c1"># episode = episode if episode is not None else self._episode</span>
@@ -2328,7 +2328,7 @@ document.write(`
             <span class="p">),</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_increase_sampled_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">,</span> <span class="n">next_obs</span><span class="p">,</span> <span class="n">episode</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_increase_sampled_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">,</span> <span class="n">next_obs</span><span class="p">,</span> <span class="n">episode</span><span class="p">):</span>
         <span class="c1"># Env steps.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span>
             <span class="n">NUM_ENV_STEPS_SAMPLED</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="n">clear_on_reduce</span><span class="o">=</span><span class="kc">True</span>
@@ -2370,7 +2370,7 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">num_steps</span>
 
-    <span class="k">def</span> <span class="nf">_log_episode_metrics</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_episode_metrics</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">length</span><span class="p">,</span>
         <span class="n">ret</span><span class="p">,</span>
@@ -2432,7 +2432,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_prune_zero_len_sa_episodes</span><span class="p">(</span><span class="n">episode</span><span class="p">:</span> <span class="n">MultiAgentEpisode</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prune_zero_len_sa_episodes</span><span class="p">(</span><span class="n">episode</span><span class="p">:</span> <span class="n">MultiAgentEpisode</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">agent_eps</span> <span class="ow">in</span> <span class="n">episode</span><span class="o">.</span><span class="n">agent_episodes</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">agent_eps</span><span class="p">:</span>
                 <span class="k">del</span> <span class="n">episode</span><span class="o">.</span><span class="n">agent_episodes</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span>
@@ -2441,14 +2441,14 @@ document.write(`
         <span class="n">new</span><span class="o">=</span><span class="s2">&quot;MultiAgentEnvRunner.get_state(components=&#39;rl_module&#39;)&quot;</span><span class="p">,</span>
         <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modules</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modules</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">rl_module_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="n">COMPONENT_RL_MODULE</span><span class="p">)[</span>
             <span class="n">COMPONENT_RL_MODULE</span>
         <span class="p">]</span>
         <span class="k">return</span> <span class="n">rl_module_state</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;MultiAgentEnvRunner.set_state()&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">set_weights</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_weights</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">weights</span><span class="p">:</span> <span class="n">ModelWeights</span><span class="p">,</span>
         <span class="n">global_vars</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

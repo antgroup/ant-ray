@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,25 +1389,25 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data._internal.datasource.tfrecords_datasource</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">struct</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">struct</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">pyarrow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span>
 
-<span class="kn">from</span> <span class="nn">ray.air.util.tensor_extensions.arrow</span> <span class="kn">import</span> <span class="n">pyarrow_table_from_pydict</span>
-<span class="kn">from</span> <span class="nn">ray.data.aggregate</span> <span class="kn">import</span> <span class="n">AggregateFn</span>
-<span class="kn">from</span> <span class="nn">ray.data.block</span> <span class="kn">import</span> <span class="n">Block</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource.file_based_datasource</span> <span class="kn">import</span> <span class="n">FileBasedDatasource</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.util.tensor_extensions.arrow</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyarrow_table_from_pydict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregateFn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.file_based_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileBasedDatasource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-    <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
-    <span class="kn">from</span> <span class="nn">tensorflow_metadata.proto.v0</span> <span class="kn">import</span> <span class="n">schema_pb2</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow_metadata.proto.v0</span><span class="w"> </span><span class="kn">import</span> <span class="n">schema_pb2</span>
 
-    <span class="kn">from</span> <span class="nn">ray.data.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1416,7 +1416,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../data/api/doc/ray.data.TFXReadOptions.html#ray.data.TFXReadOptions">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">TFXReadOptions</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TFXReadOptions</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Specifies read options when reading TFRecord files with TFX.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1433,12 +1433,12 @@ document.write(`
 
 
 
-<span class="k">class</span> <span class="nc">TFRecordDatasource</span><span class="p">(</span><span class="n">FileBasedDatasource</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TFRecordDatasource</span><span class="p">(</span><span class="n">FileBasedDatasource</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;TFRecord datasource, for reading and writing TFRecord files.&quot;&quot;&quot;</span>
 
     <span class="n">_FILE_EXTENSIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tfrecords&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
         <span class="n">tf_schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;schema_pb2.Schema&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1458,17 +1458,17 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_tf_schema</span> <span class="o">=</span> <span class="n">tf_schema</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tfx_read_options</span> <span class="o">=</span> <span class="n">tfx_read_options</span>
 
-    <span class="k">def</span> <span class="nf">_read_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="s2">&quot;pyarrow.NativeFile&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Block</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="s2">&quot;pyarrow.NativeFile&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Block</span><span class="p">]:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tfx_read_options</span><span class="p">:</span>
             <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tfx_read_stream</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_read_stream</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_default_read_stream</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_default_read_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="s2">&quot;pyarrow.NativeFile&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Block</span><span class="p">]:</span>
-        <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
-        <span class="kn">from</span> <span class="nn">google.protobuf.message</span> <span class="kn">import</span> <span class="n">DecodeError</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">google.protobuf.message</span><span class="w"> </span><span class="kn">import</span> <span class="n">DecodeError</span>
 
         <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">_read_records</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
             <span class="n">example</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Example</span><span class="p">()</span>
@@ -1485,9 +1485,9 @@ document.write(`
                 <span class="n">_convert_example_to_dict</span><span class="p">(</span><span class="n">example</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tf_schema</span><span class="p">)</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_tfx_read_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="s2">&quot;pyarrow.NativeFile&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Block</span><span class="p">]:</span>
-        <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
-        <span class="kn">from</span> <span class="nn">tfx_bsl.cc.tfx_bsl_extension.coders</span> <span class="kn">import</span> <span class="n">ExamplesToRecordBatchDecoder</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_tfx_read_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="s2">&quot;pyarrow.NativeFile&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Block</span><span class="p">]:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">tfx_bsl.cc.tfx_bsl_extension.coders</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExamplesToRecordBatchDecoder</span>
 
         <span class="n">full_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_full_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
@@ -1520,8 +1520,8 @@ document.write(`
         <span class="k">if</span> <span class="n">exception_thrown</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to read TFRecord file </span><span class="si">{</span><span class="n">full_path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_resolve_full_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">ray.data._internal.util</span> <span class="kn">import</span> <span class="n">RetryingPyFileSystem</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_full_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">RetryingPyFileSystem</span>
 
         <span class="n">filesystem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filesystem</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filesystem</span><span class="p">,</span> <span class="n">RetryingPyFileSystem</span><span class="p">):</span>
@@ -1543,7 +1543,7 @@ document.write(`
         <span class="k">return</span> <span class="n">relative_path</span>
 
 
-<span class="k">def</span> <span class="nf">_convert_example_to_dict</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_convert_example_to_dict</span><span class="p">(</span>
     <span class="n">example</span><span class="p">:</span> <span class="s2">&quot;tf.train.Example&quot;</span><span class="p">,</span>
     <span class="n">tf_schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;schema_pb2.Schema&quot;</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">Array</span><span class="p">]:</span>
@@ -1565,7 +1565,7 @@ document.write(`
     <span class="k">return</span> <span class="n">record</span>
 
 
-<span class="k">def</span> <span class="nf">_get_single_true_type</span><span class="p">(</span><span class="n">dct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_single_true_type</span><span class="p">(</span><span class="n">dct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Utility function for getting the single key which has a `True` value in</span>
 <span class="sd">    a dict. Used to filter a dict of `{field_type: is_valid}` to get</span>
 <span class="sd">    the field type from a schema or data source.&quot;&quot;&quot;</span>
@@ -1574,11 +1574,11 @@ document.write(`
     <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">filtered_types</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_feature_value</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_feature_value</span><span class="p">(</span>
     <span class="n">feature</span><span class="p">:</span> <span class="s2">&quot;tf.train.Feature&quot;</span><span class="p">,</span>
     <span class="n">schema_feature_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;schema_pb2.FeatureType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
 
     <span class="n">underlying_feature_type</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;bytes&quot;</span><span class="p">:</span> <span class="n">feature</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;bytes_list&quot;</span><span class="p">),</span>
@@ -1592,7 +1592,7 @@ document.write(`
 
     <span class="k">if</span> <span class="n">schema_feature_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">tensorflow_metadata.proto.v0</span> <span class="kn">import</span> <span class="n">schema_pb2</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow_metadata.proto.v0</span><span class="w"> </span><span class="kn">import</span> <span class="n">schema_pb2</span>
         <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span>
                 <span class="s2">&quot;To use TensorFlow schemas, please install &quot;</span>
@@ -1666,7 +1666,7 @@ document.write(`
 <span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
-<span class="k">def</span> <span class="nf">_read_records</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_records</span><span class="p">(</span>
     <span class="n">file</span><span class="p">:</span> <span class="s2">&quot;pyarrow.NativeFile&quot;</span><span class="p">,</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">memoryview</span><span class="p">]:</span>
@@ -1740,10 +1740,10 @@ document.write(`
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">data_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">error_message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; Byte size of current record data is </span><span class="si">{</span><span class="n">data_length</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
 
-<span class="k">def</span> <span class="nf">_cast_large_list_to_list</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">Table</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_cast_large_list_to_list</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">Table</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function transform pyarrow.large_list into list and pyarrow.large_binary into</span>
 <span class="sd">    pyarrow.binary so that all types resulting from the tfrecord_datasource are usable</span>
@@ -1770,7 +1770,7 @@ document.write(`
     <span class="k">return</span> <span class="n">batch</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">new_schema</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_infer_schema_and_transform</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_infer_schema_and_transform</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">):</span>
     <span class="n">list_sizes</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">_MaxListSize</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">schema</span><span class="p">()</span><span class="o">.</span><span class="n">names</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map_batches</span><span class="p">(</span>
@@ -1780,7 +1780,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_unwrap_single_value_lists</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">Table</span><span class="p">,</span> <span class="n">col_lengths</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_unwrap_single_value_lists</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">Table</span><span class="p">,</span> <span class="n">col_lengths</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function will transfrom the dataset converting list types that always</span>
 <span class="sd">    contain single values to thery underlying data type</span>
@@ -1803,8 +1803,8 @@ document.write(`
     <span class="k">return</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_MaxListSize</span><span class="p">(</span><span class="n">AggregateFn</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_MaxListSize</span><span class="p">(</span><span class="n">AggregateFn</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span> <span class="o">=</span> <span class="n">columns</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_init</span><span class="p">,</span>
@@ -1814,17 +1814,17 @@ document.write(`
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;max_list_size&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span><span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">_merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acc1</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">acc2</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acc1</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">acc2</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
         <span class="n">merged</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns</span><span class="p">:</span>
             <span class="n">merged</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">acc1</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">acc2</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">merged</span>
 
-    <span class="k">def</span> <span class="nf">_accumulate_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acc</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">row</span><span class="p">:</span> <span class="s2">&quot;pd.Series&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_accumulate_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acc</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">row</span><span class="p">:</span> <span class="s2">&quot;pd.Series&quot;</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">value</span><span class="p">:</span>

@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,33 +1389,33 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.dashboard.modules.job.common</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">replace</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">replace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">ray._private</span> <span class="kn">import</span> <span class="n">ray_constants</span>
-<span class="kn">from</span> <span class="nn">ray._private.event.export_event_logger</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private</span><span class="w"> </span><span class="kn">import</span> <span class="n">ray_constants</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.event.export_event_logger</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">EventLogType</span><span class="p">,</span>
     <span class="n">check_export_api_enabled</span><span class="p">,</span>
     <span class="n">get_export_event_logger</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray._private.gcs_utils</span> <span class="kn">import</span> <span class="n">GcsAioClient</span><span class="p">,</span> <span class="n">GcsChannel</span>
-<span class="kn">from</span> <span class="nn">ray._private.runtime_env.packaging</span> <span class="kn">import</span> <span class="n">parse_uri</span>
-<span class="kn">from</span> <span class="nn">ray.core.generated</span> <span class="kn">import</span> <span class="n">gcs_service_pb2_grpc</span>
-<span class="kn">from</span> <span class="nn">ray.core.generated.export_event_pb2</span> <span class="kn">import</span> <span class="n">ExportEvent</span>
-<span class="kn">from</span> <span class="nn">ray.core.generated.export_submission_job_event_pb2</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.gcs_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">GcsAioClient</span><span class="p">,</span> <span class="n">GcsChannel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.runtime_env.packaging</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_uri</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.core.generated</span><span class="w"> </span><span class="kn">import</span> <span class="n">gcs_service_pb2_grpc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.core.generated.export_event_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExportEvent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.core.generated.export_submission_job_event_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ExportSubmissionJobEventData</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.core.generated.gcs_service_pb2</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.core.generated.gcs_service_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">CreateJobClusterRequest</span><span class="p">,</span>
     <span class="n">RemoveVirtualClusterRequest</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="c1"># NOTE(edoakes): these constants should be considered a public API because</span>
 <span class="c1"># they&#39;re exposed in the snapshot API.</span>
@@ -1435,7 +1435,7 @@ document.write(`
 <div class="viewcode-block" id="JobStatus">
 <a class="viewcode-back" href="../../../../../cluster/running-applications/job-submission/doc/ray.job_submission.JobStatus.html#ray.job_submission.JobStatus">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">JobStatus</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JobStatus</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An enumeration for describing the status of a job.&quot;&quot;&quot;</span>
 
     <span class="c1">#: The job has not started yet, likely waiting for the runtime_env to be set up.</span>
@@ -1449,12 +1449,12 @@ document.write(`
     <span class="c1">#: The job failed.</span>
     <span class="n">FAILED</span> <span class="o">=</span> <span class="s2">&quot;FAILED&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
 
 <div class="viewcode-block" id="JobStatus.is_terminal">
 <a class="viewcode-back" href="../../../../../cluster/running-applications/job-submission/doc/ray.job_submission.JobStatus.is_terminal.html#ray.job_submission.JobStatus.is_terminal">[docs]</a>
-    <span class="k">def</span> <span class="nf">is_terminal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_terminal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether or not this status is terminal.</span>
 
 <span class="sd">        A terminal status is one that cannot transition to any other status.</span>
@@ -1473,7 +1473,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../cluster/running-applications/job-submission/doc/ray.job_submission.JobInfo.html#ray.job_submission.JobInfo">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">JobInfo</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JobInfo</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for recording information associated with a job and its execution.</span>
 
 <span class="sd">    Please keep this in sync with the JobsAPIInfo proto in src/ray/protobuf/gcs.proto.</span>
@@ -1515,7 +1515,7 @@ document.write(`
     <span class="c1">#: The job cluster this job belongs to.</span>
     <span class="n">job_cluster_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">JobStatus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1551,7 +1551,7 @@ document.write(`
 
 <div class="viewcode-block" id="JobInfo.to_json">
 <a class="viewcode-back" href="../../../../../cluster/running-applications/job-submission/doc/ray.job_submission.JobInfo.to_json.html#ray.job_submission.JobInfo.to_json">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert this object to a JSON-serializable dictionary.</span>
 
 <span class="sd">        Note that the runtime_env field is converted to a JSON-serialized string</span>
@@ -1581,7 +1581,7 @@ document.write(`
 <div class="viewcode-block" id="JobInfo.from_json">
 <a class="viewcode-back" href="../../../../../cluster/running-applications/job-submission/doc/ray.job_submission.JobInfo.from_json.html#ray.job_submission.JobInfo.from_json">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">json_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">json_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize this object from a JSON dictionary.</span>
 
 <span class="sd">        Note that the runtime_env_json field is converted to a dictionary and</span>
@@ -1604,7 +1604,7 @@ document.write(`
 
 
 
-<span class="k">class</span> <span class="nc">JobInfoStorageClient</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JobInfoStorageClient</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Interface to put and get job data from the Internal KV store.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1614,7 +1614,7 @@ document.write(`
     <span class="n">JOB_DATA_KEY_PREFIX</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ray_constants</span><span class="o">.</span><span class="n">RAY_INTERNAL_NAMESPACE_PREFIX</span><span class="si">}</span><span class="s2">job_info_&quot;</span>
     <span class="n">JOB_DATA_KEY</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">JOB_DATA_KEY_PREFIX</span><span class="si">}</span><span class="se">{{</span><span class="s2">job_id</span><span class="se">}}</span><span class="s2">&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">gcs_aio_client</span><span class="p">:</span> <span class="n">GcsAioClient</span><span class="p">,</span>
         <span class="n">export_event_log_dir_root</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1643,7 +1643,7 @@ document.write(`
                 <span class="s2">&quot;events will be written.&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">put_info</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">put_info</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">job_info</span><span class="p">:</span> <span class="n">JobInfo</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Put job info to the internal kv store.</span>
@@ -1670,7 +1670,7 @@ document.write(`
                 <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error while writing job submission export event.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">added_num</span> <span class="o">==</span> <span class="mi">1</span>
 
-    <span class="k">def</span> <span class="nf">_write_submission_job_export_event</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write_submission_job_export_event</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">job_info</span><span class="p">:</span> <span class="n">JobInfo</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1710,7 +1710,7 @@ document.write(`
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_export_submission_job_event_logger</span><span class="o">.</span><span class="n">send_event</span><span class="p">(</span><span class="n">submission_event_data</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">JobInfo</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">JobInfo</span><span class="p">]:</span>
         <span class="n">serialized_info</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gcs_aio_client</span><span class="o">.</span><span class="n">internal_kv_get</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">JOB_DATA_KEY</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">job_id</span><span class="o">=</span><span class="n">job_id</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span>
             <span class="n">namespace</span><span class="o">=</span><span class="n">ray_constants</span><span class="o">.</span><span class="n">KV_NAMESPACE_JOB</span><span class="p">,</span>
@@ -1721,7 +1721,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">JobInfo</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">serialized_info</span><span class="p">))</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">delete_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">):</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gcs_aio_client</span><span class="o">.</span><span class="n">internal_kv_del</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">JOB_DATA_KEY</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">job_id</span><span class="o">=</span><span class="n">job_id</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span>
             <span class="kc">False</span><span class="p">,</span>
@@ -1729,7 +1729,7 @@ document.write(`
             <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">put_status</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">put_status</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">status</span><span class="p">:</span> <span class="n">JobStatus</span><span class="p">,</span>
@@ -1760,14 +1760,14 @@ document.write(`
 
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">put_info</span><span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">new_info</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">JobStatus</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">JobStatus</span><span class="p">]:</span>
         <span class="n">job_info</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_info</span><span class="p">(</span><span class="n">job_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">job_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">job_info</span><span class="o">.</span><span class="n">status</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_all_jobs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">JobInfo</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_all_jobs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">JobInfo</span><span class="p">]:</span>
         <span class="n">raw_job_ids_with_prefixes</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gcs_aio_client</span><span class="o">.</span><span class="n">internal_kv_keys</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">JOB_DATA_KEY_PREFIX</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span>
             <span class="n">namespace</span><span class="o">=</span><span class="n">ray_constants</span><span class="o">.</span><span class="n">KV_NAMESPACE_JOB</span><span class="p">,</span>
@@ -1783,15 +1783,15 @@ document.write(`
             <span class="p">),</span> <span class="s2">&quot;Unexpected format for internal_kv key for Job submission&quot;</span>
             <span class="n">job_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job_id_with_prefix</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">JOB_DATA_KEY_PREFIX</span><span class="p">)</span> <span class="p">:])</span>
 
-        <span class="k">async</span> <span class="k">def</span> <span class="nf">get_job_info</span><span class="p">(</span><span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_job_info</span><span class="p">(</span><span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">job_info</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_info</span><span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">job_info</span>
 
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">get_job_info</span><span class="p">(</span><span class="n">job_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">job_id</span> <span class="ow">in</span> <span class="n">job_ids</span><span class="p">]))</span>
 
 
-<span class="k">class</span> <span class="nc">VirtualClusterClient</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gcs_address</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">VirtualClusterClient</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gcs_address</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_gcs_channel</span> <span class="o">=</span> <span class="n">GcsChannel</span><span class="p">(</span><span class="n">gcs_address</span><span class="o">=</span><span class="n">gcs_address</span><span class="p">,</span> <span class="n">aio</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_gcs_channel</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 
@@ -1801,7 +1801,7 @@ document.write(`
             <span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">build_job_cluster_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_job_cluster_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs a unique job cluster ID by combining</span>
 <span class="sd">        the virtual cluster ID and job ID.</span>
@@ -1810,7 +1810,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">virtual_cluster_id</span><span class="si">}</span><span class="s2">##</span><span class="si">{</span><span class="n">job_id</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">create_job_cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="p">,</span> <span class="n">replica_sets</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_job_cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="p">,</span> <span class="n">replica_sets</span><span class="p">):</span>
         <span class="n">request</span> <span class="o">=</span> <span class="n">CreateJobClusterRequest</span><span class="p">(</span>
             <span class="n">job_id</span><span class="o">=</span><span class="n">job_id</span><span class="p">,</span>
             <span class="n">virtual_cluster_id</span><span class="o">=</span><span class="n">virtual_cluster_id</span><span class="p">,</span>
@@ -1829,7 +1829,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">reply</span><span class="o">.</span><span class="n">job_cluster_id</span><span class="p">,</span> <span class="kc">None</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">remove_job_cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_cluster_id</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">remove_job_cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_cluster_id</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">job_cluster_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -1846,7 +1846,7 @@ document.write(`
             <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">uri_to_http_components</span><span class="p">(</span><span class="n">package_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">uri_to_http_components</span><span class="p">(</span><span class="n">package_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
     <span class="n">suffix</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">package_uri</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
     <span class="k">if</span> <span class="n">suffix</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;.zip&quot;</span><span class="p">,</span> <span class="s2">&quot;.whl&quot;</span><span class="p">}:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;package_uri (</span><span class="si">{</span><span class="n">package_uri</span><span class="si">}</span><span class="s2">) does not end in .zip or .whl&quot;</span><span class="p">)</span>
@@ -1856,16 +1856,16 @@ document.write(`
     <span class="k">return</span> <span class="n">protocol</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">package_name</span>
 
 
-<span class="k">def</span> <span class="nf">http_uri_components_to_uri</span><span class="p">(</span><span class="n">protocol</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">package_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">http_uri_components_to_uri</span><span class="p">(</span><span class="n">protocol</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">package_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">protocol</span><span class="si">}</span><span class="s2">://</span><span class="si">{</span><span class="n">package_name</span><span class="si">}</span><span class="s2">&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">validate_request_type</span><span class="p">(</span><span class="n">json_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">request_type</span><span class="p">:</span> <span class="n">dataclass</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_request_type</span><span class="p">(</span><span class="n">json_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">request_type</span><span class="p">:</span> <span class="n">dataclass</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">request_type</span><span class="p">(</span><span class="o">**</span><span class="n">json_data</span><span class="p">)</span>
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">JobSubmitRequest</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JobSubmitRequest</span><span class="p">:</span>
     <span class="c1"># Command to start execution, ex: &quot;python script.py&quot;</span>
     <span class="n">entrypoint</span><span class="p">:</span> <span class="nb">str</span>
     <span class="c1"># Optional submission_id to specify for the job. If the submission_id</span>
@@ -1899,7 +1899,7 @@ document.write(`
     <span class="c1"># Optional replica sets for job</span>
     <span class="n">replica_sets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entrypoint</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;entrypoint must be a string, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entrypoint</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -2010,25 +2010,25 @@ document.write(`
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">JobSubmitResponse</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JobSubmitResponse</span><span class="p">:</span>
     <span class="c1"># DEPRECATED: Use submission_id instead.</span>
     <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">submission_id</span><span class="p">:</span> <span class="nb">str</span>
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">JobStopResponse</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JobStopResponse</span><span class="p">:</span>
     <span class="n">stopped</span><span class="p">:</span> <span class="nb">bool</span>
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">JobDeleteResponse</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JobDeleteResponse</span><span class="p">:</span>
     <span class="n">deleted</span><span class="p">:</span> <span class="nb">bool</span>
 
 
 <span class="c1"># TODO(jiaodong): Support log streaming #19415</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">JobLogsResponse</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JobLogsResponse</span><span class="p">:</span>
     <span class="n">logs</span><span class="p">:</span> <span class="nb">str</span>
 </pre></div>
 

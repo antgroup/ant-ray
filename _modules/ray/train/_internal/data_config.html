@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,18 +1392,18 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.train._internal.data_config</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.actor</span> <span class="kn">import</span> <span class="n">ActorHandle</span>
-<span class="kn">from</span> <span class="nn">ray.data</span> <span class="kn">import</span> <span class="n">DataIterator</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">ExecutionOptions</span><span class="p">,</span> <span class="n">NodeIdStr</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.execution.interfaces.execution_options</span> <span class="kn">import</span> <span class="n">ExecutionResources</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.actor</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActorHandle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataIterator</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">ExecutionOptions</span><span class="p">,</span> <span class="n">NodeIdStr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.execution.interfaces.execution_options</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExecutionResources</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">DataConfig</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class responsible for configuring Train dataset preprocessing.</span>
 
 <span class="sd">    For advanced use cases, this class can be subclassed and the `configure()` method</span>
@@ -1412,7 +1412,7 @@ document.write(`
 
 <div class="viewcode-block" id="DataConfig.__init__">
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.DataConfig.__init__.html#ray.train.DataConfig.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">datasets_to_split</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
         <span class="n">execution_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ExecutionOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1446,7 +1446,7 @@ document.write(`
 
 <div class="viewcode-block" id="DataConfig.set_train_total_resources">
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.DataConfig.set_train_total_resources.html#ray.train.DataConfig.set_train_total_resources">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_train_total_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_train_cpus</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">num_train_gpus</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_train_total_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_train_cpus</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">num_train_gpus</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the total number of CPUs and GPUs used by training.</span>
 
 <span class="sd">        If CPU or GPU resource limits are not set, they will be set to the</span>
@@ -1460,7 +1460,7 @@ document.write(`
 <div class="viewcode-block" id="DataConfig.configure">
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.DataConfig.configure.html#ray.train.DataConfig.configure">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">datasets</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">],</span>
         <span class="n">world_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1526,7 +1526,7 @@ document.write(`
 <div class="viewcode-block" id="DataConfig.default_ingest_options">
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.DataConfig.default_ingest_options.html#ray.train.DataConfig.default_ingest_options">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">default_ingest_options</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ExecutionOptions</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default_ingest_options</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ExecutionOptions</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The default Ray Data options used for data ingest.</span>
 
 <span class="sd">        By default, configurations are carried over from what is already set</span>

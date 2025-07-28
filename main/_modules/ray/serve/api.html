@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,37 +1389,37 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.serve.api</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">attr</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">APIRouter</span><span class="p">,</span> <span class="n">FastAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">attr</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">APIRouter</span><span class="p">,</span> <span class="n">FastAPI</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">cloudpickle</span>
-<span class="kn">from</span> <span class="nn">ray._private.serialization</span> <span class="kn">import</span> <span class="n">pickle_dumps</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.build_app</span> <span class="kn">import</span> <span class="n">build_app</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.config</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">cloudpickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.serialization</span><span class="w"> </span><span class="kn">import</span> <span class="n">pickle_dumps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.build_app</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_app</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.config</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DeploymentConfig</span><span class="p">,</span>
     <span class="n">ReplicaConfig</span><span class="p">,</span>
     <span class="n">handle_num_replicas_auto</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">RAY_SERVE_FORCE_LOCAL_TESTING_MODE</span><span class="p">,</span>
     <span class="n">SERVE_DEFAULT_APP_NAME</span><span class="p">,</span>
     <span class="n">SERVE_LOGGER_NAME</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.http_util</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.http_util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ASGIAppReplicaWrapper</span><span class="p">,</span>
     <span class="n">make_fastapi_class_based_view</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.local_testing_mode</span> <span class="kn">import</span> <span class="n">make_local_deployment_handle</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.logging_utils</span> <span class="kn">import</span> <span class="n">configure_component_logger</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.usage</span> <span class="kn">import</span> <span class="n">ServeUsageTag</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.local_testing_mode</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_local_deployment_handle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.logging_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">configure_component_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.usage</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServeUsageTag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT</span><span class="p">,</span>
     <span class="n">Default</span><span class="p">,</span>
     <span class="n">ensure_serialization_context</span><span class="p">,</span>
@@ -1427,27 +1427,27 @@ document.write(`
     <span class="n">validate_route_prefix</span><span class="p">,</span>
     <span class="n">wait_for_interrupt</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.serve.config</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.config</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AutoscalingConfig</span><span class="p">,</span>
     <span class="n">DeploymentMode</span><span class="p">,</span>
     <span class="n">HTTPOptions</span><span class="p">,</span>
     <span class="n">ProxyLocation</span><span class="p">,</span>
     <span class="n">gRPCOptions</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.serve.context</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.context</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ReplicaContext</span><span class="p">,</span>
     <span class="n">_get_global_client</span><span class="p">,</span>
     <span class="n">_get_internal_replica_context</span><span class="p">,</span>
     <span class="n">_set_global_client</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.serve.deployment</span> <span class="kn">import</span> <span class="n">Application</span><span class="p">,</span> <span class="n">Deployment</span>
-<span class="kn">from</span> <span class="nn">ray.serve.exceptions</span> <span class="kn">import</span> <span class="n">RayServeException</span>
-<span class="kn">from</span> <span class="nn">ray.serve.handle</span> <span class="kn">import</span> <span class="n">DeploymentHandle</span>
-<span class="kn">from</span> <span class="nn">ray.serve.multiplex</span> <span class="kn">import</span> <span class="n">_ModelMultiplexWrapper</span>
-<span class="kn">from</span> <span class="nn">ray.serve.schema</span> <span class="kn">import</span> <span class="n">LoggingConfig</span><span class="p">,</span> <span class="n">ServeInstanceDetails</span><span class="p">,</span> <span class="n">ServeStatus</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.deployment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Application</span><span class="p">,</span> <span class="n">Deployment</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">RayServeException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.handle</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentHandle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.multiplex</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ModelMultiplexWrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggingConfig</span><span class="p">,</span> <span class="n">ServeInstanceDetails</span><span class="p">,</span> <span class="n">ServeStatus</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
-<span class="kn">from</span> <span class="nn">ray.serve._private</span> <span class="kn">import</span> <span class="n">api</span> <span class="k">as</span> <span class="n">_private_api</span>  <span class="c1"># isort:skip</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private</span><span class="w"> </span><span class="kn">import</span> <span class="n">api</span> <span class="k">as</span> <span class="n">_private_api</span>  <span class="c1"># isort:skip</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">SERVE_LOGGER_NAME</span><span class="p">)</span>
@@ -1456,7 +1456,7 @@ document.write(`
 <div class="viewcode-block" id="start">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.start.html#ray.serve.start">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">start</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span>
     <span class="n">proxy_location</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ProxyLocation</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">http_options</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">HTTPOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">grpc_options</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">gRPCOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1513,7 +1513,7 @@ document.write(`
 <div class="viewcode-block" id="shutdown">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.shutdown.html#ray.serve.shutdown">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">shutdown</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Completely shut down Serve on the cluster.</span>
 
 <span class="sd">    Deletes all applications and shuts down Serve system actors.</span>
@@ -1536,7 +1536,7 @@ document.write(`
 <div class="viewcode-block" id="get_replica_context">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.get_replica_context.html#ray.serve.get_replica_context">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">get_replica_context</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ReplicaContext</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_replica_context</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ReplicaContext</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the deployment and replica tag from within a replica at runtime.</span>
 
 <span class="sd">    A replica tag uniquely identifies a single replica for a Ray Serve</span>
@@ -1571,7 +1571,7 @@ document.write(`
 <div class="viewcode-block" id="ingress">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.ingress.html#ray.serve.ingress">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">ingress</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;FastAPI&quot;</span><span class="p">,</span> <span class="s2">&quot;APIRouter&quot;</span><span class="p">,</span> <span class="n">Callable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ingress</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;FastAPI&quot;</span><span class="p">,</span> <span class="s2">&quot;APIRouter&quot;</span><span class="p">,</span> <span class="n">Callable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap a deployment class with a FastAPI application for HTTP request parsing.</span>
 
 <span class="sd">    Example:</span>
@@ -1597,7 +1597,7 @@ document.write(`
 <span class="sd">            Can be any ASGI-compatible callable.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;@serve.ingress must be used with a class.&quot;</span><span class="p">)</span>
 
@@ -1619,15 +1619,15 @@ document.write(`
             <span class="n">pickle_dumps</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">error_msg</span><span class="o">=</span><span class="s2">&quot;Failed to serialize the FastAPI app.&quot;</span><span class="p">)</span>
         <span class="p">)</span>
 
-        <span class="k">class</span> <span class="nc">ASGIIngressWrapper</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ASGIAppReplicaWrapper</span><span class="p">):</span>
-            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">ASGIIngressWrapper</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ASGIAppReplicaWrapper</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="c1"># Call user-defined constructor.</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
                 <span class="n">ServeUsageTag</span><span class="o">.</span><span class="n">FASTAPI_USED</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
                 <span class="n">ASGIAppReplicaWrapper</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frozen_app</span><span class="p">)</span>
 
-            <span class="k">async</span> <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="k">await</span> <span class="n">ASGIAppReplicaWrapper</span><span class="o">.</span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
                 <span class="c1"># Call user-defined destructor if defined.</span>
@@ -1650,7 +1650,7 @@ document.write(`
 <div class="viewcode-block" id="deployment">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.deployment_decorator.html#ray.serve.deployment">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">deployment</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">deployment</span><span class="p">(</span>
     <span class="n">_func_or_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Default</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT</span><span class="o">.</span><span class="n">VALUE</span><span class="p">,</span>
     <span class="n">version</span><span class="p">:</span> <span class="n">Default</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT</span><span class="o">.</span><span class="n">VALUE</span><span class="p">,</span>
@@ -1796,7 +1796,7 @@ document.write(`
     <span class="p">)</span>
     <span class="n">deployment_config</span><span class="o">.</span><span class="n">user_configured_option_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">user_configured_option_names</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">_func_or_class</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">_func_or_class</span><span class="p">):</span>
         <span class="n">replica_config</span> <span class="o">=</span> <span class="n">ReplicaConfig</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
             <span class="n">_func_or_class</span><span class="p">,</span>
             <span class="n">init_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1837,7 +1837,7 @@ document.write(`
 
 <span class="nd">@DeveloperAPI</span>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RunTarget</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RunTarget</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a Serve application to run for `serve.run_many`.&quot;&quot;&quot;</span>
 
     <span class="n">target</span><span class="p">:</span> <span class="n">Application</span>
@@ -1847,7 +1847,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">_run_many</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_many</span><span class="p">(</span>
     <span class="n">targets</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">RunTarget</span><span class="p">],</span>
     <span class="n">wait_for_ingress_deployment_creation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">wait_for_applications_running</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -1924,7 +1924,7 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_run</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_run</span><span class="p">(</span>
     <span class="n">target</span><span class="p">:</span> <span class="n">Application</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">_blocking</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -1953,7 +1953,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">run_many</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_many</span><span class="p">(</span>
     <span class="n">targets</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">RunTarget</span><span class="p">],</span>
     <span class="n">blocking</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">wait_for_ingress_deployment_creation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -1996,7 +1996,7 @@ document.write(`
 <div class="viewcode-block" id="run">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.run.html#ray.serve.run">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span>
     <span class="n">target</span><span class="p">:</span> <span class="n">Application</span><span class="p">,</span>
     <span class="n">blocking</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">SERVE_DEFAULT_APP_NAME</span><span class="p">,</span>
@@ -2048,7 +2048,7 @@ document.write(`
 <div class="viewcode-block" id="delete">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.delete.html#ray.serve.delete">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">_blocking</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">_blocking</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Delete an application by its name.</span>
 
 <span class="sd">    Deletes the app with all corresponding deployments.</span>
@@ -2061,7 +2061,7 @@ document.write(`
 <div class="viewcode-block" id="multiplexed">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.multiplexed.html#ray.serve.multiplexed">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">multiplexed</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">multiplexed</span><span class="p">(</span>
     <span class="n">func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_num_models_per_replica</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap a callable or method used to load multiplexed models in a replica.</span>
@@ -2150,9 +2150,9 @@ document.write(`
     <span class="k">if</span> <span class="n">max_num_models_per_replica</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">max_num_models_per_replica</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;max_num_models_per_replica must be positive.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_multiplex_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_multiplex_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
         <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-        <span class="k">async</span> <span class="k">def</span> <span class="nf">_multiplex_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_multiplex_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
             <span class="n">args_check_error_msg</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="s2">&quot;Functions decorated with `@serve.multiplexed` must take exactly one&quot;</span>
                 <span class="s2">&quot;the multiplexed model ID (str), but got </span><span class="si">{}</span><span class="s2">&quot;</span>
@@ -2202,7 +2202,7 @@ document.write(`
 <div class="viewcode-block" id="get_multiplexed_model_id">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.get_multiplexed_model_id.html#ray.serve.get_multiplexed_model_id">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_multiplexed_model_id</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_multiplexed_model_id</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the multiplexed model ID for the current request.</span>
 
 <span class="sd">    This is used with a function decorated with `@serve.multiplexed`</span>
@@ -2237,7 +2237,7 @@ document.write(`
 <div class="viewcode-block" id="status">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.status.html#ray.serve.status">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">status</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ServeStatus</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">status</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ServeStatus</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the status of Serve on the cluster.</span>
 
 <span class="sd">    Includes status of all HTTP Proxies, all active applications, and</span>
@@ -2268,7 +2268,7 @@ document.write(`
 <div class="viewcode-block" id="get_app_handle">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.get_app_handle.html#ray.serve.get_app_handle">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_app_handle</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DeploymentHandle</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_app_handle</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DeploymentHandle</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a handle to the application&#39;s ingress deployment by name.</span>
 
 <span class="sd">    Args:</span>
@@ -2307,7 +2307,7 @@ document.write(`
 <div class="viewcode-block" id="get_deployment_handle">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.get_deployment_handle.html#ray.serve.get_deployment_handle">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">get_deployment_handle</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_deployment_handle</span><span class="p">(</span>
     <span class="n">deployment_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">app_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">_check_exists</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>

@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1502,13 +1502,13 @@ Say we have a RayCluster configured as in the config snippet above:</p>
 <li><p><code class="code docutils literal notranslate"><span class="pre">maxReplicas</span></code> for the group is at least 2.</p></li>
 </ul>
 <p>Then the following Ray program will trigger upscaling of 2 GPU workers.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">GPUActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">say_hello</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GPUActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">say_hello</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I live in a pod with GPU access.&quot;</span><span class="p">)</span>
 
 <span class="c1"># Request actor placement.</span>
@@ -1526,7 +1526,7 @@ nodes will be scaled down as well.</p>
 <section id="requesting-gpus">
 <h3>Requesting GPUs<a class="headerlink" href="#requesting-gpus" title="Link to this heading">#</a></h3>
 <p>You can also make a <a class="reference internal" href="../../running-applications/autoscaling/reference.html#ref-autoscaler-sdk-request-resources"><span class="std std-ref">direct request to the autoscaler</span></a> to scale up GPU resources.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">autoscaler</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">request_resources</span><span class="p">(</span><span class="n">bundles</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;GPU&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}]</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
@@ -1534,7 +1534,7 @@ nodes will be scaled down as well.</p>
 </div>
 <p>After the nodes are scaled up, they will persist until the request is explicitly overridden.
 The following program will remove the resource request.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">autoscaler</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">request_resources</span><span class="p">(</span><span class="n">bundles</span><span class="o">=</span><span class="p">[])</span>

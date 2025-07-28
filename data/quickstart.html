@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1415,7 +1415,7 @@ and can efficiently handle data collections that exceed a single machine’s mem
 <span id="loading-key-concept"></span><h2>Loading data<a class="headerlink" href="#loading-data" title="Link to this heading">#</a></h2>
 <p>Create datasets from various sources including local files, Python objects, and cloud storage services like S3 or GCS.
 Ray Data seamlessly integrates with any <a class="reference external" href="http://arrow.apache.org/docs/python/generated/pyarrow.fs.FileSystem.html">filesystem supported by Arrow</a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="c1"># Load a CSV dataset directly from S3</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@air-example-data/iris.csv&quot;</span><span class="p">)</span>
@@ -1433,11 +1433,11 @@ Ray Data seamlessly integrates with any <a class="reference external" href="http
 <span id="transforming-key-concept"></span><h2>Transforming data<a class="headerlink" href="#transforming-data" title="Link to this heading">#</a></h2>
 <p>Apply user-defined functions (UDFs) to transform datasets. Ray automatically parallelizes these transformations
 across your cluster for better performance.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># Define a transformation to compute a &quot;petal area&quot; attribute</span>
-<span class="k">def</span> <span class="nf">transform_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">transform_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     <span class="n">vec_a</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;petal length (cm)&quot;</span><span class="p">]</span>
     <span class="n">vec_b</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;petal width (cm)&quot;</span><span class="p">]</span>
     <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;petal area (cm^2)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vec_a</span> <span class="o">*</span> <span class="n">vec_b</span>
@@ -1492,7 +1492,7 @@ for distributed processing.</p>
 <span id="saving-key-concept"></span><h2>Saving data<a class="headerlink" href="#saving-data" title="Link to this heading">#</a></h2>
 <p>Export processed datasets to a variety of formats and storage locations using methods
 like <a class="reference internal" href="api/doc/ray.data.Dataset.write_parquet.html#ray.data.Dataset.write_parquet" title="ray.data.Dataset.write_parquet"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write_parquet()</span></code></a>, <a class="reference internal" href="api/doc/ray.data.Dataset.write_csv.html#ray.data.Dataset.write_csv" title="ray.data.Dataset.write_csv"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write_csv()</span></code></a>, and more.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="c1"># Save the transformed dataset as Parquet files</span>
 <span class="n">transformed_ds</span><span class="o">.</span><span class="n">write_parquet</span><span class="p">(</span><span class="s2">&quot;/tmp/iris&quot;</span><span class="p">)</span>

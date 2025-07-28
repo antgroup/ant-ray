@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1438,14 +1438,14 @@ the <code class="docutils literal notranslate"><span class="pre">setup_mlflow</s
 Let’s start with a few crucial imports:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
-<span class="kn">import</span> <span class="nn">mlflow</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mlflow</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.air.integrations.mlflow</span> <span class="kn">import</span> <span class="n">MLflowLoggerCallback</span><span class="p">,</span> <span class="n">setup_mlflow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.integrations.mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLflowLoggerCallback</span><span class="p">,</span> <span class="n">setup_mlflow</span>
 </pre></div>
 </div>
 </div>
@@ -1454,11 +1454,11 @@ Let’s start with a few crucial imports:</p>
 intermediate scores that we report to Tune.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluation_fn</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">evaluation_fn</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="mf">0.1</span> <span class="o">+</span> <span class="n">width</span> <span class="o">*</span> <span class="n">step</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">height</span> <span class="o">*</span> <span class="mf">0.1</span>
 
 
-<span class="k">def</span> <span class="nf">train_function</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_function</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;width&quot;</span><span class="p">],</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)):</span>
@@ -1475,7 +1475,7 @@ intermediate scores that we report to Tune.</p>
 your <code class="docutils literal notranslate"><span class="pre">RunConfig()</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">tune_with_callback</span><span class="p">(</span><span class="n">mlflow_tracking_uri</span><span class="p">,</span> <span class="n">finish_fast</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">tune_with_callback</span><span class="p">(</span><span class="n">mlflow_tracking_uri</span><span class="p">,</span> <span class="n">finish_fast</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">tuner</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
         <span class="n">train_function</span><span class="p">,</span>
         <span class="n">tune_config</span><span class="o">=</span><span class="n">tune</span><span class="o">.</span><span class="n">TuneConfig</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mi">5</span><span class="p">),</span>
@@ -1505,7 +1505,7 @@ Note that we also use <code class="docutils literal notranslate"><span class="pr
 Otherwise, this version of our training function is identical to its original.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train_function_mlflow</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">train_function_mlflow</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="n">tracking_uri</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;tracking_uri&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">setup_mlflow</span><span class="p">(</span>
         <span class="n">config</span><span class="p">,</span>
@@ -1531,7 +1531,7 @@ Otherwise, this version of our training function is identical to its original.</
 <p>With this new objective function ready, you can now create a Tune run with it as follows:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">tune_with_setup</span><span class="p">(</span><span class="n">mlflow_tracking_uri</span><span class="p">,</span> <span class="n">finish_fast</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">tune_with_setup</span><span class="p">(</span><span class="n">mlflow_tracking_uri</span><span class="p">,</span> <span class="n">finish_fast</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="c1"># Set the experiment, or create a new one if does not exist yet.</span>
     <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="n">mlflow_tracking_uri</span><span class="p">)</span>
     <span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="n">experiment_name</span><span class="o">=</span><span class="s2">&quot;setup_mlflow_example&quot;</span><span class="p">)</span>
@@ -1829,7 +1829,7 @@ corresponding run in MlFlow.</p></li>
 </dd>
 </dl>
 <p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.air.integrations.mlflow</span> <span class="kn">import</span> <span class="n">MLflowLoggerCallback</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.integrations.mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLflowLoggerCallback</span>
 
 <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;user_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span>
          <span class="s2">&quot;git_commit_hash&quot;</span> <span class="p">:</span> <span class="s2">&quot;abc123&quot;</span><span class="p">}</span>
@@ -1912,9 +1912,9 @@ session for all workers. Defaults to True.</p></li>
 <p class="rubric">Example</p>
 <p>Per default, you can just call <code class="docutils literal notranslate"><span class="pre">setup_mlflow</span></code> and continue to use
 MLflow like you would normally do:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.air.integrations.mlflow</span> <span class="kn">import</span> <span class="n">setup_mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.integrations.mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">setup_mlflow</span>
 
-<span class="k">def</span> <span class="nf">training_loop</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">training_loop</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="n">mlflow</span> <span class="o">=</span> <span class="n">setup_mlflow</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
     <span class="c1"># ...</span>
     <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.123</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -1923,9 +1923,9 @@ MLflow like you would normally do:</p>
 <p>In distributed data parallel training, you can utilize the return value of
 <code class="docutils literal notranslate"><span class="pre">setup_mlflow</span></code>. This will make sure it is only invoked on the first worker
 in distributed training runs.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.air.integrations.mlflow</span> <span class="kn">import</span> <span class="n">setup_mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.integrations.mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">setup_mlflow</span>
 
-<span class="k">def</span> <span class="nf">training_loop</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">training_loop</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="n">mlflow</span> <span class="o">=</span> <span class="n">setup_mlflow</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
     <span class="c1"># ...</span>
     <span class="n">mlflow</span><span class="o">.</span><span class="n">log_metric</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.123</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -1935,9 +1935,9 @@ in distributed training runs.</p>
 framework like Pytorch Lightning, XGBoost, etc. More information can be
 found here
 (<a class="reference external" href="https://mlflow.org/docs/latest/tracking.html#automatic-logging">https://mlflow.org/docs/latest/tracking.html#automatic-logging</a>).</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.air.integrations.mlflow</span> <span class="kn">import</span> <span class="n">setup_mlflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.integrations.mlflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">setup_mlflow</span>
 
-<span class="k">def</span> <span class="nf">train_fn</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_fn</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="n">mlflow</span> <span class="o">=</span> <span class="n">setup_mlflow</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
     <span class="n">mlflow</span><span class="o">.</span><span class="n">autolog</span><span class="p">()</span>
     <span class="n">xgboost_results</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>

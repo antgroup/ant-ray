@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,17 +1389,17 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.env.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.env.env_context</span> <span class="kn">import</span> <span class="n">EnvContext</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.error</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.env_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.error</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ERR_MSG_INVALID_ENV_DESCRIPTOR</span><span class="p">,</span>
     <span class="n">EnvError</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -1408,7 +1408,7 @@ document.write(`
 <div class="viewcode-block" id="try_import_pyspiel">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.utils.try_import_pyspiel.html#ray.rllib.env.utils.try_import_pyspiel">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">try_import_pyspiel</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">try_import_pyspiel</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Tries importing pyspiel and returns the module (or None).</span>
 
 <span class="sd">    Args:</span>
@@ -1421,7 +1421,7 @@ document.write(`
 <span class="sd">        ImportError: If error=True and pyspiel is not installed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">pyspiel</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pyspiel</span>
 
         <span class="k">return</span> <span class="n">pyspiel</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -1438,7 +1438,7 @@ document.write(`
 <div class="viewcode-block" id="try_import_open_spiel">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.utils.try_import_open_spiel.html#ray.rllib.env.utils.try_import_open_spiel">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">try_import_open_spiel</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">try_import_open_spiel</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Tries importing open_spiel and returns the module (or None).</span>
 
 <span class="sd">    Args:</span>
@@ -1451,7 +1451,7 @@ document.write(`
 <span class="sd">        ImportError: If error=True and open_spiel is not installed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">open_spiel</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">open_spiel</span>
 
         <span class="k">return</span> <span class="n">open_spiel</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -1465,7 +1465,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_gym_env_creator</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_gym_env_creator</span><span class="p">(</span>
     <span class="n">env_context</span><span class="p">:</span> <span class="n">EnvContext</span><span class="p">,</span>
     <span class="n">env_descriptor</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">:</span>
@@ -1494,7 +1494,7 @@ document.write(`
     <span class="c1"># Allow for PyBullet or envs to be used as well (via string). This allows</span>
     <span class="c1"># for doing things like `env=CartPoleContinuousBulletEnv-v0`.</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">pybullet_envs</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pybullet_envs</span>
 
         <span class="n">pybullet_envs</span><span class="o">.</span><span class="n">getList</span><span class="p">()</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">ModuleNotFoundError</span><span class="p">,</span> <span class="ne">ImportError</span><span class="p">):</span>
@@ -1503,7 +1503,7 @@ document.write(`
     <span class="c1"># If env descriptor is a str, starting with &quot;ale_py:ALE/&quot;, for now, register all ALE</span>
     <span class="c1"># envs from ale_py.</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">env_descriptor</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">env_descriptor</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;ale_py:ALE/&quot;</span><span class="p">):</span>
-        <span class="kn">import</span> <span class="nn">ale_py</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">ale_py</span>
 
         <span class="n">gym</span><span class="o">.</span><span class="n">register_envs</span><span class="p">(</span><span class="n">ale_py</span><span class="p">)</span>
 

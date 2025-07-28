@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1391,21 +1391,21 @@ document.write(`
   <h1>Source code for ray.autoscaler.sdk.sdk</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;IMPORTANT: this is an experimental interface and not currently stable.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">ray.autoscaler._private</span> <span class="kn">import</span> <span class="n">commands</span>
-<span class="kn">from</span> <span class="nn">ray.autoscaler._private.cli_logger</span> <span class="kn">import</span> <span class="n">cli_logger</span>
-<span class="kn">from</span> <span class="nn">ray.autoscaler._private.event_system</span> <span class="kn">import</span> <span class="n">CreateClusterEvent</span>  <span class="c1"># noqa: F401</span>
-<span class="kn">from</span> <span class="nn">ray.autoscaler._private.event_system</span> <span class="kn">import</span> <span class="n">global_event_system</span>  <span class="c1"># noqa: F401</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.autoscaler._private</span><span class="w"> </span><span class="kn">import</span> <span class="n">commands</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.autoscaler._private.cli_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">cli_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.autoscaler._private.event_system</span><span class="w"> </span><span class="kn">import</span> <span class="n">CreateClusterEvent</span>  <span class="c1"># noqa: F401</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.autoscaler._private.event_system</span><span class="w"> </span><span class="kn">import</span> <span class="n">global_event_system</span>  <span class="c1"># noqa: F401</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">create_or_update_cluster</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_or_update_cluster</span><span class="p">(</span>
     <span class="n">cluster_config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">no_restart</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1441,7 +1441,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">teardown_cluster</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">teardown_cluster</span><span class="p">(</span>
     <span class="n">cluster_config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
     <span class="n">workers_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">keep_min_workers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1467,7 +1467,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">run_on_cluster</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_on_cluster</span><span class="p">(</span>
     <span class="n">cluster_config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">cmd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1513,7 +1513,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">rsync</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rsync</span><span class="p">(</span>
     <span class="n">cluster_config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">source</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
@@ -1558,7 +1558,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">get_head_node_ip</span><span class="p">(</span><span class="n">cluster_config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_head_node_ip</span><span class="p">(</span><span class="n">cluster_config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns head node IP for given configuration file if exists.</span>
 
 <span class="sd">    Args:</span>
@@ -1576,7 +1576,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">get_worker_node_ips</span><span class="p">(</span><span class="n">cluster_config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_worker_node_ips</span><span class="p">(</span><span class="n">cluster_config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns worker node IPs for given configuration file.</span>
 
 <span class="sd">    Args:</span>
@@ -1596,7 +1596,7 @@ document.write(`
 <div class="viewcode-block" id="request_resources">
 <a class="viewcode-back" href="../../../../cluster/running-applications/autoscaling/reference.html#ray.autoscaler.sdk.request_resources">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">request_resources</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">request_resources</span><span class="p">(</span>
     <span class="n">num_cpus</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">bundles</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Command the autoscaler to scale to accommodate the specified requests.</span>
@@ -1654,7 +1654,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">configure_logging</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">configure_logging</span><span class="p">(</span>
     <span class="n">log_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">color_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">verbosity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1685,7 +1685,7 @@ document.write(`
 
 <span class="nd">@contextmanager</span>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">_as_config_file</span><span class="p">(</span><span class="n">cluster_config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_as_config_file</span><span class="p">(</span><span class="n">cluster_config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cluster_config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;autoscaler-sdk-tmp-&quot;</span><span class="p">)</span>
         <span class="n">tmp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">cluster_config</span><span class="p">))</span>
@@ -1697,7 +1697,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">bootstrap_config</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bootstrap_config</span><span class="p">(</span>
     <span class="n">cluster_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">no_config_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and add provider-specific fields to the config. For example,</span>
@@ -1706,15 +1706,15 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">fillout_defaults</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fillout_defaults</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Fillout default values for a cluster_config based on the provider.&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">ray.autoscaler._private.util</span> <span class="kn">import</span> <span class="n">fillout_defaults</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.autoscaler._private.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">fillout_defaults</span>
 
     <span class="k">return</span> <span class="n">fillout_defaults</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">register_callback_handler</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">register_callback_handler</span><span class="p">(</span>
     <span class="n">event_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">callback</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Dict</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Dict</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1731,7 +1731,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">get_docker_host_mount_location</span><span class="p">(</span><span class="n">cluster_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_docker_host_mount_location</span><span class="p">(</span><span class="n">cluster_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return host path that Docker mounts attach to.&quot;&quot;&quot;</span>
     <span class="n">docker_mount_prefix</span> <span class="o">=</span> <span class="s2">&quot;/tmp/ray_tmp_mount/</span><span class="si">{cluster_name}</span><span class="s2">&quot;</span>
     <span class="k">return</span> <span class="n">docker_mount_prefix</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cluster_name</span><span class="o">=</span><span class="n">cluster_name</span><span class="p">)</span>

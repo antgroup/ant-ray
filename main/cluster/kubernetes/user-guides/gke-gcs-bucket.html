@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1488,9 +1488,9 @@ document.write(`
 <p>In the shell, run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">google-cloud-storage</span></code> to install the Google Cloud Storage Python client library.</p>
 <p>(For production use cases, you will need to make sure <code class="docutils literal notranslate"><span class="pre">google-cloud-storage</span></code> is installed on every node of your cluster, or use <code class="docutils literal notranslate"><span class="pre">ray.init(runtime_env={&quot;pip&quot;:</span> <span class="pre">[&quot;google-cloud-storage&quot;]})</span></code> to have the package installed as needed at runtime – see <a class="reference external" href="https://docs.ray.io/en/latest/ray-core/handling-dependencies.html#runtime-environments">https://docs.ray.io/en/latest/ray-core/handling-dependencies.html#runtime-environments</a> for more details.)</p>
 <p>Then run the following Python code to test access to the bucket:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">google.cloud</span> <span class="kn">import</span> <span class="n">storage</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">google.cloud</span><span class="w"> </span><span class="kn">import</span> <span class="n">storage</span>
 
 <span class="n">GCP_GCS_BUCKET</span> <span class="o">=</span> <span class="s2">&quot;my-bucket&quot;</span>
 <span class="n">GCP_GCS_FILE</span> <span class="o">=</span> <span class="s2">&quot;test_file.txt&quot;</span>
@@ -1498,7 +1498,7 @@ document.write(`
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">address</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">check_gcs_read_write</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_gcs_read_write</span><span class="p">():</span>
     <span class="n">client</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
     <span class="n">bucket</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_bucket</span><span class="p">(</span><span class="n">GCP_GCS_BUCKET</span><span class="p">)</span>
     <span class="n">blob</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">blob</span><span class="p">(</span><span class="n">GCP_GCS_FILE</span><span class="p">)</span>

@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,13 +1389,13 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.serve.config</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">cloudpickle</span>
-<span class="kn">from</span> <span class="nn">ray._private.pydantic_compat</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">cloudpickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.pydantic_compat</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BaseModel</span><span class="p">,</span>
     <span class="n">Field</span><span class="p">,</span>
     <span class="n">NonNegativeFloat</span><span class="p">,</span>
@@ -1405,8 +1405,8 @@ document.write(`
     <span class="n">PrivateAttr</span><span class="p">,</span>
     <span class="n">validator</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray._common.utils</span> <span class="kn">import</span> <span class="n">import_attr</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._common.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">import_attr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_AUTOSCALING_POLICY</span><span class="p">,</span>
     <span class="n">DEFAULT_GRPC_PORT</span><span class="p">,</span>
     <span class="n">DEFAULT_HTTP_HOST</span><span class="p">,</span>
@@ -1415,7 +1415,7 @@ document.write(`
     <span class="n">DEFAULT_UVICORN_KEEP_ALIVE_TIMEOUT_S</span><span class="p">,</span>
     <span class="n">SERVE_LOGGER_NAME</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">SERVE_LOGGER_NAME</span><span class="p">)</span>
 
@@ -1423,7 +1423,7 @@ document.write(`
 <div class="viewcode-block" id="AutoscalingConfig">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.config.AutoscalingConfig.html#ray.serve.config.AutoscalingConfig">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">AutoscalingConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AutoscalingConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Config for the Serve Autoscaler.&quot;&quot;&quot;</span>
 
     <span class="c1"># Please keep these options in sync with those in</span>
@@ -1471,7 +1471,7 @@ document.write(`
     <span class="n">_policy</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="n">PrivateAttr</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_AUTOSCALING_POLICY</span><span class="p">)</span>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;max_replicas&quot;</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">replicas_settings_valid</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">max_replicas</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">replicas_settings_valid</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">max_replicas</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="n">min_replicas</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_replicas&quot;</span><span class="p">)</span>
         <span class="n">initial_replicas</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_replicas&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">min_replicas</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_replicas</span> <span class="o">&lt;</span> <span class="n">min_replicas</span><span class="p">:</span>
@@ -1494,13 +1494,13 @@ document.write(`
 
         <span class="k">return</span> <span class="n">max_replicas</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">serialize_policy</span><span class="p">()</span>
 
 <div class="viewcode-block" id="AutoscalingConfig.serialize_policy">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.config.AutoscalingConfig.serialize_policy.html#ray.serve.config.AutoscalingConfig.serialize_policy">[docs]</a>
-    <span class="k">def</span> <span class="nf">serialize_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">serialize_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Serialize policy with cloudpickle.</span>
 
 <span class="sd">        Import the policy if it&#39;s passed in as a string import path. Then cloudpickle</span>
@@ -1523,7 +1523,7 @@ document.write(`
 
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">target_ongoing_requests</span><span class="o">=</span><span class="n">DEFAULT_TARGET_ONGOING_REQUESTS</span><span class="p">,</span>
             <span class="n">min_replicas</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -1532,31 +1532,31 @@ document.write(`
 
 <div class="viewcode-block" id="AutoscalingConfig.get_policy">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.config.AutoscalingConfig.get_policy.html#ray.serve.config.AutoscalingConfig.get_policy">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_policy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Deserialize policy from cloudpickled bytes.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">cloudpickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_serialized_policy_def</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">get_upscaling_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PositiveFloat</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_upscaling_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PositiveFloat</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">upscaling_factor</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">upscaling_factor</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">upscale_smoothing_factor</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">smoothing_factor</span>
 
-    <span class="k">def</span> <span class="nf">get_downscaling_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PositiveFloat</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_downscaling_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PositiveFloat</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">downscaling_factor</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">downscaling_factor</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">downscale_smoothing_factor</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">smoothing_factor</span>
 
-    <span class="k">def</span> <span class="nf">get_target_ongoing_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PositiveFloat</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_target_ongoing_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PositiveFloat</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_ongoing_requests</span></div>
 
 
 
 <span class="c1"># Keep in sync with ServeDeploymentMode in dashboard/client/src/type/serve.ts</span>
 <span class="nd">@Deprecated</span>
-<span class="k">class</span> <span class="nc">DeploymentMode</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DeploymentMode</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
     <span class="n">NoServer</span> <span class="o">=</span> <span class="s2">&quot;NoServer&quot;</span>
     <span class="n">HeadOnly</span> <span class="o">=</span> <span class="s2">&quot;HeadOnly&quot;</span>
     <span class="n">EveryNode</span> <span class="o">=</span> <span class="s2">&quot;EveryNode&quot;</span>
@@ -1565,7 +1565,7 @@ document.write(`
 <div class="viewcode-block" id="ProxyLocation">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.config.ProxyLocation.html#ray.serve.config.ProxyLocation">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ProxyLocation</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProxyLocation</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Config for where to run proxies to receive ingress traffic to the cluster.</span>
 
 <span class="sd">    Options:</span>
@@ -1582,7 +1582,7 @@ document.write(`
     <span class="n">EveryNode</span> <span class="o">=</span> <span class="s2">&quot;EveryNode&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_to_deployment_mode</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_to_deployment_mode</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">proxy_location</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;ProxyLocation&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DeploymentMode</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">proxy_location</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -1598,7 +1598,7 @@ document.write(`
             <span class="k">return</span> <span class="n">DeploymentMode</span><span class="p">(</span><span class="n">proxy_location</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_from_deployment_mode</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_from_deployment_mode</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">deployment_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">DeploymentMode</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;ProxyLocation&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts DeploymentMode enum into ProxyLocation enum.</span>
@@ -1626,7 +1626,7 @@ document.write(`
 <div class="viewcode-block" id="HTTPOptions">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.config.HTTPOptions.html#ray.serve.config.HTTPOptions">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">HTTPOptions</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HTTPOptions</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;HTTP options for the proxies. Supported fields:</span>
 
 <span class="sd">    - host: Host that the proxies listens for HTTP on. Defaults to</span>
@@ -1664,14 +1664,14 @@ document.write(`
     <span class="n">keep_alive_timeout_s</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_UVICORN_KEEP_ALIVE_TIMEOUT_S</span>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;location&quot;</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">location_backfill_no_server</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">location_backfill_no_server</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;host&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">DeploymentMode</span><span class="o">.</span><span class="n">NoServer</span>
 
         <span class="k">return</span> <span class="n">v</span>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;middlewares&quot;</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">warn_for_middlewares</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">warn_for_middlewares</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Passing `middlewares` to HTTPOptions is deprecated and will be &quot;</span>
@@ -1682,7 +1682,7 @@ document.write(`
         <span class="k">return</span> <span class="n">v</span>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;num_cpus&quot;</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">warn_for_num_cpus</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">warn_for_num_cpus</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Passing `num_cpus` to HTTPOptions is deprecated and will be &quot;</span>
@@ -1690,7 +1690,7 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">v</span>
 
-    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
         <span class="n">validate_assignment</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">arbitrary_types_allowed</span> <span class="o">=</span> <span class="kc">True</span></div>
 
@@ -1699,7 +1699,7 @@ document.write(`
 <div class="viewcode-block" id="gRPCOptions">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.config.gRPCOptions.html#ray.serve.config.gRPCOptions">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">gRPCOptions</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">gRPCOptions</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;gRPC options for the proxies. Supported fields:</span>
 
 <span class="sd">    Args:</span>
@@ -1718,7 +1718,7 @@ document.write(`
     <span class="n">grpc_servicer_functions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">grpc_servicer_func_callable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">grpc_servicer_func_callable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a list of callable functions from the grpc_servicer_functions.</span>
 
 <span class="sd">        If the function is not callable or not found, it will be ignored and a warning</span>
@@ -1742,7 +1742,7 @@ document.write(`
                     <span class="s2">&quot;in those functions. Or you might want to rebuild service &quot;</span>
                     <span class="s2">&quot;definitions if .proto file is changed.&quot;</span>
                 <span class="p">)</span>
-                <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
         <span class="k">return</span> <span class="n">callables</span></div>
 

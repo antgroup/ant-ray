@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1629,7 +1629,7 @@ simply set the command line args: <code class="code docutils literal notranslate
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># For `observation_filter=&quot;NoFilter&quot;`, don&#39;t set anything in particular. This is the default.</span>
 
 <span class="c1"># For `observation_filter=&quot;MeanStdFilter&quot;`, do the following:</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.connectors.env_to_module</span> <span class="kn">import</span> <span class="n">MeanStdFilter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.env_to_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeanStdFilter</span>
 
 <span class="n">config</span><span class="o">.</span><span class="n">env_runners</span><span class="p">(</span>
     <span class="n">env_to_module_connector</span><span class="o">=</span><span class="k">lambda</span> <span class="n">env</span><span class="p">:</span> <span class="n">MeanStdFilter</span><span class="p">(</span><span class="n">multi_agent</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>  <span class="c1"># &lt;- or True</span>
@@ -1673,11 +1673,11 @@ You can continue this approach with the new API stack and pass your custom subcl
 side, for example, <code class="docutils literal notranslate"><span class="pre">on_episode_start/stop/step/etc...</span></code>, you may have to translate some call arguments.</p>
 <p>The following is a one-to-one translation guide for these types of :py:class`~ray.rllib.callbacks.callbacks.RLlibCallback`
 methods:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.callbacks.callbacks</span> <span class="kn">import</span> <span class="n">RLlibCallback</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.callbacks.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLlibCallback</span>
 
-<span class="k">class</span> <span class="nc">YourCallbacksClass</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">YourCallbacksClass</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">on_episode_start</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_episode_start</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">episode</span><span class="p">,</span>
@@ -1765,11 +1765,11 @@ and <a class="reference internal" href="package_ref/doc/ray.rllib.core.rl_module
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-0">
 Same action dist. class</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.models.torch.torch_distributions</span> <span class="kn">import</span> <span class="n">YOUR_DIST_CLASS</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.models.torch.torch_distributions</span><span class="w"> </span><span class="kn">import</span> <span class="n">YOUR_DIST_CLASS</span>
 
 
-<span class="k">class</span> <span class="nc">MyRLModule</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyRLModule</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="o">...</span>
         <span class="c1"># Set the following attribute at the end of your custom `setup()`.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">action_dist_cls</span> <span class="o">=</span> <span class="n">YOUR_DIST_CLASS</span>
@@ -1779,19 +1779,19 @@ Same action dist. class</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-1">
 Different action dist. classes</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.models.torch.torch_distributions</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.models.torch.torch_distributions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">YOUR_INFERENCE_DIST_CLASS</span><span class="p">,</span>
     <span class="n">YOUR_EXPLORATION_DIST_CLASS</span><span class="p">,</span>
     <span class="n">YOUR_TRAIN_DIST_CLASS</span><span class="p">,</span>
 <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_inference_action_dist_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_inference_action_dist_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">YOUR_INFERENCE_DIST_CLASS</span>
 
-    <span class="k">def</span> <span class="nf">get_exploration_action_dist_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_exploration_action_dist_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">YOUR_EXPLORATION_DIST_CLASS</span>
 
-    <span class="k">def</span> <span class="nf">get_train_action_dist_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_train_action_dist_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">YOUR_TRAIN_DIST_CLASS</span>
 </pre></div>
 </div>
@@ -1801,12 +1801,12 @@ Different action dist. classes</label><div class="sd-tab-content docutils">
 <section id="translating-policy-action-sampler-fn">
 <h3>Translating Policy.action_sampler_fn<a class="headerlink" href="#translating-policy-action-sampler-fn" title="Link to this heading">#</a></h3>
 <p>To translate <code class="docutils literal notranslate"><span class="pre">action_sampler_fn</span></code>, write the following custom RLModule code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.models.torch.torch_distributions</span> <span class="kn">import</span> <span class="n">YOUR_DIST_CLASS</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.models.torch.torch_distributions</span><span class="w"> </span><span class="kn">import</span> <span class="n">YOUR_DIST_CLASS</span>
 
 
-<span class="k">class</span> <span class="nc">MyRLModule</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyRLModule</span><span class="p">(</span><span class="n">TorchRLModule</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">_forward_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="n">computation_results</span> <span class="o">=</span> <span class="o">...</span>
         <span class="n">my_dist</span> <span class="o">=</span> <span class="n">YOUR_DIST_CLASS</span><span class="p">(</span><span class="n">computation_results</span><span class="p">)</span>
         <span class="n">actions</span> <span class="o">=</span> <span class="n">my_dist</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
@@ -1814,7 +1814,7 @@ Different action dist. classes</label><div class="sd-tab-content docutils">
 
     <span class="c1"># Maybe for inference, you would like to sample from the deterministic version</span>
     <span class="c1"># of your distribution:</span>
-    <span class="k">def</span> <span class="nf">_forward_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="n">computation_results</span> <span class="o">=</span> <span class="o">...</span>
         <span class="n">my_dist</span> <span class="o">=</span> <span class="n">YOUR_DIST_CLASS</span><span class="p">(</span><span class="n">computation_results</span><span class="p">)</span>
         <span class="n">greedy_actions</span> <span class="o">=</span> <span class="n">my_dist</span><span class="o">.</span><span class="n">to_deterministic</span><span class="p">()</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>

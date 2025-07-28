@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,17 +1389,17 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.serve.exceptions</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">ray.exceptions</span> <span class="kn">import</span> <span class="n">TaskCancelledError</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.common</span> <span class="kn">import</span> <span class="n">DeploymentID</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskCancelledError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentID</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 
 <div class="viewcode-block" id="RayServeException">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.exceptions.RayServeException.html#ray.serve.exceptions.RayServeException">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RayServeException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayServeException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">pass</span></div>
 
 
@@ -1407,10 +1407,10 @@ document.write(`
 <div class="viewcode-block" id="BackPressureError">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.exceptions.BackPressureError.html#ray.serve.exceptions.BackPressureError">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">BackPressureError</span><span class="p">(</span><span class="n">RayServeException</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BackPressureError</span><span class="p">(</span><span class="n">RayServeException</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when max_queued_requests is exceeded on a DeploymentHandle.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_queued_requests</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_queued_requests</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_queued_requests</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_queued_requests</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">num_queued_requests</span><span class="p">,</span> <span class="n">max_queued_requests</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_message</span> <span class="o">=</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Request dropped due to backpressure &quot;</span>
@@ -1418,11 +1418,11 @@ document.write(`
             <span class="sa">f</span><span class="s2">&quot;max_queued_requests=</span><span class="si">{</span><span class="n">max_queued_requests</span><span class="si">}</span><span class="s2">).&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_message</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_message</span></div>
 
 
@@ -1430,13 +1430,13 @@ document.write(`
 <div class="viewcode-block" id="RequestCancelledError">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.exceptions.RequestCancelledError.html#ray.serve.exceptions.RequestCancelledError">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RequestCancelledError</span><span class="p">(</span><span class="n">RayServeException</span><span class="p">,</span> <span class="n">TaskCancelledError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RequestCancelledError</span><span class="p">(</span><span class="n">RayServeException</span><span class="p">,</span> <span class="n">TaskCancelledError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise when a Serve request is cancelled.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_request_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">request_id</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_id</span><span class="p">:</span>
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Request </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_request_id</span><span class="si">}</span><span class="s2"> was cancelled.&quot;</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1447,17 +1447,17 @@ document.write(`
 <div class="viewcode-block" id="DeploymentUnavailableError">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.exceptions.DeploymentUnavailableError.html#ray.serve.exceptions.DeploymentUnavailableError">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">DeploymentUnavailableError</span><span class="p">(</span><span class="n">RayServeException</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DeploymentUnavailableError</span><span class="p">(</span><span class="n">RayServeException</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a Serve deployment is unavailable to receive requests.</span>
 
 <span class="sd">    Currently this happens because the deployment failed to deploy.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deployment_id</span><span class="p">:</span> <span class="n">DeploymentID</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deployment_id</span><span class="p">:</span> <span class="n">DeploymentID</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_deployment_id</span> <span class="o">=</span> <span class="n">deployment_id</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_deployment_id</span><span class="si">}</span><span class="s2"> is unavailable because it failed to deploy.&quot;</span></div>
 
 </pre></div>

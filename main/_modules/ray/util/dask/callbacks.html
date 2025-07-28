@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,14 +1392,14 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.util.dask.callbacks</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">contextlib</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">ObjectRef</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span><span class="p">,</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObjectRef</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span><span class="p">,</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">dask.callbacks</span> <span class="kn">import</span> <span class="n">Callback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dask.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span>
 
 <span class="c1"># The names of the Ray-specific callbacks. These are the kwarg names that</span>
 <span class="c1"># RayDaskCallback will accept on construction, and is considered the</span>
@@ -1428,7 +1428,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayDaskCallback">
 <a class="viewcode-back" href="../../../../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html#ray.util.dask.RayDaskCallback">[docs]</a>
-<span class="k">class</span> <span class="nc">RayDaskCallback</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayDaskCallback</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extends Dask&#39;s `Callback` class with Ray-specific hooks. When instantiating</span>
 <span class="sd">    or subclassing this class, both the normal Dask hooks (e.g. pretask,</span>
@@ -1445,7 +1445,7 @@ document.write(`
     <span class="c1"># Set of active Ray-specific callbacks.</span>
     <span class="n">ray_active</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="n">CBS</span><span class="p">:</span>
             <span class="n">cb_func</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">cb</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">cb_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1454,30 +1454,30 @@ document.write(`
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_ray_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">RayCallback</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">CB_FIELDS</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ray_cm</span> <span class="o">=</span> <span class="n">add_ray_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ray_cm</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ray_cm</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">ray_active</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ray_callback</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">register</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">unregister</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unregister</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">ray_active</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ray_callback</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">unregister</span><span class="p">()</span>
 
 <div class="viewcode-block" id="RayDaskCallback._ray_presubmit">
 <a class="viewcode-back" href="../../../../ray-more-libs/doc/ray.util.dask.callbacks.RayDaskCallback._ray_presubmit.html#ray.util.dask.RayDaskCallback._ray_presubmit">[docs]</a>
-    <span class="k">def</span> <span class="nf">_ray_presubmit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">deps</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_presubmit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">deps</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run before submitting a Ray task.</span>
 
 <span class="sd">        If this callback returns a non-`None` value, Ray does _not_ create</span>
@@ -1503,7 +1503,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayDaskCallback._ray_postsubmit">
 <a class="viewcode-back" href="../../../../ray-more-libs/doc/ray.util.dask.callbacks.RayDaskCallback._ray_postsubmit.html#ray.util.dask.RayDaskCallback._ray_postsubmit">[docs]</a>
-    <span class="k">def</span> <span class="nf">_ray_postsubmit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">object_ref</span><span class="p">:</span> <span class="n">ObjectRef</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_postsubmit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">object_ref</span><span class="p">:</span> <span class="n">ObjectRef</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run after submitting a Ray task.</span>
 
 <span class="sd">        Args:</span>
@@ -1523,7 +1523,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayDaskCallback._ray_pretask">
 <a class="viewcode-back" href="../../../../ray-more-libs/doc/ray.util.dask.callbacks.RayDaskCallback._ray_pretask.html#ray.util.dask.RayDaskCallback._ray_pretask">[docs]</a>
-    <span class="k">def</span> <span class="nf">_ray_pretask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">object_refs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_pretask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">object_refs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run before executing a Dask task within a Ray task.</span>
 
 <span class="sd">        This method executes after Ray submits the task within a Ray</span>
@@ -1544,7 +1544,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayDaskCallback._ray_posttask">
 <a class="viewcode-back" href="../../../../ray-more-libs/doc/ray.util.dask.callbacks.RayDaskCallback._ray_posttask.html#ray.util.dask.RayDaskCallback._ray_posttask">[docs]</a>
-    <span class="k">def</span> <span class="nf">_ray_posttask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">pre_state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_posttask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">pre_state</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run after executing a Dask task within a Ray task.</span>
 
 <span class="sd">        This method executes within a Ray worker. This callback receives the</span>
@@ -1561,7 +1561,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayDaskCallback._ray_postsubmit_all">
 <a class="viewcode-back" href="../../../../ray-more-libs/doc/ray.util.dask.callbacks.RayDaskCallback._ray_postsubmit_all.html#ray.util.dask.RayDaskCallback._ray_postsubmit_all">[docs]</a>
-    <span class="k">def</span> <span class="nf">_ray_postsubmit_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_refs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">],</span> <span class="n">dsk</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_postsubmit_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_refs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">],</span> <span class="n">dsk</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run after Ray submits all tasks.</span>
 
 <span class="sd">        Args:</span>
@@ -1574,7 +1574,7 @@ document.write(`
 
 <div class="viewcode-block" id="RayDaskCallback._ray_finish">
 <a class="viewcode-back" href="../../../../ray-more-libs/doc/ray.util.dask.callbacks.RayDaskCallback._ray_finish.html#ray.util.dask.RayDaskCallback._ray_finish">[docs]</a>
-    <span class="k">def</span> <span class="nf">_ray_finish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_finish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run after Ray finishes executing all Ray tasks and returns the final</span>
 <span class="sd">        result.</span>
 
@@ -1588,20 +1588,20 @@ document.write(`
 
 
 
-<span class="k">class</span> <span class="nc">add_ray_callbacks</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">callbacks</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">add_ray_callbacks</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">callbacks</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">normalize_ray_callback</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">callbacks</span><span class="p">]</span>
         <span class="n">RayDaskCallback</span><span class="o">.</span><span class="n">ray_active</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">:</span>
             <span class="n">RayDaskCallback</span><span class="o">.</span><span class="n">ray_active</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">normalize_ray_callback</span><span class="p">(</span><span class="n">cb</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">normalize_ray_callback</span><span class="p">(</span><span class="n">cb</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cb</span><span class="p">,</span> <span class="n">RayDaskCallback</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">cb</span><span class="o">.</span><span class="n">_ray_callback</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cb</span><span class="p">,</span> <span class="n">RayCallback</span><span class="p">):</span>
@@ -1612,7 +1612,7 @@ document.write(`
         <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">unpack_ray_callbacks</span><span class="p">(</span><span class="n">cbs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">unpack_ray_callbacks</span><span class="p">(</span><span class="n">cbs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Take an iterable of callbacks, return a list of each callback.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">cbs</span><span class="p">:</span>
         <span class="c1"># Only drop callback methods that aren&#39;t in CBS_DONT_DROP.</span>
@@ -1627,7 +1627,7 @@ document.write(`
 
 
 <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
-<span class="k">def</span> <span class="nf">local_ray_callbacks</span><span class="p">(</span><span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">local_ray_callbacks</span><span class="p">(</span><span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Allows Dask-Ray callbacks to work with nested schedulers.</span>
 
@@ -1644,31 +1644,31 @@ document.write(`
             <span class="n">RayDaskCallback</span><span class="o">.</span><span class="n">ray_active</span> <span class="o">=</span> <span class="n">callbacks</span>
 
 
-<span class="k">class</span> <span class="nc">ProgressBarCallback</span><span class="p">(</span><span class="n">RayDaskCallback</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="kn">import</span> <span class="nn">ray</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgressBarCallback</span><span class="p">(</span><span class="n">RayDaskCallback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
         <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-        <span class="k">class</span> <span class="nc">ProgressBarActor</span><span class="p">:</span>
-            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">ProgressBarActor</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_init</span><span class="p">()</span>
 
-            <span class="k">def</span> <span class="nf">submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">deps</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">deps</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dep</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">submitted</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">now</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">submission_queue</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">key</span><span class="p">,</span> <span class="n">now</span><span class="p">))</span>
 
-            <span class="k">def</span> <span class="nf">task_scheduled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">task_scheduled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">scheduled</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">now</span>
 
-            <span class="k">def</span> <span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">finished</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">now</span>
 
-            <span class="k">def</span> <span class="nf">result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">submitted</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">finished</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="n">result</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">finished</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="n">submitted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">submitted</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
@@ -1688,13 +1688,13 @@ document.write(`
                 <span class="n">result</span><span class="p">[</span><span class="s2">&quot;submission_order&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission_queue</span>
                 <span class="k">return</span> <span class="n">result</span>
 
-            <span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="k">pass</span>
 
-            <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_init</span><span class="p">()</span>
 
-            <span class="k">def</span> <span class="nf">_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">submission_queue</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">submitted</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">scheduled</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
@@ -1708,18 +1708,18 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">pb</span> <span class="o">=</span> <span class="n">ProgressBarActor</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;_dask_on_ray_pb&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
             <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="o">.</span><span class="n">ready</span><span class="o">.</span><span class="n">remote</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">_ray_postsubmit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">object_ref</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_postsubmit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">object_ref</span><span class="p">):</span>
         <span class="c1"># Indicate the dask task is submitted.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="o">.</span><span class="n">submit</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">deps</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">_ray_pretask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">object_refs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_pretask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">object_refs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="o">.</span><span class="n">task_scheduled</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">_ray_posttask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">pre_state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_posttask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">pre_state</span><span class="p">):</span>
         <span class="c1"># Indicate the dask task is finished.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pb</span><span class="o">.</span><span class="n">finish</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">_ray_finish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_finish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All tasks are completed.&quot;</span><span class="p">)</span>
 </pre></div>
 

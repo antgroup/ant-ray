@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,19 +1389,19 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data.datasource.datasource</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">ray.data._internal.util</span> <span class="kn">import</span> <span class="n">_check_pyarrow_version</span>
-<span class="kn">from</span> <span class="nn">ray.data.block</span> <span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">BlockMetadata</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">_check_pyarrow_version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">BlockMetadata</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
 
 <div class="viewcode-block" id="Datasource">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.Datasource.html#ray.data.Datasource">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">Datasource</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Datasource</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Interface for defining a custom :class:`~ray.data.Dataset` datasource.</span>
 
 <span class="sd">    To read a datasource into a dataset, use :meth:`~ray.data.read_datasource`.</span>
@@ -1410,7 +1410,7 @@ document.write(`
 <div class="viewcode-block" id="Datasource.create_reader">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.Datasource.create_reader.html#ray.data.Datasource.create_reader">[docs]</a>
     <span class="nd">@Deprecated</span>
-    <span class="k">def</span> <span class="nf">create_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">read_args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Reader&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">read_args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Reader&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deprecated: Implement :meth:`~ray.data.Datasource.get_read_tasks` and</span>
 <span class="sd">        :meth:`~ray.data.Datasource.estimate_inmemory_data_size` instead.</span>
@@ -1421,7 +1421,7 @@ document.write(`
 <div class="viewcode-block" id="Datasource.prepare_read">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.Datasource.prepare_read.html#ray.data.Datasource.prepare_read">[docs]</a>
     <span class="nd">@Deprecated</span>
-    <span class="k">def</span> <span class="nf">prepare_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">read_args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ReadTask&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">read_args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ReadTask&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deprecated: Implement :meth:`~ray.data.Datasource.get_read_tasks` and</span>
 <span class="sd">        :meth:`~ray.data.Datasource.estimate_inmemory_data_size` instead.</span>
@@ -1431,7 +1431,7 @@ document.write(`
 
 <div class="viewcode-block" id="Datasource.get_name">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.Datasource.get_name.html#ray.data.Datasource.get_name">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a human-readable name for this datasource.</span>
 <span class="sd">        This will be used as the names of the read tasks.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1444,7 +1444,7 @@ document.write(`
 
 <div class="viewcode-block" id="Datasource.estimate_inmemory_data_size">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.Datasource.estimate_inmemory_data_size.html#ray.data.Datasource.estimate_inmemory_data_size">[docs]</a>
-    <span class="k">def</span> <span class="nf">estimate_inmemory_data_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">estimate_inmemory_data_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an estimate of the in-memory data size, or None if unknown.</span>
 
 <span class="sd">        Note that the in-memory data size may be larger than the on-disk data size.</span>
@@ -1454,7 +1454,7 @@ document.write(`
 
 <div class="viewcode-block" id="Datasource.get_read_tasks">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.Datasource.get_read_tasks.html#ray.data.Datasource.get_read_tasks">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_read_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ReadTask&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_read_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ReadTask&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute the read and return read tasks.</span>
 
 <span class="sd">        Args:</span>
@@ -1469,7 +1469,7 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">should_create_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">should_create_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="n">has_implemented_get_read_tasks</span> <span class="o">=</span> <span class="p">(</span>
             <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_read_tasks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Datasource</span><span class="o">.</span><span class="n">get_read_tasks</span>
         <span class="p">)</span>
@@ -1483,14 +1483,14 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">supports_distributed_reads</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">supports_distributed_reads</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;If ``False``, only launch read tasks on the driver&#39;s node.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
 
 
 <span class="nd">@Deprecated</span>
-<span class="k">class</span> <span class="nc">Reader</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Reader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A bound read operation for a :class:`~ray.data.Datasource`.</span>
 
 <span class="sd">    This is a stateful class so that reads can be prepared in multiple stages.</span>
@@ -1498,14 +1498,14 @@ document.write(`
 <span class="sd">    in-memory size of the read prior to executing it.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">estimate_inmemory_data_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">estimate_inmemory_data_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an estimate of the in-memory data size, or None if unknown.</span>
 
 <span class="sd">        Note that the in-memory data size may be larger than the on-disk data size.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-    <span class="k">def</span> <span class="nf">get_read_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ReadTask&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_read_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ReadTask&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute the read and return read tasks.</span>
 
 <span class="sd">        Args:</span>
@@ -1520,22 +1520,22 @@ document.write(`
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
 
-<span class="k">class</span> <span class="nc">_LegacyDatasourceReader</span><span class="p">(</span><span class="n">Reader</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasource</span><span class="p">:</span> <span class="n">Datasource</span><span class="p">,</span> <span class="o">**</span><span class="n">read_args</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_LegacyDatasourceReader</span><span class="p">(</span><span class="n">Reader</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasource</span><span class="p">:</span> <span class="n">Datasource</span><span class="p">,</span> <span class="o">**</span><span class="n">read_args</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_datasource</span> <span class="o">=</span> <span class="n">datasource</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_read_args</span> <span class="o">=</span> <span class="n">read_args</span>
 
-    <span class="k">def</span> <span class="nf">estimate_inmemory_data_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">estimate_inmemory_data_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">get_read_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ReadTask&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_read_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ReadTask&quot;</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasource</span><span class="o">.</span><span class="n">prepare_read</span><span class="p">(</span><span class="n">parallelism</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_read_args</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="ReadTask">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.ReadTask.html#ray.data.ReadTask">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">ReadTask</span><span class="p">(</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Block</span><span class="p">]]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ReadTask</span><span class="p">(</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Block</span><span class="p">]]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A function used to read blocks from the :class:`~ray.data.Dataset`.</span>
 
 <span class="sd">    Read tasks are generated by :meth:`~ray.data.Datasource.get_read_tasks`,</span>
@@ -1556,19 +1556,19 @@ document.write(`
 <span class="sd">    contents of the block itself.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">read_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Block</span><span class="p">]],</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">BlockMetadata</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">read_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Block</span><span class="p">]],</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">BlockMetadata</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="n">metadata</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_read_fn</span> <span class="o">=</span> <span class="n">read_fn</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockMetadata</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockMetadata</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">read_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Block</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Block</span><span class="p">]]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_fn</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Block</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Block</span><span class="p">]:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_fn</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">&quot;__iter__&quot;</span><span class="p">):</span>
             <span class="ne">DeprecationWarning</span><span class="p">(</span>
@@ -1581,7 +1581,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">RandomIntRowDatasource</span><span class="p">(</span><span class="n">Datasource</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RandomIntRowDatasource</span><span class="p">(</span><span class="n">Datasource</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An example datasource that generates rows with random int64 columns.</span>
 
 <span class="sd">    Examples:</span>
@@ -1594,26 +1594,26 @@ document.write(`
 <span class="sd">        {&#39;c_0&#39;: 4983608804013926748, &#39;c_1&#39;: 1160140066899844087}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_columns</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_columns</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="n">n</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_columns</span> <span class="o">=</span> <span class="n">num_columns</span>
 
-    <span class="k">def</span> <span class="nf">estimate_inmemory_data_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">estimate_inmemory_data_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_columns</span> <span class="o">*</span> <span class="mi">8</span>
 
-    <span class="k">def</span> <span class="nf">get_read_tasks</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_read_tasks</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">parallelism</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ReadTask</span><span class="p">]:</span>
         <span class="n">_check_pyarrow_version</span><span class="p">()</span>
-        <span class="kn">import</span> <span class="nn">pyarrow</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span>
 
         <span class="n">read_tasks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ReadTask</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span>
         <span class="n">num_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_columns</span>
         <span class="n">block_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">//</span> <span class="n">parallelism</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">make_block</span><span class="p">(</span><span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_columns</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">make_block</span><span class="p">(</span><span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_columns</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
                     <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">num_columns</span><span class="p">,</span> <span class="n">count</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span>
@@ -1647,7 +1647,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">read_tasks</span>
 
-    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a human-readable name for this datasource.</span>
 <span class="sd">        This will be used as the names of the read tasks.</span>
 <span class="sd">        Note: overrides the base `Datasource` method.</span>

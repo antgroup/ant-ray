@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/autodoc_pydantic.css" />
@@ -1389,24 +1389,24 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data._internal.execution.interfaces.execution_options</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">NodeIdStr</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.execution.util</span> <span class="kn">import</span> <span class="n">memory_string</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">NodeIdStr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.execution.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">memory_string</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 
 <div class="viewcode-block" id="ExecutionResources">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources">[docs]</a>
-<span class="k">class</span> <span class="nc">ExecutionResources</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExecutionResources</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Specifies resources usage or resource limits for execution.</span>
 
 <span class="sd">    By default this class represents resource usage. Use `for_limits` or</span>
 <span class="sd">    set `default_to_inf` to True to create an object that represents resource limits.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">cpu</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">gpu</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1431,7 +1431,7 @@ document.write(`
 <div class="viewcode-block" id="ExecutionResources.from_resource_dict">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources.from_resource_dict">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_resource_dict</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_resource_dict</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">resource_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
         <span class="n">default_to_inf</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1448,7 +1448,7 @@ document.write(`
 <div class="viewcode-block" id="ExecutionResources.for_limits">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources.for_limits">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">for_limits</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">for_limits</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">cpu</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">gpu</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1469,42 +1469,42 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">cpu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cpu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cpu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cpu</span>
         <span class="k">return</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_to_inf</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
 
     <span class="nd">@cpu</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">cpu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cpu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cpu</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">gpu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gpu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gpu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gpu</span>
         <span class="k">return</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_to_inf</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
 
     <span class="nd">@gpu</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">gpu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gpu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_gpu</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">object_store_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">object_store_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_object_store_memory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_object_store_memory</span>
         <span class="k">return</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_to_inf</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
 
     <span class="nd">@object_store_memory</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">object_store_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">object_store_memory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_object_store_memory</span> <span class="o">=</span> <span class="n">value</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;ExecutionResources(cpu=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cpu</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, gpu=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">gpu</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;object_store_memory=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">object_store_memory_str</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cpu</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">cpu</span>
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpu</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">gpu</span>
@@ -1514,28 +1514,28 @@ document.write(`
 <div class="viewcode-block" id="ExecutionResources.zero">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources.zero">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">zero</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an ExecutionResources object with zero resources.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">ExecutionResources</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ExecutionResources.is_zero">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources.is_zero">[docs]</a>
-    <span class="k">def</span> <span class="nf">is_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True if all resources are zero.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpu</span> <span class="o">==</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpu</span> <span class="o">==</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">object_store_memory</span> <span class="o">==</span> <span class="mf">0.0</span></div>
 
 
 <div class="viewcode-block" id="ExecutionResources.is_non_negative">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources.is_non_negative">[docs]</a>
-    <span class="k">def</span> <span class="nf">is_non_negative</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_non_negative</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True if all resources are non-negative.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpu</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpu</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">object_store_memory</span> <span class="o">&gt;=</span> <span class="mi">0</span></div>
 
 
 <div class="viewcode-block" id="ExecutionResources.object_store_memory_str">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources.object_store_memory_str">[docs]</a>
-    <span class="k">def</span> <span class="nf">object_store_memory_str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">object_store_memory_str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a human-readable string for the object store memory field.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">object_store_memory</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;inf&quot;</span>
@@ -1544,7 +1544,7 @@ document.write(`
 
 <div class="viewcode-block" id="ExecutionResources.copy">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources.copy">[docs]</a>
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a copy of this ExecutionResources object.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">ExecutionResources</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cpu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gpu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_object_store_memory</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_to_inf</span>
@@ -1553,7 +1553,7 @@ document.write(`
 
 <div class="viewcode-block" id="ExecutionResources.add">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources.add">[docs]</a>
-    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds execution resources.</span>
 
 <span class="sd">        Returns:</span>
@@ -1568,7 +1568,7 @@ document.write(`
 
 <div class="viewcode-block" id="ExecutionResources.subtract">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources.subtract">[docs]</a>
-    <span class="k">def</span> <span class="nf">subtract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">subtract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Subtracts execution resources.</span>
 
 <span class="sd">        Returns:</span>
@@ -1583,7 +1583,7 @@ document.write(`
 
 <div class="viewcode-block" id="ExecutionResources.max">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources.max">[docs]</a>
-    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the maximum for each resource type.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">ExecutionResources</span><span class="p">(</span>
             <span class="n">cpu</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpu</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">cpu</span><span class="p">),</span>
@@ -1596,7 +1596,7 @@ document.write(`
 
 <div class="viewcode-block" id="ExecutionResources.min">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources.min">[docs]</a>
-    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the minimum for each resource type.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">ExecutionResources</span><span class="p">(</span>
             <span class="n">cpu</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpu</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">cpu</span><span class="p">),</span>
@@ -1609,7 +1609,7 @@ document.write(`
 
 <div class="viewcode-block" id="ExecutionResources.satisfies_limit">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources.satisfies_limit">[docs]</a>
-    <span class="k">def</span> <span class="nf">satisfies_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">satisfies_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return if this resource struct meets the specified limits.</span>
 
 <span class="sd">        Note that None for a field means no limit.</span>
@@ -1623,7 +1623,7 @@ document.write(`
 
 <div class="viewcode-block" id="ExecutionResources.scale">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources.scale">[docs]</a>
-    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ExecutionResources&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return copy with all set values scaled by `f`.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">f</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Scaling factor must be non-negative.&quot;</span><span class="p">)</span>
@@ -1642,7 +1642,7 @@ document.write(`
 <div class="viewcode-block" id="ExecutionOptions">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionOptions.html#ray.data.ExecutionOptions">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">ExecutionOptions</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExecutionOptions</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Common options for execution.</span>
 
 <span class="sd">    Some options may not be supported on all executors (e.g., resource limits).</span>
@@ -1670,7 +1670,7 @@ document.write(`
 <span class="sd">            option is useful for performance debugging. On by default.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resource_limits</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ExecutionResources</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">exclude_resources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ExecutionResources</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1696,7 +1696,7 @@ document.write(`
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose_progress</span> <span class="o">=</span> <span class="n">verbose_progress</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;ExecutionOptions(resource_limits=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_limits</span><span class="si">}</span><span class="s2">, &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;exclude_resources=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">exclude_resources</span><span class="si">}</span><span class="s2">, &quot;</span>
@@ -1707,11 +1707,11 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">resource_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExecutionResources</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resource_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExecutionResources</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resource_limits</span>
 
     <span class="nd">@resource_limits</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">resource_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ExecutionResources</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resource_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ExecutionResources</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_resource_limits</span> <span class="o">=</span> <span class="n">ExecutionResources</span><span class="o">.</span><span class="n">for_limits</span><span class="p">(</span>
             <span class="n">cpu</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">_cpu</span><span class="p">,</span>
             <span class="n">gpu</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">_gpu</span><span class="p">,</span>
@@ -1720,14 +1720,14 @@ document.write(`
 
 <div class="viewcode-block" id="ExecutionOptions.is_resource_limits_default">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionOptions.html#ray.data.ExecutionOptions.is_resource_limits_default">[docs]</a>
-    <span class="k">def</span> <span class="nf">is_resource_limits_default</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_resource_limits_default</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True if resource_limits is the default value.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resource_limits</span> <span class="o">==</span> <span class="n">ExecutionResources</span><span class="o">.</span><span class="n">for_limits</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ExecutionOptions.validate">
 <a class="viewcode-back" href="../../../../../../data/api/doc/ray.data.ExecutionOptions.html#ray.data.ExecutionOptions.validate">[docs]</a>
-    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate the options.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;object_store_memory&quot;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="p">(</span>

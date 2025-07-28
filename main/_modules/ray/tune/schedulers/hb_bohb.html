@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1397,16 +1397,16 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.schedulers.hb_bohb</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">ray.tune.experiment</span> <span class="kn">import</span> <span class="n">Trial</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers.hyperband</span> <span class="kn">import</span> <span class="n">HyperBandScheduler</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers.trial_scheduler</span> <span class="kn">import</span> <span class="n">TrialScheduler</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers.hyperband</span><span class="w"> </span><span class="kn">import</span> <span class="n">HyperBandScheduler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers.trial_scheduler</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrialScheduler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.execution.tune_controller</span> <span class="kn">import</span> <span class="n">TuneController</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.tune_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneController</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1414,7 +1414,7 @@ document.write(`
 <div class="viewcode-block" id="HyperBandForBOHB">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.HyperBandForBOHB.html#ray.tune.schedulers.HyperBandForBOHB">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">HyperBandForBOHB</span><span class="p">(</span><span class="n">HyperBandScheduler</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HyperBandForBOHB</span><span class="p">(</span><span class="n">HyperBandScheduler</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Extends HyperBand early stopping algorithm for BOHB.</span>
 
 <span class="sd">    This implementation removes the ``HyperBandScheduler`` pipelining. This</span>
@@ -1431,7 +1431,7 @@ document.write(`
 
 <div class="viewcode-block" id="HyperBandForBOHB.on_trial_add">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.HyperBandForBOHB.on_trial_add.html#ray.tune.schedulers.HyperBandForBOHB.on_trial_add">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds new trial.</span>
 
 <span class="sd">        On a new trial add, if current bracket is not filled, add to current</span>
@@ -1479,7 +1479,7 @@ document.write(`
 
 <div class="viewcode-block" id="HyperBandForBOHB.on_trial_result">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.HyperBandForBOHB.on_trial_result.html#ray.tune.schedulers.HyperBandForBOHB.on_trial_result">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_trial_result</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_result</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;If bracket is finished, all trials will be stopped.</span>
@@ -1527,13 +1527,13 @@ document.write(`
         <span class="k">return</span> <span class="n">action</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_unpause_trial</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_unpause_trial</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">):</span>
         <span class="c1"># Hack. See comment in on_trial_result</span>
         <span class="n">tune_controller</span><span class="o">.</span><span class="n">search_alg</span><span class="o">.</span><span class="n">searcher</span><span class="o">.</span><span class="n">on_unpause</span><span class="p">(</span><span class="n">trial</span><span class="o">.</span><span class="n">trial_id</span><span class="p">)</span>
 
 <div class="viewcode-block" id="HyperBandForBOHB.choose_trial_to_run">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.HyperBandForBOHB.choose_trial_to_run.html#ray.tune.schedulers.HyperBandForBOHB.choose_trial_to_run">[docs]</a>
-    <span class="k">def</span> <span class="nf">choose_trial_to_run</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">choose_trial_to_run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">allow_recurse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Trial</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fair scheduling within iteration by completion percentage.</span>

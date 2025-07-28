@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1423,17 +1423,17 @@ document.write(`
 <span class="sd">This example is uses the official</span>
 <span class="sd">huggingface transformers `hyperparameter_search` API.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">CLIReporter</span>
-<span class="kn">from</span> <span class="nn">ray.tune.examples.pbt_transformers.utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">CLIReporter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.examples.pbt_transformers.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">download_data</span><span class="p">,</span>
     <span class="n">build_compute_metrics_fn</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers</span> <span class="kn">import</span> <span class="n">PopulationBasedTraining</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers</span><span class="w"> </span><span class="kn">import</span> <span class="n">PopulationBasedTraining</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">glue_tasks_num_labels</span><span class="p">,</span>
     <span class="n">AutoConfig</span><span class="p">,</span>
     <span class="n">AutoModelForSequenceClassification</span><span class="p">,</span>
@@ -1445,7 +1445,7 @@ document.write(`
 <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">tune_transformer</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">gpus_per_trial</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">smoke_test</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">tune_transformer</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">gpus_per_trial</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">smoke_test</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">data_dir_name</span> <span class="o">=</span> <span class="s2">&quot;./data&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">smoke_test</span> <span class="k">else</span> <span class="s2">&quot;./test_data&quot;</span>
     <span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">data_dir_name</span><span class="p">))</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">data_dir</span><span class="p">):</span>
@@ -1476,7 +1476,7 @@ document.write(`
         <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_model</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">():</span>
         <span class="k">return</span> <span class="n">AutoModelForSequenceClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
             <span class="n">model_name</span><span class="p">,</span>
             <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
@@ -1568,7 +1568,7 @@ document.write(`
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">argparse</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
 
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
@@ -1595,18 +1595,18 @@ document.write(`
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;Utilities to load and cache data.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">EvalPrediction</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">glue_compute_metrics</span><span class="p">,</span> <span class="n">glue_output_modes</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvalPrediction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">glue_compute_metrics</span><span class="p">,</span> <span class="n">glue_output_modes</span>
 
 
-<span class="k">def</span> <span class="nf">build_compute_metrics_fn</span><span class="p">(</span><span class="n">task_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">EvalPrediction</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_compute_metrics_fn</span><span class="p">(</span><span class="n">task_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">EvalPrediction</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Function from transformers/examples/text-classification/run_glue.py&quot;&quot;&quot;</span>
     <span class="n">output_mode</span> <span class="o">=</span> <span class="n">glue_output_modes</span><span class="p">[</span><span class="n">task_name</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">compute_metrics_fn</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">EvalPrediction</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_metrics_fn</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">EvalPrediction</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">output_mode</span> <span class="o">==</span> <span class="s2">&quot;classification&quot;</span><span class="p">:</span>
             <span class="n">preds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">predictions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">output_mode</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
@@ -1617,11 +1617,11 @@ document.write(`
     <span class="k">return</span> <span class="n">compute_metrics_fn</span>
 
 
-<span class="k">def</span> <span class="nf">download_data</span><span class="p">(</span><span class="n">task_name</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;./data&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">download_data</span><span class="p">(</span><span class="n">task_name</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;./data&quot;</span><span class="p">):</span>
     <span class="c1"># Download RTE training data</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Downloading dataset.&quot;</span><span class="p">)</span>
-    <span class="kn">import</span> <span class="nn">urllib</span>
-    <span class="kn">import</span> <span class="nn">zipfile</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">urllib</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">zipfile</span>
 
     <span class="k">if</span> <span class="n">task_name</span> <span class="o">==</span> <span class="s2">&quot;rte&quot;</span><span class="p">:</span>
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://dl.fbaipublicfiles.com/glue/data/RTE.zip&quot;</span>

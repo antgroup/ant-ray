@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1428,7 +1428,7 @@ faster.</p>
 </ol>
 <p>Occasionally, it’s advantageous to manually tune the number of blocks to optimize the application.
 For example, the following code batches multiple files into the same read task to avoid creating blocks that are too large.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="c1"># Pretend there are two CPUs.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -1448,7 +1448,7 @@ For example, the following code batches multiple files into the same read task t
 This could be, for example, because you know that additional CPUs should get added to the cluster by the autoscaler or because you want the downstream operator to transform each file’s contents in parallel.
 You can get this behavior by setting the <code class="docutils literal notranslate"><span class="pre">override_num_blocks</span></code> parameter.
 Notice how the number of output blocks is equal to <code class="docutils literal notranslate"><span class="pre">override_num_blocks</span></code> in the following code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="c1"># Pretend there are two CPUs.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -1468,7 +1468,7 @@ Notice how the number of output blocks is equal to <code class="docutils literal
 Note however that Ray Data can’t perfectly predict the size of each task’s output, so it’s possible that each task produces one or more output blocks.
 Thus, the total blocks in the final <a class="reference internal" href="api/dataset.html#ray.data.Dataset" title="ray.data.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> may differ from the specified <code class="docutils literal notranslate"><span class="pre">override_num_blocks</span></code>.
 Here’s an example where we manually specify <code class="docutils literal notranslate"><span class="pre">override_num_blocks=1</span></code>, but the one task still produces multiple blocks in the materialized Dataset:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="c1"># Pretend there are two CPUs.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -1489,7 +1489,7 @@ Thus, if the number of input files is smaller than <code class="docutils literal
 To ensure that downstream transforms can still execute with the desired number of blocks, Ray Data splits the read tasks’ outputs into a total of <code class="docutils literal notranslate"><span class="pre">override_num_blocks</span></code> blocks and prevents fusion with the downstream transform.
 In other words, each read task’s output blocks are materialized to Ray’s object store before the consuming map task executes.
 For example, the following code executes <a class="reference internal" href="api/doc/ray.data.read_csv.html#ray.data.read_csv" title="ray.data.read_csv"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_csv()</span></code></a> with only one task, but its output is split into 4 blocks before executing the <a class="reference internal" href="api/doc/ray.data.Dataset.map.html#ray.data.Dataset.map" title="ray.data.Dataset.map"><code class="xref py py-func docutils literal notranslate"><span class="pre">map()</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="c1"># Pretend there are two CPUs.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -1507,7 +1507,7 @@ Operator 2 Map(&lt;lambda&gt;): 4 tasks executed, 4 blocks produced in 0.3s
 </div>
 <p>To turn off this behavior and allow the read and map operators to be fused, set <code class="docutils literal notranslate"><span class="pre">override_num_blocks</span></code> manually.
 For example, this code sets the number of files equal to <code class="docutils literal notranslate"><span class="pre">override_num_blocks</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="c1"># Pretend there are two CPUs.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -1534,7 +1534,7 @@ If you only need a subset of the columns, make sure to specify the list of colum
 explicitly when calling <a class="reference internal" href="api/doc/ray.data.read_parquet.html#ray.data.read_parquet" title="ray.data.read_parquet"><code class="xref py py-func docutils literal notranslate"><span class="pre">ray.data.read_parquet()</span></code></a> to
 avoid loading unnecessary data (projection pushdown). Note that this is more efficient than
 calling <a class="reference internal" href="api/doc/ray.data.Dataset.select_columns.html#ray.data.Dataset.select_columns" title="ray.data.Dataset.select_columns"><code class="xref py py-func docutils literal notranslate"><span class="pre">select_columns()</span></code></a>, since column selection is pushed down to the file scan.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="c1"># Read just two of the five columns of the Iris dataset.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span>
     <span class="s2">&quot;s3://anonymous@ray-example-data/iris.parquet&quot;</span><span class="p">,</span>
@@ -1570,7 +1570,7 @@ To avoid these issues:</p>
 </ol>
 <p>As an example of tuning batch size, the following code uses one task to load a 1 GB <a class="reference internal" href="api/dataset.html#ray.data.Dataset" title="ray.data.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> with 1000 1 MB rows and applies an identity function using <a class="reference internal" href="api/doc/ray.data.Dataset.map_batches.html#ray.data.Dataset.map_batches" title="ray.data.Dataset.map_batches"><code class="xref py py-func docutils literal notranslate"><span class="pre">map_batches()</span></code></a>.
 Because the default <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> for <a class="reference internal" href="api/doc/ray.data.Dataset.map_batches.html#ray.data.Dataset.map_batches" title="ray.data.Dataset.map_batches"><code class="xref py py-func docutils literal notranslate"><span class="pre">map_batches()</span></code></a> is 1024 rows, this code produces only one very large batch, causing the heap memory usage to increase to 4 GB.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="c1"># Pretend there are two CPUs.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -1590,7 +1590,7 @@ Because the default <code class="docutils literal notranslate"><span class="pre"
 </pre></div>
 </div>
 <p>Setting a lower batch size produces lower peak heap memory usage:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="c1"># Pretend there are two CPUs.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -1648,7 +1648,7 @@ There are two ways to do this:</p>
 <p>When <a class="reference internal" href="api/doc/ray.data.Dataset.map_batches.html#ray.data.Dataset.map_batches" title="ray.data.Dataset.map_batches"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ds.map_batches()</span></code></a> is used, Ray Data coalesces blocks so that each map task can process at least this many rows.
 Note that the chosen <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> is a lower bound on the task’s input block size but it does not necessarily determine the task’s final <em>output</em> block size; see <a class="reference internal" href="#data-out-of-memory"><span class="std std-ref">the section</span></a> on block memory usage for more information on how block size is determined.</p>
 <p>To illustrate these, the following code uses both strategies to coalesce the 10 tiny blocks with 1 row each into 1 larger block with 10 rows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="c1"># Pretend there are two CPUs.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 

@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,14 +1389,14 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data.datasource.datasink</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.execution.interfaces</span> <span class="kn">import</span> <span class="n">TaskContext</span>
-<span class="kn">from</span> <span class="nn">ray.data.block</span> <span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">BlockAccessor</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.execution.interfaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">BlockAccessor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1409,7 +1409,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.WriteResult.html#ray.data.WriteResult">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">WriteResult</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">WriteReturnType</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WriteResult</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">WriteReturnType</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Aggregated result of the Datasink write operations.&quot;&quot;&quot;</span>
 
     <span class="c1"># Total number of written rows.</span>
@@ -1424,7 +1424,7 @@ document.write(`
 <div class="viewcode-block" id="Datasink">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.Datasink.html#ray.data.Datasink">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Datasink</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">WriteReturnType</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Datasink</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">WriteReturnType</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Interface for defining write-related logic.</span>
 
 <span class="sd">    If you want to write data to something that isn&#39;t built-in, subclass this class</span>
@@ -1433,7 +1433,7 @@ document.write(`
 
 <div class="viewcode-block" id="Datasink.on_write_start">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.Datasink.on_write_start.html#ray.data.Datasink.on_write_start">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_write_start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_write_start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Callback for when a write job starts.</span>
 
 <span class="sd">        Use this method to perform setup for write tasks. For example, creating a</span>
@@ -1444,7 +1444,7 @@ document.write(`
 
 <div class="viewcode-block" id="Datasink.write">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.Datasink.write.html#ray.data.Datasink.write">[docs]</a>
-    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">blocks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span>
         <span class="n">ctx</span><span class="p">:</span> <span class="n">TaskContext</span><span class="p">,</span>
@@ -1465,7 +1465,7 @@ document.write(`
 
 <div class="viewcode-block" id="Datasink.on_write_complete">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.Datasink.on_write_complete.html#ray.data.Datasink.on_write_complete">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_write_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_result</span><span class="p">:</span> <span class="n">WriteResult</span><span class="p">[</span><span class="n">WriteReturnType</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_write_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_result</span><span class="p">:</span> <span class="n">WriteResult</span><span class="p">[</span><span class="n">WriteReturnType</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Callback for when a write job completes.</span>
 
 <span class="sd">        This can be used to &quot;commit&quot; a write output. This method must</span>
@@ -1481,7 +1481,7 @@ document.write(`
 
 <div class="viewcode-block" id="Datasink.on_write_failed">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.Datasink.on_write_failed.html#ray.data.Datasink.on_write_failed">[docs]</a>
-    <span class="k">def</span> <span class="nf">on_write_failed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_write_failed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Callback for when a write job fails.</span>
 
 <span class="sd">        This is called on a best-effort basis on write failures.</span>
@@ -1494,7 +1494,7 @@ document.write(`
 
 <div class="viewcode-block" id="Datasink.get_name">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.Datasink.get_name.html#ray.data.Datasink.get_name">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a human-readable name for this datasink.</span>
 
 <span class="sd">        This is used as the names of the write tasks.</span>
@@ -1509,12 +1509,12 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">supports_distributed_writes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">supports_distributed_writes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;If ``False``, only launch write tasks on the driver&#39;s node.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">min_rows_per_write</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">min_rows_per_write</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The target number of rows to pass to each :meth:`~ray.data.Datasink.write` call.</span>
 
 <span class="sd">        If ``None``, Ray Data passes a system-chosen number of rows.</span>
@@ -1524,7 +1524,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">DummyOutputDatasink</span><span class="p">(</span><span class="n">Datasink</span><span class="p">[</span><span class="kc">None</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DummyOutputDatasink</span><span class="p">(</span><span class="n">Datasink</span><span class="p">[</span><span class="kc">None</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An example implementation of a writable datasource for testing.</span>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; import ray</span>
@@ -1534,22 +1534,22 @@ document.write(`
 <span class="sd">        &gt;&gt;&gt; assert output.num_ok == 1</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">ctx</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataContext</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span>
 
         <span class="c1"># Setup a dummy actor to send the data. In a real datasource, write</span>
         <span class="c1"># tasks would send data to an external system instead of a Ray actor.</span>
         <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">scheduling_strategy</span><span class="o">=</span><span class="n">ctx</span><span class="o">.</span><span class="n">scheduling_strategy</span><span class="p">)</span>
-        <span class="k">class</span> <span class="nc">DataSink</span><span class="p">:</span>
-            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">DataSink</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">rows_written</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">True</span>
 
-            <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">block</span> <span class="o">=</span> <span class="n">BlockAccessor</span><span class="o">.</span><span class="n">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">rows_written</span> <span class="o">+=</span> <span class="n">block</span><span class="o">.</span><span class="n">num_rows</span><span class="p">()</span>
 
-            <span class="k">def</span> <span class="nf">get_rows_written</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">get_rows_written</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rows_written</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">data_sink</span> <span class="o">=</span> <span class="n">DataSink</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
@@ -1557,7 +1557,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">num_failed</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">blocks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span>
         <span class="n">ctx</span><span class="p">:</span> <span class="n">TaskContext</span><span class="p">,</span>
@@ -1569,10 +1569,10 @@ document.write(`
             <span class="n">tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_sink</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
         <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_write_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_result</span><span class="p">:</span> <span class="n">WriteResult</span><span class="p">[</span><span class="kc">None</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_write_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_result</span><span class="p">:</span> <span class="n">WriteResult</span><span class="p">[</span><span class="kc">None</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_ok</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="k">def</span> <span class="nf">on_write_failed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_write_failed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_failed</span> <span class="o">+=</span> <span class="mi">1</span>
 </pre></div>
 

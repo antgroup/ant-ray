@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1432,7 +1432,7 @@ See the Hugging Face tutorial for useful explanations and suggestions on hyperpa
     <span class="n">subfolder</span><span class="o">=</span><span class="s2">&quot;tokenizer&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">_tokenize</span><span class="p">(</span><span class="n">prompt</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_tokenize</span><span class="p">(</span><span class="n">prompt</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">tokenizer</span><span class="p">(</span>
         <span class="n">prompt</span><span class="p">,</span>
         <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -1461,7 +1461,7 @@ See the Hugging Face tutorial for useful explanations and suggestions on hyperpa
     <span class="p">]</span>
 <span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">transform_image</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">transform_image</span><span class="p">(</span>
     <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">output_column_name</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     <span class="n">transformed_tensors</span> <span class="o">=</span> <span class="p">[</span><span class="n">transform</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]]</span>
@@ -1503,7 +1503,7 @@ See the Hugging Face tutorial for useful explanations and suggestions on hyperpa
 <li><p>Report results to Ray Train with <code class="code docutils literal notranslate"><span class="pre">session.report(results)`</span></code></p></li>
 </ol>
 <p>The code is compacted for brevity. The <a class="reference external" href="https://github.com/ray-project/ray/tree/master/doc/source/templates/05_dreambooth_finetuning/dreambooth/train.py">full code</a> is more thoroughly annotated.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train_fn</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">train_fn</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 
     <span class="c1"># Load pre-trained models.</span>
     <span class="p">(</span>

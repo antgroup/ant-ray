@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,29 +1389,29 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.offline.offline_prelearner</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.core.columns</span> <span class="kn">import</span> <span class="n">Columns</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.core.rl_module.multi_rl_module</span> <span class="kn">import</span> <span class="n">MultiRLModuleSpec</span><span class="p">,</span> <span class="n">MultiRLModule</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.single_agent_episode</span> <span class="kn">import</span> <span class="n">SingleAgentEpisode</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.sample_batch</span> <span class="kn">import</span> <span class="n">MultiAgentBatch</span><span class="p">,</span> <span class="n">SampleBatch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.columns</span><span class="w"> </span><span class="kn">import</span> <span class="n">Columns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiRLModuleSpec</span><span class="p">,</span> <span class="n">MultiRLModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.single_agent_episode</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingleAgentEpisode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.sample_batch</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentBatch</span><span class="p">,</span> <span class="n">SampleBatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">OverrideToImplementCustomLogic</span><span class="p">,</span>
     <span class="n">OverrideToImplementCustomLogic_CallToSuperRecommended</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.compression</span> <span class="kn">import</span> <span class="n">unpack_if_needed</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.replay_buffers.replay_buffer</span> <span class="kn">import</span> <span class="n">ReplayBuffer</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.spaces.space_utils</span> <span class="kn">import</span> <span class="n">from_jsonable_if_needed</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">EpisodeType</span><span class="p">,</span> <span class="n">ModuleID</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.compression</span><span class="w"> </span><span class="kn">import</span> <span class="n">unpack_if_needed</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.replay_buffers.replay_buffer</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReplayBuffer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.spaces.space_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_jsonable_if_needed</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">EpisodeType</span><span class="p">,</span> <span class="n">ModuleID</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="c1">#: This is the default schema used if no `input_read_schema` is set in</span>
 <span class="c1">#: the config. If a user passes in a schema into `input_read_schema`</span>
@@ -1443,7 +1443,7 @@ document.write(`
 <div class="viewcode-block" id="OfflinePreLearner">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">OfflinePreLearner</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OfflinePreLearner</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class that coordinates data transformation from dataset to learner.</span>
 
 <span class="sd">    This class is an essential part of the new `Offline RL API` of `RLlib`.</span>
@@ -1473,7 +1473,7 @@ document.write(`
 <div class="viewcode-block" id="OfflinePreLearner.__init__">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.__init__.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner.__init__">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic_CallToSuperRecommended</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="s2">&quot;AlgorithmConfig&quot;</span><span class="p">,</span>
@@ -1535,7 +1535,7 @@ document.write(`
 <div class="viewcode-block" id="OfflinePreLearner.__call__">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner.__call__.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner.__call__">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">EpisodeType</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">EpisodeType</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepares plain data batches for training with `Learner`&#39;s.</span>
 
 <span class="sd">        Args:</span>
@@ -1549,8 +1549,8 @@ document.write(`
         <span class="c1"># If we directly read in episodes we just convert to list.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_read_episodes</span><span class="p">:</span>
             <span class="c1"># Import `msgpack` for decoding.</span>
-            <span class="kn">import</span> <span class="nn">msgpack</span>
-            <span class="kn">import</span> <span class="nn">msgpack_numpy</span> <span class="k">as</span> <span class="nn">mnp</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">msgpack</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">msgpack_numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mnp</span>
 
             <span class="c1"># Read the episodes and decode them.</span>
             <span class="n">episodes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">SingleAgentEpisode</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
@@ -1678,9 +1678,9 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">default_prelearner_buffer_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReplayBuffer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default_prelearner_buffer_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReplayBuffer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the default replay buffer.&quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.rllib.utils.replay_buffers.episode_replay_buffer</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.replay_buffers.episode_replay_buffer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">EpisodeReplayBuffer</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -1688,7 +1688,7 @@ document.write(`
         <span class="k">return</span> <span class="n">EpisodeReplayBuffer</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">default_prelearner_buffer_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default_prelearner_buffer_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the default arguments for the replay buffer.</span>
 
 <span class="sd">        Note, the `capacity` might vary with the size of the episodes or</span>
@@ -1699,7 +1699,7 @@ document.write(`
             <span class="s2">&quot;batch_size_B&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">train_batch_size_per_learner</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">_validate_episodes</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_episodes</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">episodes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">SingleAgentEpisode</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">SingleAgentEpisode</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate episodes sampled from the dataset.</span>
@@ -1739,7 +1739,7 @@ document.write(`
 
 <div class="viewcode-block" id="OfflinePreLearner._should_module_be_updated">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner._should_module_be_updated.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner._should_module_be_updated">[docs]</a>
-    <span class="k">def</span> <span class="nf">_should_module_be_updated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">,</span> <span class="n">multi_agent_batch</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_should_module_be_updated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">,</span> <span class="n">multi_agent_batch</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks which modules in a MultiRLModule should be updated.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_policies_to_train</span><span class="p">:</span>
             <span class="c1"># In case of no update information, the module is updated.</span>
@@ -1754,7 +1754,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner._map_to_episodes.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner._map_to_episodes">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_map_to_episodes</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_map_to_episodes</span><span class="p">(</span>
         <span class="n">is_multi_agent</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>
         <span class="n">schema</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">SCHEMA</span><span class="p">,</span>
@@ -1776,7 +1776,7 @@ document.write(`
         <span class="c1"># Otherwise we use an identity function.</span>
         <span class="k">else</span><span class="p">:</span>
 
-            <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">space</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">space</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">sample</span>
 
         <span class="n">episodes</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1884,7 +1884,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.offline.offline_prelearner.OfflinePreLearner._map_sample_batch_to_episode.html#ray.rllib.offline.offline_prelearner.OfflinePreLearner._map_sample_batch_to_episode">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_map_sample_batch_to_episode</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_map_sample_batch_to_episode</span><span class="p">(</span>
         <span class="n">is_multi_agent</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>
         <span class="n">schema</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">SCHEMA</span><span class="p">,</span>

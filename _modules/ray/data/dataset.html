@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,14 +1389,14 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data.dataset</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">html</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">html</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -1413,47 +1413,47 @@ document.write(`
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray.cloudpickle</span> <span class="k">as</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">ray._private.thirdparty.tabulate.tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
-<span class="kn">from</span> <span class="nn">ray._private.usage</span> <span class="kn">import</span> <span class="n">usage_lib</span>
-<span class="kn">from</span> <span class="nn">ray.air.util.tensor_extensions.arrow</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.cloudpickle</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.thirdparty.tabulate.tabulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">tabulate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.usage</span><span class="w"> </span><span class="kn">import</span> <span class="n">usage_lib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.util.tensor_extensions.arrow</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ArrowTensorTypeV2</span><span class="p">,</span>
     <span class="n">get_arrow_extension_fixed_shape_tensor_types</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.air.util.tensor_extensions.utils</span> <span class="kn">import</span> <span class="n">_create_possibly_ragged_ndarray</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.compute</span> <span class="kn">import</span> <span class="n">ComputeStrategy</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.bigquery_datasink</span> <span class="kn">import</span> <span class="n">BigQueryDatasink</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.csv_datasink</span> <span class="kn">import</span> <span class="n">CSVDatasink</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.iceberg_datasink</span> <span class="kn">import</span> <span class="n">IcebergDatasink</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.image_datasink</span> <span class="kn">import</span> <span class="n">ImageDatasink</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.json_datasink</span> <span class="kn">import</span> <span class="n">JSONDatasink</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.lance_datasink</span> <span class="kn">import</span> <span class="n">LanceDatasink</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.mongo_datasink</span> <span class="kn">import</span> <span class="n">MongoDatasink</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.numpy_datasink</span> <span class="kn">import</span> <span class="n">NumpyDatasink</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.parquet_datasink</span> <span class="kn">import</span> <span class="n">ParquetDatasink</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.sql_datasink</span> <span class="kn">import</span> <span class="n">SQLDatasink</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.tfrecords_datasink</span> <span class="kn">import</span> <span class="n">TFRecordDatasink</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.datasource.webdataset_datasink</span> <span class="kn">import</span> <span class="n">WebDatasetDatasink</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.equalize</span> <span class="kn">import</span> <span class="n">_equalize</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.execution.interfaces</span> <span class="kn">import</span> <span class="n">RefBundle</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.execution.interfaces.ref_bundle</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.util.tensor_extensions.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_create_possibly_ragged_ndarray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.compute</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComputeStrategy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.bigquery_datasink</span><span class="w"> </span><span class="kn">import</span> <span class="n">BigQueryDatasink</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.csv_datasink</span><span class="w"> </span><span class="kn">import</span> <span class="n">CSVDatasink</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.iceberg_datasink</span><span class="w"> </span><span class="kn">import</span> <span class="n">IcebergDatasink</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.image_datasink</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageDatasink</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.json_datasink</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONDatasink</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.lance_datasink</span><span class="w"> </span><span class="kn">import</span> <span class="n">LanceDatasink</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.mongo_datasink</span><span class="w"> </span><span class="kn">import</span> <span class="n">MongoDatasink</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.numpy_datasink</span><span class="w"> </span><span class="kn">import</span> <span class="n">NumpyDatasink</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.parquet_datasink</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParquetDatasink</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.sql_datasink</span><span class="w"> </span><span class="kn">import</span> <span class="n">SQLDatasink</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.tfrecords_datasink</span><span class="w"> </span><span class="kn">import</span> <span class="n">TFRecordDatasink</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.webdataset_datasink</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebDatasetDatasink</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.equalize</span><span class="w"> </span><span class="kn">import</span> <span class="n">_equalize</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.execution.interfaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">RefBundle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.execution.interfaces.ref_bundle</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_ref_bundles_iterator_to_block_refs_list</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.execution.util</span> <span class="kn">import</span> <span class="n">memory_string</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.iterator.iterator_impl</span> <span class="kn">import</span> <span class="n">DataIteratorImpl</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.iterator.stream_split_iterator</span> <span class="kn">import</span> <span class="n">StreamSplitDataIterator</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.logical.operators.all_to_all_operator</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.execution.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">memory_string</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.iterator.iterator_impl</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataIteratorImpl</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.iterator.stream_split_iterator</span><span class="w"> </span><span class="kn">import</span> <span class="n">StreamSplitDataIterator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.logical.operators.all_to_all_operator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">RandomizeBlocks</span><span class="p">,</span>
     <span class="n">RandomShuffle</span><span class="p">,</span>
     <span class="n">Repartition</span><span class="p">,</span>
     <span class="n">Sort</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.logical.operators.count_operator</span> <span class="kn">import</span> <span class="n">Count</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.logical.operators.input_data_operator</span> <span class="kn">import</span> <span class="n">InputData</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.logical.operators.map_operator</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.logical.operators.count_operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Count</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.logical.operators.input_data_operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">InputData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.logical.operators.map_operator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Filter</span><span class="p">,</span>
     <span class="n">FlatMap</span><span class="p">,</span>
     <span class="n">MapBatches</span><span class="p">,</span>
@@ -1461,28 +1461,28 @@ document.write(`
     <span class="n">Project</span><span class="p">,</span>
     <span class="n">StreamingRepartition</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.logical.operators.n_ary_operator</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.logical.operators.n_ary_operator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Union</span> <span class="k">as</span> <span class="n">UnionLogicalOperator</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.logical.operators.n_ary_operator</span> <span class="kn">import</span> <span class="n">Zip</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.logical.operators.one_to_one_operator</span> <span class="kn">import</span> <span class="n">Limit</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.logical.operators.write_operator</span> <span class="kn">import</span> <span class="n">Write</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.logical.optimizers</span> <span class="kn">import</span> <span class="n">LogicalPlan</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.pandas_block</span> <span class="kn">import</span> <span class="n">PandasBlockBuilder</span><span class="p">,</span> <span class="n">PandasBlockSchema</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.plan</span> <span class="kn">import</span> <span class="n">ExecutionPlan</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.planner.exchange.sort_task_spec</span> <span class="kn">import</span> <span class="n">SortKey</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.planner.plan_write_op</span> <span class="kn">import</span> <span class="n">gen_datasink_write_result</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.remote_fn</span> <span class="kn">import</span> <span class="n">cached_remote_fn</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.split</span> <span class="kn">import</span> <span class="n">_get_num_rows</span><span class="p">,</span> <span class="n">_split_at_indices</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.stats</span> <span class="kn">import</span> <span class="n">DatasetStats</span><span class="p">,</span> <span class="n">DatasetStatsSummary</span><span class="p">,</span> <span class="n">StatsManager</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.util</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.logical.operators.n_ary_operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Zip</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.logical.operators.one_to_one_operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Limit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.logical.operators.write_operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Write</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.logical.optimizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogicalPlan</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.pandas_block</span><span class="w"> </span><span class="kn">import</span> <span class="n">PandasBlockBuilder</span><span class="p">,</span> <span class="n">PandasBlockSchema</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.plan</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExecutionPlan</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.planner.exchange.sort_task_spec</span><span class="w"> </span><span class="kn">import</span> <span class="n">SortKey</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.planner.plan_write_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">gen_datasink_write_result</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.remote_fn</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_remote_fn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.split</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_num_rows</span><span class="p">,</span> <span class="n">_split_at_indices</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetStats</span><span class="p">,</span> <span class="n">DatasetStatsSummary</span><span class="p">,</span> <span class="n">StatsManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AllToAllAPI</span><span class="p">,</span>
     <span class="n">ConsumptionAPI</span><span class="p">,</span>
     <span class="n">_validate_rows_per_file_args</span><span class="p">,</span>
     <span class="n">get_compute_strategy</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data.aggregate</span> <span class="kn">import</span> <span class="n">AggregateFn</span><span class="p">,</span> <span class="n">Max</span><span class="p">,</span> <span class="n">Mean</span><span class="p">,</span> <span class="n">Min</span><span class="p">,</span> <span class="n">Std</span><span class="p">,</span> <span class="n">Sum</span><span class="p">,</span> <span class="n">Unique</span>
-<span class="kn">from</span> <span class="nn">ray.data.block</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregateFn</span><span class="p">,</span> <span class="n">Max</span><span class="p">,</span> <span class="n">Mean</span><span class="p">,</span> <span class="n">Min</span><span class="p">,</span> <span class="n">Std</span><span class="p">,</span> <span class="n">Sum</span><span class="p">,</span> <span class="n">Unique</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.block</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">VALID_BATCH_FORMATS</span><span class="p">,</span>
     <span class="n">Block</span><span class="p">,</span>
     <span class="n">BlockAccessor</span><span class="p">,</span>
@@ -1493,30 +1493,30 @@ document.write(`
     <span class="n">UserDefinedFunction</span><span class="p">,</span>
     <span class="n">_apply_batch_format</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data.context</span> <span class="kn">import</span> <span class="n">DataContext</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource</span> <span class="kn">import</span> <span class="n">Connection</span><span class="p">,</span> <span class="n">Datasink</span><span class="p">,</span> <span class="n">FilenameProvider</span>
-<span class="kn">from</span> <span class="nn">ray.data.iterator</span> <span class="kn">import</span> <span class="n">DataIterator</span>
-<span class="kn">from</span> <span class="nn">ray.data.random_access_dataset</span> <span class="kn">import</span> <span class="n">RandomAccessDataset</span>
-<span class="kn">from</span> <span class="nn">ray.types</span> <span class="kn">import</span> <span class="n">ObjectRef</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
-<span class="kn">from</span> <span class="nn">ray.util.scheduling_strategies</span> <span class="kn">import</span> <span class="n">NodeAffinitySchedulingStrategy</span>
-<span class="kn">from</span> <span class="nn">ray.widgets</span> <span class="kn">import</span> <span class="n">Template</span>
-<span class="kn">from</span> <span class="nn">ray.widgets.util</span> <span class="kn">import</span> <span class="n">repr_with_fallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">Connection</span><span class="p">,</span> <span class="n">Datasink</span><span class="p">,</span> <span class="n">FilenameProvider</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.iterator</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataIterator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.random_access_dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomAccessDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObjectRef</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.scheduling_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">NodeAffinitySchedulingStrategy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.widgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Template</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.widgets.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">repr_with_fallback</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">dask</span>
-    <span class="kn">import</span> <span class="nn">mars</span>
-    <span class="kn">import</span> <span class="nn">modin</span>
-    <span class="kn">import</span> <span class="nn">pandas</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span>
-    <span class="kn">import</span> <span class="nn">pyspark</span>
-    <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
-    <span class="kn">import</span> <span class="nn">torch</span>
-    <span class="kn">import</span> <span class="nn">torch.utils.data</span>
-    <span class="kn">from</span> <span class="nn">tensorflow_metadata.proto.v0</span> <span class="kn">import</span> <span class="n">schema_pb2</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">mars</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">modin</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyspark</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">torch.utils.data</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow_metadata.proto.v0</span><span class="w"> </span><span class="kn">import</span> <span class="n">schema_pb2</span>
 
-    <span class="kn">from</span> <span class="nn">ray.data._internal.execution.interfaces</span> <span class="kn">import</span> <span class="n">Executor</span><span class="p">,</span> <span class="n">NodeIdStr</span>
-    <span class="kn">from</span> <span class="nn">ray.data.grouped_data</span> <span class="kn">import</span> <span class="n">GroupedData</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.execution.interfaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">Executor</span><span class="p">,</span> <span class="n">NodeIdStr</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.grouped_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">GroupedData</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -1543,7 +1543,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset">
 <a class="viewcode-back" href="../../../data/api/dataset.html#ray.data.Dataset">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">Dataset</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A Dataset is a distributed data collection for data loading and processing.</span>
 
 <span class="sd">    Datasets are distributed pipelines that produce ``ObjectRef[Block]`` outputs,</span>
@@ -1613,7 +1613,7 @@ document.write(`
 <span class="sd">    compatible with distributed TensorFlow / PyTorch.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">plan</span><span class="p">:</span> <span class="n">ExecutionPlan</span><span class="p">,</span>
         <span class="n">logical_plan</span><span class="p">:</span> <span class="n">LogicalPlan</span><span class="p">,</span>
@@ -1637,7 +1637,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_uuid</span><span class="p">(</span><span class="n">StatsManager</span><span class="o">.</span><span class="n">get_dataset_id_from_stats_actor</span><span class="p">())</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span>
         <span class="n">ds</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="n">_deep_copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">_as</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_as</span><span class="p">:</span>
@@ -1650,7 +1650,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.map">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.map.html#ray.data.Dataset.map">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">BT_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">map</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">fn</span><span class="p">:</span> <span class="n">UserDefinedFunction</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1788,7 +1788,7 @@ document.write(`
         <span class="k">return</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">logical_plan</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_set_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the name of the dataset.</span>
 
 <span class="sd">        Used as a prefix for metrics tags.</span>
@@ -1796,14 +1796,14 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_plan</span><span class="o">.</span><span class="n">_dataset_name</span> <span class="o">=</span> <span class="n">name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the dataset name&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plan</span><span class="o">.</span><span class="n">_dataset_name</span>
 
 <div class="viewcode-block" id="Dataset.map_batches">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.map_batches.html#ray.data.Dataset.map_batches">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">BT_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">map_batches</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">map_batches</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">fn</span><span class="p">:</span> <span class="n">UserDefinedFunction</span><span class="p">[</span><span class="n">DataBatch</span><span class="p">,</span> <span class="n">DataBatch</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2043,7 +2043,7 @@ document.write(`
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_map_batches_without_batch_size_validation</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_map_batches_without_batch_size_validation</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">fn</span><span class="p">:</span> <span class="n">UserDefinedFunction</span><span class="p">[</span><span class="n">DataBatch</span><span class="p">,</span> <span class="n">DataBatch</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2121,7 +2121,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.add_column">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.add_column.html#ray.data.Dataset.add_column">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">BT_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">add_column</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_column</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">col</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span>
@@ -2187,13 +2187,13 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;got: </span><span class="si">{</span><span class="n">batch_format</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">add_column</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">DataBatch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataBatch</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">add_column</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">DataBatch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataBatch</span><span class="p">:</span>
             <span class="n">column</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">batch_format</span> <span class="o">==</span> <span class="s2">&quot;pandas&quot;</span><span class="p">:</span>
                 <span class="n">batch</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">column</span>
                 <span class="k">return</span> <span class="n">batch</span>
             <span class="k">elif</span> <span class="n">batch_format</span> <span class="o">==</span> <span class="s2">&quot;pyarrow&quot;</span><span class="p">:</span>
-                <span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
+                <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
 
                 <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="p">(</span><span class="n">pa</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">ChunkedArray</span><span class="p">)),</span> <span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;For pyarrow batch format, the function must return a pyarrow &quot;</span>
@@ -2238,7 +2238,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.drop_columns">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.drop_columns.html#ray.data.Dataset.drop_columns">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">BT_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">drop_columns</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">drop_columns</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2285,7 +2285,7 @@ document.write(`
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">cols</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;drop_columns expects unique column names, got: </span><span class="si">{</span><span class="n">cols</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">drop_columns</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">drop_columns</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">batch</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">map_batches</span><span class="p">(</span>
@@ -2301,7 +2301,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.select_columns">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.select_columns.html#ray.data.Dataset.select_columns">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">BT_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">select_columns</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">select_columns</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">cols</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2371,7 +2371,7 @@ document.write(`
             <span class="p">)</span>
 
         <span class="c1"># Don&#39;t feel like we really need this</span>
-        <span class="kn">from</span> <span class="nn">ray.data._internal.compute</span> <span class="kn">import</span> <span class="n">TaskPoolStrategy</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.compute</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskPoolStrategy</span>
 
         <span class="n">compute</span> <span class="o">=</span> <span class="n">TaskPoolStrategy</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">concurrency</span><span class="p">)</span>
 
@@ -2390,7 +2390,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.rename_columns">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.rename_columns.html#ray.data.Dataset.rename_columns">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">BT_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">rename_columns</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rename_columns</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">names</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2500,7 +2500,7 @@ document.write(`
             <span class="p">)</span>
 
         <span class="c1"># Construct the plan and project operation</span>
-        <span class="kn">from</span> <span class="nn">ray.data._internal.compute</span> <span class="kn">import</span> <span class="n">TaskPoolStrategy</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.compute</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskPoolStrategy</span>
 
         <span class="n">compute</span> <span class="o">=</span> <span class="n">TaskPoolStrategy</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">concurrency</span><span class="p">)</span>
 
@@ -2519,7 +2519,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.flat_map">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.flat_map.html#ray.data.Dataset.flat_map">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">BT_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">flat_map</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">flat_map</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">fn</span><span class="p">:</span> <span class="n">UserDefinedFunction</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2653,7 +2653,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.filter">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.filter.html#ray.data.Dataset.filter">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">BT_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">fn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UserDefinedFunction</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">expr</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2732,8 +2732,8 @@ document.write(`
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;when &#39;expr&#39; is used, &#39;fn_args/fn_kwargs&#39; or &#39;fn_constructor_args/fn_constructor_kwargs&#39; can not be used.&quot;</span>
                 <span class="p">)</span>
-            <span class="kn">from</span> <span class="nn">ray.data._internal.compute</span> <span class="kn">import</span> <span class="n">TaskPoolStrategy</span>
-            <span class="kn">from</span> <span class="nn">ray.data._internal.planner.plan_expression.expression_evaluator</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa: E501</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.compute</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskPoolStrategy</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.planner.plan_expression.expression_evaluator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa: E501</span>
                 <span class="n">ExpressionEvaluator</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -2782,7 +2782,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.repartition.html#ray.data.Dataset.repartition">[docs]</a>
     <span class="nd">@AllToAllAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">SSR_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">repartition</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">repartition</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">num_blocks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">target_num_rows_per_block</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2882,7 +2882,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.random_shuffle.html#ray.data.Dataset.random_shuffle">[docs]</a>
     <span class="nd">@AllToAllAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">SSR_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">random_shuffle</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">random_shuffle</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2935,7 +2935,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.randomize_block_order.html#ray.data.Dataset.randomize_block_order">[docs]</a>
     <span class="nd">@AllToAllAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">SSR_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">randomize_block_order</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">randomize_block_order</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2974,7 +2974,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.random_sample">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.random_sample.html#ray.data.Dataset.random_sample">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">BT_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">random_sample</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">random_sample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">fraction</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new :class:`Dataset` containing a random fraction of the rows.</span>
@@ -2997,10 +2997,10 @@ document.write(`
 <span class="sd">        Returns:</span>
 <span class="sd">            Returns a :class:`Dataset` containing the sampled rows.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">random</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
-        <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-        <span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plan</span><span class="o">.</span><span class="n">initial_num_blocks</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot sample from an empty Dataset.&quot;</span><span class="p">)</span>
@@ -3011,7 +3011,7 @@ document.write(`
         <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">random_sample</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">random_sample</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="k">return</span> <span class="p">[</span><span class="n">row</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">batch</span> <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">fraction</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="p">):</span>
@@ -3034,7 +3034,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.streaming_split.html#ray.data.Dataset.streaming_split">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">SMD_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">streaming_split</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">streaming_split</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3131,7 +3131,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.split.html#ray.data.Dataset.split">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">SMD_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">split</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">equal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">locality_hints</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;MaterializedDataset&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Materialize and split the dataset into ``n`` disjoint pieces.</span>
@@ -3251,7 +3251,7 @@ document.write(`
         <span class="c1"># In the second round: fill each actor&#39;s allocation with</span>
         <span class="c1"># remaining unallocated blocks until we reach the limit.</span>
 
-        <span class="k">def</span> <span class="nf">build_allocation_size_map</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">build_allocation_size_map</span><span class="p">(</span>
             <span class="n">num_blocks</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">actors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Given the total number of blocks and a list of actors, calcuate</span>
@@ -3267,7 +3267,7 @@ document.write(`
                     <span class="n">num_blocks_by_actor</span><span class="p">[</span><span class="n">actor</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">return</span> <span class="n">num_blocks_by_actor</span>
 
-        <span class="k">def</span> <span class="nf">build_block_refs_by_node_id</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">build_block_refs_by_node_id</span><span class="p">(</span>
             <span class="n">blocks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">[</span><span class="n">Block</span><span class="p">]],</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">[</span><span class="n">Block</span><span class="p">]]]:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Build the reverse index from node_id to block_refs. For</span>
@@ -3282,7 +3282,7 @@ document.write(`
                 <span class="n">block_refs_by_node_id</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block_ref</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">block_refs_by_node_id</span>
 
-        <span class="k">def</span> <span class="nf">build_node_id_by_actor</span><span class="p">(</span><span class="n">actors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">build_node_id_by_actor</span><span class="p">(</span><span class="n">actors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Build a map from a actor to its node_id.&quot;&quot;&quot;</span>
             <span class="n">actors_state</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">actors</span><span class="p">()</span>
             <span class="k">return</span> <span class="p">{</span>
@@ -3357,7 +3357,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.split_at_indices.html#ray.data.Dataset.split_at_indices">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">SMD_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">split_at_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;MaterializedDataset&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">split_at_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;MaterializedDataset&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Materialize and split the dataset at the given indices (like ``np.split``).</span>
 
 <span class="sd">        Examples:</span>
@@ -3435,7 +3435,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.split_proportionately.html#ray.data.Dataset.split_proportionately">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">SMD_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">split_proportionately</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">split_proportionately</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">proportions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;MaterializedDataset&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Materialize and split the dataset using proportions.</span>
@@ -3519,7 +3519,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.train_test_split.html#ray.data.Dataset.train_test_split">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">SMD_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">train_test_split</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">train_test_split</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">test_size</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3584,7 +3584,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.union">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.union.html#ray.data.Dataset.union">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">SMD_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">union</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">other</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Dataset&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">union</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">other</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Dataset&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Concatenate :class:`Datasets &lt;ray.data.Dataset&gt;` across rows.</span>
 
 <span class="sd">        The order of the blocks in the datasets is preserved, as is the</span>
@@ -3634,7 +3634,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.groupby.html#ray.data.Dataset.groupby">[docs]</a>
     <span class="nd">@AllToAllAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">GGA_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">groupby</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">groupby</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
         <span class="n">num_partitions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3680,7 +3680,7 @@ document.write(`
 <span class="sd">            :meth:`~ray.data.grouped_data.GroupedData.map_groups`</span>
 <span class="sd">                Call this method to transform groups of data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.data.grouped_data</span> <span class="kn">import</span> <span class="n">GroupedData</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.grouped_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">GroupedData</span>
 
         <span class="c1"># Always allow None since groupby interprets that as grouping all</span>
         <span class="c1"># records into a single global group.</span>
@@ -3700,7 +3700,7 @@ document.write(`
     <span class="nd">@AllToAllAPI</span>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">GGA_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">unique</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unique</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;List the unique elements in a given column.</span>
 
 <span class="sd">        Examples:</span>
@@ -3747,7 +3747,7 @@ document.write(`
     <span class="nd">@AllToAllAPI</span>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">GGA_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">aggregate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">aggs</span><span class="p">:</span> <span class="n">AggregateFn</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">aggregate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">aggs</span><span class="p">:</span> <span class="n">AggregateFn</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Aggregate values using one or more functions.</span>
 
 <span class="sd">        Use this method to compute metrics like the product of a column.</span>
@@ -3791,7 +3791,7 @@ document.write(`
     <span class="nd">@AllToAllAPI</span>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">GGA_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">sum</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the sum of one or more columns.</span>
@@ -3838,7 +3838,7 @@ document.write(`
     <span class="nd">@AllToAllAPI</span>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">GGA_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">min</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the minimum of one or more columns.</span>
@@ -3885,7 +3885,7 @@ document.write(`
     <span class="nd">@AllToAllAPI</span>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">GGA_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the maximum of one or more columns.</span>
@@ -3932,7 +3932,7 @@ document.write(`
     <span class="nd">@AllToAllAPI</span>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">GGA_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mean</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the mean of one or more columns.</span>
@@ -3979,7 +3979,7 @@ document.write(`
     <span class="nd">@AllToAllAPI</span>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">GGA_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">std</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">std</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ddof</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -4039,7 +4039,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.sort.html#ray.data.Dataset.sort">[docs]</a>
     <span class="nd">@AllToAllAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">SSR_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">sort</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sort</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">key</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
         <span class="n">descending</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -4113,7 +4113,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.zip">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.zip.html#ray.data.Dataset.zip">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">SMD_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Zip the columns of this dataset with the columns of another.</span>
 
 <span class="sd">        The datasets must have the same number of rows. Their column sets are</span>
@@ -4152,7 +4152,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.limit">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.limit.html#ray.data.Dataset.limit">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">BT_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Truncate the dataset to the first ``limit`` rows.</span>
 
 <span class="sd">        Unlike :meth:`~Dataset.take`, this method doesn&#39;t move data to the caller&#39;s</span>
@@ -4183,7 +4183,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.take_batch.html#ray.data.Dataset.take_batch">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">CD_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">take_batch</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">take_batch</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">batch_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataBatch</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return up to ``batch_size`` rows from the :class:`Dataset` in a batch.</span>
@@ -4246,7 +4246,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.take.html#ray.data.Dataset.take">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">CD_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">take</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">take</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return up to ``limit`` rows from the :class:`Dataset`.</span>
 
 <span class="sd">        This method is useful for inspecting data.</span>
@@ -4300,7 +4300,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.take_all.html#ray.data.Dataset.take_all">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">CD_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">take_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">take_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all of the rows in this :class:`Dataset`.</span>
 
 <span class="sd">        This method is useful for inspecting small datasets.</span>
@@ -4345,7 +4345,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.show.html#ray.data.Dataset.show">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">CD_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Print up to the given number of rows from the :class:`Dataset`.</span>
 
 <span class="sd">        This method is useful for inspecting data.</span>
@@ -4381,7 +4381,7 @@ document.write(`
         <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Examples:&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IM_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Count the number of rows in the dataset.</span>
 
 <span class="sd">        For Datasets which only read Parquet files (created with</span>
@@ -4432,7 +4432,7 @@ document.write(`
         <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Time complexity:&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IM_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fetch_if_missing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Schema&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fetch_if_missing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Schema&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the schema of the dataset.</span>
 
 <span class="sd">        Examples:</span>
@@ -4482,7 +4482,7 @@ document.write(`
         <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Time complexity:&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IM_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fetch_if_missing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fetch_if_missing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the columns of this Dataset.</span>
 
 <span class="sd">        Time complexity: O(1)</span>
@@ -4513,7 +4513,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.num_blocks">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.num_blocks.html#ray.data.Dataset.num_blocks">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IM_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">num_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the number of blocks of this :class:`Dataset`.</span>
 
 <span class="sd">        This method is only implemented for :class:`~ray.data.MaterializedDataset`,</span>
@@ -4536,7 +4536,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.size_bytes.html#ray.data.Dataset.size_bytes">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IM_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">size_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the in-memory size of the dataset.</span>
 
 <span class="sd">        Examples:</span>
@@ -4563,7 +4563,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.input_files.html#ray.data.Dataset.input_files">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IM_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">input_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">input_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the list of input files for the dataset.</span>
 
 <span class="sd">        Examples:</span>
@@ -4583,7 +4583,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.write_parquet.html#ray.data.Dataset.write_parquet">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IOC_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">write_parquet</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_parquet</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -4706,7 +4706,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.write_json.html#ray.data.Dataset.write_json">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IOC_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">write_json</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_json</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -4829,7 +4829,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.write_iceberg.html#ray.data.Dataset.write_iceberg">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="n">api_group</span><span class="o">=</span><span class="n">IOC_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">write_iceberg</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_iceberg</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">table_identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">catalog_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4887,7 +4887,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.write_images.html#ray.data.Dataset.write_images">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="n">api_group</span><span class="o">=</span><span class="n">IOC_API_GROUP</span><span class="p">)</span>
     <span class="nd">@ConsumptionAPI</span>
-    <span class="k">def</span> <span class="nf">write_images</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_images</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -4962,7 +4962,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.write_csv.html#ray.data.Dataset.write_csv">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IOC_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">write_csv</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_csv</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -5083,7 +5083,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.write_tfrecords.html#ray.data.Dataset.write_tfrecords">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IOC_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">write_tfrecords</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_tfrecords</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -5189,7 +5189,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.write_webdataset.html#ray.data.Dataset.write_webdataset">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="n">api_group</span><span class="o">=</span><span class="n">IOC_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">write_webdataset</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_webdataset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -5284,7 +5284,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.write_numpy.html#ray.data.Dataset.write_numpy">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IOC_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">write_numpy</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_numpy</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -5381,7 +5381,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.write_sql">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.write_sql.html#ray.data.Dataset.write_sql">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
-    <span class="k">def</span> <span class="nf">write_sql</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_sql</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">connection_factory</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Connection</span><span class="p">],</span>
@@ -5453,7 +5453,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.write_mongo.html#ray.data.Dataset.write_mongo">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="n">api_group</span><span class="o">=</span><span class="n">IOC_API_GROUP</span><span class="p">)</span>
     <span class="nd">@ConsumptionAPI</span>
-    <span class="k">def</span> <span class="nf">write_mongo</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_mongo</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">database</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -5530,7 +5530,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.write_bigquery">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.write_bigquery.html#ray.data.Dataset.write_bigquery">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
-    <span class="k">def</span> <span class="nf">write_bigquery</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_bigquery</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -5607,7 +5607,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.write_lance">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.write_lance.html#ray.data.Dataset.write_lance">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
-    <span class="k">def</span> <span class="nf">write_lance</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_lance</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -5660,7 +5660,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.write_datasink">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.write_datasink.html#ray.data.Dataset.write_datasink">[docs]</a>
     <span class="nd">@ConsumptionAPI</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Time complexity:&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">write_datasink</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_datasink</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">datasink</span><span class="p">:</span> <span class="n">Datasink</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -5732,7 +5732,7 @@ document.write(`
         <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Returns:&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">CD_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataIterator</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataIterator</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a :class:`~ray.data.DataIterator` over this dataset.</span>
 
 <span class="sd">        Don&#39;t call this method directly. Use it internally.</span>
@@ -5747,7 +5747,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.iter_rows.html#ray.data.Dataset.iter_rows">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">CD_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">iter_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iter_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an iterable over the rows in this dataset.</span>
 
 <span class="sd">        Examples:</span>
@@ -5770,7 +5770,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.iter_batches.html#ray.data.Dataset.iter_batches">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">CD_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">iter_batches</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iter_batches</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">prefetch_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -5844,7 +5844,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.iter_torch_batches.html#ray.data.Dataset.iter_torch_batches">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">CD_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">iter_torch_batches</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iter_torch_batches</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">prefetch_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -5954,7 +5954,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.iter_tf_batches.html#ray.data.Dataset.iter_tf_batches">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@Deprecated</span>
-    <span class="k">def</span> <span class="nf">iter_tf_batches</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iter_tf_batches</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">prefetch_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -6045,7 +6045,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.to_torch.html#ray.data.Dataset.to_torch">[docs]</a>
     <span class="nd">@ConsumptionAPI</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Time complexity:&quot;</span><span class="p">)</span>
     <span class="nd">@Deprecated</span>
-    <span class="k">def</span> <span class="nf">to_torch</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_torch</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">label_column</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -6179,7 +6179,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.to_tf.html#ray.data.Dataset.to_tf">[docs]</a>
     <span class="nd">@ConsumptionAPI</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IOC_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">to_tf</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_tf</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">feature_columns</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
         <span class="n">label_columns</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
@@ -6348,7 +6348,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.to_dask.html#ray.data.Dataset.to_dask">[docs]</a>
     <span class="nd">@ConsumptionAPI</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Time complexity:&quot;</span><span class="p">)</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IOC_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">to_dask</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dask</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">meta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
             <span class="s2">&quot;pandas.DataFrame&quot;</span><span class="p">,</span>
@@ -6389,23 +6389,23 @@ document.write(`
 <span class="sd">        .. _pandas DataFrame: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html</span>
 <span class="sd">        .. _Series: https://pandas.pydata.org/docs/reference/api/pandas.Series.html</span>
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
-        <span class="kn">import</span> <span class="nn">dask</span>
-        <span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
-        <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">dask.dataframe</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dd</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">pa</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="kn">from</span> <span class="nn">ray.data._internal.pandas_block</span> <span class="kn">import</span> <span class="n">PandasBlockSchema</span>
-        <span class="kn">from</span> <span class="nn">ray.util.client.common</span> <span class="kn">import</span> <span class="n">ClientObjectRef</span>
-        <span class="kn">from</span> <span class="nn">ray.util.dask</span> <span class="kn">import</span> <span class="n">ray_dask_get</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.pandas_block</span><span class="w"> </span><span class="kn">import</span> <span class="n">PandasBlockSchema</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.client.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClientObjectRef</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.dask</span><span class="w"> </span><span class="kn">import</span> <span class="n">ray_dask_get</span>
 
         <span class="n">dask</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scheduler</span><span class="o">=</span><span class="n">ray_dask_get</span><span class="p">)</span>
 
         <span class="nd">@dask</span><span class="o">.</span><span class="n">delayed</span>
-        <span class="k">def</span> <span class="nf">block_to_df</span><span class="p">(</span><span class="n">block_ref</span><span class="p">:</span> <span class="n">ObjectRef</span><span class="p">[</span><span class="n">Block</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">block_to_df</span><span class="p">(</span><span class="n">block_ref</span><span class="p">:</span> <span class="n">ObjectRef</span><span class="p">[</span><span class="n">Block</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">block_ref</span><span class="p">,</span> <span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">,</span> <span class="n">ClientObjectRef</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;Dataset.to_dask() must be used with Dask-on-Ray, please &quot;</span>
@@ -6415,7 +6415,7 @@ document.write(`
             <span class="k">return</span> <span class="n">_block_to_df</span><span class="p">(</span><span class="n">block_ref</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">meta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.data.extensions</span> <span class="kn">import</span> <span class="n">TensorDtype</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorDtype</span>
 
             <span class="c1"># Infer Dask metadata from Dataset schema.</span>
             <span class="n">schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span><span class="n">fetch_if_missing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -6470,7 +6470,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.to_mars.html#ray.data.Dataset.to_mars">[docs]</a>
     <span class="nd">@ConsumptionAPI</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Time complexity:&quot;</span><span class="p">)</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IOC_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">to_mars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;mars.dataframe.DataFrame&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_mars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;mars.dataframe.DataFrame&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert this :class:`~ray.data.Dataset` into a</span>
 <span class="sd">        `Mars DataFrame &lt;https://mars-project.readthedocs.io/en/latest/reference/dataframe/index.html&gt;`_.</span>
 
@@ -6479,12 +6479,12 @@ document.write(`
 <span class="sd">        Returns:</span>
 <span class="sd">            A `Mars DataFrame`_ created from this dataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
-        <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-        <span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
-        <span class="kn">from</span> <span class="nn">mars.dataframe.datasource.read_raydataset</span> <span class="kn">import</span> <span class="n">DataFrameReadRayDataset</span>
-        <span class="kn">from</span> <span class="nn">mars.dataframe.utils</span> <span class="kn">import</span> <span class="n">parse_index</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mars.dataframe.datasource.read_raydataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameReadRayDataset</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mars.dataframe.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_index</span>
 
-        <span class="kn">from</span> <span class="nn">ray.data._internal.pandas_block</span> <span class="kn">import</span> <span class="n">PandasBlockSchema</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.pandas_block</span><span class="w"> </span><span class="kn">import</span> <span class="n">PandasBlockSchema</span>
 
         <span class="n">refs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_pandas_refs</span><span class="p">()</span>
         <span class="c1"># remove this when https://github.com/mars-project/mars/issues/2945 got fixed</span>
@@ -6507,7 +6507,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.to_modin.html#ray.data.Dataset.to_modin">[docs]</a>
     <span class="nd">@ConsumptionAPI</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Time complexity:&quot;</span><span class="p">)</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IOC_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">to_modin</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;modin.pandas.dataframe.DataFrame&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_modin</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;modin.pandas.dataframe.DataFrame&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert this :class:`~ray.data.Dataset` into a</span>
 <span class="sd">        `Modin DataFrame &lt;https://modin.readthedocs.io/en/stable/flow/modin/pandas/dataframe.html&gt;`_.</span>
 
@@ -6528,7 +6528,7 @@ document.write(`
 <span class="sd">            A `Modin DataFrame`_ created from this dataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
-        <span class="kn">from</span> <span class="nn">modin.distributed.dataframe.pandas.partitions</span> <span class="kn">import</span> <span class="n">from_partitions</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">modin.distributed.dataframe.pandas.partitions</span><span class="w"> </span><span class="kn">import</span> <span class="n">from_partitions</span>
 
         <span class="n">pd_objs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_pandas_refs</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">from_partitions</span><span class="p">(</span><span class="n">pd_objs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
@@ -6538,7 +6538,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.to_spark.html#ray.data.Dataset.to_spark">[docs]</a>
     <span class="nd">@ConsumptionAPI</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Time complexity:&quot;</span><span class="p">)</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IOC_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">to_spark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spark</span><span class="p">:</span> <span class="s2">&quot;pyspark.sql.SparkSession&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pyspark.sql.DataFrame&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_spark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spark</span><span class="p">:</span> <span class="s2">&quot;pyspark.sql.SparkSession&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pyspark.sql.DataFrame&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert this :class:`~ray.data.Dataset` into a</span>
 <span class="sd">        `Spark DataFrame &lt;https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.html&gt;`_.</span>
 
@@ -6552,7 +6552,7 @@ document.write(`
 
 <span class="sd">        .. _SparkSession: https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.SparkSession.html</span>
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
-        <span class="kn">import</span> <span class="nn">raydp</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">raydp</span>
 
         <span class="n">schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">Schema</span><span class="p">):</span>
@@ -6567,7 +6567,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.to_pandas.html#ray.data.Dataset.to_pandas">[docs]</a>
     <span class="nd">@ConsumptionAPI</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Time complexity:&quot;</span><span class="p">)</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IOC_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pandas.DataFrame&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pandas.DataFrame&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert this :class:`~ray.data.Dataset` to a single pandas DataFrame.</span>
 
 <span class="sd">        This method errors if the number of rows exceeds the provided ``limit``.</span>
@@ -6622,7 +6622,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.to_pandas_refs.html#ray.data.Dataset.to_pandas_refs">[docs]</a>
     <span class="nd">@ConsumptionAPI</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Time complexity:&quot;</span><span class="p">)</span>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">to_pandas_refs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">[</span><span class="s2">&quot;pandas.DataFrame&quot;</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_pandas_refs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">[</span><span class="s2">&quot;pandas.DataFrame&quot;</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts this :class:`~ray.data.Dataset` into a distributed set of Pandas</span>
 <span class="sd">        dataframes.</span>
 
@@ -6656,7 +6656,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.to_numpy_refs">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.to_numpy_refs.html#ray.data.Dataset.to_numpy_refs">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">to_numpy_refs</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_numpy_refs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts this :class:`~ray.data.Dataset` into a distributed set of NumPy</span>
@@ -6696,7 +6696,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.to_arrow_refs.html#ray.data.Dataset.to_arrow_refs">[docs]</a>
     <span class="nd">@ConsumptionAPI</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Time complexity:&quot;</span><span class="p">)</span>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">to_arrow_refs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">[</span><span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_arrow_refs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">[</span><span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert this :class:`~ray.data.Dataset` into a distributed set of PyArrow</span>
 <span class="sd">        tables.</span>
 
@@ -6718,7 +6718,7 @@ document.write(`
 <span class="sd">        Returns:</span>
 <span class="sd">            A list of remote PyArrow tables created from this dataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
 
         <span class="n">ref_bundles</span><span class="p">:</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">RefBundle</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_internal_ref_bundles</span><span class="p">()</span>
         <span class="n">block_refs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span>
@@ -6738,7 +6738,7 @@ document.write(`
 
 
     <span class="nd">@ConsumptionAPI</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Args:&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">to_random_access_dataset</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_random_access_dataset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -6771,7 +6771,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.materialize.html#ray.data.Dataset.materialize">[docs]</a>
     <span class="nd">@ConsumptionAPI</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;store memory.&quot;</span><span class="p">,</span> <span class="n">insert_after</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">E_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">materialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MaterializedDataset&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">materialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MaterializedDataset&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute and materialize this dataset into object store memory.</span>
 
 <span class="sd">        This can be used to read all blocks into memory. By default, Dataset</span>
@@ -6823,7 +6823,7 @@ document.write(`
 <div class="viewcode-block" id="Dataset.stats">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.stats.html#ray.data.Dataset.stats">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">api_group</span><span class="o">=</span><span class="n">IM_API_GROUP</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a string containing execution timing information.</span>
 
 <span class="sd">        Note that this does not trigger execution, so if the dataset has not yet</span>
@@ -6860,14 +6860,14 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_stats_summary</span><span class="p">()</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_get_stats_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DatasetStatsSummary</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_stats_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DatasetStatsSummary</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plan</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span><span class="o">.</span><span class="n">to_summary</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Dataset.iter_internal_ref_bundles">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.Dataset.iter_internal_ref_bundles.html#ray.data.Dataset.iter_internal_ref_bundles">[docs]</a>
     <span class="nd">@ConsumptionAPI</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Examples:&quot;</span><span class="p">)</span>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">iter_internal_ref_bundles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">RefBundle</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iter_internal_ref_bundles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">RefBundle</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an iterator over ``RefBundles``</span>
 <span class="sd">        belonging to this Dataset. Calling this function doesn&#39;t keep</span>
 <span class="sd">        the data materialized in-memory.</span>
@@ -6890,7 +6890,7 @@ document.write(`
 
     <span class="nd">@Deprecated</span>
     <span class="nd">@ConsumptionAPI</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;Examples:&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_internal_block_refs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">[</span><span class="n">Block</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_internal_block_refs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ObjectRef</span><span class="p">[</span><span class="n">Block</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a list of references to the underlying blocks of this dataset.</span>
 
 <span class="sd">        This function can be used for zero-copy access to the data. It blocks</span>
@@ -6914,7 +6914,7 @@ document.write(`
         <span class="k">return</span> <span class="n">block_refs</span>
 
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">has_serializable_lineage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_serializable_lineage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether this dataset&#39;s lineage is able to be serialized for storage and</span>
 <span class="sd">        later deserialized, possibly on a different cluster.</span>
 
@@ -6937,7 +6937,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">serialize_lineage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">serialize_lineage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Serialize this dataset&#39;s lineage, not the actual data or the existing data</span>
 <span class="sd">        futures, to bytes that can be stored and later deserialized, possibly on a</span>
@@ -7005,7 +7005,7 @@ document.write(`
         <span class="n">ds</span><span class="o">.</span><span class="n">_plan</span><span class="o">.</span><span class="n">clear_snapshot</span><span class="p">()</span>
         <span class="n">ds</span><span class="o">.</span><span class="n">_set_uuid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_uuid</span><span class="p">())</span>
 
-        <span class="k">def</span> <span class="nf">_reduce_remote_fn</span><span class="p">(</span><span class="n">rf</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">remote_function</span><span class="o">.</span><span class="n">RemoteFunction</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_remote_fn</span><span class="p">(</span><span class="n">rf</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">remote_function</span><span class="o">.</span><span class="n">RemoteFunction</span><span class="p">):</span>
             <span class="c1"># Custom reducer for Ray remote function handles that allows for</span>
             <span class="c1"># cross-cluster serialization.</span>
             <span class="c1"># This manually unsets the last export session and job to force re-exporting</span>
@@ -7028,7 +7028,7 @@ document.write(`
 
     <span class="nd">@staticmethod</span>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">deserialize_lineage</span><span class="p">(</span><span class="n">serialized_ds</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">deserialize_lineage</span><span class="p">(</span><span class="n">serialized_ds</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deserialize the provided lineage-serialized Dataset.</span>
 
@@ -7069,11 +7069,11 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataContext</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataContext</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the DataContext used to create this Dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plan</span><span class="o">.</span><span class="n">_context</span>
 
-    <span class="k">def</span> <span class="nf">_aggregate_on</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_aggregate_on</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">agg_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper for aggregating on a particular subset of the dataset.</span>
@@ -7086,7 +7086,7 @@ document.write(`
         <span class="n">aggs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_multicolumn_aggs</span><span class="p">(</span><span class="n">agg_cls</span><span class="p">,</span> <span class="n">on</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="o">*</span><span class="n">aggs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_build_multicolumn_aggs</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_multicolumn_aggs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">agg_cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
         <span class="n">on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span>
@@ -7114,7 +7114,7 @@ document.write(`
 
         <span class="k">return</span> <span class="p">[</span><span class="n">agg_cls</span><span class="p">(</span><span class="n">on_</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">on_</span> <span class="ow">in</span> <span class="n">on</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_aggregate_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">U</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_aggregate_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">U</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -7127,7 +7127,7 @@ document.write(`
             <span class="k">return</span> <span class="n">result</span>
 
     <span class="nd">@repr_with_fallback</span><span class="p">([</span><span class="s2">&quot;ipywidgets&quot;</span><span class="p">,</span> <span class="s2">&quot;8&quot;</span><span class="p">])</span>
-    <span class="k">def</span> <span class="nf">_repr_mimebundle_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_repr_mimebundle_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a mimebundle with an ipywidget repr and a simple text repr.</span>
 
 <span class="sd">        Depending on the frontend where the data is being displayed,</span>
@@ -7140,7 +7140,7 @@ document.write(`
 <span class="sd">        Returns:</span>
 <span class="sd">            A mimebundle containing an ipywidget repr and a simple text repr.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">ipywidgets</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span>
 
         <span class="n">title</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;h2&gt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&lt;/h2&gt;&quot;</span><span class="p">)</span>
         <span class="n">tab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tab_repr_</span><span class="p">()</span>
@@ -7156,8 +7156,8 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">bundle</span>
 
-    <span class="k">def</span> <span class="nf">_tab_repr_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">Tab</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_tab_repr_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">Tab</span>
 
         <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;num_blocks&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plan</span><span class="o">.</span><span class="n">initial_num_blocks</span><span class="p">(),</span>
@@ -7205,31 +7205,31 @@ document.write(`
         <span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="n">schema_repr</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">Tab</span><span class="p">(</span><span class="n">children</span><span class="p">,</span> <span class="n">titles</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Metadata&quot;</span><span class="p">,</span> <span class="s2">&quot;Schema&quot;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plan</span><span class="o">.</span><span class="n">get_plan_as_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="c1"># Prevents `__len__` from being called to check if it is None</span>
         <span class="c1"># see: issue #25152</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
             <span class="s2">&quot;Use `ds.count()` to compute the length of a distributed Dataset. &quot;</span>
             <span class="s2">&quot;This may be an expensive operation.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="s2">&quot;`Dataset` objects aren&#39;t iterable. To iterate records, call &quot;</span>
             <span class="s2">&quot;`ds.iter_rows()` or `ds.iter_batches()`. For more information, read &quot;</span>
             <span class="s2">&quot;https://docs.ray.io/en/latest/data/iterating-over-data.html.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_block_num_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_block_num_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
         <span class="n">get_num_rows</span> <span class="o">=</span> <span class="n">cached_remote_fn</span><span class="p">(</span><span class="n">_get_num_rows</span><span class="p">)</span>
         <span class="n">num_rows</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">ref_bundle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_internal_ref_bundles</span><span class="p">():</span>
@@ -7237,18 +7237,18 @@ document.write(`
                 <span class="n">num_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_num_rows</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">block_ref</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">num_rows</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_meta_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_meta_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plan</span><span class="o">.</span><span class="n">meta_count</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_get_uuid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_uuid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_uuid</span>
 
-    <span class="k">def</span> <span class="nf">_set_uuid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_uuid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_uuid</span> <span class="o">=</span> <span class="n">uuid</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_plan</span><span class="o">.</span><span class="n">_dataset_uuid</span> <span class="o">=</span> <span class="n">uuid</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_plan</span><span class="o">.</span><span class="n">_in_stats</span><span class="o">.</span><span class="n">dataset_uuid</span> <span class="o">=</span> <span class="n">uuid</span>
 
-    <span class="k">def</span> <span class="nf">_synchronize_progress_bar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_synchronize_progress_bar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Flush progress bar output by shutting down the current executor.</span>
 
 <span class="sd">        This should be called at the end of all blocking APIs (e.g., `take`), but not</span>
@@ -7263,7 +7263,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_current_executor</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_current_executor</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Note: excludes _current_executor which is not serializable.</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;plan&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plan</span><span class="p">,</span>
@@ -7271,13 +7271,13 @@ document.write(`
             <span class="s2">&quot;logical_plan&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logical_plan</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_plan</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;plan&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_uuid</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logical_plan</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;logical_plan&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_current_executor</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_executor</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -7293,7 +7293,7 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">MaterializedDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MaterializedDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A Dataset materialized in Ray memory, e.g., via `.materialize()`.</span>
 
 <span class="sd">    The blocks of a MaterializedDataset object are materialized into Ray object store</span>
@@ -7301,7 +7301,7 @@ document.write(`
 <span class="sd">    tasks without re-executing the underlying computations for producing the stream.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">num_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the number of blocks of this :class:`MaterializedDataset`.</span>
 
 <span class="sd">        Examples:</span>
@@ -7321,14 +7321,14 @@ document.write(`
 <div class="viewcode-block" id="Schema">
 <a class="viewcode-back" href="../../../data/api/dataset.html#ray.data.Schema">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Schema</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Schema</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset schema.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        base_schema: The underlying Arrow or Pandas schema.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">base_schema</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;pyarrow.lib.Schema&quot;</span><span class="p">,</span> <span class="s2">&quot;PandasBlockSchema&quot;</span><span class="p">],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -7341,19 +7341,19 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_context</span> <span class="o">=</span> <span class="n">data_context</span> <span class="ow">or</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">DataContext</span><span class="o">.</span><span class="n">get_current</span><span class="p">())</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Lists the columns of this Dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_schema</span><span class="o">.</span><span class="n">names</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span> <span class="s2">&quot;pyarrow.lib.DataType&quot;</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="nb">object</span><span class="p">],</span> <span class="s2">&quot;pyarrow.lib.DataType&quot;</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Lists the types of this Dataset in Arrow format</span>
 
 <span class="sd">        For non-Arrow compatible types, we return &quot;object&quot;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">pyarrow</span> <span class="k">as</span> <span class="nn">pa</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span>
 
-        <span class="kn">from</span> <span class="nn">ray.data.extensions</span> <span class="kn">import</span> <span class="n">ArrowTensorType</span><span class="p">,</span> <span class="n">TensorDtype</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrowTensorType</span><span class="p">,</span> <span class="n">TensorDtype</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_schema</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">Schema</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_schema</span><span class="o">.</span><span class="n">types</span><span class="p">)</span>
@@ -7383,14 +7383,14 @@ document.write(`
                     <span class="n">arrow_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">arrow_types</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Schema</span><span class="p">)</span>
             <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">types</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">types</span>
             <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">names</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">column_width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;Column&quot;</span><span class="p">)])</span>
         <span class="n">padding</span> <span class="o">=</span> <span class="mi">2</span>
 
@@ -7412,17 +7412,17 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_block_to_df</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pandas.DataFrame&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_block_to_df</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pandas.DataFrame&quot;</span><span class="p">:</span>
     <span class="n">block</span> <span class="o">=</span> <span class="n">BlockAccessor</span><span class="o">.</span><span class="n">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">block</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_block_to_ndarray</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_block_to_ndarray</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
     <span class="n">block</span> <span class="o">=</span> <span class="n">BlockAccessor</span><span class="o">.</span><span class="n">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">block</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_block_to_arrow</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_block_to_arrow</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">):</span>
     <span class="n">block</span> <span class="o">=</span> <span class="n">BlockAccessor</span><span class="o">.</span><span class="n">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">block</span><span class="o">.</span><span class="n">to_arrow</span><span class="p">()</span>
 </pre></div>

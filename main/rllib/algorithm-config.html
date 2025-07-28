@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1411,7 +1411,7 @@ the auto-validated and type-safe gateway into configuring and building an RLlib
 and then call some of its methods to set various configuration options. RLlib uses the following, <a class="reference external" href="https://github.com/psf/black">black</a> compliant format
 in all parts of its code.</p>
 <p>Note that you can chain together more than one method call, including the constructor:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="c1"># Create an `AlgorithmConfig` instance.</span>
@@ -1446,7 +1446,7 @@ method.</p>
 subclass that matches the <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>
 you would like to run your learning experiments with. For example, if you would like to
 use <a class="reference internal" href="rllib-algorithms.html#impala"><span class="std std-ref">IMPALA</span></a> as your algorithm, you should import its specific config class:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.impala</span> <span class="kn">import</span> <span class="n">IMPALAConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.impala</span><span class="w"> </span><span class="kn">import</span> <span class="n">IMPALAConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
     <span class="c1"># Create an `IMPALAConfig` instance.</span>
@@ -1483,7 +1483,7 @@ build another algorithm instance without affecting the previously built one:</p>
 <p>If you are working with <a class="reference external" href="https://docs.ray.io/en/latest/tune/index.html">Ray Tune</a>,
 pass your <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig" title="ray.rllib.algorithms.algorithm_config.AlgorithmConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AlgorithmConfig</span></code></a>
 instance into the constructor of the <a class="reference internal" href="../tune/api/doc/ray.tune.Tuner.html#ray.tune.Tuner" title="ray.tune.tuner.Tuner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tuner</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 <span class="n">tuner</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
     <span class="s2">&quot;IMPALA&quot;</span><span class="p">,</span>

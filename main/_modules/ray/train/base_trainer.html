@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1392,45 +1392,45 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.train.base_trainer</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">abc</span>
-<span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">pyarrow.fs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray.cloudpickle</span> <span class="k">as</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">ray._private.dict</span> <span class="kn">import</span> <span class="n">deep_update</span>
-<span class="kn">from</span> <span class="nn">ray.air._internal</span> <span class="kn">import</span> <span class="n">usage</span> <span class="k">as</span> <span class="n">air_usage</span>
-<span class="kn">from</span> <span class="nn">ray.air._internal.config</span> <span class="kn">import</span> <span class="n">ensure_only_allowed_dataclass_keys_updated</span>
-<span class="kn">from</span> <span class="nn">ray.air._internal.usage</span> <span class="kn">import</span> <span class="n">AirEntrypoint</span>
-<span class="kn">from</span> <span class="nn">ray.air.config</span> <span class="kn">import</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">ScalingConfig</span>
-<span class="kn">from</span> <span class="nn">ray.air.result</span> <span class="kn">import</span> <span class="n">Result</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.session</span> <span class="kn">import</span> <span class="n">get_session</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.storage</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.cloudpickle</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.dict</span><span class="w"> </span><span class="kn">import</span> <span class="n">deep_update</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal</span><span class="w"> </span><span class="kn">import</span> <span class="n">usage</span> <span class="k">as</span> <span class="n">air_usage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_only_allowed_dataclass_keys_updated</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.usage</span><span class="w"> </span><span class="kn">import</span> <span class="n">AirEntrypoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">ScalingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.result</span><span class="w"> </span><span class="kn">import</span> <span class="n">Result</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_session</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.storage</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">StorageContext</span><span class="p">,</span>
     <span class="n">_exists_at_fs_path</span><span class="p">,</span>
     <span class="n">get_fs_and_path</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.train.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_v2_migration_warnings_enabled</span><span class="p">,</span>
     <span class="n">V2_MIGRATION_GUIDE_MESSAGE</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.train.context</span> <span class="kn">import</span> <span class="n">_GET_METADATA_DEPRECATION_MESSAGE</span>
-<span class="kn">from</span> <span class="nn">ray.train.utils</span> <span class="kn">import</span> <span class="n">_log_deprecation_warning</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">_GET_METADATA_DEPRECATION_MESSAGE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_log_deprecation_warning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
-    <span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">Trainable</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trainable</span>
 
 <span class="n">_TRAINER_PKL</span> <span class="o">=</span> <span class="s2">&quot;trainer.pkl&quot;</span>
 
@@ -1464,7 +1464,7 @@ document.write(`
 <div class="viewcode-block" id="TrainingFailedError">
 <a class="viewcode-back" href="../../../train/api/doc/ray.train.base_trainer.TrainingFailedError.html#ray.train.tensorflow.tensorflow_trainer.TrainingFailedError">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TrainingFailedError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrainingFailedError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An error indicating that training has failed.&quot;&quot;&quot;</span>
 
     <span class="n">_RESTORE_MSG</span> <span class="o">=</span> <span class="p">(</span>
@@ -1485,7 +1485,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_train_coordinator_fn</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_train_coordinator_fn</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">trainer_cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;BaseTrainer&quot;</span><span class="p">],</span> <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This is the function that defines the logic of the Ray Train coordinator.</span>
@@ -1522,7 +1522,7 @@ document.write(`
 <div class="viewcode-block" id="BaseTrainer">
 <a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.html#ray.train.tensorflow.tensorflow_trainer.BaseTrainer">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">BaseTrainer</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseTrainer</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines interface for distributed training on Ray.</span>
 
 <span class="sd">    Note: The base ``BaseTrainer`` class cannot be instantiated directly. Only</span>
@@ -1632,7 +1632,7 @@ document.write(`
     <span class="c1"># See `BaseTrainer._extract_fields_for_tuner_param_space` for more details.</span>
     <span class="n">_fields_for_tuner_param_space</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">scaling_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ScalingConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1669,7 +1669,7 @@ document.write(`
 <a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.restore.html#ray.train.tensorflow.tensorflow_trainer.BaseTrainer.restore">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">_TRAINER_RESTORE_DEPRECATION_WARNING</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;BaseTrainer&quot;</span><span class="p">],</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
         <span class="n">storage_filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1821,7 +1821,7 @@ document.write(`
                 <span class="s2">&quot;Trainer restoration failed (see above for the stack trace). &quot;</span>
                 <span class="s2">&quot;Make sure that you use the right trainer class to restore: &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.restore`</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="n">trainer</span><span class="o">.</span><span class="n">_restore_path</span> <span class="o">=</span> <span class="n">path</span>
         <span class="n">trainer</span><span class="o">.</span><span class="n">_restore_storage_filesystem</span> <span class="o">=</span> <span class="n">storage_filesystem</span>
         <span class="k">return</span> <span class="n">trainer</span></div>
@@ -1834,7 +1834,7 @@ document.write(`
         <span class="n">message</span><span class="o">=</span><span class="n">_TRAINER_RESTORE_DEPRECATION_WARNING</span><span class="p">,</span>
         <span class="n">warning</span><span class="o">=</span><span class="n">_v2_migration_warnings_enabled</span><span class="p">(),</span>
     <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">can_restore</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_restore</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;BaseTrainer&quot;</span><span class="p">],</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
         <span class="n">storage_filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1857,7 +1857,7 @@ document.write(`
         <span class="k">return</span> <span class="n">_exists_at_fs_path</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">trainer_pkl_path</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># A dictionary that maps parameters to their default values.</span>
         <span class="n">default_values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;scaling_config&quot;</span><span class="p">:</span> <span class="n">ScalingConfig</span><span class="p">(),</span>
@@ -1877,7 +1877,7 @@ document.write(`
 
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Store the init args as attributes so this can be merged with Tune hparams.</span>
         <span class="n">trainer</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">BaseTrainer</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
         <span class="n">parameters</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
@@ -1888,7 +1888,7 @@ document.write(`
         <span class="n">trainer</span><span class="o">.</span><span class="n">_param_dict</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">arg_dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">trainer</span>
 
-    <span class="k">def</span> <span class="nf">_validate_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Called on __init()__ to validate trainer attributes.&quot;&quot;&quot;</span>
         <span class="c1"># Run config</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_config</span><span class="p">,</span> <span class="n">RunConfig</span><span class="p">):</span>
@@ -1942,7 +1942,7 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_v2_deprecation_warnings</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_log_v2_deprecation_warnings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_v2_deprecation_warnings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Logs deprecation warnings for v2 migration.</span>
 
 <span class="sd">        Log them here in the Ray Train case rather than in the configuration</span>
@@ -1953,7 +1953,7 @@ document.write(`
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_v2_migration_warnings_enabled</span><span class="p">():</span>
             <span class="k">return</span>
 
-        <span class="kn">from</span> <span class="nn">ray.train.v2._internal.migration_utils</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2._internal.migration_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">FAIL_FAST_DEPRECATION_MESSAGE</span><span class="p">,</span>
             <span class="n">TRAINER_RESOURCES_DEPRECATION_MESSAGE</span><span class="p">,</span>
             <span class="n">VERBOSE_DEPRECATION_MESSAGE</span><span class="p">,</span>
@@ -1993,7 +1993,7 @@ document.write(`
             <span class="n">_log_deprecation_warning</span><span class="p">(</span><span class="n">SYNC_CONFIG_DEPRECATION_MESSAGE</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_validate_scaling_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">scaling_config</span><span class="p">:</span> <span class="n">ScalingConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalingConfig</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_scaling_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">scaling_config</span><span class="p">:</span> <span class="n">ScalingConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalingConfig</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns scaling config dataclass after validating updated keys.&quot;&quot;&quot;</span>
         <span class="n">ensure_only_allowed_dataclass_keys_updated</span><span class="p">(</span>
             <span class="n">dataclass</span><span class="o">=</span><span class="n">scaling_config</span><span class="p">,</span>
@@ -2003,7 +2003,7 @@ document.write(`
 
 <div class="viewcode-block" id="BaseTrainer.setup">
 <a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.setup.html#ray.train.tensorflow.tensorflow_trainer.BaseTrainer.setup">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Called during fit() to perform initial setup on the Trainer.</span>
 
 <span class="sd">        .. note:: This method is run on a remote process.</span>
@@ -2019,7 +2019,7 @@ document.write(`
 
 <div class="viewcode-block" id="BaseTrainer.preprocess_datasets">
 <a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.preprocess_datasets.html#ray.train.tensorflow.tensorflow_trainer.BaseTrainer.preprocess_datasets">[docs]</a>
-    <span class="k">def</span> <span class="nf">preprocess_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">preprocess_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Deprecated.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span>
             <span class="s2">&quot;`preprocess_datasets` is no longer used, since preprocessors &quot;</span>
@@ -2030,7 +2030,7 @@ document.write(`
 <div class="viewcode-block" id="BaseTrainer.training_loop">
 <a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.training_loop.html#ray.train.tensorflow.tensorflow_trainer.BaseTrainer.training_loop">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">training_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">training_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Loop called by fit() to run training and report results to Tune.</span>
 
 <span class="sd">        .. note:: This method runs on a remote process.</span>
@@ -2062,7 +2062,7 @@ document.write(`
 <div class="viewcode-block" id="BaseTrainer.fit">
 <a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.fit.html#ray.train.tensorflow.tensorflow_trainer.BaseTrainer.fit">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs training.</span>
 
 <span class="sd">        Returns:</span>
@@ -2072,8 +2072,8 @@ document.write(`
 <span class="sd">            ray.train.base_trainer.TrainingFailedError: If any failures during the execution</span>
 <span class="sd">                of ``self.as_trainable()``, or during the Tune execution loop.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">ResumeConfig</span><span class="p">,</span> <span class="n">TuneError</span>
-        <span class="kn">from</span> <span class="nn">ray.tune.tuner</span> <span class="kn">import</span> <span class="n">Tuner</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResumeConfig</span><span class="p">,</span> <span class="n">TuneError</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.tuner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuner</span>
 
         <span class="n">trainable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_trainable</span><span class="p">()</span>
         <span class="n">param_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_fields_for_tuner_param_space</span><span class="p">()</span>
@@ -2125,7 +2125,7 @@ document.write(`
             <span class="n">parent_error</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">__cause__</span> <span class="ow">or</span> <span class="n">e</span>
 
             <span class="c1"># Raise it to the user as a `TrainingFailedError` with a message to restore.</span>
-            <span class="k">raise</span> <span class="n">TrainingFailedError</span><span class="p">(</span><span class="n">restore_msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">parent_error</span>
+            <span class="k">raise</span> <span class="n">TrainingFailedError</span><span class="p">(</span><span class="n">restore_msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">parent_error</span>
         <span class="c1"># Other exceptions get passed through directly (ex: on `fail_fast=&#39;raise&#39;`)</span>
 
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">result_grid</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
@@ -2135,11 +2135,11 @@ document.write(`
             <span class="c1"># or configure `FailureConfig` in a new run.</span>
             <span class="k">raise</span> <span class="n">TrainingFailedError</span><span class="p">(</span>
                 <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">restore_msg</span><span class="p">,</span> <span class="n">TrainingFailedError</span><span class="o">.</span><span class="n">_FAILURE_CONFIG_MSG</span><span class="p">])</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">result.error</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">result.error</span>
         <span class="k">return</span> <span class="n">result</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fs</span><span class="p">:</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">,</span> <span class="n">experiment_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fs</span><span class="p">:</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">,</span> <span class="n">experiment_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Saves the current trainer&#39;s class along with the `param_dict` of</span>
 <span class="sd">        parameters passed to this trainer&#39;s constructor.</span>
 
@@ -2158,7 +2158,7 @@ document.write(`
         <span class="n">param_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_dict</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">datasets</span> <span class="o">=</span> <span class="n">param_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;datasets&quot;</span><span class="p">,</span> <span class="p">{})</span>
 
-        <span class="k">def</span> <span class="nf">raise_fn</span><span class="p">():</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">raise_fn</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span>
 
         <span class="k">if</span> <span class="n">datasets</span><span class="p">:</span>
@@ -2172,7 +2172,7 @@ document.write(`
         <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open_output_stream</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">experiment_path</span><span class="p">,</span> <span class="n">_TRAINER_PKL</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">cls_and_param_dict</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">_extract_fields_for_tuner_param_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_extract_fields_for_tuner_param_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts fields to be included in `Tuner.param_space`.</span>
 
 <span class="sd">        This is needed to leverage the full logging/integration offerings from Tune.</span>
@@ -2189,15 +2189,15 @@ document.write(`
                 <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_param_dict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">result</span>
 
-    <span class="k">def</span> <span class="nf">_generate_trainable_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;Trainable&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_trainable_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;Trainable&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates the base Trainable class.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A Trainable class to use for training.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="kn">from</span> <span class="nn">ray.tune.execution.placement_groups</span> <span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
-        <span class="kn">from</span> <span class="nn">ray.tune.trainable</span> <span class="kn">import</span> <span class="n">wrap_function</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.placement_groups</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable</span><span class="w"> </span><span class="kn">import</span> <span class="n">wrap_function</span>
 
         <span class="n">trainer_cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
         <span class="n">scaling_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaling_config</span>
@@ -2214,29 +2214,29 @@ document.write(`
         <span class="n">trainable_cls</span> <span class="o">=</span> <span class="n">wrap_function</span><span class="p">(</span><span class="n">train_coordinator_fn</span><span class="p">)</span>
         <span class="n">has_base_dataset</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">has_base_dataset</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.data.context</span> <span class="kn">import</span> <span class="n">DataContext</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataContext</span>
 
             <span class="n">dataset_context</span> <span class="o">=</span> <span class="n">DataContext</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dataset_context</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">class</span> <span class="nc">TrainTrainable</span><span class="p">(</span><span class="n">trainable_cls</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">TrainTrainable</span><span class="p">(</span><span class="n">trainable_cls</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Adds default resources to the Trainable.&quot;&quot;&quot;</span>
 
             <span class="n">_handles_checkpoint_freq</span> <span class="o">=</span> <span class="n">trainer_cls</span><span class="o">.</span><span class="n">_handles_checkpoint_freq</span>
             <span class="n">_handles_checkpoint_at_end</span> <span class="o">=</span> <span class="n">trainer_cls</span><span class="o">.</span><span class="n">_handles_checkpoint_at_end</span>
 
             <span class="nd">@classmethod</span>
-            <span class="k">def</span> <span class="nf">has_base_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">has_base_dataset</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">                </span><span class="sd">&quot;&quot;&quot;Whether a dataset is provided through the Trainer.&quot;&quot;&quot;</span>
                 <span class="k">return</span> <span class="n">has_base_dataset</span>
 
             <span class="nd">@classmethod</span>
-            <span class="k">def</span> <span class="nf">base_scaling_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalingConfig</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">base_scaling_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalingConfig</span><span class="p">:</span>
 <span class="w">                </span><span class="sd">&quot;&quot;&quot;Returns the unchanged scaling config provided through the Trainer.&quot;&quot;&quot;</span>
                 <span class="k">return</span> <span class="n">scaling_config</span>
 
-            <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="n">base_config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
                 <span class="c1"># Merge Tuner param space hyperparameters in `config` into the</span>
                 <span class="c1"># base config passed to the Trainer constructor, which is `base_config`.</span>
@@ -2266,7 +2266,7 @@ document.write(`
                     <span class="n">DataContext</span><span class="o">.</span><span class="n">_set_current</span><span class="p">(</span><span class="n">dataset_context</span><span class="p">)</span>
                 <span class="nb">super</span><span class="p">(</span><span class="n">TrainTrainable</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">_reconcile_scaling_config_with_trial_resources</span><span class="p">(</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_reconcile_scaling_config_with_trial_resources</span><span class="p">(</span>
                 <span class="bp">self</span><span class="p">,</span> <span class="n">scaling_config</span><span class="p">:</span> <span class="n">ScalingConfig</span>
             <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScalingConfig</span><span class="p">:</span>
 <span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2292,13 +2292,13 @@ document.write(`
 
                 <span class="k">return</span> <span class="n">ScalingConfig</span><span class="o">.</span><span class="n">from_placement_group_factory</span><span class="p">(</span><span class="n">trial_resources</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">_trainable_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_trainable_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
                 <span class="c1"># We ignore the config passed by Tune and instead use the merged</span>
                 <span class="c1"># config which includes the initial Trainer args.</span>
                 <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_trainable_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_merged_config</span><span class="p">)</span>
 
             <span class="nd">@classmethod</span>
-            <span class="k">def</span> <span class="nf">default_resource_request</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">default_resource_request</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
                 <span class="c1"># `config[&quot;scaling_config&quot;] is a dataclass when passed via the</span>
                 <span class="c1"># `scaling_config` argument in `Trainer` and is a dict when passed</span>
                 <span class="c1"># via the `scaling_config` key of `param_spec`.</span>
@@ -2317,9 +2317,9 @@ document.write(`
 
 <div class="viewcode-block" id="BaseTrainer.as_trainable">
 <a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.as_trainable.html#ray.train.tensorflow.tensorflow_trainer.BaseTrainer.as_trainable">[docs]</a>
-    <span class="k">def</span> <span class="nf">as_trainable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;Trainable&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_trainable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;Trainable&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts self to a ``tune.Trainable`` class.&quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
         <span class="n">base_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_dict</span>
         <span class="n">trainable_cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_trainable_cls</span><span class="p">()</span>

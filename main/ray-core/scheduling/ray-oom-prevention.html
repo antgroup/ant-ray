@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1458,10 +1458,10 @@ Example: Workloads fails if the last task of the caller is killed<div class="sd-
 </summary><div class="sd-summary-content sd-card-body docutils">
 <p class="sd-card-text">Let’s create an application oom.py that runs a single task that requires more memory than what is available. It is set to infinite retry by setting <code class="docutils literal notranslate"><span class="pre">max_retries</span></code> to -1.</p>
 <p class="sd-card-text">The worker killer policy sees that it is the last task of the caller, and will fail the workload when it kills the task as it is the last one for the caller, even when the task is set to retry forever.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">max_retries</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">leaks_memory</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">leaks_memory</span><span class="p">():</span>
     <span class="n">chunks</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">bits_to_allocate</span> <span class="o">=</span> <span class="mi">8</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>  <span class="c1"># ~100 MiB</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
@@ -1497,18 +1497,18 @@ Example: memory monitor prefers to kill a retriable task<div class="sd-summary-d
 </pre></div>
 </div>
 <p class="sd-card-text">Let’s create an application two_actors.py that submits two actors, where the first one is retriable and the second one is non-retriable.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray._private.utils</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">ceil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_system_memory</span><span class="p">,</span>
 <span class="p">)</span>  <span class="c1"># do not use outside of this example as these are private methods.</span>
-<span class="kn">from</span> <span class="nn">ray._private.utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_used_memory</span><span class="p">,</span>
 <span class="p">)</span>  <span class="c1"># do not use outside of this example as these are private methods.</span>
 
 
 <span class="c1"># estimates the number of bytes to allocate to reach the desired memory usage percentage.</span>
-<span class="k">def</span> <span class="nf">get_additional_bytes_to_reach_memory_usage_pct</span><span class="p">(</span><span class="n">pct</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_additional_bytes_to_reach_memory_usage_pct</span><span class="p">(</span><span class="n">pct</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="n">used</span> <span class="o">=</span> <span class="n">get_used_memory</span><span class="p">()</span>
     <span class="n">total</span> <span class="o">=</span> <span class="n">get_system_memory</span><span class="p">()</span>
     <span class="n">bytes_needed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">total</span> <span class="o">*</span> <span class="n">pct</span><span class="p">)</span> <span class="o">-</span> <span class="n">used</span>
@@ -1519,11 +1519,11 @@ Example: memory monitor prefers to kill a retriable task<div class="sd-summary-d
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">MemoryHogger</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MemoryHogger</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allocations</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_to_allocate</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_to_allocate</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># divide by 8 as each element in the array occupies 8 bytes</span>
         <span class="n">new_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">ceil</span><span class="p">(</span><span class="n">bytes_to_allocate</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allocations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_list</span><span class="p">)</span>

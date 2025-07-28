@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1422,14 +1422,14 @@ document.write(`
 <code class="docutils literal notranslate"><span class="pre">async/await</span></code> <a class="reference external" href="https://docs.python.org/3/library/asyncio.html">syntax</a>.
 Ray natively integrates with asyncio. You can use ray alongside with popular
 async frameworks like aiohttp, aioredis, etc.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">asyncio</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">AsyncActor</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AsyncActor</span><span class="p">:</span>
     <span class="c1"># multiple invocation of this method can be running in</span>
     <span class="c1"># the event loop at the same time</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">run_concurrent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_concurrent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;started&quot;</span><span class="p">)</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># concurrent workload here</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;finished&quot;</span><span class="p">)</span>
@@ -1440,7 +1440,7 @@ async frameworks like aiohttp, aioredis, etc.</p>
 <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">run_concurrent</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)])</span>
 
 <span class="c1"># async ray.get</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">async_get</span><span class="p">():</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">async_get</span><span class="p">():</span>
     <span class="k">await</span> <span class="n">actor</span><span class="o">.</span><span class="n">run_concurrent</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
 <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">async_get</span><span class="p">())</span>
 </pre></div>
@@ -1464,10 +1464,10 @@ async frameworks like aiohttp, aioredis, etc.</p>
 make it possible to <code class="docutils literal notranslate"><span class="pre">await</span></code> on ray futures in existing concurrent
 applications.</p>
 <p>Instead of:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">some_task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">some_task</span><span class="p">():</span>
     <span class="k">return</span> <span class="mi">1</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">some_task</span><span class="o">.</span><span class="n">remote</span><span class="p">())</span>
@@ -1475,14 +1475,14 @@ applications.</p>
 </pre></div>
 </div>
 <p>you can do:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">asyncio</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">some_task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">some_task</span><span class="p">():</span>
     <span class="k">return</span> <span class="mi">1</span>
 
-<span class="k">async</span> <span class="k">def</span> <span class="nf">await_obj_ref</span><span class="p">():</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">await_obj_ref</span><span class="p">():</span>
     <span class="k">await</span> <span class="n">some_task</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
     <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">([</span><span class="n">some_task</span><span class="o">.</span><span class="n">remote</span><span class="p">()])</span>
 
@@ -1492,9 +1492,9 @@ applications.</p>
 <p>Please refer to <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html">asyncio doc</a>
 for more <code class="code docutils literal notranslate"><span class="pre">asyncio</span></code> patterns including timeouts and <code class="docutils literal notranslate"><span class="pre">asyncio.gather</span></code>.</p>
 <p>If you need to directly access the future object, you can call:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
-<span class="k">async</span> <span class="k">def</span> <span class="nf">convert_to_asyncio_future</span><span class="p">():</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">convert_to_asyncio_future</span><span class="p">():</span>
     <span class="n">ref</span> <span class="o">=</span> <span class="n">some_task</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
     <span class="n">fut</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wrap_future</span><span class="p">(</span><span class="n">ref</span><span class="o">.</span><span class="n">future</span><span class="p">())</span>
     <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">fut</span><span class="p">)</span>
@@ -1509,7 +1509,7 @@ for more <code class="code docutils literal notranslate"><span class="pre">async
 <span id="async-ref-to-futures"></span><h3>ObjectRefs as concurrent.futures.Futures<a class="headerlink" href="#objectrefs-as-concurrent-futures-futures" title="Link to this heading">#</a></h3>
 <p>ObjectRefs can also be wrapped into <code class="docutils literal notranslate"><span class="pre">concurrent.futures.Future</span></code> objects. This
 is useful for interfacing with existing <code class="docutils literal notranslate"><span class="pre">concurrent.futures</span></code> APIs:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">concurrent</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">concurrent</span>
 
 <span class="n">refs</span> <span class="o">=</span> <span class="p">[</span><span class="n">some_task</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
 <span class="n">futs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ref</span><span class="o">.</span><span class="n">future</span><span class="p">()</span> <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">refs</span><span class="p">]</span>
@@ -1528,11 +1528,11 @@ is useful for interfacing with existing <code class="docutils literal notranslat
 <section id="defining-an-async-actor">
 <h3>Defining an Async Actor<a class="headerlink" href="#defining-an-async-actor" title="Link to this heading">#</a></h3>
 <p>By using <code class="code docutils literal notranslate"><span class="pre">async</span></code> method definitions, Ray will automatically detect whether an actor support <code class="code docutils literal notranslate"><span class="pre">async</span></code> calls or not.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">AsyncActor</span><span class="p">:</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AsyncActor</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;started&quot;</span><span class="p">)</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># Network, I/O task here</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ended&quot;</span><span class="p">)</span>
@@ -1565,11 +1565,11 @@ of the event loop.</p>
 <h3>Setting concurrency in Async Actors<a class="headerlink" href="#setting-concurrency-in-async-actors" title="Link to this heading">#</a></h3>
 <p>You can set the number of “concurrent” task running at once using the
 <code class="docutils literal notranslate"><span class="pre">max_concurrency</span></code> flag. By default, 1000 tasks can be running concurrently.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">AsyncActor</span><span class="p">:</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AsyncActor</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_task</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;started&quot;</span><span class="p">)</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Network, I/O task here</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ended&quot;</span><span class="p">)</span>
@@ -1611,9 +1611,9 @@ have one method that performs some computation heavy task while blocking the eve
 will recognize the actor as AsyncActor instead of ThreadedActor.</p>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">ThreadedActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">task_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I&#39;m running in a thread!&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">task_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I&#39;m running in another thread!&quot;</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ThreadedActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">task_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I&#39;m running in a thread!&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">task_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I&#39;m running in another thread!&quot;</span><span class="p">)</span>
 
 <span class="n">a</span> <span class="o">=</span> <span class="n">ThreadedActor</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">max_concurrency</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">task_1</span><span class="o">.</span><span class="n">remote</span><span class="p">(),</span> <span class="n">a</span><span class="o">.</span><span class="n">task_2</span><span class="o">.</span><span class="n">remote</span><span class="p">()])</span>
@@ -1629,17 +1629,17 @@ will recognize the actor as AsyncActor instead of ThreadedActor.</p>
 <h2>AsyncIO for Remote Tasks<a class="headerlink" href="#asyncio-for-remote-tasks" title="Link to this heading">#</a></h2>
 <p>We don’t support asyncio for remote tasks. The following snippet will fail:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">async</span> <span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="k">pass</span>
 </pre></div>
 </div>
 <p>Instead, you can wrap the <code class="docutils literal notranslate"><span class="pre">async</span></code> function with a wrapper to run the task synchronously:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="k">pass</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">wrapper</span><span class="p">():</span>
-    <span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">():</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">f</span><span class="p">())</span>
 </pre></div>
 </div>

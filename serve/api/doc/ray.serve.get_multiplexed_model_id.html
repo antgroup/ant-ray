@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1406,9 +1406,9 @@ document.write(`
 <dd><p>Get the multiplexed model ID for the current request.</p>
 <p>This is used with a function decorated with <code class="code docutils literal notranslate"><span class="pre">&#64;serve.multiplexed</span></code>
 to retrieve the model ID for the current request.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">import</span> <span class="nn">requests</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 
 <span class="c1"># Set the multiplexed model id with the key</span>
 <span class="c1"># &quot;ray_serve_multiplexed_model_id&quot; in the request</span>
@@ -1422,7 +1422,7 @@ to retrieve the model ID for the current request.</p>
 <span class="c1"># In your deployment code, you can retrieve the model id from</span>
 <span class="c1"># `get_multiplexed_model_id()`.</span>
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">def</span> <span class="nf">my_deployment_function</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_deployment_function</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="k">assert</span> <span class="n">serve</span><span class="o">.</span><span class="n">get_multiplexed_model_id</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;model_1&quot;</span>
 </pre></div>
 </div>

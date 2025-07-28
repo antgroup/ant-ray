@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,21 +1389,21 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data.datasource.parquet_meta_provider</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">ray.cloudpickle</span> <span class="k">as</span> <span class="nn">cloudpickle</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.util</span> <span class="kn">import</span> <span class="n">call_with_retry</span>
-<span class="kn">from</span> <span class="nn">ray.data.block</span> <span class="kn">import</span> <span class="n">BlockMetadata</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource.file_meta_provider</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.cloudpickle</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cloudpickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">call_with_retry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockMetadata</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.file_meta_provider</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">FileMetadataProvider</span><span class="p">,</span>
     <span class="n">_fetch_metadata_parallel</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span>
 
-    <span class="kn">from</span> <span class="nn">ray.data._internal.datasource.parquet_datasource</span> <span class="kn">import</span> <span class="n">SerializedFragment</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.parquet_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">SerializedFragment</span>
 
 
 <span class="n">FRAGMENTS_PER_META_FETCH</span> <span class="o">=</span> <span class="mi">6</span>
@@ -1419,13 +1419,13 @@ document.write(`
 <span class="n">RETRY_MAX_BACKOFF_S_FOR_META_FETCH_TASK</span> <span class="o">=</span> <span class="mi">64</span>
 
 
-<span class="k">class</span> <span class="nc">_ParquetFileFragmentMetaData</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_ParquetFileFragmentMetaData</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to store metadata of a Parquet file fragment. This includes</span>
 <span class="sd">    all attributes from `pyarrow.parquet.FileMetaData` except for `schema`,</span>
 <span class="sd">    which is stored in `self.schema_pickled` as a pickled object from</span>
 <span class="sd">    `cloudpickle.loads()`, used in deduplicating schemas across multiple fragments.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fragment_metadata</span><span class="p">:</span> <span class="s2">&quot;pyarrow.parquet.FileMetaData&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fragment_metadata</span><span class="p">:</span> <span class="s2">&quot;pyarrow.parquet.FileMetaData&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">created_by</span> <span class="o">=</span> <span class="n">fragment_metadata</span><span class="o">.</span><span class="n">created_by</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">format_version</span> <span class="o">=</span> <span class="n">fragment_metadata</span><span class="o">.</span><span class="n">format_version</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_columns</span> <span class="o">=</span> <span class="n">fragment_metadata</span><span class="o">.</span><span class="n">num_columns</span>
@@ -1444,7 +1444,7 @@ document.write(`
             <span class="n">row_group_metadata</span> <span class="o">=</span> <span class="n">fragment_metadata</span><span class="o">.</span><span class="n">row_group</span><span class="p">(</span><span class="n">row_group_idx</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">total_byte_size</span> <span class="o">+=</span> <span class="n">row_group_metadata</span><span class="o">.</span><span class="n">total_byte_size</span>
 
-    <span class="k">def</span> <span class="nf">set_schema_pickled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_pickled</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_schema_pickled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_pickled</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Note: to get the underlying schema, use</span>
 <span class="sd">        `cloudpickle.loads(self.schema_pickled)`.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schema_pickled</span> <span class="o">=</span> <span class="n">schema_pickled</span>
@@ -1453,10 +1453,10 @@ document.write(`
 <div class="viewcode-block" id="ParquetMetadataProvider">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.ParquetMetadataProvider.html#ray.data.datasource.ParquetMetadataProvider">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">ParquetMetadataProvider</span><span class="p">(</span><span class="n">FileMetadataProvider</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParquetMetadataProvider</span><span class="p">(</span><span class="n">FileMetadataProvider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Provides block metadata for Arrow Parquet file fragments.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_get_block_metadata</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_block_metadata</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="s2">&quot;pyarrow.lib.Schema&quot;</span><span class="p">]],</span>
@@ -1507,7 +1507,7 @@ document.write(`
 
 <div class="viewcode-block" id="ParquetMetadataProvider.prefetch_file_metadata">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.ParquetMetadataProvider.prefetch_file_metadata.html#ray.data.datasource.ParquetMetadataProvider.prefetch_file_metadata">[docs]</a>
-    <span class="k">def</span> <span class="nf">prefetch_file_metadata</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prefetch_file_metadata</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">fragments</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;pyarrow.dataset.ParquetFileFragment&quot;</span><span class="p">],</span>
         <span class="o">**</span><span class="n">ray_remote_args</span><span class="p">,</span>
@@ -1526,14 +1526,14 @@ document.write(`
 <span class="sd">            must be returned in the same order as all input file fragments, such</span>
 <span class="sd">            that `metadata[i]` always contains the metadata for `fragments[i]`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.data._internal.datasource.parquet_datasource</span> <span class="kn">import</span> <span class="n">SerializedFragment</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.parquet_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">SerializedFragment</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fragments</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">PARALLELIZE_META_FETCH_THRESHOLD</span><span class="p">:</span>
             <span class="c1"># Wrap Parquet fragments in serialization workaround.</span>
             <span class="n">fragments</span> <span class="o">=</span> <span class="p">[</span><span class="n">SerializedFragment</span><span class="p">(</span><span class="n">fragment</span><span class="p">)</span> <span class="k">for</span> <span class="n">fragment</span> <span class="ow">in</span> <span class="n">fragments</span><span class="p">]</span>
             <span class="c1"># Fetch Parquet metadata in parallel using Ray tasks.</span>
 
-            <span class="k">def</span> <span class="nf">fetch_func</span><span class="p">(</span><span class="n">fragments</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">fetch_func</span><span class="p">(</span><span class="n">fragments</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">_fetch_metadata_serialization_wrapper</span><span class="p">(</span>
                     <span class="n">fragments</span><span class="p">,</span>
                     <span class="c1"># Ensure that retry settings are propagated to remote tasks.</span>
@@ -1558,13 +1558,13 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_fetch_metadata_serialization_wrapper</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fetch_metadata_serialization_wrapper</span><span class="p">(</span>
     <span class="n">fragments</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;SerializedFragment&quot;</span><span class="p">],</span>
     <span class="n">retry_match</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="n">retry_max_attempts</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">retry_max_interval</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;pyarrow.parquet.FileMetaData&quot;</span><span class="p">]:</span>
-    <span class="kn">from</span> <span class="nn">ray.data._internal.datasource.parquet_datasource</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.datasource.parquet_datasource</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">_deserialize_fragments_with_retry</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -1605,11 +1605,11 @@ document.write(`
             <span class="s2">&quot;```</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="s1">&#39;ray.data._internal.datasource.parquet_datasource.RETRY_EXCEPTIONS_FOR_META_FETCH_TASK = [&quot;AWS Error ACCESS_DENIED&quot;, &quot;Timeout&quot;]</span><span class="se">\n</span><span class="s1">&#39;</span>  <span class="c1"># noqa: E501</span>
             <span class="s2">&quot;```&quot;</span>
-        <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
     <span class="k">return</span> <span class="n">metadata</span>
 
 
-<span class="k">def</span> <span class="nf">_fetch_metadata</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fetch_metadata</span><span class="p">(</span>
     <span class="n">fragments</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;pyarrow.dataset.ParquetFileFragment&quot;</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;pyarrow.parquet.FileMetaData&quot;</span><span class="p">]:</span>
     <span class="n">fragment_metadata</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1621,7 +1621,7 @@ document.write(`
     <span class="k">return</span> <span class="n">fragment_metadata</span>
 
 
-<span class="k">def</span> <span class="nf">_dedupe_metadata</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_dedupe_metadata</span><span class="p">(</span>
     <span class="n">raw_metadatas</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;pyarrow.parquet.FileMetaData&quot;</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">_ParquetFileFragmentMetaData</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;For datasets with a large number of columns, the FileMetaData</span>

@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1392,33 +1392,33 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.tuner</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">pyarrow.fs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.air._internal.usage</span> <span class="kn">import</span> <span class="n">AirEntrypoint</span>
-<span class="kn">from</span> <span class="nn">ray.air.util.node</span> <span class="kn">import</span> <span class="n">_force_on_current_node</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.storage</span> <span class="kn">import</span> <span class="n">_exists_at_fs_path</span><span class="p">,</span> <span class="n">get_fs_and_path</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">ResumeConfig</span><span class="p">,</span> <span class="n">RunConfig</span>
-<span class="kn">from</span> <span class="nn">ray.tune.experimental.output</span> <span class="kn">import</span> <span class="n">get_air_verbosity</span>
-<span class="kn">from</span> <span class="nn">ray.tune.impl.tuner_internal</span> <span class="kn">import</span> <span class="n">_TUNER_PKL</span><span class="p">,</span> <span class="n">TunerInternal</span>
-<span class="kn">from</span> <span class="nn">ray.tune.progress_reporter</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.usage</span><span class="w"> </span><span class="kn">import</span> <span class="n">AirEntrypoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.util.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">_force_on_current_node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">_exists_at_fs_path</span><span class="p">,</span> <span class="n">get_fs_and_path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResumeConfig</span><span class="p">,</span> <span class="n">RunConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experimental.output</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_air_verbosity</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.impl.tuner_internal</span><span class="w"> </span><span class="kn">import</span> <span class="n">_TUNER_PKL</span><span class="p">,</span> <span class="n">TunerInternal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.progress_reporter</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_prepare_progress_reporter_for_ray_client</span><span class="p">,</span>
     <span class="n">_stream_client_output</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.result_grid</span> <span class="kn">import</span> <span class="n">ResultGrid</span>
-<span class="kn">from</span> <span class="nn">ray.tune.trainable</span> <span class="kn">import</span> <span class="n">Trainable</span>
-<span class="kn">from</span> <span class="nn">ray.tune.tune_config</span> <span class="kn">import</span> <span class="n">TuneConfig</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResultGrid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trainable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.tune_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.train.base_trainer</span> <span class="kn">import</span> <span class="n">BaseTrainer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.base_trainer</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseTrainer</span>
 
 <span class="n">ClientActorHandle</span> <span class="o">=</span> <span class="n">Any</span>
 
@@ -1436,7 +1436,7 @@ document.write(`
 <div class="viewcode-block" id="Tuner">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.Tuner.html#ray.tune.Tuner">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Tuner</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Tuner</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Tuner is the recommended way of launching hyperparameter tuning jobs with Ray Tune.</span>
 
 <span class="sd">    Args:</span>
@@ -1484,7 +1484,7 @@ document.write(`
 
 <div class="viewcode-block" id="Tuner.__init__">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.Tuner.__init__.html#ray.tune.Tuner.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">trainable</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
             <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Trainable</span><span class="p">],</span> <span class="s2">&quot;BaseTrainer&quot;</span><span class="p">]</span>
@@ -1533,7 +1533,7 @@ document.write(`
 <div class="viewcode-block" id="Tuner.restore">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.Tuner.restore.html#ray.tune.Tuner.restore">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">trainable</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">Trainable</span><span class="p">],</span> <span class="s2">&quot;BaseTrainer&quot;</span><span class="p">],</span>
@@ -1647,7 +1647,7 @@ document.write(`
 <div class="viewcode-block" id="Tuner.can_restore">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.Tuner.can_restore.html#ray.tune.Tuner.can_restore">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">can_restore</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_restore</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
         <span class="n">storage_filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1700,7 +1700,7 @@ document.write(`
         <span class="k">return</span> <span class="n">_exists_at_fs_path</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">fs_path</span><span class="p">,</span> <span class="n">_TUNER_PKL</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_prepare_remote_tuner_for_jupyter_progress_reporting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_remote_tuner_for_jupyter_progress_reporting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">run_config</span><span class="p">:</span> <span class="n">RunConfig</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_remote_tuner</span><span class="o">.</span><span class="n">get_run_config</span><span class="o">.</span><span class="n">remote</span><span class="p">())</span>
         <span class="n">progress_reporter</span><span class="p">,</span> <span class="n">string_queue</span> <span class="o">=</span> <span class="n">_prepare_progress_reporter_for_ray_client</span><span class="p">(</span>
             <span class="n">run_config</span><span class="o">.</span><span class="n">progress_reporter</span><span class="p">,</span> <span class="n">run_config</span><span class="o">.</span><span class="n">verbose</span>
@@ -1716,7 +1716,7 @@ document.write(`
 
 <div class="viewcode-block" id="Tuner.fit">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.Tuner.fit.html#ray.tune.Tuner.fit">[docs]</a>
-    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultGrid</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultGrid</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Executes hyperparameter tuning job as configured and returns result.</span>
 
 <span class="sd">        Failure handling:</span>
@@ -1766,7 +1766,7 @@ document.write(`
 
 <div class="viewcode-block" id="Tuner.get_results">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.Tuner.get_results.html#ray.tune.Tuner.get_results">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultGrid</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultGrid</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get results of a hyperparameter tuning run.</span>
 
 <span class="sd">        This method returns the same results as :meth:`~ray.tune.Tuner.fit`</span>
@@ -1803,7 +1803,7 @@ document.write(`
             <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">get_results_future</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;restore&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
                 <span class="s2">&quot;`Tuner.restore()` is a classmethod and cannot be called on an &quot;</span>

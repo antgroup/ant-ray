@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1415,11 +1415,11 @@ and user-imposed metadata.</p>
 <h2>Retrieving metadata<a class="headerlink" href="#retrieving-metadata" title="Link to this heading">#</a></h2>
 <p>Workflow metadata can be retrieved with <code class="docutils literal notranslate"><span class="pre">workflow.get_metadata(workflow_id)</span></code>.
 For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">workflow</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">workflow</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">left</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">left</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">left</span> <span class="o">+</span> <span class="n">right</span>
 
 <span class="n">workflow</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">add</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="n">workflow_id</span><span class="o">=</span><span class="s2">&quot;add_example&quot;</span><span class="p">)</span>
@@ -1487,10 +1487,10 @@ result for the time it is called, this also means not all fields will
 be available in the result if corresponding metadata is not available
 (e.g., <code class="docutils literal notranslate"><span class="pre">metadata[&quot;stats&quot;][&quot;end_time&quot;]</span></code> won’t be available until the workflow
 is completed).</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">simple</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">simple</span><span class="p">():</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
     <span class="k">return</span> <span class="mi">0</span>
 
@@ -1514,7 +1514,7 @@ is completed).</p>
 </div>
 <p>2. For resumed workflows, the current behavior is that “stats” will
 be updated whenever a workflow is resumed.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="n">workflow_id</span> <span class="o">=</span> <span class="s2">&quot;simple&quot;</span>
 
@@ -1522,7 +1522,7 @@ be updated whenever a workflow is resumed.</p>
 <span class="n">error_flag</span><span class="o">.</span><span class="n">touch</span><span class="p">()</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">simple</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">simple</span><span class="p">():</span>
     <span class="k">if</span> <span class="n">error_flag</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
     <span class="k">return</span> <span class="mi">0</span>

@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1421,14 +1421,14 @@ so the user can try-catch either of them. Otherwise, the wrapped exception is ju
 <code class="docutils literal notranslate"><span class="pre">RayTaskError</span></code> and the actual user’s exception type can be accessed via the <code class="docutils literal notranslate"><span class="pre">cause</span></code>
 field of the <code class="docutils literal notranslate"><span class="pre">RayTaskError</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;the real error&quot;</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span>
 
 
@@ -1456,11 +1456,11 @@ field of the <code class="docutils literal notranslate"><span class="pre">RayTas
 </div>
 <p>Example code of catching the user exception type when the exception type can be subclassed:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
-<span class="k">class</span> <span class="nc">MyException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="o">...</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">raises_my_exc</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">raises_my_exc</span><span class="p">():</span>
     <span class="k">raise</span> <span class="n">MyException</span><span class="p">(</span><span class="s2">&quot;a user exception&quot;</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">raises_my_exc</span><span class="o">.</span><span class="n">remote</span><span class="p">())</span>
@@ -1474,12 +1474,12 @@ field of the <code class="docutils literal notranslate"><span class="pre">RayTas
 </pre></div>
 </div>
 <p>Example code of accessing the user exception type when the exception type can <em>not</em> be subclassed:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyFinalException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init_subclass__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyFinalException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__init_subclass__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot subclass this little exception class.&quot;</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">raises_my_final_exc</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">raises_my_final_exc</span><span class="p">():</span>
     <span class="k">raise</span> <span class="n">MyFinalException</span><span class="p">(</span><span class="s2">&quot;a *final* user exception&quot;</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">raises_my_final_exc</span><span class="o">.</span><span class="n">remote</span><span class="p">())</span>
@@ -1499,14 +1499,14 @@ field of the <code class="docutils literal notranslate"><span class="pre">RayTas
 </div>
 <p>If Ray can’t serialize the user’s exception, it converts the exception to a <code class="docutils literal notranslate"><span class="pre">RayError</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
-<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
 
-<span class="k">class</span> <span class="nc">UnserializableException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UnserializableException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">raise_unserializable_error</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">raise_unserializable_error</span><span class="p">():</span>
     <span class="k">raise</span> <span class="n">UnserializableException</span>
 
 <span class="k">try</span><span class="p">:</span>
@@ -1555,15 +1555,15 @@ of retries for all tasks submitted, set the OS environment variable
 <code class="docutils literal notranslate"><span class="pre">RAY_TASK_MAX_RETRIES</span></code>. e.g., by passing this to your driver script or by
 using <a class="reference internal" href="../handling-dependencies.html#runtime-environments"><span class="std std-ref">runtime environments</span></a>.</p>
 <p>You can experiment with this behavior by running the following code.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ignore_reinit_error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">max_retries</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">potentially_fail</span><span class="p">(</span><span class="n">failure_probability</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">potentially_fail</span><span class="p">(</span><span class="n">failure_probability</span><span class="p">):</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">failure_probability</span><span class="p">:</span>
         <span class="n">os</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -1593,18 +1593,18 @@ and even <strong>which</strong> application-level errors are retried, via the
 <code class="docutils literal notranslate"><span class="pre">retry_exceptions</span></code> argument. This is <code class="docutils literal notranslate"><span class="pre">False</span></code> by default. To enable retries
 upon application-level errors, set <code class="docutils literal notranslate"><span class="pre">retry_exceptions=True</span></code> to retry upon any
 exception, or pass a list of retryable exceptions. An example is shown below.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ignore_reinit_error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">RandomError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RandomError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">pass</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">max_retries</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">retry_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">potentially_fail</span><span class="p">(</span><span class="n">failure_probability</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">potentially_fail</span><span class="p">(</span><span class="n">failure_probability</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">failure_probability</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">failure_probability</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;failure_probability must be between 0 and 1, but got: &quot;</span>

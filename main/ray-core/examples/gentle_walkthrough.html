@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1422,7 +1422,7 @@ can start working with distributed computing using Python by learning the Ray Co
 <p>Start a local cluster by running the following commands:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1456,7 +1456,7 @@ words of the title of the <a class="reference external" href="https://www.amazon
 The <code class="docutils literal notranslate"><span class="pre">sleep</span></code> function pauses for a certain amount of time to simulate the cost of accessing and processing data from the database.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 <span class="n">database</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;Learning&quot;</span><span class="p">,</span> <span class="s2">&quot;Ray&quot;</span><span class="p">,</span>
@@ -1464,7 +1464,7 @@ The <code class="docutils literal notranslate"><span class="pre">sleep</span></c
 <span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">retrieve</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">retrieve</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">item</span> <span class="o">/</span> <span class="mf">10.</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">item</span><span class="p">,</span> <span class="n">database</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
 </pre></div>
@@ -1475,7 +1475,7 @@ The <code class="docutils literal notranslate"><span class="pre">sleep</span></c
 Run the following code to get the actual time:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">print_runtime</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">start_time</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">print_runtime</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">start_time</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Runtime: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> seconds, data:&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">input_data</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -1511,11 +1511,11 @@ that is, <code class="docutils literal notranslate"><span class="pre">7/10.</spa
 To extend this example to run in parallel on Ray, start by using the &#64;ray.remote decorator:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span> 
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">retrieve_task</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">retrieve_task</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">retrieve</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1593,7 +1593,7 @@ In the <code class="docutils literal notranslate"><span class="pre">retrieve_tas
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">retrieve_task</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">retrieve_task</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">item</span> <span class="o">/</span> <span class="mf">10.</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">item</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
 </pre></div>
@@ -1674,7 +1674,7 @@ The code below sets up this follow-up task and executes both the <code class="do
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">follow_up_task</span><span class="p">(</span><span class="n">retrieve_result</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">follow_up_task</span><span class="p">(</span><span class="n">retrieve_result</span><span class="p">):</span>
     <span class="n">original_item</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">retrieve_result</span>
     <span class="n">follow_up_result</span> <span class="o">=</span> <span class="n">retrieve</span><span class="p">(</span><span class="n">original_item</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">retrieve_result</span><span class="p">,</span> <span class="n">follow_up_result</span>
@@ -1727,14 +1727,14 @@ Therefore, you can create a simple counter using a Ray actor to track the number
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">DataTracker</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataTracker</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_counts</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">def</span> <span class="nf">increment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">increment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_counts</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="k">def</span> <span class="nf">counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_counts</span>
 </pre></div>
 </div>
@@ -1746,7 +1746,7 @@ Modify the retrieve_task to incorporate this actor.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">retrieve_tracker_task</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">tracker</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">retrieve_tracker_task</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">tracker</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">item</span> <span class="o">/</span> <span class="mf">10.</span><span class="p">)</span>
     <span class="n">tracker</span><span class="o">.</span><span class="n">increment</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">item</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>

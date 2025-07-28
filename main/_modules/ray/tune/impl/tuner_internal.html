@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,12 +1392,12 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.impl.tuner_internal</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">io</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -1409,20 +1409,20 @@ document.write(`
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">pyarrow.fs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
 
-<span class="kn">import</span> <span class="nn">ray.cloudpickle</span> <span class="k">as</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">ray.train</span>
-<span class="kn">import</span> <span class="nn">ray.tune</span>
-<span class="kn">from</span> <span class="nn">ray.air._internal.uri_utils</span> <span class="kn">import</span> <span class="n">URI</span>
-<span class="kn">from</span> <span class="nn">ray.air._internal.usage</span> <span class="kn">import</span> <span class="n">AirEntrypoint</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.storage</span> <span class="kn">import</span> <span class="n">StorageContext</span><span class="p">,</span> <span class="n">get_fs_and_path</span>
-<span class="kn">from</span> <span class="nn">ray.train.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.cloudpickle</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.uri_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">URI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.usage</span><span class="w"> </span><span class="kn">import</span> <span class="n">AirEntrypoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">StorageContext</span><span class="p">,</span> <span class="n">get_fs_and_path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_v2_migration_warnings_enabled</span><span class="p">,</span>
     <span class="n">V2_MIGRATION_GUIDE_MESSAGE</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.train.utils</span> <span class="kn">import</span> <span class="n">_log_deprecation_warning</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_log_deprecation_warning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Experiment</span><span class="p">,</span>
     <span class="n">ExperimentAnalysis</span><span class="p">,</span>
     <span class="n">ResumeConfig</span><span class="p">,</span>
@@ -1430,16 +1430,16 @@ document.write(`
     <span class="n">TuneConfig</span><span class="p">,</span>
     <span class="n">TuneError</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.registry</span> <span class="kn">import</span> <span class="n">is_function_trainable</span>
-<span class="kn">from</span> <span class="nn">ray.tune.result_grid</span> <span class="kn">import</span> <span class="n">ResultGrid</span>
-<span class="kn">from</span> <span class="nn">ray.tune.trainable</span> <span class="kn">import</span> <span class="n">Trainable</span>
-<span class="kn">from</span> <span class="nn">ray.tune.tune</span> <span class="kn">import</span> <span class="n">_Config</span><span class="p">,</span> <span class="n">run</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils</span> <span class="kn">import</span> <span class="n">flatten_dict</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">inspect_serializability</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_function_trainable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResultGrid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trainable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">_Config</span><span class="p">,</span> <span class="n">run</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatten_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">inspect_serializability</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.train.trainer</span> <span class="kn">import</span> <span class="n">BaseTrainer</span>
-    <span class="kn">from</span> <span class="nn">ray.util.queue</span> <span class="kn">import</span> <span class="n">Queue</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.trainer</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseTrainer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.queue</span><span class="w"> </span><span class="kn">import</span> <span class="n">Queue</span>
 
 
 <span class="n">_TUNER_PKL</span> <span class="o">=</span> <span class="s2">&quot;tuner.pkl&quot;</span>
@@ -1456,7 +1456,7 @@ document.write(`
 
 <div class="viewcode-block" id="TunerInternal">
 <a class="viewcode-back" href="../../../../tune/api/internals.html#ray.tune.impl.tuner_internal.TunerInternal">[docs]</a>
-<span class="k">class</span> <span class="nc">TunerInternal</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TunerInternal</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The real implementation behind external facing ``Tuner``.</span>
 
 <span class="sd">    The external facing ``Tuner`` multiplexes between local Tuner and remote Tuner</span>
@@ -1485,7 +1485,7 @@ document.write(`
 <span class="sd">            if applicable. Refer to ray.tune.RunConfig for more info.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">restore_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">storage_filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pyarrow</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">FileSystem</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1497,7 +1497,7 @@ document.write(`
         <span class="n">_tuner_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">_entrypoint</span><span class="p">:</span> <span class="n">AirEntrypoint</span> <span class="o">=</span> <span class="n">AirEntrypoint</span><span class="o">.</span><span class="n">TUNER</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">ray.train.trainer</span> <span class="kn">import</span> <span class="n">BaseTrainer</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.trainer</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseTrainer</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trainable</span><span class="p">,</span> <span class="n">BaseTrainer</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">_v2_migration_warnings_enabled</span><span class="p">():</span>
@@ -1574,20 +1574,20 @@ document.write(`
         <span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">()))</span>
 
-    <span class="k">def</span> <span class="nf">get_run_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RunConfig</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_run_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RunConfig</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_config</span>
 
     <span class="c1"># For Jupyter output with Ray Client</span>
-    <span class="k">def</span> <span class="nf">set_run_config_and_remote_string_queue</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_run_config_and_remote_string_queue</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">run_config</span><span class="p">:</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">string_queue</span><span class="p">:</span> <span class="s2">&quot;Queue&quot;</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_config</span> <span class="o">=</span> <span class="n">run_config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tuner_kwargs</span><span class="p">[</span><span class="s2">&quot;_remote_string_queue&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">string_queue</span>
 
-    <span class="k">def</span> <span class="nf">clear_remote_string_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_remote_string_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tuner_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;_remote_string_queue&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_expected_utilization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpus_per_trial</span><span class="p">,</span> <span class="n">cpus_total</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_expected_utilization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpus_per_trial</span><span class="p">,</span> <span class="n">cpus_total</span><span class="p">):</span>
         <span class="n">num_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tune_config</span><span class="o">.</span><span class="n">num_samples</span>
         <span class="k">if</span> <span class="n">num_samples</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># TODO: simplify this in Tune</span>
             <span class="n">num_samples</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
@@ -1604,7 +1604,7 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">actual_concurrency</span> <span class="o">*</span> <span class="n">cpus_per_trial</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">cpus_total</span> <span class="o">+</span> <span class="mf">0.001</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_validate_trainable</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_trainable</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trainable</span><span class="p">:</span> <span class="n">TrainableType</span><span class="p">,</span> <span class="n">required_trainable_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Determines whether or not the trainable is valid.</span>
@@ -1634,7 +1634,7 @@ document.write(`
                 <span class="s2">&quot;objects that were found in your trainable:</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sio</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">required_trainable_name</span><span class="p">:</span>
             <span class="k">return</span>
@@ -1649,10 +1649,10 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">trainable_name</span><span class="si">}</span><span class="s2">&#39; but expected &#39;</span><span class="si">{</span><span class="n">required_trainable_name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_set_trainable_on_restore</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_trainable_on_restore</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trainable</span><span class="p">:</span> <span class="n">TrainableType</span><span class="p">,</span> <span class="n">old_trainable_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">ray.train.base_trainer</span> <span class="kn">import</span> <span class="n">BaseTrainer</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.base_trainer</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseTrainer</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">trainable</span> <span class="o">=</span> <span class="n">trainable</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">converted_trainable</span>
@@ -1677,7 +1677,7 @@ document.write(`
 
             <span class="n">trainer</span><span class="o">.</span><span class="n">run_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_config</span>
 
-    <span class="k">def</span> <span class="nf">_validate_param_space_on_restore</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_param_space_on_restore</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">new_param_space</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">flattened_param_space_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
@@ -1705,7 +1705,7 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Got: </span><span class="si">{</span><span class="n">keys</span><span class="si">}</span><span class="se">\n</span><span class="s2">Expected: </span><span class="si">{</span><span class="n">flattened_param_space_keys</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_set_param_space_on_restore</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_param_space_on_restore</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">param_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
         <span class="n">flattened_param_space_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
@@ -1719,7 +1719,7 @@ document.write(`
                 <span class="n">flattened_param_space_keys</span><span class="o">=</span><span class="n">flattened_param_space_keys</span><span class="p">,</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_load_tuner_state</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_tuner_state</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tuner_state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Loads Tuner state from the previously saved `tuner.pkl`.</span>
@@ -1742,7 +1742,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">old_trainable_name</span><span class="p">,</span> <span class="n">flattened_param_space_keys</span>
 
-    <span class="k">def</span> <span class="nf">_restore_from_path_or_uri</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_restore_from_path_or_uri</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path_or_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">trainable</span><span class="p">:</span> <span class="n">TrainableTypeOrTrainer</span><span class="p">,</span>
@@ -1793,7 +1793,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_resume_config</span> <span class="o">=</span> <span class="n">resume_config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_restored</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_choose_run_config</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_choose_run_config</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">tuner_run_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RunConfig</span><span class="p">],</span>
         <span class="n">trainer</span><span class="p">:</span> <span class="s2">&quot;BaseTrainer&quot;</span><span class="p">,</span>
@@ -1836,7 +1836,7 @@ document.write(`
         <span class="c1"># Tuner RunConfig + No Trainer RunConfig --&gt; Use the Tuner config</span>
         <span class="k">return</span> <span class="n">tuner_run_config</span>
 
-    <span class="k">def</span> <span class="nf">_process_scaling_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_scaling_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts ``self._param_space[&quot;scaling_config&quot;]`` to a dict.</span>
 
 <span class="sd">        The dict is converted back to a dataclass by the Trainer, after the</span>
@@ -1850,24 +1850,24 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_param_space</span><span class="p">[</span><span class="s2">&quot;scaling_config&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scaling_config</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trainable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrainableTypeOrTrainer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trainable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrainableTypeOrTrainer</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trainable</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">converted_trainable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrainableType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">converted_trainable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrainableType</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_converted_trainable</span>
 
     <span class="nd">@trainable</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">trainable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainable</span><span class="p">:</span> <span class="n">TrainableTypeOrTrainer</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trainable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainable</span><span class="p">:</span> <span class="n">TrainableTypeOrTrainer</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_trainable</span> <span class="o">=</span> <span class="n">trainable</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_converted_trainable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_trainable</span><span class="p">(</span><span class="n">trainable</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">param_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">param_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_space</span>
 
     <span class="nd">@param_space</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">param_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">param_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]):</span>
         <span class="c1"># Handle any configs that adhere to the `to_dict` interface.</span>
         <span class="c1"># Ex: AlgorithmConfig from RLlib</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param_space</span><span class="p">,</span> <span class="n">_Config</span><span class="p">):</span>
@@ -1884,10 +1884,10 @@ document.write(`
         <span class="k">if</span> <span class="n">param_space</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_process_scaling_config</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_convert_trainable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainable</span><span class="p">:</span> <span class="n">TrainableTypeOrTrainer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrainableType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_trainable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainable</span><span class="p">:</span> <span class="n">TrainableTypeOrTrainer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrainableType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts a Trainer to a Tune trainable and saves the converted</span>
 <span class="sd">        trainable. If not using a Trainer, this leaves the trainable as is.&quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.train.trainer</span> <span class="kn">import</span> <span class="n">BaseTrainer</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.trainer</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseTrainer</span>
 
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">trainable</span><span class="o">.</span><span class="n">as_trainable</span><span class="p">()</span>
@@ -1895,7 +1895,7 @@ document.write(`
             <span class="k">else</span> <span class="n">trainable</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultGrid</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultGrid</span><span class="p">:</span>
         <span class="n">trainable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">converted_trainable</span>
         <span class="n">param_space</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_space</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_restored</span><span class="p">:</span>
@@ -1907,7 +1907,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">ResultGrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_experiment_analysis</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultGrid</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultGrid</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_experiment_analysis</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Can&#39;t return results as experiment has not been run, yet. &quot;</span>
@@ -1915,7 +1915,7 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">ResultGrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_experiment_analysis</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_tune_run_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainable</span><span class="p">:</span> <span class="n">TrainableType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_tune_run_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainable</span><span class="p">:</span> <span class="n">TrainableType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get tune.run arguments common for both new and resumed runs.&quot;&quot;&quot;</span>
         <span class="c1"># Avoid overwriting the originally configured checkpoint config.</span>
         <span class="n">checkpoint_config</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_run_config</span><span class="o">.</span><span class="n">checkpoint_config</span><span class="p">)</span>
@@ -1999,7 +1999,7 @@ document.write(`
             <span class="n">chdir_to_trial_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tune_config</span><span class="o">.</span><span class="n">chdir_to_trial_dir</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_fit_internal</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fit_internal</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trainable</span><span class="p">:</span> <span class="n">TrainableType</span><span class="p">,</span> <span class="n">param_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExperimentAnalysis</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fitting for a fresh Tuner.&quot;&quot;&quot;</span>
@@ -2021,7 +2021,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">clear_remote_string_queue</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">analysis</span>
 
-    <span class="k">def</span> <span class="nf">_fit_resume</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fit_resume</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trainable</span><span class="p">:</span> <span class="n">TrainableType</span><span class="p">,</span> <span class="n">param_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExperimentAnalysis</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fitting for a restored Tuner.&quot;&quot;&quot;</span>
@@ -2042,7 +2042,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">clear_remote_string_queue</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">analysis</span>
 
-    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">state</span><span class="p">[</span><span class="s2">&quot;_tuner_kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;_tuner_kwargs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">state</span><span class="p">[</span><span class="s2">&quot;_tuner_kwargs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;_remote_string_queue&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -2062,7 +2062,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">state</span>
 
-    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="c1"># Make sure the magic metadata gets removed first.</span>
         <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;__flattened_param_space_keys&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;__trainable_name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>

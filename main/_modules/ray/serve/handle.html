@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,51 +1389,51 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.serve.handle</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">import</span> <span class="nn">concurrent.futures</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">AsyncIterator</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">concurrent.futures</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">AsyncIterator</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray._raylet</span> <span class="kn">import</span> <span class="n">ObjectRefGenerator</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.common</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._raylet</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObjectRefGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.common</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DeploymentHandleSource</span><span class="p">,</span>
     <span class="n">DeploymentID</span><span class="p">,</span>
     <span class="n">RequestMetadata</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.constants</span> <span class="kn">import</span> <span class="n">SERVE_LOGGER_NAME</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.default_impl</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SERVE_LOGGER_NAME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.default_impl</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">CreateRouterCallable</span><span class="p">,</span>
     <span class="n">create_dynamic_handle_options</span><span class="p">,</span>
     <span class="n">create_init_handle_options</span><span class="p">,</span>
     <span class="n">create_router</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.handle_options</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.handle_options</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DynamicHandleOptionsBase</span><span class="p">,</span>
     <span class="n">InitHandleOptionsBase</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.replica_result</span> <span class="kn">import</span> <span class="n">ReplicaResult</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.router</span> <span class="kn">import</span> <span class="n">Router</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.usage</span> <span class="kn">import</span> <span class="n">ServeUsageTag</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.replica_result</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReplicaResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">Router</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.usage</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServeUsageTag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT</span><span class="p">,</span>
     <span class="n">calculate_remaining_timeout</span><span class="p">,</span>
     <span class="n">get_random_string</span><span class="p">,</span>
     <span class="n">inside_ray_client_context</span><span class="p">,</span>
     <span class="n">is_running_in_asyncio_loop</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.serve.exceptions</span> <span class="kn">import</span> <span class="n">RayServeException</span><span class="p">,</span> <span class="n">RequestCancelledError</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">metrics</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">RayServeException</span><span class="p">,</span> <span class="n">RequestCancelledError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">metrics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">SERVE_LOGGER_NAME</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_DeploymentHandleBase</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_DeploymentHandleBase</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">deployment_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">app_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1465,14 +1465,14 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_create_router</span> <span class="o">=</span> <span class="n">_create_router</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_gen_handle_tag</span><span class="p">(</span><span class="n">app_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">deployment_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">handle_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gen_handle_tag</span><span class="p">(</span><span class="n">app_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">deployment_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">handle_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">app_name</span><span class="p">:</span>
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">app_name</span><span class="si">}</span><span class="s2">#</span><span class="si">{</span><span class="n">deployment_name</span><span class="si">}</span><span class="s2">#</span><span class="si">{</span><span class="n">handle_id</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">deployment_name</span><span class="si">}</span><span class="s2">#</span><span class="si">{</span><span class="n">handle_id</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_create_request_counter</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_request_counter</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">app_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">deployment_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">handle_id</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">):</span>
         <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span>
@@ -1492,25 +1492,25 @@ document.write(`
             <span class="p">}</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">running_replicas_populated</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">running_replicas_populated</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_router</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_router</span><span class="o">.</span><span class="n">running_replicas_populated</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">deployment_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">deployment_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deployment_id</span><span class="o">.</span><span class="n">name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">app_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">app_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deployment_id</span><span class="o">.</span><span class="n">app_name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_initialized</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_initialized</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_router</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize this handle with arguments.</span>
 
 <span class="sd">        A handle can only be initialized once. A handle is implicitly</span>
@@ -1548,7 +1548,7 @@ document.write(`
         <span class="p">):</span>
             <span class="n">ServeUsageTag</span><span class="o">.</span><span class="n">DEPLOYMENT_HANDLE_API_USED</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_prefer_local_routing</span><span class="o">=</span><span class="n">DEFAULT</span><span class="o">.</span><span class="n">VALUE</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_prefer_local_routing</span><span class="o">=</span><span class="n">DEFAULT</span><span class="o">.</span><span class="n">VALUE</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stream&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">inside_ray_client_context</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Streaming DeploymentHandles are not currently supported when &quot;</span>
@@ -1575,7 +1575,7 @@ document.write(`
             <span class="n">_handle_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">handle_id</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_remote</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remote</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
         <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
@@ -1596,28 +1596,28 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_router</span><span class="o">.</span><span class="n">assign_request</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="n">metadata</span>
 
-    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">method_name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_router</span><span class="p">:</span>
             <span class="n">shutdown_future</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_router</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
             <span class="n">shutdown_future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">shutdown_async</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">shutdown_async</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_router</span><span class="p">:</span>
             <span class="n">shutdown_future</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_router</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
             <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wrap_future</span><span class="p">(</span><span class="n">shutdown_future</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span> <span class="sa">f</span><span class="s2">&quot;(deployment=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">deployment_name</span><span class="si">}</span><span class="s2">&#39;)&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_deserialize</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_deserialize</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Required for this class&#39;s __reduce__ method to be picklable.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">serialized_constructor_args</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;deployment_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">deployment_name</span><span class="p">,</span>
             <span class="s2">&quot;app_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_name</span><span class="p">,</span>
@@ -1626,8 +1626,8 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_deserialize</span><span class="p">,</span> <span class="p">(</span><span class="n">serialized_constructor_args</span><span class="p">,)</span>
 
 
-<span class="k">class</span> <span class="nc">_DeploymentResponseBase</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_DeploymentResponseBase</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">replica_result_future</span><span class="p">:</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">Future</span><span class="p">[</span><span class="n">ReplicaResult</span><span class="p">],</span>
         <span class="n">request_metadata</span><span class="p">:</span> <span class="n">RequestMetadata</span><span class="p">,</span>
@@ -1638,10 +1638,10 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_request_metadata</span><span class="p">:</span> <span class="n">RequestMetadata</span> <span class="o">=</span> <span class="n">request_metadata</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">request_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">request_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_metadata</span><span class="o">.</span><span class="n">request_id</span>
 
-    <span class="k">def</span> <span class="nf">_fetch_future_result_sync</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_future_result_sync</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">_timeout_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReplicaResult</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Synchronously fetch the replica result.</span>
@@ -1655,13 +1655,13 @@ document.write(`
                     <span class="n">timeout</span><span class="o">=</span><span class="n">_timeout_s</span>
                 <span class="p">)</span>
             <span class="k">except</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="s2">&quot;Timed out resolving to ObjectRef.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="s2">&quot;Timed out resolving to ObjectRef.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
             <span class="k">except</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">RequestCancelledError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request_id</span><span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+                <span class="k">raise</span> <span class="n">RequestCancelledError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request_id</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_replica_result</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_fetch_future_result_async</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReplicaResult</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_future_result_async</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReplicaResult</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Asynchronously fetch replica result.</span>
 
 <span class="sd">        The result is cached in `self._replica_result`..</span>
@@ -1675,11 +1675,11 @@ document.write(`
                     <span class="bp">self</span><span class="o">.</span><span class="n">_replica_result_future</span>
                 <span class="p">)</span>
             <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">RequestCancelledError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request_id</span><span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+                <span class="k">raise</span> <span class="n">RequestCancelledError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request_id</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_replica_result</span>
 
-    <span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Attempt to cancel the `DeploymentHandle` call.</span>
 
 <span class="sd">        This is best effort.</span>
@@ -1710,7 +1710,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_replica_result</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
 
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">cancelled</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cancelled</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether or not the request has been cancelled.</span>
 
 <span class="sd">        This is `True` if `.cancel()` is called, but the request may actually have run</span>
@@ -1722,7 +1722,7 @@ document.write(`
 <div class="viewcode-block" id="DeploymentResponse">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.handle.DeploymentResponse.html#ray.serve.handle.DeploymentResponse">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">DeploymentResponse</span><span class="p">(</span><span class="n">_DeploymentResponseBase</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DeploymentResponse</span><span class="p">(</span><span class="n">_DeploymentResponseBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A future-like object wrapping the result of a unary deployment handle call.</span>
 
 <span class="sd">    From inside a deployment, a `DeploymentResponse` can be awaited to retrieve the</span>
@@ -1791,13 +1791,13 @@ document.write(`
 <span class="sd">        assert handle.remote(0).result() == 2</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__await__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__await__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Yields the final result of the deployment handle call.&quot;&quot;&quot;</span>
         <span class="n">replica_result</span> <span class="o">=</span> <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_future_result_async</span><span class="p">()</span><span class="o">.</span><span class="fm">__await__</span><span class="p">()</span>
         <span class="n">result</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">replica_result</span><span class="o">.</span><span class="n">get_async</span><span class="p">()</span><span class="o">.</span><span class="fm">__await__</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">result</span>
 
-    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">RayServeException</span><span class="p">(</span>
             <span class="s2">&quot;`DeploymentResponse` is not serializable. If you are passing the &quot;</span>
             <span class="s2">&quot;`DeploymentResponse` in a nested object (e.g. a list or dictionary) to a &quot;</span>
@@ -1807,7 +1807,7 @@ document.write(`
 
 <div class="viewcode-block" id="DeploymentResponse.result">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.handle.DeploymentResponse.html#ray.serve.handle.DeploymentResponse.result">[docs]</a>
-    <span class="k">def</span> <span class="nf">result</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">result</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">timeout_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1838,7 +1838,7 @@ document.write(`
 
 
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_to_object_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_to_object_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Advanced API to convert the response to a Ray `ObjectRef`.</span>
 
 <span class="sd">        This is used to pass the output of a `DeploymentHandle` call to a Ray task or</span>
@@ -1855,7 +1855,7 @@ document.write(`
         <span class="k">return</span> <span class="k">await</span> <span class="n">replica_result</span><span class="o">.</span><span class="n">to_object_ref_async</span><span class="p">()</span>
 
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">_to_object_ref_sync</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_to_object_ref_sync</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">_timeout_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">_allow_running_in_asyncio_loop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1898,7 +1898,7 @@ document.write(`
 <div class="viewcode-block" id="DeploymentResponseGenerator">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.handle.DeploymentResponseGenerator.html#ray.serve.handle.DeploymentResponseGenerator">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">DeploymentResponseGenerator</span><span class="p">(</span><span class="n">_DeploymentResponseBase</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DeploymentResponseGenerator</span><span class="p">(</span><span class="n">_DeploymentResponseBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A future-like object wrapping the result of a streaming deployment handle call.</span>
 
 <span class="sd">    This is returned when using `handle.options(stream=True)` and calling a generator</span>
@@ -1952,23 +1952,23 @@ document.write(`
 <span class="sd">    `DeploymentHandle` call.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__await__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__await__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="s2">&quot;`DeploymentResponseGenerator` cannot be awaited directly. Use `async for` &quot;</span>
             <span class="s2">&quot;or `await response.__anext__() instead`.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__aiter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__aiter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="fm">__anext__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__anext__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="n">replica_result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_future_result_async</span><span class="p">()</span>
         <span class="k">return</span> <span class="k">await</span> <span class="n">replica_result</span><span class="o">.</span><span class="fm">__anext__</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">is_running_in_asyncio_loop</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Sync methods should not be called from within an `asyncio` event &quot;</span>
@@ -1979,7 +1979,7 @@ document.write(`
         <span class="k">return</span> <span class="n">replica_result</span><span class="o">.</span><span class="fm">__next__</span><span class="p">()</span>
 
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_to_object_ref_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ObjectRefGenerator</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_to_object_ref_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ObjectRefGenerator</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Advanced API to convert the generator to a Ray `ObjectRefGenerator`.</span>
 
 <span class="sd">        This method is `async def` because it will block until the handle call has been</span>
@@ -1993,7 +1993,7 @@ document.write(`
         <span class="k">return</span> <span class="n">replica_result</span><span class="o">.</span><span class="n">to_object_ref_gen</span><span class="p">()</span>
 
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">_to_object_ref_gen_sync</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_to_object_ref_gen_sync</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">_timeout_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">_allow_running_in_asyncio_loop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -2024,7 +2024,7 @@ document.write(`
 <div class="viewcode-block" id="DeploymentHandle">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.handle.DeploymentHandle.html#ray.serve.handle.DeploymentHandle">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">DeploymentHandle</span><span class="p">(</span><span class="n">_DeploymentHandleBase</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DeploymentHandle</span><span class="p">(</span><span class="n">_DeploymentHandleBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A handle used to make requests to a deployment at runtime.</span>
 
 <span class="sd">    This is primarily used to compose multiple deployments within a single application.</span>
@@ -2063,7 +2063,7 @@ document.write(`
 
 <div class="viewcode-block" id="DeploymentHandle.options">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.handle.DeploymentHandle.html#ray.serve.handle.DeploymentHandle.options">[docs]</a>
-    <span class="k">def</span> <span class="nf">options</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">options</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">method_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DEFAULT</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT</span><span class="o">.</span><span class="n">VALUE</span><span class="p">,</span>
@@ -2105,7 +2105,7 @@ document.write(`
 
 <div class="viewcode-block" id="DeploymentHandle.remote">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.handle.DeploymentHandle.html#ray.serve.handle.DeploymentHandle.remote">[docs]</a>
-    <span class="k">def</span> <span class="nf">remote</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remote</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">DeploymentResponse</span><span class="p">,</span> <span class="n">DeploymentResponseGenerator</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Issue a remote call to a method of the deployment.</span>

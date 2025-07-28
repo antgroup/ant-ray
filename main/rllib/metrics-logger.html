@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1480,7 +1480,7 @@ yourself with how to actually use its APIs.</p>
 <h3>Logging scalar values<a class="headerlink" href="#logging-scalar-values" title="Link to this heading">#</a></h3>
 <p>To log a scalar value under some string key in your <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a>,
 use the <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">log_value()</span></code></a> method:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics.metrics_logger</span> <span class="kn">import</span> <span class="n">MetricsLogger</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.metrics_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsLogger</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">MetricsLogger</span><span class="p">()</span>
 
@@ -1568,7 +1568,7 @@ to <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algo
 <code class="docutils literal notranslate"><span class="pre">{&quot;time_s&quot;:</span> <span class="pre">0.1,</span> <span class="pre">&quot;lives&quot;:</span> <span class="pre">5,</span> <span class="pre">&quot;rounds_played&quot;:</span> <span class="pre">{&quot;player1&quot;:</span> <span class="pre">10,</span> <span class="pre">&quot;player2&quot;:</span> <span class="pre">4}}</span></code> and all values have the exact same log settings
 in terms of the <code class="docutils literal notranslate"><span class="pre">reduce</span></code>, <code class="docutils literal notranslate"><span class="pre">clear_on_reduce</span></code>, <code class="docutils literal notranslate"><span class="pre">window</span></code>, etc arguments, you can also call the shortcut
 <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">log_dict()</span></code></a> method to do so:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics.metrics_logger</span> <span class="kn">import</span> <span class="n">MetricsLogger</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.metrics_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsLogger</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">MetricsLogger</span><span class="p">()</span>
 
@@ -1590,7 +1590,7 @@ in terms of the <code class="docutils literal notranslate"><span class="pre">red
 You can also use it to log images, videos, or any other complex data.</p>
 <p>Normally, you would chose the previously described <code class="docutils literal notranslate"><span class="pre">reduce=None</span></code> argument. For example, to
 log three consecutive image frames from a <code class="docutils literal notranslate"><span class="pre">CartPole</span></code> environment, do the following:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
 
 <span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;CartPole-v1&quot;</span><span class="p">)</span>
 
@@ -1610,8 +1610,8 @@ log three consecutive image frames from a <code class="docutils literal notransl
 <p><a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> is context capable and offers the following
 simple API to log timer results.
 Notice that you can now time all your code blocks of interest inside your custom code through a single <code class="docutils literal notranslate"><span class="pre">with-</span></code> line:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics.metrics_logger</span> <span class="kn">import</span> <span class="n">MetricsLogger</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.metrics_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsLogger</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">MetricsLogger</span><span class="p">()</span>
 
@@ -1643,7 +1643,7 @@ counts either over the lifetime or over some particular phase, use the <code cla
 <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">log_value()</span></code></a>.</p>
 <p>Combine this with <code class="docutils literal notranslate"><span class="pre">clear_on_reduce=True</span></code>, if you want the count to only accumulate until the next “reduce” event.
 Set <code class="docutils literal notranslate"><span class="pre">clear_on_reduce=False</span></code>, which is the default, if you want the count to accumulate over the lifetime.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics.metrics_logger</span> <span class="kn">import</span> <span class="n">MetricsLogger</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.metrics_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsLogger</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">MetricsLogger</span><span class="p">()</span>
 
@@ -1674,8 +1674,8 @@ on each <code class="docutils literal notranslate"><span class="pre">reduce()</s
 to the original key and assigning it the value for the throughput per second.</p>
 <p>You can use the <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek"><code class="xref py py-meth docutils literal notranslate"><span class="pre">peek()</span></code></a> method with the call argument <code class="docutils literal notranslate"><span class="pre">throughput=True</span></code>
 to access the throughput value. For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.metrics.metrics_logger</span> <span class="kn">import</span> <span class="n">MetricsLogger</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.metrics_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsLogger</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">MetricsLogger</span><span class="p">()</span>
 
@@ -1703,20 +1703,20 @@ makes use of the <a class="reference internal" href="package_ref/doc/ray.rllib.c
 and logs the results through the <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> API.</p>
 <p>Note that this example is <a class="reference internal" href="rllib-callback.html#rllib-callback-example-on-episode-step-and-end"><span class="std std-ref">identical to the one described here</span></a>, but the focus has shifted to explain
 only the <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> aspects of the code.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.callbacks.callbacks</span> <span class="kn">import</span> <span class="n">RLlibCallback</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.callbacks.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLlibCallback</span>
 
 <span class="c1"># Define a custom RLlibCallback.</span>
-<span class="k">class</span> <span class="nc">LogAcrobotAngle</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">on_episode_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">episode</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogAcrobotAngle</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_episode_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">episode</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Compute the angle at every episode step and store it temporarily in episode:</span>
         <span class="n">state</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">envs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">state</span>
         <span class="n">deg_theta1</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
         <span class="n">episode</span><span class="o">.</span><span class="n">add_temporary_timestep_data</span><span class="p">(</span><span class="s2">&quot;theta1&quot;</span><span class="p">,</span> <span class="n">deg_theta1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_episode_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">episode</span><span class="p">,</span> <span class="n">metrics_logger</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_episode_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">episode</span><span class="p">,</span> <span class="n">metrics_logger</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">theta1s</span> <span class="o">=</span> <span class="n">episode</span><span class="o">.</span><span class="n">get_temporary_timestep_data</span><span class="p">(</span><span class="s2">&quot;theta1&quot;</span><span class="p">)</span>
         <span class="n">avg_theta1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">theta1s</span><span class="p">)</span>
 
@@ -1757,7 +1757,7 @@ current loss value, rather than a smoothened result over time. This way, you not
 behavior in your loss math right away and can pinpoint problems to a particular iteration.</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@override</span><span class="p">(</span><span class="n">TorchLearner</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">compute_loss_for_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">module_id</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">fwd_out</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_loss_for_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">module_id</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">fwd_out</span><span class="p">):</span>
     <span class="o">...</span>
 
     <span class="n">loss_xyz</span> <span class="o">=</span> <span class="o">...</span>
@@ -1778,7 +1778,7 @@ behavior in your loss math right away and can pinpoint problems to a particular 
 <p>You can log metrics inside your custom Algorithm <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.training_step.html#ray.rllib.algorithms.algorithm.Algorithm.training_step" title="ray.rllib.algorithms.algorithm.Algorithm.training_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">training_step()</span></code></a> method.
 Use the Algorithm’s own <code class="docutils literal notranslate"><span class="pre">self.metrics</span></code> attribute for this.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@override</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="o">...</span>
 
     <span class="c1"># Log some value.</span>

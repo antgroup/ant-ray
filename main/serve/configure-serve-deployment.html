@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1438,7 +1438,7 @@ document.write(`
 <p>Use the <code class="docutils literal notranslate"><span class="pre">&#64;serve.deployment</span></code> decorator to specify deployment parameters when you are defining a deployment for the first time:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># File name: configure_serve.py</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span><span class="p">(</span>
@@ -1451,7 +1451,7 @@ document.write(`
     <span class="n">graceful_shutdown_timeout_s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
     <span class="n">graceful_shutdown_wait_loop_s</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="k">class</span> <span class="nc">Example</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Example</span><span class="p">:</span>
     <span class="o">...</span>
 
 
@@ -1498,7 +1498,7 @@ document.write(`
 <p>In other words, if you specify a parameter for a deployment in the config file and the application code, Serve uses the config file’s value. If it’s only specified in the code, Serve uses the value you specified in the code. If you don’t specify the parameter anywhere, Serve uses the default for that parameter.</p>
 <p>For example, the following application code contains a single deployment <code class="docutils literal notranslate"><span class="pre">ExampleDeployment</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span><span class="p">(</span><span class="n">num_replicas</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">graceful_shutdown_timeout_s</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ExampleDeployment</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExampleDeployment</span><span class="p">:</span>
     <span class="o">...</span>
 
 <span class="n">example_app</span> <span class="o">=</span> <span class="n">ExampleDeployment</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span>

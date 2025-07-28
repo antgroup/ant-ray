@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1512,13 +1512,13 @@ learn to identify subjects with breast cancer and those without.</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sklearn.datasets</span>
-<span class="kn">import</span> <span class="nn">sklearn.metrics</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-<span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sklearn.datasets</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sklearn.metrics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xgboost</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xgb</span>
 
 
-<span class="k">def</span> <span class="nf">train_breast_cancer</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_breast_cancer</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="c1"># Load dataset</span>
     <span class="n">data</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">load_breast_cancer</span><span class="p">(</span><span class="n">return_X_y</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1"># Split into train and test set</span>
@@ -1709,13 +1709,13 @@ also takes care of training these runs in parallel, greatly increasing search sp
 a few changes to our code-block:</p>
 <div class="cell tag_hide-output docutils container">
 <div class="cell_input above-output-prompt docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sklearn.datasets</span>
-<span class="kn">import</span> <span class="nn">sklearn.metrics</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sklearn.datasets</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sklearn.metrics</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
 
 
-<span class="k">def</span> <span class="nf">train_breast_cancer</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_breast_cancer</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="c1"># Load dataset</span>
     <span class="n">data</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">load_breast_cancer</span><span class="p">(</span><span class="n">return_X_y</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1"># Split into train and test set</span>
@@ -1931,17 +1931,17 @@ The best model is selected with respect to the <code class="docutils literal not
 pass to the <code class="docutils literal notranslate"><span class="pre">TunerConfig()</span></code>.</p>
 <div class="cell tag_hide-output docutils container">
 <div class="cell_input above-output-prompt docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sklearn.datasets</span>
-<span class="kn">import</span> <span class="nn">sklearn.metrics</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers</span> <span class="kn">import</span> <span class="n">ASHAScheduler</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-<span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sklearn.datasets</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sklearn.metrics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ASHAScheduler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xgboost</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xgb</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune.integration.xgboost</span> <span class="kn">import</span> <span class="n">TuneReportCheckpointCallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.integration.xgboost</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneReportCheckpointCallback</span>
 
 
-<span class="k">def</span> <span class="nf">train_breast_cancer</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_breast_cancer</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
     <span class="c1"># This is a simple training function to be passed into Tune</span>
     <span class="c1"># Load dataset</span>
     <span class="n">data</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">load_breast_cancer</span><span class="p">(</span><span class="n">return_X_y</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1961,7 +1961,7 @@ pass to the <code class="docutils literal notranslate"><span class="pre">TunerCo
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">get_best_model_checkpoint</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_best_model_checkpoint</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
     <span class="n">best_result</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">get_best_result</span><span class="p">()</span>
 
     <span class="c1"># `TuneReportCheckpointCallback` provides a helper method to retrieve the</span>
@@ -1974,7 +1974,7 @@ pass to the <code class="docutils literal notranslate"><span class="pre">TunerCo
     <span class="k">return</span> <span class="n">best_bst</span>
 
 
-<span class="k">def</span> <span class="nf">tune_xgboost</span><span class="p">(</span><span class="n">smoke_test</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">tune_xgboost</span><span class="p">(</span><span class="n">smoke_test</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">search_space</span> <span class="o">=</span> <span class="p">{</span>
         <span class="c1"># You can mix constants with search space objects.</span>
         <span class="s2">&quot;objective&quot;</span><span class="p">:</span> <span class="s2">&quot;binary:logistic&quot;</span><span class="p">,</span>

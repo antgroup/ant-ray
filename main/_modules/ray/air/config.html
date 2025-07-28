@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,12 +1389,12 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.air.config</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">_MISSING_TYPE</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">fields</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">_MISSING_TYPE</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">fields</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -1405,24 +1405,24 @@ document.write(`
     <span class="n">Tuple</span><span class="p">,</span>
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
-<span class="kn">import</span> <span class="nn">pyarrow.fs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray._private.ray_constants</span> <span class="kn">import</span> <span class="n">RESOURCE_CONSTRAINT_PREFIX</span>
-<span class="kn">from</span> <span class="nn">ray._private.thirdparty.tabulate.tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
-<span class="kn">from</span> <span class="nn">ray.data.preprocessor</span> <span class="kn">import</span> <span class="n">Preprocessor</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">PublicAPI</span><span class="p">,</span> <span class="n">RayDeprecationWarning</span>
-<span class="kn">from</span> <span class="nn">ray.widgets</span> <span class="kn">import</span> <span class="n">Template</span><span class="p">,</span> <span class="n">make_table_html_repr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.ray_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">RESOURCE_CONSTRAINT_PREFIX</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.thirdparty.tabulate.tabulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">tabulate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.preprocessor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Preprocessor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">PublicAPI</span><span class="p">,</span> <span class="n">RayDeprecationWarning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.widgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Template</span><span class="p">,</span> <span class="n">make_table_html_repr</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.callback</span> <span class="kn">import</span> <span class="n">Callback</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.execution.placement_groups</span> <span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.experimental.output</span> <span class="kn">import</span> <span class="n">AirVerbosity</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.search.sample</span> <span class="kn">import</span> <span class="n">Domain</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.stopper</span> <span class="kn">import</span> <span class="n">Stopper</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.utils.log</span> <span class="kn">import</span> <span class="n">Verbosity</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.callback</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.placement_groups</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experimental.output</span><span class="w"> </span><span class="kn">import</span> <span class="n">AirVerbosity</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.sample</span><span class="w"> </span><span class="kn">import</span> <span class="n">Domain</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.stopper</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stopper</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">Verbosity</span>
 
 
 <span class="c1"># Dict[str, List] is to support `tune.grid_search`:</span>
@@ -1442,7 +1442,7 @@ document.write(`
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_repr_dataclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">default_values</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_repr_dataclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">default_values</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A utility function to elegantly represent dataclasses.</span>
 
 <span class="sd">    In contrast to the default dataclass `__repr__`, which shows all parameters, this</span>
@@ -1464,7 +1464,7 @@ document.write(`
 
     <span class="n">non_default_values</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Maps field name to value.</span>
 
-    <span class="k">def</span> <span class="nf">equals</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">default_value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">equals</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">default_value</span><span class="p">):</span>
         <span class="c1"># We need to special case None because of a bug in pyarrow:</span>
         <span class="c1"># https://github.com/apache/arrow/issues/38535</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">default_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1493,7 +1493,7 @@ document.write(`
 <a class="viewcode-back" href="../../../train/api/doc/ray.air.config.ScalingConfig.html#ray.train.ScalingConfig">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ScalingConfig</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ScalingConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for scaling training.</span>
 
 <span class="sd">    For more details, see :ref:`train_scaling_config`.</span>
@@ -1554,7 +1554,7 @@ document.write(`
     <span class="n">placement_strategy</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SampleRange</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;PACK&quot;</span>
     <span class="n">accelerator_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resources_per_worker</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_gpu</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_gpus_per_worker</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1571,19 +1571,19 @@ document.write(`
                     <span class="s2">&quot;`resources_per_worker.&quot;</span>
                 <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_repr_dataclass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">make_table_html_repr</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">:</span> <span class="s2">&quot;ScalingConfig&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">:</span> <span class="s2">&quot;ScalingConfig&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_placement_group_factory</span><span class="p">()</span> <span class="o">==</span> <span class="n">o</span><span class="o">.</span><span class="n">as_placement_group_factory</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_resources_per_worker_not_none</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_resources_per_worker_not_none</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resources_per_worker</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_gpu</span><span class="p">:</span>
                 <span class="c1"># Note that we don&#39;t request any CPUs, which avoids possible</span>
@@ -1606,7 +1606,7 @@ document.write(`
         <span class="k">return</span> <span class="n">resources_per_worker</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_trainer_resources_not_none</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_trainer_resources_not_none</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer_resources</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">:</span>
                 <span class="c1"># For Google Colab, don&#39;t allocate resources to the base Trainer.</span>
@@ -1616,7 +1616,7 @@ document.write(`
                 <span class="c1"># leading to all Trainers being scheduled on the head node if we set</span>
                 <span class="c1"># `trainer_resources` to 0 is no longer applicable.</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="kn">import</span> <span class="nn">google.colab</span>  <span class="c1"># noqa: F401</span>
+                    <span class="kn">import</span><span class="w"> </span><span class="nn">google.colab</span>  <span class="c1"># noqa: F401</span>
 
                     <span class="n">trainer_num_cpus</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -1635,7 +1635,7 @@ document.write(`
         <span class="k">return</span> <span class="n">trainer_resources</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">total_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">total_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Map of total resources required for the trainer.&quot;&quot;&quot;</span>
         <span class="n">total_resource_map</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trainer_resources_not_none</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resources_per_worker_not_none</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1643,17 +1643,17 @@ document.write(`
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">total_resource_map</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">num_cpus_per_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_cpus_per_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The number of CPUs to set per worker.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resources_per_worker_not_none</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;CPU&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">num_gpus_per_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_gpus_per_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The number of GPUs to set per worker.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resources_per_worker_not_none</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GPU&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">additional_resources_per_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">additional_resources_per_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Resources per worker, not including CPU or GPU resources.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
@@ -1663,9 +1663,9 @@ document.write(`
 
 <div class="viewcode-block" id="ScalingConfig.as_placement_group_factory">
 <a class="viewcode-back" href="../../../train/api/doc/ray.train.ScalingConfig.as_placement_group_factory.html#ray.train.ScalingConfig.as_placement_group_factory">[docs]</a>
-    <span class="k">def</span> <span class="nf">as_placement_group_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PlacementGroupFactory&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_placement_group_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PlacementGroupFactory&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a PlacementGroupFactory to specify resources for Tune.&quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.tune.execution.placement_groups</span> <span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.placement_groups</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
 
         <span class="n">trainer_bundle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trainer_resources_not_none</span>
         <span class="n">worker_bundle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resources_per_worker_not_none</span>
@@ -1682,7 +1682,7 @@ document.write(`
 <div class="viewcode-block" id="ScalingConfig.from_placement_group_factory">
 <a class="viewcode-back" href="../../../train/api/doc/ray.train.ScalingConfig.from_placement_group_factory.html#ray.train.ScalingConfig.from_placement_group_factory">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_placement_group_factory</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_placement_group_factory</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">pgf</span><span class="p">:</span> <span class="s2">&quot;PlacementGroupFactory&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ScalingConfig&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a ScalingConfig from a Tune&#39;s PlacementGroupFactory</span>
@@ -1722,7 +1722,7 @@ document.write(`
 
 <span class="nd">@dataclass</span>
 <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">DATASET_CONFIG_DEPRECATION_MSG</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">DatasetConfig</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DatasetConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for ingest of a single Dataset.</span>
 
 <span class="sd">    See :ref:`the AIR Dataset configuration guide &lt;data-ingest-torch&gt;` for</span>
@@ -1789,7 +1789,7 @@ document.write(`
     <span class="n">use_stream_api</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">stream_window_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span><span class="n">DATASET_CONFIG_DEPRECATION_MSG</span><span class="p">)</span>
 
 
@@ -1797,7 +1797,7 @@ document.write(`
 <a class="viewcode-back" href="../../../train/api/doc/ray.air.config.FailureConfig.html#ray.train.FailureConfig">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">FailureConfig</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FailureConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration related to failure handling of each training/tuning run.</span>
 
 <span class="sd">    Args:</span>
@@ -1814,7 +1814,7 @@ document.write(`
     <span class="n">max_failures</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">fail_fast</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Same check as in TuneController</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fail_fast</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">fail_fast</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;RAISE&quot;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1827,10 +1827,10 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;max_failures must be 0 if fail_fast=</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fail_fast</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_repr_dataclass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Template</span><span class="p">(</span><span class="s2">&quot;scrollableTable.html.j2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
             <span class="n">table</span><span class="o">=</span><span class="n">tabulate</span><span class="p">(</span>
                 <span class="p">{</span>
@@ -1848,7 +1848,7 @@ document.write(`
 
 <span class="nd">@dataclass</span>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">CheckpointConfig</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CheckpointConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Configurable parameters for defining the checkpointing strategy.</span>
 
 <span class="sd">    Default behavior is to persist all checkpoints to disk. If</span>
@@ -1901,7 +1901,7 @@ document.write(`
     <span class="n">_checkpoint_keep_all_ranks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DEPRECATED_VALUE</span>
     <span class="n">_checkpoint_upload_from_workers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DEPRECATED_VALUE</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkpoint_keep_all_ranks</span> <span class="o">!=</span> <span class="n">_DEPRECATED_VALUE</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span>
                 <span class="s2">&quot;The experimental `_checkpoint_keep_all_ranks` config is deprecated. &quot;</span>
@@ -1937,10 +1937,10 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;checkpoint_frequency must be &gt;=0, got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_frequency</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_repr_dataclass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_to_keep</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">num_to_keep_repr</span> <span class="o">=</span> <span class="s2">&quot;All&quot;</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1982,7 +1982,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_tune_legacy_checkpoint_score_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_tune_legacy_checkpoint_score_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Same as ``checkpoint_score_attr`` in ``tune.run``.</span>
 
 <span class="sd">        Only used for Legacy API compatibility.</span>
@@ -1999,7 +1999,7 @@ document.write(`
 <a class="viewcode-back" href="../../../train/api/doc/ray.air.config.RunConfig.html#ray.train.RunConfig">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RunConfig</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RunConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Runtime configuration for training and tuning runs.</span>
 
 <span class="sd">    Upon resuming from a training or tuning run checkpoint,</span>
@@ -2066,10 +2066,10 @@ document.write(`
     <span class="c1"># Deprecated</span>
     <span class="n">local_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">SyncConfig</span>
-        <span class="kn">from</span> <span class="nn">ray.train.constants</span> <span class="kn">import</span> <span class="n">DEFAULT_STORAGE_PATH</span>
-        <span class="kn">from</span> <span class="nn">ray.tune.experimental.output</span> <span class="kn">import</span> <span class="n">AirVerbosity</span><span class="p">,</span> <span class="n">get_air_verbosity</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">SyncConfig</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_STORAGE_PATH</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experimental.output</span><span class="w"> </span><span class="kn">import</span> <span class="n">AirVerbosity</span><span class="p">,</span> <span class="n">get_air_verbosity</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span>
@@ -2118,8 +2118,8 @@ document.write(`
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">SyncConfig</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">SyncConfig</span>
 
         <span class="k">return</span> <span class="n">_repr_dataclass</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -2130,7 +2130,7 @@ document.write(`
             <span class="p">},</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">reprs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">failure_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">reprs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>

@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1513,7 +1513,7 @@ or <a class="reference external" href="https://docs.cupy.dev/en/stable/install.h
 </pre></div>
 </div>
 <p>To use these APIs, import the collective package in your actor/task or driver code via:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray.util.collective</span> <span class="k">as</span> <span class="nn">col</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray.util.collective</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">col</span>
 </pre></div>
 </div>
 </section>
@@ -1524,27 +1524,27 @@ A collective group contains a number of processes (in Ray, they are usually Ray-
 Before making collective calls, users need to declare a set of actors/tasks, statically, as a collective group.</p>
 <p>Below is an example code snippet that uses the two APIs <code class="docutils literal notranslate"><span class="pre">init_collective_group()</span></code> and <code class="docutils literal notranslate"><span class="pre">create_collective_group()</span></code> to initialize collective groups among a few
 remote actors. Refer to <a class="reference external" href="#api-reference">APIs</a> for the detailed descriptions of the two APIs.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray.util.collective</span> <span class="k">as</span> <span class="nn">collective</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.util.collective</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">collective</span>
 
-<span class="kn">import</span> <span class="nn">cupy</span> <span class="k">as</span> <span class="nn">cp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Worker</span><span class="p">:</span>
-   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Worker</span><span class="p">:</span>
+   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
        <span class="bp">self</span><span class="o">.</span><span class="n">send</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
        <span class="bp">self</span><span class="o">.</span><span class="n">recv</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
-   <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">world_size</span><span class="p">,</span> <span class="n">rank</span><span class="p">):</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">world_size</span><span class="p">,</span> <span class="n">rank</span><span class="p">):</span>
        <span class="n">collective</span><span class="o">.</span><span class="n">init_collective_group</span><span class="p">(</span><span class="n">world_size</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="s2">&quot;nccl&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span>
        <span class="k">return</span> <span class="kc">True</span>
 
-   <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
        <span class="n">collective</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span>
        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send</span>
 
-   <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
        <span class="n">collective</span><span class="o">.</span><span class="n">destroy_group</span><span class="p">()</span>
 
 <span class="c1"># imperative</span>
@@ -1587,17 +1587,17 @@ Upon all the processes have made the call and rendezvous with each other, the co
 <li><p>The APIs are imperative and the communication happens out-of-band — they need to be used inside the collective process (actor/task) code.</p></li>
 </ul>
 <p>An example of using <code class="docutils literal notranslate"><span class="pre">ray.util.collective.allreduce</span></code> is below:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">cupy</span>
-<span class="kn">import</span> <span class="nn">ray.util.collective</span> <span class="k">as</span> <span class="nn">col</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.util.collective</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">col</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Worker</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Worker</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="n">cupy</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">10</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cupy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">col</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span>
 
@@ -1615,28 +1615,28 @@ Upon all the processes have made the call and rendezvous with each other, the co
 <p>The send/recv exhibits the same behavior with the collective functions:
 they are synchronous blocking calls – a pair of send and recv must be called together on paired processes in order to specify the entire communication,
 and must successfully rendezvous with each other to proceed. See the code example below:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">cupy</span>
-<span class="kn">import</span> <span class="nn">ray.util.collective</span> <span class="k">as</span> <span class="nn">col</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.util.collective</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">col</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Worker</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Worker</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="n">cupy</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">10</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cupy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span>
 
-    <span class="k">def</span> <span class="nf">do_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_rank</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_rank</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="c1"># this call is blocking</span>
         <span class="n">col</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">target_rank</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">do_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_rank</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_rank</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="c1"># this call is blocking</span>
         <span class="n">col</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">src_rank</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">do_allreduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_allreduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># this call is blocking as well</span>
         <span class="n">col</span><span class="o">.</span><span class="n">allreduce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span>
@@ -1672,16 +1672,16 @@ See the API references for the signatures of multi-GPU collective APIs.</p>
 <li><p>The input to multi-GPU collective functions are normally a list of tensors, each located on a different GPU device owned by the caller process.</p></li>
 </ul>
 <p>An example code utilizing the multi-GPU collective APIs is provided below:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray.util.collective</span> <span class="k">as</span> <span class="nn">collective</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.util.collective</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">collective</span>
 
-<span class="kn">import</span> <span class="nn">cupy</span> <span class="k">as</span> <span class="nn">cp</span>
-<span class="kn">from</span> <span class="nn">cupy.cuda</span> <span class="kn">import</span> <span class="n">Device</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cupy.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">Device</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Worker</span><span class="p">:</span>
-   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Worker</span><span class="p">:</span>
+   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
        <span class="k">with</span> <span class="n">Device</span><span class="p">(</span><span class="mi">0</span><span class="p">):</span>
            <span class="bp">self</span><span class="o">.</span><span class="n">send1</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
        <span class="k">with</span> <span class="n">Device</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
@@ -1691,16 +1691,16 @@ See the API references for the signatures of multi-GPU collective APIs.</p>
        <span class="k">with</span> <span class="n">Device</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
            <span class="bp">self</span><span class="o">.</span><span class="n">recv2</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
 
-   <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">world_size</span><span class="p">,</span> <span class="n">rank</span><span class="p">):</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">world_size</span><span class="p">,</span> <span class="n">rank</span><span class="p">):</span>
        <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="n">rank</span>
        <span class="n">collective</span><span class="o">.</span><span class="n">init_collective_group</span><span class="p">(</span><span class="n">world_size</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="s2">&quot;nccl&quot;</span><span class="p">,</span> <span class="s2">&quot;177&quot;</span><span class="p">)</span>
        <span class="k">return</span> <span class="kc">True</span>
 
-   <span class="k">def</span> <span class="nf">allreduce_call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">allreduce_call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
        <span class="n">collective</span><span class="o">.</span><span class="n">allreduce_multigpu</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">send1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">send2</span><span class="p">],</span> <span class="s2">&quot;177&quot;</span><span class="p">)</span>
        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">send1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">send2</span><span class="p">]</span>
 
-   <span class="k">def</span> <span class="nf">p2p_call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">p2p_call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
           <span class="n">collective</span><span class="o">.</span><span class="n">send_multigpu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send1</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;8&quot;</span><span class="p">)</span>
        <span class="k">else</span><span class="p">:</span>

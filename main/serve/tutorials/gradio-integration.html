@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1409,11 +1409,11 @@ document.write(`
 <h2>Example 1: Scaling up your Gradio app with <code class="docutils literal notranslate"><span class="pre">GradioServer</span></code><a class="headerlink" href="#example-1-scaling-up-your-gradio-app-with-gradioserver" title="Link to this heading">#</a></h2>
 <p>The first example summarizes text using the <a class="reference external" href="https://huggingface.co/t5-small">T5 Small</a> model and uses <a class="reference external" href="https://huggingface.co/docs/transformers/main_classes/pipelines">Hugging Face’s Pipelines</a> to access that model. It demonstrates one easy way to deploy Gradio apps onto Ray Serve: using the simple <code class="docutils literal notranslate"><span class="pre">GradioServer</span></code> wrapper. Example 2 shows how to use <code class="docutils literal notranslate"><span class="pre">GradioIngress</span></code> for more customized use-cases.</p>
 <p>First, create a new Python file named <code class="docutils literal notranslate"><span class="pre">demo.py</span></code>. Second, import <code class="docutils literal notranslate"><span class="pre">GradioServer</span></code> from Ray Serve to deploy your Gradio app later, <code class="docutils literal notranslate"><span class="pre">gradio</span></code>, and <code class="docutils literal notranslate"><span class="pre">transformers.pipeline</span></code> to load text summarization models.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.serve.gradio_integrations</span> <span class="kn">import</span> <span class="n">GradioServer</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.gradio_integrations</span><span class="w"> </span><span class="kn">import</span> <span class="n">GradioServer</span>
 
-<span class="kn">import</span> <span class="nn">gradio</span> <span class="k">as</span> <span class="nn">gr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gradio</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gr</span>
 
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">pipeline</span>
 
 </pre></div>
 </div>
@@ -1438,10 +1438,10 @@ document.write(`
 <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">gradio_summarizer_builder</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gradio_summarizer_builder</span><span class="p">():</span>
     <span class="n">summarizer</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;summarization&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;t5-small&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
         <span class="n">summary_list</span> <span class="o">=</span> <span class="n">summarizer</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
         <span class="n">summary</span> <span class="o">=</span> <span class="n">summary_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;summary_text&quot;</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">summary</span>
@@ -1501,13 +1501,13 @@ document.write(`
 <span class="n">generator2</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;text-generation&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;distilgpt2&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">model1</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">model1</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
     <span class="n">generated_list</span> <span class="o">=</span> <span class="n">generator1</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
     <span class="n">generated</span> <span class="o">=</span> <span class="n">generated_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;generated_text&quot;</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">generated</span>
 
 
-<span class="k">def</span> <span class="nf">model2</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">model2</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
     <span class="n">generated_list</span> <span class="o">=</span> <span class="n">generator2</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
     <span class="n">generated</span> <span class="o">=</span> <span class="n">generated_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;generated_text&quot;</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">generated</span>
@@ -1527,24 +1527,24 @@ document.write(`
 <h3>Parallelize using Ray Serve<a class="headerlink" href="#parallelize-using-ray-serve" title="Link to this heading">#</a></h3>
 <p>With Ray Serve, you can parallelize the two text generation models by wrapping each model in a separate Ray Serve <a class="reference internal" href="../key-concepts.html#serve-key-concepts-deployment"><span class="std std-ref">deployment</span></a>. You can define deployments by decorating a Python class or function with <code class="docutils literal notranslate"><span class="pre">&#64;serve.deployment</span></code>. The deployments usually wrap the models that you want to deploy on Ray Serve to handle incoming requests.</p>
 <p>Follow these steps to achieve parallelism. First, import the dependencies. Note that you need to import <code class="docutils literal notranslate"><span class="pre">GradioIngress</span></code> instead of <code class="docutils literal notranslate"><span class="pre">GradioServer</span></code> like before because in this case, you’re building a customized <code class="docutils literal notranslate"><span class="pre">MyGradioServer</span></code> that can run models in parallel.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray.serve.handle</span> <span class="kn">import</span> <span class="n">DeploymentHandle</span>
-<span class="kn">from</span> <span class="nn">ray.serve.gradio_integrations</span> <span class="kn">import</span> <span class="n">GradioIngress</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.handle</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentHandle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.gradio_integrations</span><span class="w"> </span><span class="kn">import</span> <span class="n">GradioIngress</span>
 
-<span class="kn">import</span> <span class="nn">gradio</span> <span class="k">as</span> <span class="nn">gr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gradio</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gr</span>
 
-<span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">pipeline</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">pipeline</span>
 
 </pre></div>
 </div>
 <p>Then, wrap the <code class="docutils literal notranslate"><span class="pre">gpt2</span></code> and <code class="docutils literal notranslate"><span class="pre">distilgpt2</span></code> models in Serve deployments, named <code class="docutils literal notranslate"><span class="pre">TextGenerationModel</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">TextGenerationModel</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TextGenerationModel</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">generator</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;text-generation&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
         <span class="n">generated_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="p">(</span>
             <span class="n">text</span><span class="p">,</span> <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span>
         <span class="p">)</span>
@@ -1558,8 +1558,8 @@ document.write(`
 </div>
 <p>Next, instead of simply wrapping the Gradio app in a <code class="docutils literal notranslate"><span class="pre">GradioServer</span></code> deployment, build your own <code class="docutils literal notranslate"><span class="pre">MyGradioServer</span></code> that reroutes the Gradio app so that it runs the <code class="docutils literal notranslate"><span class="pre">TextGenerationModel</span></code> deployments.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">MyGradioServer</span><span class="p">(</span><span class="n">GradioIngress</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyGradioServer</span><span class="p">(</span><span class="n">GradioIngress</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">downstream_model_1</span><span class="p">:</span> <span class="n">DeploymentHandle</span><span class="p">,</span> <span class="n">downstream_model_2</span><span class="p">:</span> <span class="n">DeploymentHandle</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span> <span class="o">=</span> <span class="n">downstream_model_1</span>
@@ -1567,7 +1567,7 @@ document.write(`
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">gr</span><span class="o">.</span><span class="n">Interface</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fanout</span><span class="p">,</span> <span class="s2">&quot;textbox&quot;</span><span class="p">,</span> <span class="s2">&quot;textbox&quot;</span><span class="p">))</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">fanout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">fanout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
         <span class="p">[</span><span class="n">result1</span><span class="p">,</span> <span class="n">result2</span><span class="p">]</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d2</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
         <span class="p">)</span>

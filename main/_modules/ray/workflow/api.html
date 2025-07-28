@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,40 +1389,40 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.workflow.api</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Any</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.dag</span> <span class="kn">import</span> <span class="n">DAGNode</span>
-<span class="kn">from</span> <span class="nn">ray.dag.input_node</span> <span class="kn">import</span> <span class="n">DAGInputData</span>
-<span class="kn">from</span> <span class="nn">ray.remote_function</span> <span class="kn">import</span> <span class="n">RemoteFunction</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag</span><span class="w"> </span><span class="kn">import</span> <span class="n">DAGNode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.input_node</span><span class="w"> </span><span class="kn">import</span> <span class="n">DAGInputData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.remote_function</span><span class="w"> </span><span class="kn">import</span> <span class="n">RemoteFunction</span>
 
 <span class="c1"># avoid collision with arguments &amp; APIs</span>
 
-<span class="kn">from</span> <span class="nn">ray.workflow.common</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.workflow.common</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">WorkflowStatus</span><span class="p">,</span>
     <span class="n">Event</span><span class="p">,</span>
     <span class="n">asyncio_run</span><span class="p">,</span>
     <span class="n">validate_user_metadata</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.workflow</span> <span class="kn">import</span> <span class="n">serialization</span><span class="p">,</span> <span class="n">workflow_access</span><span class="p">,</span> <span class="n">workflow_context</span>
-<span class="kn">from</span> <span class="nn">ray.workflow.event_listener</span> <span class="kn">import</span> <span class="n">EventListener</span><span class="p">,</span> <span class="n">EventListenerType</span><span class="p">,</span> <span class="n">TimerListener</span>
-<span class="kn">from</span> <span class="nn">ray.workflow.workflow_storage</span> <span class="kn">import</span> <span class="n">WorkflowStorage</span>
-<span class="kn">from</span> <span class="nn">ray.workflow.workflow_state_from_dag</span> <span class="kn">import</span> <span class="n">workflow_state_from_dag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">serialization</span><span class="p">,</span> <span class="n">workflow_access</span><span class="p">,</span> <span class="n">workflow_context</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.workflow.event_listener</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventListener</span><span class="p">,</span> <span class="n">EventListenerType</span><span class="p">,</span> <span class="n">TimerListener</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.workflow.workflow_storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">WorkflowStorage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.workflow.workflow_state_from_dag</span><span class="w"> </span><span class="kn">import</span> <span class="n">workflow_state_from_dag</span>
 
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
-<span class="kn">from</span> <span class="nn">ray._private.usage</span> <span class="kn">import</span> <span class="n">usage_lib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.usage</span><span class="w"> </span><span class="kn">import</span> <span class="n">usage_lib</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">init</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">init</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">max_running_workflows</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">max_pending_workflows</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1470,7 +1470,7 @@ document.write(`
     <span class="n">serialization</span><span class="o">.</span><span class="n">init_manager</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_ensure_workflow_initialized</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_ensure_workflow_initialized</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># NOTE: Trying to get the actor has a side effect: it initializes Ray with</span>
     <span class="c1"># default arguments. This is different in &quot;init()&quot;: it assigns a temporary</span>
     <span class="c1"># storage. This is why we need to check &quot;ray.is_initialized()&quot; first.</span>
@@ -1483,7 +1483,7 @@ document.write(`
             <span class="n">init</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">client_mode_wrap</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">client_mode_wrap</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Wraps a function called during client mode for execution as a remote task.</span>
 
 <span class="sd">    Adopted from &quot;ray._private.client_mode_hook.client_mode_wrap&quot;. Some changes are made</span>
@@ -1492,9 +1492,9 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">ray._private.client_mode_hook</span> <span class="kn">import</span> <span class="n">client_mode_should_convert</span>
-        <span class="kn">from</span> <span class="nn">ray._private.auto_init_hook</span> <span class="kn">import</span> <span class="n">enable_auto_connect</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.client_mode_hook</span><span class="w"> </span><span class="kn">import</span> <span class="n">client_mode_should_convert</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.auto_init_hook</span><span class="w"> </span><span class="kn">import</span> <span class="n">enable_auto_connect</span>
 
         <span class="k">if</span> <span class="n">enable_auto_connect</span><span class="p">:</span>
             <span class="n">_ensure_workflow_initialized</span><span class="p">()</span>
@@ -1513,7 +1513,7 @@ document.write(`
 <div class="viewcode-block" id="run">
 <a class="viewcode-back" href="../../../workflows/api/doc/ray.workflow.run.html#ray.workflow.run">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span>
     <span class="n">dag</span><span class="p">:</span> <span class="n">DAGNode</span><span class="p">,</span>
     <span class="o">*</span><span class="n">args</span><span class="p">,</span>
     <span class="n">workflow_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1570,7 +1570,7 @@ document.write(`
 <div class="viewcode-block" id="run_async">
 <a class="viewcode-back" href="../../../workflows/api/doc/ray.workflow.run_async.html#ray.workflow.run_async">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">run_async</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_async</span><span class="p">(</span>
     <span class="n">dag</span><span class="p">:</span> <span class="n">DAGNode</span><span class="p">,</span>
     <span class="o">*</span><span class="n">args</span><span class="p">,</span>
     <span class="n">workflow_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1612,7 +1612,7 @@ document.write(`
     <span class="k">with</span> <span class="n">workflow_context</span><span class="o">.</span><span class="n">workflow_task_context</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
         <span class="c1"># checkpoint the workflow</span>
         <span class="nd">@client_mode_wrap</span>
-        <span class="k">def</span> <span class="nf">_try_checkpoint_workflow</span><span class="p">(</span><span class="n">workflow_state</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_try_checkpoint_workflow</span><span class="p">(</span><span class="n">workflow_state</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
             <span class="n">ws</span> <span class="o">=</span> <span class="n">WorkflowStorage</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">)</span>
             <span class="n">ws</span><span class="o">.</span><span class="n">save_workflow_user_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
@@ -1639,7 +1639,7 @@ document.write(`
 <div class="viewcode-block" id="resume">
 <a class="viewcode-back" href="../../../workflows/api/doc/ray.workflow.resume.html#ray.workflow.resume">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">resume</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">resume</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Resume a workflow.</span>
 
 <span class="sd">    Resume a workflow and retrieve its output. If the workflow was incomplete,</span>
@@ -1673,7 +1673,7 @@ document.write(`
 <div class="viewcode-block" id="resume_async">
 <a class="viewcode-back" href="../../../workflows/api/doc/ray.workflow.resume_async.html#ray.workflow.resume_async">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">resume_async</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">resume_async</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Resume a workflow asynchronously.</span>
 
 <span class="sd">    Resume a workflow and retrieve its output. If the workflow was incomplete,</span>
@@ -1722,7 +1722,7 @@ document.write(`
 <div class="viewcode-block" id="get_output">
 <a class="viewcode-back" href="../../../workflows/api/doc/ray.workflow.get_output.html#ray.workflow.get_output">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_output</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_output</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the output of a running workflow.</span>
 
 <span class="sd">    Args:</span>
@@ -1758,7 +1758,7 @@ document.write(`
 <a class="viewcode-back" href="../../../workflows/api/doc/ray.workflow.get_output_async.html#ray.workflow.get_output_async">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
 <span class="nd">@client_mode_wrap</span>
-<span class="k">def</span> <span class="nf">get_output_async</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_output_async</span><span class="p">(</span>
     <span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the output of a running workflow asynchronously.</span>
@@ -1780,7 +1780,7 @@ document.write(`
             <span class="s2">&quot;actor. The workflow could have already failed. You can use &quot;</span>
             <span class="s2">&quot;workflow.resume() or workflow.resume_async() to resume the &quot;</span>
             <span class="s2">&quot;workflow.&quot;</span>
-        <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
     <span class="k">return</span> <span class="n">workflow_manager</span><span class="o">.</span><span class="n">get_output</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">,</span> <span class="n">task_id</span><span class="p">)</span></div>
 
 
@@ -1789,7 +1789,7 @@ document.write(`
 <a class="viewcode-back" href="../../../workflows/api/doc/ray.workflow.list_all.html#ray.workflow.list_all">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
 <span class="nd">@client_mode_wrap</span>
-<span class="k">def</span> <span class="nf">list_all</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_all</span><span class="p">(</span>
     <span class="n">status_filter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
         <span class="n">Union</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">WorkflowStatus</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Set</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">WorkflowStatus</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]</span>
     <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1913,7 +1913,7 @@ document.write(`
 <a class="viewcode-back" href="../../../workflows/api/doc/ray.workflow.resume_all.html#ray.workflow.resume_all">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
 <span class="nd">@client_mode_wrap</span>
-<span class="k">def</span> <span class="nf">resume_all</span><span class="p">(</span><span class="n">include_failed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">resume_all</span><span class="p">(</span><span class="n">include_failed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ray</span><span class="o">.</span><span class="n">ObjectRef</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Resume all resumable workflow jobs.</span>
 
 <span class="sd">    This can be used after cluster restart to resume all tasks.</span>
@@ -1958,7 +1958,7 @@ document.write(`
     <span class="k">try</span><span class="p">:</span>
         <span class="n">workflow_manager</span> <span class="o">=</span> <span class="n">workflow_access</span><span class="o">.</span><span class="n">get_management_actor</span><span class="p">()</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to get management actor&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to get management actor&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
     <span class="n">job_id</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_job_id</span><span class="p">()</span>
     <span class="n">reconstructed_workflows</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1991,7 +1991,7 @@ document.write(`
 <div class="viewcode-block" id="get_status">
 <a class="viewcode-back" href="../../../workflows/api/doc/ray.workflow.get_status.html#ray.workflow.get_status">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">get_status</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkflowStatus</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_status</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkflowStatus</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the status for a given workflow.</span>
 
 <span class="sd">    Args:</span>
@@ -2022,7 +2022,7 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">wait_for_event</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">wait_for_event</span><span class="p">(</span>
     <span class="n">event_listener_type</span><span class="p">:</span> <span class="n">EventListenerType</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DAGNode[Event]&quot;</span><span class="p">:</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">event_listener_type</span><span class="p">,</span> <span class="n">EventListener</span><span class="p">):</span>
@@ -2032,12 +2032,12 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-    <span class="k">def</span> <span class="nf">get_message</span><span class="p">(</span><span class="n">event_listener_type</span><span class="p">:</span> <span class="n">EventListenerType</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Event</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_message</span><span class="p">(</span><span class="n">event_listener_type</span><span class="p">:</span> <span class="n">EventListenerType</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Event</span><span class="p">:</span>
         <span class="n">event_listener</span> <span class="o">=</span> <span class="n">event_listener_type</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">asyncio_run</span><span class="p">(</span><span class="n">event_listener</span><span class="o">.</span><span class="n">poll_for_event</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
 
     <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-    <span class="k">def</span> <span class="nf">message_committed</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">message_committed</span><span class="p">(</span>
         <span class="n">event_listener_type</span><span class="p">:</span> <span class="n">EventListenerType</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">Event</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Event</span><span class="p">:</span>
         <span class="n">event_listener</span> <span class="o">=</span> <span class="n">event_listener_type</span><span class="p">()</span>
@@ -2050,13 +2050,13 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">sleep</span><span class="p">(</span><span class="n">duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DAGNode[Event]&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sleep</span><span class="p">(</span><span class="n">duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DAGNode[Event]&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A workfow that resolves after sleeping for a given duration.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-    <span class="k">def</span> <span class="nf">end_time</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">end_time</span><span class="p">():</span>
         <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">duration</span>
 
     <span class="k">return</span> <span class="n">wait_for_event</span><span class="p">(</span><span class="n">TimerListener</span><span class="p">,</span> <span class="n">end_time</span><span class="o">.</span><span class="n">bind</span><span class="p">())</span>
@@ -2066,7 +2066,7 @@ document.write(`
 <a class="viewcode-back" href="../../../workflows/api/doc/ray.workflow.get_metadata.html#ray.workflow.get_metadata">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
 <span class="nd">@client_mode_wrap</span>
-<span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_metadata</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the metadata of the workflow.</span>
 
 <span class="sd">    This will return a dict of metadata of either the workflow (</span>
@@ -2132,7 +2132,7 @@ document.write(`
 <div class="viewcode-block" id="cancel">
 <a class="viewcode-back" href="../../../workflows/api/doc/ray.workflow.cancel.html#ray.workflow.cancel">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cancel</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Cancel a workflow. Workflow checkpoints will still be saved in storage. To</span>
 <span class="sd">       clean up saved checkpoints, see `workflow.delete()`.</span>
 
@@ -2166,7 +2166,7 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Delete a workflow, its checkpoints, and other information it may have</span>
 <span class="sd">       persisted to storage. To stop a running workflow, see</span>
 <span class="sd">       `workflow.cancel()`.</span>
@@ -2197,7 +2197,7 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">continuation</span><span class="p">(</span><span class="n">dag_node</span><span class="p">:</span> <span class="s2">&quot;DAGNode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;DAGNode&quot;</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">continuation</span><span class="p">(</span><span class="n">dag_node</span><span class="p">:</span> <span class="s2">&quot;DAGNode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;DAGNode&quot;</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a DAG into a continuation.</span>
 
 <span class="sd">    The result depends on the context. If it is inside a workflow, it</span>
@@ -2207,7 +2207,7 @@ document.write(`
 <span class="sd">    Args:</span>
 <span class="sd">        dag_node: The DAG to be converted.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">ray.workflow.workflow_context</span> <span class="kn">import</span> <span class="n">in_workflow_execution</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.workflow.workflow_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">in_workflow_execution</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dag_node</span><span class="p">,</span> <span class="n">DAGNode</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input should be a DAG.&quot;</span><span class="p">)</span>
@@ -2218,7 +2218,7 @@ document.write(`
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">options</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">options</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class serves both as a decorator and options for workflow.</span>
 
 <span class="sd">    Examples:</span>
@@ -2238,7 +2238,7 @@ document.write(`
 <span class="sd">            foo_new = foo.options(**workflow.options(catch_exceptions=False))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">workflow_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">workflow_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
         <span class="c1"># TODO(suquark): More rigid arguments check like @ray.remote arguments. This is</span>
         <span class="c1"># fairly complex, but we should enable it later.</span>
         <span class="n">valid_options</span> <span class="o">=</span> <span class="p">{</span>
@@ -2253,19 +2253,19 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;Invalid option keywords </span><span class="si">{</span><span class="n">invalid_keywords</span><span class="si">}</span><span class="s2"> for workflow tasks. &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Valid ones are </span><span class="si">{</span><span class="n">valid_options</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
-        <span class="kn">from</span> <span class="nn">ray.workflow.common</span> <span class="kn">import</span> <span class="n">WORKFLOW_OPTIONS</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.workflow.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">WORKFLOW_OPTIONS</span>
 
         <span class="n">validate_user_metadata</span><span class="p">(</span><span class="n">workflow_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metadata&quot;</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;_metadata&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">WORKFLOW_OPTIONS</span><span class="p">:</span> <span class="n">workflow_options</span><span class="p">}}</span>
 
-    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;_metadata&quot;</span><span class="p">,)</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">RemoteFunction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RemoteFunction</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">RemoteFunction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RemoteFunction</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">RemoteFunction</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only apply &#39;workflow.options&#39; to Ray remote functions.&quot;</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">_default_options</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>

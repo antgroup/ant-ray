@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1392,24 +1392,24 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.train._checkpoint</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">contextlib</span>
-<span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">platform</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">traceback</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">pyarrow.fs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
 
-<span class="kn">from</span> <span class="nn">ray.air._internal.filelock</span> <span class="kn">import</span> <span class="n">TempFileLock</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.storage</span> <span class="kn">import</span> <span class="n">_download_from_fs_path</span><span class="p">,</span> <span class="n">_exists_at_fs_path</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.filelock</span><span class="w"> </span><span class="kn">import</span> <span class="n">TempFileLock</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">_download_from_fs_path</span><span class="p">,</span> <span class="n">_exists_at_fs_path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1421,8 +1421,8 @@ document.write(`
 <span class="n">_CHECKPOINT_TEMP_DIR_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;checkpoint_tmp_&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">_CheckpointMetaClass</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_CheckpointMetaClass</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
@@ -1433,21 +1433,21 @@ document.write(`
                 <span class="s2">&quot;to_bytes&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;get_internal_representation&quot;</span><span class="p">,</span>
             <span class="p">}:</span>
-                <span class="k">raise</span> <span class="n">_get_migration_error</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+                <span class="k">raise</span> <span class="n">_get_migration_error</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
             <span class="k">elif</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">{</span>
                 <span class="s2">&quot;from_uri&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;to_uri&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;uri&quot;</span><span class="p">,</span>
             <span class="p">}:</span>
-                <span class="k">raise</span> <span class="n">_get_uri_error</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+                <span class="k">raise</span> <span class="n">_get_uri_error</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
             <span class="k">elif</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;get_preprocessor&quot;</span><span class="p">,</span> <span class="s2">&quot;set_preprocessor&quot;</span><span class="p">}:</span>
-                <span class="k">raise</span> <span class="n">_get_preprocessor_error</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+                <span class="k">raise</span> <span class="n">_get_preprocessor_error</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 
             <span class="k">raise</span> <span class="n">exc</span>
 
 
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">Checkpoint</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">_CheckpointMetaClass</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Checkpoint</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">_CheckpointMetaClass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A reference to data persisted as a directory in local or remote storage.</span>
 
 <span class="sd">    Access the checkpoint contents locally using ``checkpoint.to_directory()``</span>
@@ -1508,7 +1508,7 @@ document.write(`
 
 <div class="viewcode-block" id="Checkpoint.__init__">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.Checkpoint.__init__.html#ray.tune.Checkpoint.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
         <span class="n">filesystem</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;pyarrow.fs.FileSystem&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1539,12 +1539,12 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_uuid</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Checkpoint(filesystem=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filesystem</span><span class="o">.</span><span class="n">type_name</span><span class="si">}</span><span class="s2">, path=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">)&quot;</span>
 
 <div class="viewcode-block" id="Checkpoint.get_metadata">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.Checkpoint.get_metadata.html#ray.tune.Checkpoint.get_metadata">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the metadata dict stored with the checkpoint.</span>
 
 <span class="sd">        If no metadata is stored, an empty dict is returned.</span>
@@ -1559,7 +1559,7 @@ document.write(`
 
 <div class="viewcode-block" id="Checkpoint.set_metadata">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.Checkpoint.set_metadata.html#ray.tune.Checkpoint.set_metadata">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the metadata stored with this checkpoint.</span>
 
 <span class="sd">        This will overwrite any existing metadata stored with this checkpoint.</span>
@@ -1571,7 +1571,7 @@ document.write(`
 
 <div class="viewcode-block" id="Checkpoint.update_metadata">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.Checkpoint.update_metadata.html#ray.tune.Checkpoint.update_metadata">[docs]</a>
-    <span class="k">def</span> <span class="nf">update_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the metadata stored with this checkpoint.</span>
 
 <span class="sd">        This will update any existing metadata stored with this checkpoint.</span>
@@ -1584,7 +1584,7 @@ document.write(`
 <div class="viewcode-block" id="Checkpoint.from_directory">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.Checkpoint.from_directory.html#ray.tune.Checkpoint.from_directory">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_directory</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Checkpoint&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_directory</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;Checkpoint&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create checkpoint object from a local directory.</span>
 
 <span class="sd">        Args:</span>
@@ -1598,7 +1598,7 @@ document.write(`
 
 <div class="viewcode-block" id="Checkpoint.to_directory">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.Checkpoint.to_directory.html#ray.tune.Checkpoint.to_directory">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Write checkpoint data to a local directory.</span>
 
 <span class="sd">        *If multiple processes on the same node call this method simultaneously,*</span>
@@ -1645,7 +1645,7 @@ document.write(`
 <div class="viewcode-block" id="Checkpoint.as_directory">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.Checkpoint.as_directory.html#ray.tune.Checkpoint.as_directory">[docs]</a>
     <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
-    <span class="k">def</span> <span class="nf">as_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">as_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns checkpoint contents in a local directory as a context.</span>
 
 <span class="sd">        This function makes checkpoint data available as a directory while avoiding</span>
@@ -1733,7 +1733,7 @@ document.write(`
                         <span class="k">pass</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_get_temporary_checkpoint_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_temporary_checkpoint_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the name for the temporary checkpoint dir that this checkpoint</span>
 <span class="sd">        will get downloaded to, if accessing via `to_directory` or `as_directory`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1759,14 +1759,14 @@ document.write(`
                 <span class="p">)</span>
         <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp_dir_path</span><span class="p">,</span> <span class="n">checkpoint_dir_name</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">__fspath__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__fspath__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="s2">&quot;You cannot use `Checkpoint` objects directly as paths. &quot;</span>
             <span class="s2">&quot;Use `Checkpoint.to_directory()` or `Checkpoint.as_directory()` instead.&quot;</span>
         <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_del_lock_path</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_del_lock_path</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the path to the deletion lock file for a file/directory at `path`.</span>
 
 <span class="sd">    Example:</span>
@@ -1783,7 +1783,7 @@ document.write(`
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.del_lock_</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_list_existing_del_locks</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_list_existing_del_locks</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;List all the deletion lock files for a file/directory at `path`.</span>
 
 <span class="sd">    For example, if 2 checkpoints are being read via `as_directory`,</span>
@@ -1792,7 +1792,7 @@ document.write(`
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_get_del_lock_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">_get_migration_error</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_migration_error</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="k">return</span> <span class="ne">AttributeError</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">&quot;The new `ray.train.Checkpoint` class does not support `</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">()`. &quot;</span>
         <span class="sa">f</span><span class="s2">&quot;Instead, only directories are supported.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
@@ -1814,7 +1814,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_uri_error</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_uri_error</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="k">return</span> <span class="ne">AttributeError</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">&quot;The new `ray.train.Checkpoint` class does not support `</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">()`. &quot;</span>
         <span class="sa">f</span><span class="s2">&quot;To create a checkpoint from remote storage, create a `Checkpoint` using its &quot;</span>
@@ -1827,7 +1827,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_preprocessor_error</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_preprocessor_error</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="k">return</span> <span class="ne">AttributeError</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">&quot;The new `ray.train.Checkpoint` class does not support `</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">()`. &quot;</span>
         <span class="sa">f</span><span class="s2">&quot;To include preprocessor information in checkpoints, &quot;</span>

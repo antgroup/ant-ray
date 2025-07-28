@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,18 +1389,18 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.env.multi_agent_env</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Type</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Type</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.env.base_env</span> <span class="kn">import</span> <span class="n">BaseEnv</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.env_context</span> <span class="kn">import</span> <span class="n">EnvContext</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.annotations</span> <span class="kn">import</span> <span class="n">OldAPIStack</span><span class="p">,</span> <span class="n">override</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="n">Deprecated</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.base_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseEnv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.env_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">OldAPIStack</span><span class="p">,</span> <span class="n">override</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AgentID</span><span class="p">,</span>
     <span class="n">EnvCreator</span><span class="p">,</span>
     <span class="n">EnvID</span><span class="p">,</span>
@@ -1408,8 +1408,8 @@ document.write(`
     <span class="n">MultiAgentDict</span><span class="p">,</span>
     <span class="n">MultiEnvDict</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">log_once</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_once</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
 
 <span class="c1"># If the obs space is Dict type, look for the global state under this key.</span>
 <span class="n">ENV_STATE</span> <span class="o">=</span> <span class="s2">&quot;state&quot;</span>
@@ -1420,7 +1420,7 @@ document.write(`
 <div class="viewcode-block" id="MultiAgentEnv">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env.html#ray.rllib.env.multi_agent_env.MultiAgentEnv">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">MultiAgentEnv</span><span class="p">(</span><span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiAgentEnv</span><span class="p">(</span><span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An environment that hosts multiple independent agents.</span>
 
 <span class="sd">    Agents are identified by AgentIDs (string).</span>
@@ -1448,7 +1448,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEnv.__init__">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env.html#ray.rllib.env.multi_agent_env.MultiAgentEnv.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="c1"># @OldAPIStack</span>
@@ -1464,7 +1464,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEnv.reset">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env.html#ray.rllib.env.multi_agent_env.MultiAgentEnv.reset">[docs]</a>
-    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1502,7 +1502,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEnv.step">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env.html#ray.rllib.env.multi_agent_env.MultiAgentEnv.step">[docs]</a>
-    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">action_dict</span><span class="p">:</span> <span class="n">MultiAgentDict</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
         <span class="n">MultiAgentDict</span><span class="p">,</span> <span class="n">MultiAgentDict</span><span class="p">,</span> <span class="n">MultiAgentDict</span><span class="p">,</span> <span class="n">MultiAgentDict</span><span class="p">,</span> <span class="n">MultiAgentDict</span>
@@ -1557,7 +1557,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEnv.render">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env.html#ray.rllib.env.multi_agent_env.MultiAgentEnv.render">[docs]</a>
-    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Tries to render the environment.&quot;&quot;&quot;</span>
 
         <span class="c1"># By default, do nothing.</span>
@@ -1566,7 +1566,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEnv.get_observation_space">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env.html#ray.rllib.env.multi_agent_env.MultiAgentEnv.get_observation_space">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_spaces</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_spaces</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span>
 
@@ -1586,7 +1586,7 @@ document.write(`
 
 <div class="viewcode-block" id="MultiAgentEnv.get_action_space">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env.html#ray.rllib.env.multi_agent_env.MultiAgentEnv.get_action_space">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span>
 
@@ -1605,18 +1605,18 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">num_agents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_agents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">max_num_agents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_num_agents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">possible_agents</span><span class="p">)</span>
 
     <span class="c1"># fmt: off</span>
     <span class="c1"># __grouping_doc_begin__</span>
 <div class="viewcode-block" id="MultiAgentEnv.with_agent_groups">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env.html#ray.rllib.env.multi_agent_env.MultiAgentEnv.with_agent_groups">[docs]</a>
-    <span class="k">def</span> <span class="nf">with_agent_groups</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">with_agent_groups</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">groups</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">AgentID</span><span class="p">]],</span>
         <span class="n">obs_space</span><span class="p">:</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1663,7 +1663,7 @@ document.write(`
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="kn">from</span> <span class="nn">ray.rllib.env.wrappers.group_agents_wrapper</span> <span class="kn">import</span> \
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.wrappers.group_agents_wrapper</span><span class="w"> </span><span class="kn">import</span> \
             <span class="n">GroupAgentsWrapper</span>
         <span class="k">return</span> <span class="n">GroupAgentsWrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">obs_space</span><span class="p">,</span> <span class="n">act_space</span><span class="p">)</span></div>
 
@@ -1673,7 +1673,7 @@ document.write(`
 
     <span class="nd">@OldAPIStack</span>
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;MultiAgentEnv.possible_agents&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_agent_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">AgentID</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_agent_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">AgentID</span><span class="p">]:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_agent_ids&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_agent_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_agent_ids</span><span class="p">,</span> <span class="nb">set</span><span class="p">):</span>
@@ -1682,7 +1682,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_agent_ids</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_agent_ids</span> <span class="k">else</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span>
 
     <span class="nd">@OldAPIStack</span>
-    <span class="k">def</span> <span class="nf">to_base_env</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_base_env</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">make_env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">EnvType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_envs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -1719,7 +1719,7 @@ document.write(`
 <span class="sd">        Returns:</span>
 <span class="sd">            The resulting BaseEnv object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.rllib.env.remote_base_env</span> <span class="kn">import</span> <span class="n">RemoteBaseEnv</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.remote_base_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">RemoteBaseEnv</span>
 
         <span class="k">if</span> <span class="n">remote_envs</span><span class="p">:</span>
             <span class="n">env</span> <span class="o">=</span> <span class="n">RemoteBaseEnv</span><span class="p">(</span>
@@ -1745,7 +1745,7 @@ document.write(`
 <div class="viewcode-block" id="make_multi_agent">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/multi_agent_env.html#ray.rllib.env.multi_agent_env.make_multi_agent">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">make_multi_agent</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_multi_agent</span><span class="p">(</span>
     <span class="n">env_name_or_creator</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EnvCreator</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;MultiAgentEnv&quot;</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convenience wrapper for any single-agent env to be converted into MA.</span>
@@ -1796,8 +1796,8 @@ document.write(`
 <span class="sd">        {0: [...], 1: [...], 2: [...]}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">class</span> <span class="nc">MultiEnv</span><span class="p">(</span><span class="n">MultiAgentEnv</span><span class="p">):</span>
-        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">EnvContext</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">MultiEnv</span><span class="p">(</span><span class="n">MultiAgentEnv</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">EnvContext</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
             <span class="c1"># Note: Explicitly check for None here, because config</span>
@@ -1828,7 +1828,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">possible_agents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="nd">@override</span><span class="p">(</span><span class="n">MultiAgentEnv</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">terminateds</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">truncateds</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
             <span class="n">obs</span><span class="p">,</span> <span class="n">infos</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
@@ -1840,7 +1840,7 @@ document.write(`
             <span class="k">return</span> <span class="n">obs</span><span class="p">,</span> <span class="n">infos</span>
 
         <span class="nd">@override</span><span class="p">(</span><span class="n">MultiAgentEnv</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_dict</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_dict</span><span class="p">):</span>
             <span class="n">obs</span><span class="p">,</span> <span class="n">rew</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
 
             <span class="c1"># The environment is expecting an action for at least one agent.</span>
@@ -1868,7 +1868,7 @@ document.write(`
             <span class="k">return</span> <span class="n">obs</span><span class="p">,</span> <span class="n">rew</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">info</span>
 
         <span class="nd">@override</span><span class="p">(</span><span class="n">MultiAgentEnv</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="c1"># This render method simply renders all n underlying individual single-agent</span>
             <span class="c1"># envs and concatenates their images (on top of each other if the returned</span>
             <span class="c1"># images have dims where [width] &gt; [height], otherwise next to each other).</span>
@@ -1884,13 +1884,13 @@ document.write(`
 
 
 <span class="nd">@OldAPIStack</span>
-<span class="k">class</span> <span class="nc">MultiAgentEnvWrapper</span><span class="p">(</span><span class="n">BaseEnv</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiAgentEnvWrapper</span><span class="p">(</span><span class="n">BaseEnv</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Internal adapter of MultiAgentEnv to BaseEnv.</span>
 
 <span class="sd">    This also supports vectorization if num_envs &gt; 1.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">make_env</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">EnvType</span><span class="p">],</span>
         <span class="n">existing_envs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;MultiAgentEnv&quot;</span><span class="p">],</span>
@@ -1927,7 +1927,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_unwrapped_env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">envs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unwrapped</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">BaseEnv</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">poll</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">poll</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
         <span class="n">MultiEnvDict</span><span class="p">,</span>
@@ -1949,7 +1949,7 @@ document.write(`
         <span class="k">return</span> <span class="n">obs</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">terminateds</span><span class="p">,</span> <span class="n">truncateds</span><span class="p">,</span> <span class="n">infos</span><span class="p">,</span> <span class="p">{}</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">BaseEnv</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">send_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_dict</span><span class="p">:</span> <span class="n">MultiEnvDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">send_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_dict</span><span class="p">:</span> <span class="n">MultiEnvDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">env_id</span><span class="p">,</span> <span class="n">agent_dict</span> <span class="ow">in</span> <span class="n">action_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">env_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminateds</span> <span class="ow">or</span> <span class="n">env_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">truncateds</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -2005,7 +2005,7 @@ document.write(`
             <span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">BaseEnv</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">try_reset</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">try_reset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">env_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EnvID</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2038,7 +2038,7 @@ document.write(`
         <span class="k">return</span> <span class="n">ret_obs</span><span class="p">,</span> <span class="n">ret_infos</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">BaseEnv</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">try_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EnvID</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">try_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EnvID</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">env_id</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="n">env_id</span> <span class="o">=</span> <span class="p">[</span><span class="n">env_id</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">env_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2059,7 +2059,7 @@ document.write(`
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sub-environment at index </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> restarted successfully.&quot;</span><span class="p">)</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">BaseEnv</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_sub_environments</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sub_environments</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">as_dict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EnvType</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">EnvType</span><span class="p">]]:</span>
         <span class="k">if</span> <span class="n">as_dict</span><span class="p">:</span>
@@ -2067,7 +2067,7 @@ document.write(`
         <span class="k">return</span> <span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">env</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_states</span><span class="p">]</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">BaseEnv</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">try_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EnvID</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">try_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EnvID</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">env_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">env_id</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">env_id</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
@@ -2075,19 +2075,19 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">BaseEnv</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gym</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gym</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">Dict</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">envs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">observation_space</span>
 
     <span class="nd">@property</span>
     <span class="nd">@override</span><span class="p">(</span><span class="n">BaseEnv</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">envs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">action_space</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">BaseEnv</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_agent_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">AgentID</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_agent_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">AgentID</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">envs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_agent_ids</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_init_env_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_env_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets all or one particular sub-environment&#39;s state (by index).</span>
 
 <span class="sd">        Args:</span>
@@ -2108,8 +2108,8 @@ document.write(`
 
 
 <span class="nd">@OldAPIStack</span>
-<span class="k">class</span> <span class="nc">_MultiAgentEnvState</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">:</span> <span class="n">MultiAgentEnv</span><span class="p">,</span> <span class="n">return_error_as_obs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_MultiAgentEnvState</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">:</span> <span class="n">MultiAgentEnv</span><span class="p">,</span> <span class="n">return_error_as_obs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">MultiAgentEnv</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">return_error_as_obs</span> <span class="o">=</span> <span class="n">return_error_as_obs</span>
@@ -2121,7 +2121,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">last_truncateds</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;__all__&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">last_infos</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">poll</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">poll</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
         <span class="n">MultiAgentDict</span><span class="p">,</span>
@@ -2177,7 +2177,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">last_truncateds</span><span class="p">[</span><span class="s2">&quot;__all__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">observations</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">terminateds</span><span class="p">,</span> <span class="n">truncateds</span><span class="p">,</span> <span class="n">infos</span>
 
-    <span class="k">def</span> <span class="nf">observe</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">observe</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">obs</span><span class="p">:</span> <span class="n">MultiAgentDict</span><span class="p">,</span>
         <span class="n">rewards</span><span class="p">:</span> <span class="n">MultiAgentDict</span><span class="p">,</span>
@@ -2203,7 +2203,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">last_truncateds</span><span class="p">[</span><span class="n">ag</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">last_infos</span> <span class="o">=</span> <span class="n">infos</span>
 
-    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

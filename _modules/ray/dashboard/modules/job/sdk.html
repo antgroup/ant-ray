@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1389,15 +1389,15 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.dashboard.modules.job.sdk</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">dataclasses</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">AsyncIterator</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">AsyncIterator</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">packaging.version</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">packaging.version</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.dashboard.modules.dashboard_sdk</span> <span class="kn">import</span> <span class="n">SubmissionClient</span>
-<span class="kn">from</span> <span class="nn">ray.dashboard.modules.job.common</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dashboard.modules.dashboard_sdk</span><span class="w"> </span><span class="kn">import</span> <span class="n">SubmissionClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dashboard.modules.job.common</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">JobDeleteResponse</span><span class="p">,</span>
     <span class="n">JobLogsResponse</span><span class="p">,</span>
     <span class="n">JobStatus</span><span class="p">,</span>
@@ -1405,15 +1405,15 @@ document.write(`
     <span class="n">JobSubmitRequest</span><span class="p">,</span>
     <span class="n">JobSubmitResponse</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.dashboard.modules.job.pydantic_models</span> <span class="kn">import</span> <span class="n">JobDetails</span>
-<span class="kn">from</span> <span class="nn">ray.dashboard.modules.job.utils</span> <span class="kn">import</span> <span class="n">strip_keys_with_value_none</span>
-<span class="kn">from</span> <span class="nn">ray.dashboard.utils</span> <span class="kn">import</span> <span class="n">get_address_for_submission_client</span>
-<span class="kn">from</span> <span class="nn">ray.runtime_env</span> <span class="kn">import</span> <span class="n">RuntimeEnv</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dashboard.modules.job.pydantic_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">JobDetails</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dashboard.modules.job.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">strip_keys_with_value_none</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dashboard.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_address_for_submission_client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.runtime_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">RuntimeEnv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">aiohttp</span>
-    <span class="kn">import</span> <span class="nn">requests</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">aiohttp</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">aiohttp</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">requests</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1425,7 +1425,7 @@ document.write(`
 
 <div class="viewcode-block" id="JobSubmissionClient">
 <a class="viewcode-back" href="../../../../../cluster/running-applications/job-submission/doc/ray.job_submission.JobSubmissionClient.html#ray.job_submission.JobSubmissionClient">[docs]</a>
-<span class="k">class</span> <span class="nc">JobSubmissionClient</span><span class="p">(</span><span class="n">SubmissionClient</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JobSubmissionClient</span><span class="p">(</span><span class="n">SubmissionClient</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A local client for submitting and interacting with jobs on a remote cluster.</span>
 
 <span class="sd">    Submits requests over HTTP to the job server on the cluster using the REST API.</span>
@@ -1452,7 +1452,7 @@ document.write(`
 <span class="sd">            a file or directory of trusted certificates. Default: True.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">create_cluster_if_needed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1517,7 +1517,7 @@ document.write(`
 <div class="viewcode-block" id="JobSubmissionClient.submit_job">
 <a class="viewcode-back" href="../../../../../cluster/running-applications/job-submission/doc/ray.job_submission.JobSubmissionClient.submit_job.html#ray.job_submission.JobSubmissionClient.submit_job">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">submit_job</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">submit_job</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">entrypoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1653,7 +1653,7 @@ document.write(`
 <div class="viewcode-block" id="JobSubmissionClient.stop_job">
 <a class="viewcode-back" href="../../../../../cluster/running-applications/job-submission/doc/ray.job_submission.JobSubmissionClient.stop_job.html#ray.job_submission.JobSubmissionClient.stop_job">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">stop_job</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop_job</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -1690,7 +1690,7 @@ document.write(`
 <div class="viewcode-block" id="JobSubmissionClient.delete_job">
 <a class="viewcode-back" href="../../../../../cluster/running-applications/job-submission/doc/ray.job_submission.JobSubmissionClient.delete_job.html#ray.job_submission.JobSubmissionClient.delete_job">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">delete_job</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_job</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -1730,7 +1730,7 @@ document.write(`
 <div class="viewcode-block" id="JobSubmissionClient.get_job_info">
 <a class="viewcode-back" href="../../../../../cluster/running-applications/job-submission/doc/ray.job_submission.JobSubmissionClient.get_job_info.html#ray.job_submission.JobSubmissionClient.get_job_info">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_job_info</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_job_info</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JobDetails</span><span class="p">:</span>
@@ -1775,7 +1775,7 @@ document.write(`
 <div class="viewcode-block" id="JobSubmissionClient.list_jobs">
 <a class="viewcode-back" href="../../../../../cluster/running-applications/job-submission/doc/ray.job_submission.JobSubmissionClient.list_jobs.html#ray.job_submission.JobSubmissionClient.list_jobs">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">list_jobs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">JobDetails</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_jobs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">JobDetails</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;List all jobs along with their status and other information.</span>
 
 <span class="sd">        Lists all jobs that have ever run on the cluster, including jobs that are</span>
@@ -1819,7 +1819,7 @@ document.write(`
 <div class="viewcode-block" id="JobSubmissionClient.get_job_status">
 <a class="viewcode-back" href="../../../../../cluster/running-applications/job-submission/doc/ray.job_submission.JobSubmissionClient.get_job_status.html#ray.job_submission.JobSubmissionClient.get_job_status">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_job_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JobStatus</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_job_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JobStatus</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the most recent status of a job.</span>
 
 <span class="sd">        Example:</span>
@@ -1846,7 +1846,7 @@ document.write(`
 <div class="viewcode-block" id="JobSubmissionClient.get_job_logs">
 <a class="viewcode-back" href="../../../../../cluster/running-applications/job-submission/doc/ray.job_submission.JobSubmissionClient.get_job_logs.html#ray.job_submission.JobSubmissionClient.get_job_logs">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_job_logs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_job_logs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all logs produced by a job.</span>
 
 <span class="sd">        Example:</span>
@@ -1878,7 +1878,7 @@ document.write(`
 <div class="viewcode-block" id="JobSubmissionClient.tail_job_logs">
 <a class="viewcode-back" href="../../../../../cluster/running-applications/job-submission/doc/ray.job_submission.JobSubmissionClient.tail_job_logs.html#ray.job_submission.JobSubmissionClient.tail_job_logs">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">tail_job_logs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">tail_job_logs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an iterator that follows the logs of a job.</span>
 
 <span class="sd">        Example:</span>

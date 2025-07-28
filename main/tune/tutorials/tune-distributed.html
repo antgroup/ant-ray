@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1471,8 +1471,8 @@ You can do this on local machines or on the cloud.</p>
 <p>Across your machines, Tune will automatically detect the number of GPUs and CPUs without you needing to manage <code class="docutils literal notranslate"><span class="pre">CUDA_VISIBLE_DEVICES</span></code>.</p>
 <p>To execute a distributed experiment, call <code class="docutils literal notranslate"><span class="pre">ray.init(address=XXX)</span></code> before <code class="docutils literal notranslate"><span class="pre">Tuner.fit()</span></code>, where <code class="docutils literal notranslate"><span class="pre">XXX</span></code> is the Ray address, which defaults to <code class="docutils literal notranslate"><span class="pre">localhost:6379</span></code>. The Tune python script should be executed only on the head node of the Ray cluster.</p>
 <p>One common approach to modifying an existing Tune experiment to go distributed is to set an <code class="docutils literal notranslate"><span class="pre">argparse</span></code> variable so that toggling between distributed and single-node is seamless.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">argparse</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
 
 <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
 <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--address&quot;</span><span class="p">)</span>
@@ -1505,8 +1505,8 @@ $<span class="w"> </span>python<span class="w"> </span>tune_script.py<span class
 reduce synchronization overhead. For this, you just have to specify a remote <code class="docutils literal notranslate"><span class="pre">storage_path</span></code> in the
 <a class="reference internal" href="../api/doc/ray.tune.RunConfig.html#ray.tune.RunConfig" title="ray.tune.RunConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">RunConfig</span></code></a>.</p>
 <p><code class="code docutils literal notranslate"><span class="pre">my_trainable</span></code> is a user-defined <a class="reference internal" href="../key-concepts.html#tune-60-seconds-trainables"><span class="std std-ref">Tune Trainable</span></a> in the following example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">my_module</span> <span class="kn">import</span> <span class="n">my_trainable</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">my_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">my_trainable</span>
 
 <span class="n">tuner</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">Tuner</span><span class="p">(</span>
     <span class="n">my_trainable</span><span class="p">,</span>

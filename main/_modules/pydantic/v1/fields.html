@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,11 +1389,11 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for pydantic.v1.fields</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span> <span class="k">as</span> <span class="n">CollectionCounter</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Hashable</span> <span class="k">as</span> <span class="n">CollectionsHashable</span><span class="p">,</span> <span class="n">Iterable</span> <span class="k">as</span> <span class="n">CollectionsIterable</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span> <span class="k">as</span> <span class="n">CollectionCounter</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Hashable</span> <span class="k">as</span> <span class="n">CollectionsHashable</span><span class="p">,</span> <span class="n">Iterable</span> <span class="k">as</span> <span class="n">CollectionsIterable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Counter</span><span class="p">,</span>
@@ -1417,14 +1417,14 @@ document.write(`
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Final</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Final</span>
 
-<span class="kn">from</span> <span class="nn">pydantic.v1</span> <span class="kn">import</span> <span class="n">errors</span> <span class="k">as</span> <span class="n">errors_</span>
-<span class="kn">from</span> <span class="nn">pydantic.v1.class_validators</span> <span class="kn">import</span> <span class="n">Validator</span><span class="p">,</span> <span class="n">make_generic_validator</span><span class="p">,</span> <span class="n">prep_validators</span>
-<span class="kn">from</span> <span class="nn">pydantic.v1.error_wrappers</span> <span class="kn">import</span> <span class="n">ErrorWrapper</span>
-<span class="kn">from</span> <span class="nn">pydantic.v1.errors</span> <span class="kn">import</span> <span class="n">ConfigError</span><span class="p">,</span> <span class="n">InvalidDiscriminator</span><span class="p">,</span> <span class="n">MissingDiscriminator</span><span class="p">,</span> <span class="n">NoneIsNotAllowedError</span>
-<span class="kn">from</span> <span class="nn">pydantic.v1.types</span> <span class="kn">import</span> <span class="n">Json</span><span class="p">,</span> <span class="n">JsonWrapper</span>
-<span class="kn">from</span> <span class="nn">pydantic.v1.typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1</span><span class="w"> </span><span class="kn">import</span> <span class="n">errors</span> <span class="k">as</span> <span class="n">errors_</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.class_validators</span><span class="w"> </span><span class="kn">import</span> <span class="n">Validator</span><span class="p">,</span> <span class="n">make_generic_validator</span><span class="p">,</span> <span class="n">prep_validators</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.error_wrappers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorWrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigError</span><span class="p">,</span> <span class="n">InvalidDiscriminator</span><span class="p">,</span> <span class="n">MissingDiscriminator</span><span class="p">,</span> <span class="n">NoneIsNotAllowedError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Json</span><span class="p">,</span> <span class="n">JsonWrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">NoArgAnyCallable</span><span class="p">,</span>
     <span class="n">convert_generics</span><span class="p">,</span>
     <span class="n">display_as_type</span><span class="p">,</span>
@@ -1439,7 +1439,7 @@ document.write(`
     <span class="n">is_union</span><span class="p">,</span>
     <span class="n">new_type_supertype</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pydantic.v1.utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PyObjectStr</span><span class="p">,</span>
     <span class="n">Representation</span><span class="p">,</span>
     <span class="n">ValueItems</span><span class="p">,</span>
@@ -1450,42 +1450,42 @@ document.write(`
     <span class="n">sequence_like</span><span class="p">,</span>
     <span class="n">smart_deepcopy</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pydantic.v1.validators</span> <span class="kn">import</span> <span class="n">constant_validator</span><span class="p">,</span> <span class="n">dict_validator</span><span class="p">,</span> <span class="n">find_validators</span><span class="p">,</span> <span class="n">validate_json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.validators</span><span class="w"> </span><span class="kn">import</span> <span class="n">constant_validator</span><span class="p">,</span> <span class="n">dict_validator</span><span class="p">,</span> <span class="n">find_validators</span><span class="p">,</span> <span class="n">validate_json</span>
 
 <span class="n">Required</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="bp">Ellipsis</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">UndefinedType</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UndefinedType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;PydanticUndefined&#39;</span>
 
-    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;Undefined&#39;</span>
 
-    <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span>
 
 
 <span class="n">Undefined</span> <span class="o">=</span> <span class="n">UndefinedType</span><span class="p">()</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">pydantic.v1.class_validators</span> <span class="kn">import</span> <span class="n">ValidatorsList</span>
-    <span class="kn">from</span> <span class="nn">pydantic.v1.config</span> <span class="kn">import</span> <span class="n">BaseConfig</span>
-    <span class="kn">from</span> <span class="nn">pydantic.v1.error_wrappers</span> <span class="kn">import</span> <span class="n">ErrorList</span>
-    <span class="kn">from</span> <span class="nn">pydantic.v1.types</span> <span class="kn">import</span> <span class="n">ModelOrDc</span>
-    <span class="kn">from</span> <span class="nn">pydantic.v1.typing</span> <span class="kn">import</span> <span class="n">AbstractSetIntStr</span><span class="p">,</span> <span class="n">MappingIntStrAny</span><span class="p">,</span> <span class="n">ReprArgs</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.class_validators</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidatorsList</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseConfig</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.error_wrappers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorList</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelOrDc</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractSetIntStr</span><span class="p">,</span> <span class="n">MappingIntStrAny</span><span class="p">,</span> <span class="n">ReprArgs</span>
 
     <span class="n">ValidateReturn</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ErrorList</span><span class="p">]]</span>
     <span class="n">LocStr</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span>
     <span class="n">BoolUndefined</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">UndefinedType</span><span class="p">]</span>
 
 
-<span class="k">class</span> <span class="nc">FieldInfo</span><span class="p">(</span><span class="n">Representation</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FieldInfo</span><span class="p">(</span><span class="n">Representation</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Captures extra information about a field.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1539,7 +1539,7 @@ document.write(`
         <span class="s1">&#39;allow_mutation&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">}</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">Undefined</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">Undefined</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">default</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_factory</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;default_factory&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alias</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;alias&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -1568,7 +1568,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">repr</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;repr&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extra</span> <span class="o">=</span> <span class="n">kwargs</span>
 
-    <span class="k">def</span> <span class="nf">__repr_args__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ReprArgs&#39;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__repr_args__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ReprArgs&#39;</span><span class="p">:</span>
         <span class="n">field_defaults_to_hide</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;repr&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">__field_constraints__</span><span class="p">,</span>
@@ -1577,7 +1577,7 @@ document.write(`
         <span class="n">attrs</span> <span class="o">=</span> <span class="p">((</span><span class="n">s</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__slots__</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">attrs</span> <span class="k">if</span> <span class="n">v</span> <span class="o">!=</span> <span class="n">field_defaults_to_hide</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span>
 
-    <span class="k">def</span> <span class="nf">get_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets the constraints set on the field by comparing the constraint value with its default value</span>
 
@@ -1585,7 +1585,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">attr</span> <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">default</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__field_constraints__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="o">!=</span> <span class="n">default</span><span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">update_from_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_from_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update this FieldInfo based on a dict from get_field_info, only fields which have not been set are dated.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1604,12 +1604,12 @@ document.write(`
                 <span class="k">elif</span> <span class="n">attr_name</span> <span class="o">==</span> <span class="s1">&#39;include&#39;</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">include</span> <span class="o">=</span> <span class="n">ValueItems</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">current_value</span><span class="p">,</span> <span class="n">intersect</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Undefined</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_factory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;cannot specify both default and default_factory&#39;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">Field</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">Field</span><span class="p">(</span>
     <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">Undefined</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">default_factory</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NoArgAnyCallable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1752,7 +1752,7 @@ document.write(`
 <span class="n">MAPPING_LIKE_SHAPES</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">SHAPE_DEFAULTDICT</span><span class="p">,</span> <span class="n">SHAPE_DICT</span><span class="p">,</span> <span class="n">SHAPE_MAPPING</span><span class="p">,</span> <span class="n">SHAPE_COUNTER</span><span class="p">}</span>
 
 
-<span class="k">class</span> <span class="nc">ModelField</span><span class="p">(</span><span class="n">Representation</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelField</span><span class="p">(</span><span class="n">Representation</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s1">&#39;type_&#39;</span><span class="p">,</span>
         <span class="s1">&#39;outer_type_&#39;</span><span class="p">,</span>
@@ -1781,7 +1781,7 @@ document.write(`
         <span class="s1">&#39;parse_json&#39;</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1824,11 +1824,11 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">model_config</span><span class="o">.</span><span class="n">prepare_field</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prepare</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">get_default</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">smart_deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_factory</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_factory</span><span class="p">()</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_get_field_info</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_field_info</span><span class="p">(</span>
         <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="s1">&#39;BaseConfig&#39;</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">FieldInfo</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1872,7 +1872,7 @@ document.write(`
         <span class="k">return</span> <span class="n">field_info</span><span class="p">,</span> <span class="n">value</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">infer</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1881,7 +1881,7 @@ document.write(`
         <span class="n">class_validators</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Validator</span><span class="p">]],</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="s1">&#39;BaseConfig&#39;</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ModelField&#39;</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">pydantic.v1.schema</span> <span class="kn">import</span> <span class="n">get_annotation_from_field_info</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_annotation_from_field_info</span>
 
         <span class="n">field_info</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_get_field_info</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">annotation</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
         <span class="n">required</span><span class="p">:</span> <span class="s1">&#39;BoolUndefined&#39;</span> <span class="o">=</span> <span class="n">Undefined</span>
@@ -1904,7 +1904,7 @@ document.write(`
             <span class="n">field_info</span><span class="o">=</span><span class="n">field_info</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">set_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="s1">&#39;BaseConfig&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="s1">&#39;BaseConfig&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="n">info_from_config</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_field_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="n">config</span><span class="o">.</span><span class="n">prepare_field</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1922,10 +1922,10 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">field_info</span><span class="o">.</span><span class="n">include</span> <span class="o">=</span> <span class="n">ValueItems</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field_info</span><span class="o">.</span><span class="n">include</span><span class="p">,</span> <span class="n">new_include</span><span class="p">,</span> <span class="n">intersect</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">alt_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">alt_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alias</span>
 
-    <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prepare the field but inspecting self.default, self.type_ etc.</span>
 
@@ -1945,7 +1945,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">populate_validators</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_set_default_and_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_default_and_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the default value, infer the type if needed and check if `None` value is valid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1969,7 +1969,7 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">required</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">default_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">allow_none</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_type_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: C901 (ignore complexity)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_type_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: C901 (ignore complexity)</span>
         <span class="c1"># typing interface is horrible, we have to do some ugly checks</span>
         <span class="k">if</span> <span class="n">lenient_issubclass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_</span><span class="p">,</span> <span class="n">JsonWrapper</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_</span><span class="o">.</span><span class="n">inner_type</span>
@@ -2146,7 +2146,7 @@ document.write(`
         <span class="c1"># type_ has been refined eg. as the type of a List and sub_fields needs to be populated</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_fields</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_create_sub_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)]</span>
 
-    <span class="k">def</span> <span class="nf">prepare_discriminated_union_sub_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_discriminated_union_sub_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prepare the mapping &lt;discriminator key&gt; -&gt; &lt;ModelField&gt; and update `sub_fields`</span>
 <span class="sd">        Note that this process can be aborted if a `ForwardRef` is encountered</span>
@@ -2174,7 +2174,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">sub_fields_mapping</span> <span class="o">=</span> <span class="n">sub_fields_mapping</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_alias</span> <span class="o">=</span> <span class="n">get_unique_discriminator_alias</span><span class="p">(</span><span class="n">all_aliases</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_key</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_create_sub_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">for_keys</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ModelField&#39;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_sub_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">for_keys</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ModelField&#39;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">for_keys</span><span class="p">:</span>
             <span class="n">class_validators</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2202,7 +2202,7 @@ document.write(`
             <span class="n">field_info</span><span class="o">=</span><span class="n">field_info</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">populate_validators</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">populate_validators</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prepare self.pre_validators, self.validators, and self.post_validators based on self.type_&#39;s  __get_validators__</span>
 <span class="sd">        and class validators. This method should be idempotent, e.g. it should be safe to call multiple times</span>
@@ -2238,7 +2238,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">pre_validators</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_validators</span> <span class="ow">or</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">post_validators</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_validators</span> <span class="ow">or</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">loc</span><span class="p">:</span> <span class="s1">&#39;LocStr&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;ModelOrDc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ValidateReturn&#39;</span><span class="p">:</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DeferredType</span>
@@ -2286,7 +2286,7 @@ document.write(`
             <span class="n">v</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_validators</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_validators</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">v</span><span class="p">,</span> <span class="n">errors</span>
 
-    <span class="k">def</span> <span class="nf">_validate_sequence_like</span><span class="p">(</span>  <span class="c1"># noqa: C901 (ignore complexity)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_sequence_like</span><span class="p">(</span>  <span class="c1"># noqa: C901 (ignore complexity)</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">loc</span><span class="p">:</span> <span class="s1">&#39;LocStr&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;ModelOrDc&#39;</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ValidateReturn&#39;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2343,7 +2343,7 @@ document.write(`
                 <span class="n">converted</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">maxlen</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;maxlen&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">converted</span><span class="p">,</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_validate_iterable</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_iterable</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">loc</span><span class="p">:</span> <span class="s1">&#39;LocStr&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;ModelOrDc&#39;</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ValidateReturn&#39;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2358,7 +2358,7 @@ document.write(`
             <span class="k">return</span> <span class="n">v</span><span class="p">,</span> <span class="n">ErrorWrapper</span><span class="p">(</span><span class="n">errors_</span><span class="o">.</span><span class="n">IterableError</span><span class="p">(),</span> <span class="n">loc</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">iterable</span><span class="p">,</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_validate_tuple</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_tuple</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">loc</span><span class="p">:</span> <span class="s1">&#39;LocStr&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;ModelOrDc&#39;</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ValidateReturn&#39;</span><span class="p">:</span>
         <span class="n">e</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="ne">Exception</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -2388,7 +2388,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">result</span><span class="p">),</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_validate_mapping_like</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_mapping_like</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">loc</span><span class="p">:</span> <span class="s1">&#39;LocStr&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;ModelOrDc&#39;</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ValidateReturn&#39;</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
@@ -2423,7 +2423,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_mapping_value</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">result</span><span class="p">),</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_get_mapping_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">original</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">converted</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_mapping_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">original</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">converted</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        When type is `Mapping[KT, KV]` (or another unsupported mapping), we try to avoid</span>
 <span class="sd">        coercing to `dict` unwillingly.</span>
@@ -2439,9 +2439,9 @@ document.write(`
                 <span class="c1"># Counter, OrderedDict, UserDict, ...</span>
                 <span class="k">return</span> <span class="n">original_cls</span><span class="p">(</span><span class="n">converted</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
             <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Could not convert dictionary to </span><span class="si">{</span><span class="n">original_cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s1">&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Could not convert dictionary to </span><span class="si">{</span><span class="n">original_cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s1">&#39;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_validate_singleton</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_singleton</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">loc</span><span class="p">:</span> <span class="s1">&#39;LocStr&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;ModelOrDc&#39;</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ValidateReturn&#39;</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_fields</span><span class="p">:</span>
@@ -2488,7 +2488,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_validators</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">validators</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_validate_discriminated_union</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_discriminated_union</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">loc</span><span class="p">:</span> <span class="s1">&#39;LocStr&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;ModelOrDc&#39;</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ValidateReturn&#39;</span><span class="p">:</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -2537,7 +2537,7 @@ document.write(`
                 <span class="n">loc</span> <span class="o">=</span> <span class="p">(</span><span class="n">loc</span><span class="p">,)</span>
             <span class="k">return</span> <span class="n">sub_field</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="p">(</span><span class="o">*</span><span class="n">loc</span><span class="p">,</span> <span class="n">display_as_type</span><span class="p">(</span><span class="n">sub_field</span><span class="o">.</span><span class="n">type_</span><span class="p">)),</span> <span class="bp">cls</span><span class="o">=</span><span class="bp">cls</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_apply_validators</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_validators</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">loc</span><span class="p">:</span> <span class="s1">&#39;LocStr&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;ModelOrDc&#39;</span><span class="p">],</span> <span class="n">validators</span><span class="p">:</span> <span class="s1">&#39;ValidatorsList&#39;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ValidateReturn&#39;</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">validator</span> <span class="ow">in</span> <span class="n">validators</span><span class="p">:</span>
@@ -2547,11 +2547,11 @@ document.write(`
                 <span class="k">return</span> <span class="n">v</span><span class="p">,</span> <span class="n">ErrorWrapper</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">loc</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">v</span><span class="p">,</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">is_complex</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_complex</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Whether the field is &quot;complex&quot; eg. env variables should be parsed as JSON.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pydantic.v1.main</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.main</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
 
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">SHAPE_SINGLETON</span>
@@ -2559,7 +2559,7 @@ document.write(`
             <span class="ow">or</span> <span class="n">lenient_issubclass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_</span><span class="p">,</span> <span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">set</span><span class="p">,</span> <span class="nb">frozenset</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_type_display</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyObjectStr</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_type_display</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyObjectStr</span><span class="p">:</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">display_as_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="ow">in</span> <span class="n">MAPPING_LIKE_SHAPES</span><span class="p">:</span>
@@ -2578,7 +2578,7 @@ document.write(`
             <span class="n">t</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Optional[</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s1">]&#39;</span>
         <span class="k">return</span> <span class="n">PyObjectStr</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__repr_args__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ReprArgs&#39;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__repr_args__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ReprArgs&#39;</span><span class="p">:</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type_display</span><span class="p">()),</span> <span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">required</span><span class="p">)]</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">required</span><span class="p">:</span>
@@ -2592,24 +2592,24 @@ document.write(`
         <span class="k">return</span> <span class="n">args</span>
 
 
-<span class="k">class</span> <span class="nc">ModelPrivateAttr</span><span class="p">(</span><span class="n">Representation</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelPrivateAttr</span><span class="p">(</span><span class="n">Representation</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;default_factory&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">Undefined</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">default_factory</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NoArgAnyCallable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">Undefined</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">default_factory</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NoArgAnyCallable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">default</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_factory</span> <span class="o">=</span> <span class="n">default_factory</span>
 
-    <span class="k">def</span> <span class="nf">get_default</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">smart_deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_factory</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_factory</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_factory</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span>
             <span class="n">other</span><span class="o">.</span><span class="n">default</span><span class="p">,</span>
             <span class="n">other</span><span class="o">.</span><span class="n">default_factory</span><span class="p">,</span>
         <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">PrivateAttr</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">PrivateAttr</span><span class="p">(</span>
     <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">Undefined</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">default_factory</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NoArgAnyCallable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2634,13 +2634,13 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">DeferredType</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DeferredType</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Used to postpone field preparation, while creating recursive generic models.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">is_finalvar_with_default_val</span><span class="p">(</span><span class="n">type_</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_finalvar_with_default_val</span><span class="p">(</span><span class="n">type_</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">is_finalvar</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span> <span class="ow">and</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Undefined</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">FieldInfo</span><span class="p">)</span>
 </pre></div>
 

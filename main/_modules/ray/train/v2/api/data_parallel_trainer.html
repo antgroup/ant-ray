@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/autodoc_pydantic.css" />
@@ -1392,13 +1392,13 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.train.v2.api.data_parallel_trainer</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray._private.ray_constants</span> <span class="kn">import</span> <span class="n">env_bool</span>
-<span class="kn">from</span> <span class="nn">ray.air._internal.usage</span> <span class="kn">import</span> <span class="n">tag_train_v2_trainer</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.ray_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">env_bool</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.usage</span><span class="w"> </span><span class="kn">import</span> <span class="n">tag_train_v2_trainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BackendConfig</span><span class="p">,</span>
     <span class="n">Checkpoint</span><span class="p">,</span>
     <span class="n">DataConfig</span><span class="p">,</span>
@@ -1406,40 +1406,40 @@ document.write(`
     <span class="n">RunConfig</span><span class="p">,</span>
     <span class="n">Result</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.train.base_trainer</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.base_trainer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_RESUME_FROM_CHECKPOINT_DEPRECATION_WARNING</span><span class="p">,</span>
     <span class="n">_TRAINER_RESTORE_DEPRECATION_WARNING</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.train.constants</span> <span class="kn">import</span> <span class="n">RAY_CHDIR_TO_TRIAL_DIR</span><span class="p">,</span> <span class="n">RAY_TRAIN_ENABLE_STATE_TRACKING</span>
-<span class="kn">from</span> <span class="nn">ray.train.context</span> <span class="kn">import</span> <span class="n">_GET_METADATA_DEPRECATION_MESSAGE</span>
-<span class="kn">from</span> <span class="nn">ray.train.v2._internal.callbacks</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">RAY_CHDIR_TO_TRIAL_DIR</span><span class="p">,</span> <span class="n">RAY_TRAIN_ENABLE_STATE_TRACKING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">_GET_METADATA_DEPRECATION_MESSAGE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2._internal.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AcceleratorSetupCallback</span><span class="p">,</span>
     <span class="n">BackendSetupCallback</span><span class="p">,</span>
     <span class="n">DatasetsSetupCallback</span><span class="p">,</span>
     <span class="n">WorkingDirectorySetupCallback</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.train.v2._internal.callbacks.datasets</span> <span class="kn">import</span> <span class="n">GenDataset</span>
-<span class="kn">from</span> <span class="nn">ray.train.v2._internal.callbacks.metrics</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2._internal.callbacks.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenDataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2._internal.callbacks.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ControllerMetricsCallback</span><span class="p">,</span>
     <span class="n">WorkerMetricsCallback</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.train.v2._internal.callbacks.state_manager</span> <span class="kn">import</span> <span class="n">StateManagerCallback</span>
-<span class="kn">from</span> <span class="nn">ray.train.v2._internal.callbacks.user_callback</span> <span class="kn">import</span> <span class="n">UserCallbackHandler</span>
-<span class="kn">from</span> <span class="nn">ray.train.v2._internal.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2._internal.callbacks.state_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">StateManagerCallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2._internal.callbacks.user_callback</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserCallbackHandler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2._internal.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_RUN_CONTROLLER_AS_ACTOR</span><span class="p">,</span>
     <span class="n">METRICS_ENABLED_ENV_VAR</span><span class="p">,</span>
     <span class="n">RUN_CONTROLLER_AS_ACTOR_ENV_VAR</span><span class="p">,</span>
     <span class="n">get_env_vars_to_propagate</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.train.v2._internal.execution.callback</span> <span class="kn">import</span> <span class="n">RayTrainCallback</span>
-<span class="kn">from</span> <span class="nn">ray.train.v2._internal.execution.context</span> <span class="kn">import</span> <span class="n">TrainRunContext</span>
-<span class="kn">from</span> <span class="nn">ray.train.v2._internal.execution.controller</span> <span class="kn">import</span> <span class="n">TrainController</span>
-<span class="kn">from</span> <span class="nn">ray.train.v2._internal.execution.failure_handling</span> <span class="kn">import</span> <span class="n">create_failure_policy</span>
-<span class="kn">from</span> <span class="nn">ray.train.v2._internal.execution.scaling_policy</span> <span class="kn">import</span> <span class="n">create_scaling_policy</span>
-<span class="kn">from</span> <span class="nn">ray.train.v2._internal.util</span> <span class="kn">import</span> <span class="n">construct_train_func</span>
-<span class="kn">from</span> <span class="nn">ray.train.v2.api.callback</span> <span class="kn">import</span> <span class="n">UserCallback</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span>
-<span class="kn">from</span> <span class="nn">ray.util.scheduling_strategies</span> <span class="kn">import</span> <span class="n">NodeAffinitySchedulingStrategy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2._internal.execution.callback</span><span class="w"> </span><span class="kn">import</span> <span class="n">RayTrainCallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2._internal.execution.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainRunContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2._internal.execution.controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainController</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2._internal.execution.failure_handling</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_failure_policy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2._internal.execution.scaling_policy</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_scaling_policy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2._internal.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">construct_train_func</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.v2.api.callback</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserCallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span><span class="p">,</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.scheduling_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">NodeAffinitySchedulingStrategy</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1447,7 +1447,7 @@ document.write(`
 <div class="viewcode-block" id="DataParallelTrainer">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.data_parallel_trainer.DataParallelTrainer.html#ray.train.tensorflow.DataParallelTrainer">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">DataParallelTrainer</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataParallelTrainer</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for distributed data parallel training on Ray.</span>
 
 <span class="sd">    This class supports the SPMD parallelization pattern, where a single</span>
@@ -1455,7 +1455,7 @@ document.write(`
 <span class="sd">    and different shards of data are processed by each worker.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">train_loop_per_worker</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">],</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Dict</span><span class="p">],</span> <span class="kc">None</span><span class="p">]],</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1489,7 +1489,7 @@ document.write(`
 
 <div class="viewcode-block" id="DataParallelTrainer.fit">
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.data_parallel_trainer.DataParallelTrainer.fit.html#ray.train.tensorflow.DataParallelTrainer.fit">[docs]</a>
-    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Launches the Ray Train controller to run training on workers.</span>
 
 <span class="sd">        Returns:</span>
@@ -1526,7 +1526,7 @@ document.write(`
         <span class="k">return</span> <span class="n">result</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_create_default_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RayTrainCallback</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_default_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RayTrainCallback</span><span class="p">]:</span>
         <span class="n">accelerator_setup_callback</span> <span class="o">=</span> <span class="n">AcceleratorSetupCallback</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">backend_config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaling_config</span>
         <span class="p">)</span>
@@ -1569,7 +1569,7 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">callbacks</span>
 
-    <span class="k">def</span> <span class="nf">_initialize_and_run_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">controller_init_kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_and_run_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">controller_init_kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="p">:</span>
         <span class="n">run_controller_as_actor</span> <span class="o">=</span> <span class="n">env_bool</span><span class="p">(</span>
             <span class="n">RUN_CONTROLLER_AS_ACTOR_ENV_VAR</span><span class="p">,</span> <span class="n">DEFAULT_RUN_CONTROLLER_AS_ACTOR</span>
         <span class="p">)</span>
@@ -1595,7 +1595,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.data_parallel_trainer.DataParallelTrainer.restore.html#ray.train.tensorflow.DataParallelTrainer.restore">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="nd">@Deprecated</span>
-    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;[Deprecated] Restores a Train experiment from a previously</span>
 <span class="sd">        interrupted/failed run.</span>
 
@@ -1608,7 +1608,7 @@ document.write(`
 <a class="viewcode-back" href="../../../../../train/api/doc/ray.train.v2.api.data_parallel_trainer.DataParallelTrainer.can_restore.html#ray.train.tensorflow.DataParallelTrainer.can_restore">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="nd">@Deprecated</span>
-    <span class="k">def</span> <span class="nf">can_restore</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_restore</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;[Deprecated] Checks if a Train experiment can be restored from</span>
 <span class="sd">        a previously interrupted/failed run.</span>
 

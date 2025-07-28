@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,29 +1389,29 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.rllib.env.single_agent_episode</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">from</span> <span class="nn">gymnasium.core</span> <span class="kn">import</span> <span class="n">ActType</span><span class="p">,</span> <span class="n">ObsType</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">SupportsFloat</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gymnasium.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActType</span><span class="p">,</span> <span class="n">ObsType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">SupportsFloat</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">ray.rllib.core.columns</span> <span class="kn">import</span> <span class="n">Columns</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.env.utils.infinite_lookback_buffer</span> <span class="kn">import</span> <span class="n">InfiniteLookbackBuffer</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.policy.sample_batch</span> <span class="kn">import</span> <span class="n">SampleBatch</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.serialization</span> <span class="kn">import</span> <span class="n">gym_space_from_dict</span><span class="p">,</span> <span class="n">gym_space_to_dict</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.deprecation</span> <span class="kn">import</span> <span class="n">Deprecated</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.utils.typing</span> <span class="kn">import</span> <span class="n">AgentID</span><span class="p">,</span> <span class="n">ModuleID</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.columns</span><span class="w"> </span><span class="kn">import</span> <span class="n">Columns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.utils.infinite_lookback_buffer</span><span class="w"> </span><span class="kn">import</span> <span class="n">InfiniteLookbackBuffer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.policy.sample_batch</span><span class="w"> </span><span class="kn">import</span> <span class="n">SampleBatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.serialization</span><span class="w"> </span><span class="kn">import</span> <span class="n">gym_space_from_dict</span><span class="p">,</span> <span class="n">gym_space_to_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Deprecated</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentID</span><span class="p">,</span> <span class="n">ModuleID</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 
 <div class="viewcode-block" id="SingleAgentEpisode">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">SingleAgentEpisode</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SingleAgentEpisode</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing RL environment episodes for individual agents.</span>
 
 <span class="sd">    SingleAgentEpisode stores observations, info dicts, actions, rewards, and all</span>
@@ -1567,7 +1567,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.__init__">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.__init__.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">id_</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1748,7 +1748,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.add_env_reset">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.add_env_reset.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.add_env_reset">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_env_reset</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_env_reset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">observation</span><span class="p">:</span> <span class="n">ObsType</span><span class="p">,</span>
         <span class="n">infos</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1791,7 +1791,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.add_env_step">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.add_env_step.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.add_env_step">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_env_step</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_env_step</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">observation</span><span class="p">:</span> <span class="n">ObsType</span><span class="p">,</span>
         <span class="n">action</span><span class="p">:</span> <span class="n">ActType</span><span class="p">,</span>
@@ -1869,7 +1869,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.validate">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.validate.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.validate">[docs]</a>
-    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates the episode&#39;s data.</span>
 
 <span class="sd">        This function ensures that the data stored to a `SingleAgentEpisode` is</span>
@@ -1900,19 +1900,19 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True if `self.add_env_reset()` has already been called.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">observations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;True, if the data in this episode is already stored as numpy arrays.&quot;&quot;&quot;</span>
         <span class="c1"># If rewards are still a list, return False.</span>
         <span class="c1"># Otherwise, rewards should already be a (1D) numpy array.</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rewards</span><span class="o">.</span><span class="n">finalized</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_done</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_done</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether the episode is actually done (terminated or truncated).</span>
 
 <span class="sd">        A done episode cannot be continued via `self.add_timestep()` or being</span>
@@ -1923,7 +1923,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.to_numpy">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.to_numpy.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.to_numpy">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SingleAgentEpisode&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SingleAgentEpisode&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts this Episode&#39;s list attributes to numpy arrays.</span>
 
 <span class="sd">        This means in particular that this episodes&#39; lists of (possibly complex)</span>
@@ -2000,7 +2000,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.concat_episode">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.concat_episode.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.concat_episode">[docs]</a>
-    <span class="k">def</span> <span class="nf">concat_episode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;SingleAgentEpisode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">concat_episode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;SingleAgentEpisode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds the given `other` SingleAgentEpisode to the right side of self.</span>
 
 <span class="sd">        In order for this to work, both chunks (`self` and `other`) must fit</span>
@@ -2055,7 +2055,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.cut">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.cut.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.cut">[docs]</a>
-    <span class="k">def</span> <span class="nf">cut</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">len_lookback_buffer</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SingleAgentEpisode&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cut</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">len_lookback_buffer</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SingleAgentEpisode&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a successor episode chunk (of len=0) continuing from this Episode.</span>
 
 <span class="sd">        The successor will have the same ID as `self`.</span>
@@ -2135,7 +2135,7 @@ document.write(`
     <span class="c1">#    (t_started).</span>
 <div class="viewcode-block" id="SingleAgentEpisode.get_observations">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_observations.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_observations">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_observations</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_observations</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">slice</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2237,7 +2237,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.get_infos">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_infos.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_infos">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_infos</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_infos</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">slice</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2317,7 +2317,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.get_actions">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_actions.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_actions">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_actions</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_actions</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">slice</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2415,7 +2415,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.get_rewards">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_rewards.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_rewards">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_rewards</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_rewards</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">slice</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2489,7 +2489,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.get_extra_model_outputs">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_extra_model_outputs.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_extra_model_outputs">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_extra_model_outputs</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_extra_model_outputs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">slice</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2589,7 +2589,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.set_observations">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.set_observations.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.set_observations">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_observations</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_observations</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">new_data</span><span class="p">,</span>
@@ -2647,7 +2647,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.set_actions">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.set_actions.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.set_actions">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_actions</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_actions</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">new_data</span><span class="p">,</span>
@@ -2705,7 +2705,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.set_rewards">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.set_rewards.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.set_rewards">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_rewards</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_rewards</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">new_data</span><span class="p">,</span>
@@ -2763,7 +2763,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.set_extra_model_outputs">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.set_extra_model_outputs.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.set_extra_model_outputs">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_extra_model_outputs</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_extra_model_outputs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">key</span><span class="p">,</span>
@@ -2828,7 +2828,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.add_temporary_timestep_data">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.add_temporary_timestep_data.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.add_temporary_timestep_data">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_temporary_timestep_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_temporary_timestep_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Temporarily adds (until `to_numpy()` called) per-timestep data to self.</span>
 
 <span class="sd">        The given `data` is appended to a list (`self._temporary_timestep_data`), which</span>
@@ -2853,7 +2853,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.get_temporary_timestep_data">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_temporary_timestep_data.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_temporary_timestep_data">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_temporary_timestep_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_temporary_timestep_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns all temporarily stored data items (list) under the given key.</span>
 
 <span class="sd">        Note that all temporary timestep data is erased/cleared when calling</span>
@@ -2876,7 +2876,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.slice">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.slice.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.slice">[docs]</a>
-    <span class="k">def</span> <span class="nf">slice</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">slice</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">slice_</span><span class="p">:</span> <span class="nb">slice</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -3054,7 +3054,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.get_data_dict">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_data_dict.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_data_dict">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_data_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_data_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts a SingleAgentEpisode into a data dict mapping str keys to data.</span>
 
 <span class="sd">        The keys used are:</span>
@@ -3101,7 +3101,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.get_sample_batch">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_sample_batch.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_sample_batch">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_sample_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SampleBatch</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sample_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SampleBatch</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts this `SingleAgentEpisode` into a `SampleBatch`.</span>
 
 <span class="sd">        Returns:</span>
@@ -3112,7 +3112,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.get_return">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_return.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_return">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_return</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_return</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates an episode&#39;s return, excluding the lookback buffer&#39;s rewards.</span>
 
 <span class="sd">        The return is computed by a simple sum, neglecting the discount factor.</span>
@@ -3130,7 +3130,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.get_duration_s">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_duration_s.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_duration_s">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_duration_s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_duration_s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the duration of this Episode (chunk) in seconds.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_step_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="mf">0.0</span>
@@ -3139,7 +3139,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.env_steps">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.env_steps.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.env_steps">[docs]</a>
-    <span class="k">def</span> <span class="nf">env_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">env_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of environment steps.</span>
 
 <span class="sd">        Note, this episode instance could be a chunk of an actual episode.</span>
@@ -3153,7 +3153,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.agent_steps">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.agent_steps.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.agent_steps">[docs]</a>
-    <span class="k">def</span> <span class="nf">agent_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">agent_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of agent steps.</span>
 
 <span class="sd">        Note, these are identical to the environment steps for a single-agent episode.</span>
@@ -3167,7 +3167,7 @@ document.write(`
 
 <div class="viewcode-block" id="SingleAgentEpisode.get_state">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_state.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_state">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the pickable state of an episode.</span>
 
 <span class="sd">        The data in the episode is stored into a dictionary. Note that episodes</span>
@@ -3215,7 +3215,7 @@ document.write(`
 <div class="viewcode-block" id="SingleAgentEpisode.from_state">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.from_state.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.from_state">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_state</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;SingleAgentEpisode&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_state</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;SingleAgentEpisode&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a new `SingleAgentEpisode` instance from a state dict.</span>
 
 <span class="sd">        Args:</span>
@@ -3279,24 +3279,24 @@ document.write(`
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_observation_space</span>
 
     <span class="nd">@observation_space</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_observation_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observations</span><span class="o">.</span><span class="n">space</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_action_space</span>
 
     <span class="nd">@action_space</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_action_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">space</span> <span class="o">=</span> <span class="n">value</span>
 
 <div class="viewcode-block" id="SingleAgentEpisode.__len__">
 <a class="viewcode-back" href="../../../../rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.__len__.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.__len__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returning the length of an episode.</span>
 
 <span class="sd">        The length of an episode is defined by the length of its data, excluding</span>
@@ -3314,13 +3314,13 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_started</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;SAEps(len=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> done=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">is_done</span><span class="si">}</span><span class="s2"> &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;R=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_return</span><span class="p">()</span><span class="si">}</span><span class="s2"> id_=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id_</span><span class="si">}</span><span class="s2">)&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">slice</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SingleAgentEpisode&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">slice</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SingleAgentEpisode&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Enable squared bracket indexing- and slicing syntax, e.g. episode[-4:].&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">slice_</span><span class="o">=</span><span class="n">item</span><span class="p">)</span>
@@ -3331,11 +3331,11 @@ document.write(`
             <span class="p">)</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;SingleAgentEpisode.is_numpy()&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">is_finalized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_finalized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;SingleAgentEpisode.to_numpy()&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
 </pre></div>

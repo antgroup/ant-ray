@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,26 +1392,26 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.train.horovod.config</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
 
-<span class="kn">from</span> <span class="nn">horovod.ray.runner</span> <span class="kn">import</span> <span class="n">Coordinator</span>
-<span class="kn">from</span> <span class="nn">horovod.ray.utils</span> <span class="kn">import</span> <span class="n">detect_nics</span><span class="p">,</span> <span class="n">nics_to_env_var</span>
-<span class="kn">from</span> <span class="nn">horovod.runner.common.util</span> <span class="kn">import</span> <span class="n">secret</span><span class="p">,</span> <span class="n">timeout</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">horovod.ray.runner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Coordinator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">horovod.ray.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">detect_nics</span><span class="p">,</span> <span class="n">nics_to_env_var</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">horovod.runner.common.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">secret</span><span class="p">,</span> <span class="n">timeout</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.utils</span> <span class="kn">import</span> <span class="n">update_env_vars</span>
-<span class="kn">from</span> <span class="nn">ray.train._internal.worker_group</span> <span class="kn">import</span> <span class="n">Worker</span><span class="p">,</span> <span class="n">WorkerGroup</span>
-<span class="kn">from</span> <span class="nn">ray.train.backend</span> <span class="kn">import</span> <span class="n">Backend</span><span class="p">,</span> <span class="n">BackendConfig</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">update_env_vars</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train._internal.worker_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">Worker</span><span class="p">,</span> <span class="n">WorkerGroup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">Backend</span><span class="p">,</span> <span class="n">BackendConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 
 <div class="viewcode-block" id="HorovodConfig">
 <a class="viewcode-back" href="../../../../train/api/doc/ray.train.horovod.HorovodConfig.html#ray.train.horovod.HorovodConfig">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">HorovodConfig</span><span class="p">(</span><span class="n">BackendConfig</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HorovodConfig</span><span class="p">(</span><span class="n">BackendConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Configurations for Horovod setup.</span>
 
 <span class="sd">    See https://github.com/horovod/horovod/blob/master/horovod/runner/common/util/settings.py # noqa: E501</span>
@@ -1441,7 +1441,7 @@ document.write(`
     <span class="n">placement_group_timeout_s</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">start_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">timeout</span><span class="o">.</span><span class="n">Timeout</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">timeout_s</span><span class="p">,</span>
             <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Timed out waiting for </span><span class="si">{activity}</span><span class="s2">. Please &quot;</span>
@@ -1450,7 +1450,7 @@ document.write(`
             <span class="s2">&quot;parameter if you have too many servers.&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssh_str</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ssh_identity_file</span><span class="p">):</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ssh_identity_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ssh_identity_file</span><span class="p">,</span> <span class="mo">0o600</span><span class="p">)</span>
@@ -1460,15 +1460,15 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">secret</span><span class="o">.</span><span class="n">make_secret_key</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">backend_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">backend_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_HorovodBackend</span></div>
 
 
 
-<span class="k">class</span> <span class="nc">_HorovodBackend</span><span class="p">(</span><span class="n">Backend</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_HorovodBackend</span><span class="p">(</span><span class="n">Backend</span><span class="p">):</span>
     <span class="n">share_cuda_visible_devices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">on_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_group</span><span class="p">:</span> <span class="n">WorkerGroup</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">:</span> <span class="n">HorovodConfig</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_group</span><span class="p">:</span> <span class="n">WorkerGroup</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">:</span> <span class="n">HorovodConfig</span><span class="p">):</span>
         <span class="c1"># TODO(matt): Implement placement group strategies in BackendExecutor.</span>
 
         <span class="c1"># Initialize workers with Horovod environment variables</span>
@@ -1528,7 +1528,7 @@ document.write(`
         <span class="n">worker_group</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">update_env_vars</span><span class="p">,</span> <span class="n">coordinator_envs</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_init_env_vars</span><span class="p">(</span><span class="n">world_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">world_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_init_env_vars</span><span class="p">(</span><span class="n">world_rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">world_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize Horovod environment variables.&quot;&quot;&quot;</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;HOROVOD_HOSTNAME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">node_id</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;HOROVOD_RANK&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">world_rank</span><span class="p">)</span>
@@ -1541,15 +1541,15 @@ document.write(`
 <span class="c1">#  RayExecutor utils into Ray Train.</span>
 <span class="c1">#  See: https://github.com/horovod/horovod/blob/v0.23.0/horovod/ray/driver_service.py#L9 # noqa: E501</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">_HorovodWorkerWrapper</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_HorovodWorkerWrapper</span><span class="p">:</span>
     <span class="n">w</span><span class="p">:</span> <span class="n">Worker</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span>
 
-        <span class="k">class</span> <span class="nc">ExecuteHandle</span><span class="p">:</span>
-            <span class="k">def</span> <span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">ExecuteHandle</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="n">_</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="k">return</span> <span class="n">w</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">_RayTrainWorker__execute</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 

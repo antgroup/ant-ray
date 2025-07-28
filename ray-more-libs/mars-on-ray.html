@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1413,28 +1413,28 @@ pipeline capabilities provided by ray futures.</p>
 <h2>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h2>
 <p>It’s easy to run Mars jobs on a Ray cluster.</p>
 <p>Starting a new Mars on Ray runtime locally via:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
-<span class="kn">import</span> <span class="nn">mars</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mars</span>
 <span class="n">mars</span><span class="o">.</span><span class="n">new_ray_session</span><span class="p">()</span>
-<span class="kn">import</span> <span class="nn">mars.tensor</span> <span class="k">as</span> <span class="nn">mt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mars.tensor</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mt</span>
 <span class="n">mt</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1000_0000</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Or connecting to a Mars on Ray runtime which is already initialized:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mars</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mars</span>
 <span class="n">mars</span><span class="o">.</span><span class="n">new_ray_session</span><span class="p">(</span><span class="s1">&#39;http://&lt;web_ip&gt;:&lt;ui_port&gt;&#39;</span><span class="p">)</span>
 <span class="c1"># perform computation</span>
 </pre></div>
 </div>
 <p>Interact with Dataset:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mars.tensor</span> <span class="k">as</span> <span class="nn">mt</span>
-<span class="kn">import</span> <span class="nn">mars.dataframe</span> <span class="k">as</span> <span class="nn">md</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mars.tensor</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mars.dataframe</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
     <span class="n">mt</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1000_0000</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
     <span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="s1">&#39;abcd&#39;</span><span class="p">))</span>
 <span class="c1"># Convert mars dataframe to ray dataset</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="c1"># ds = md.to_ray_dataset(df)</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">from_mars</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">schema</span><span class="p">(),</span> <span class="n">ds</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>

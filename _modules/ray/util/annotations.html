@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1392,15 +1392,15 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.util.annotations</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">wraps</span>
 
 
-<span class="k">class</span> <span class="nc">AnnotationType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AnnotationType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">PUBLIC_API</span> <span class="o">=</span> <span class="s2">&quot;PublicAPI&quot;</span>
     <span class="n">DEVELOPER_API</span> <span class="o">=</span> <span class="s2">&quot;DeveloperAPI&quot;</span>
     <span class="n">DEPRECATED</span> <span class="o">=</span> <span class="s2">&quot;Deprecated&quot;</span>
@@ -1409,7 +1409,7 @@ document.write(`
 
 <div class="viewcode-block" id="PublicAPI">
 <a class="viewcode-back" href="../../../rllib/rllib-dev.html#ray.util.annotations.PublicAPI">[docs]</a>
-<span class="k">def</span> <span class="nf">PublicAPI</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">PublicAPI</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Annotation for documenting public APIs.</span>
 
 <span class="sd">    Public APIs are classes and methods exposed to end users of Ray.</span>
@@ -1451,7 +1451,7 @@ document.write(`
         <span class="n">stability</span> <span class="o">=</span> <span class="s2">&quot;stable&quot;</span>
     <span class="n">api_group</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;api_group&quot;</span><span class="p">,</span> <span class="s2">&quot;Others&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrap</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">stability</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="s2">&quot;beta&quot;</span><span class="p">]:</span>
             <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;**PublicAPI (</span><span class="si">{</span><span class="n">stability</span><span class="si">}</span><span class="s2">):** This API is in </span><span class="si">{</span><span class="n">stability</span><span class="si">}</span><span class="s2"> &quot;</span>
@@ -1468,7 +1468,7 @@ document.write(`
 
 <div class="viewcode-block" id="DeveloperAPI">
 <a class="viewcode-back" href="../../../rllib/rllib-dev.html#ray.util.annotations.DeveloperAPI">[docs]</a>
-<span class="k">def</span> <span class="nf">DeveloperAPI</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">DeveloperAPI</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Annotation for documenting developer APIs.</span>
 
 <span class="sd">    Developer APIs are lower-level methods explicitly exposed to advanced Ray</span>
@@ -1484,7 +1484,7 @@ document.write(`
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
         <span class="k">return</span> <span class="n">DeveloperAPI</span><span class="p">()(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrap</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
         <span class="n">_append_doc</span><span class="p">(</span>
             <span class="n">obj</span><span class="p">,</span>
             <span class="n">message</span><span class="o">=</span><span class="s2">&quot;**DeveloperAPI:** This API may change across minor Ray releases.&quot;</span><span class="p">,</span>
@@ -1496,7 +1496,7 @@ document.write(`
 
 
 
-<span class="k">class</span> <span class="nc">RayDeprecationWarning</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayDeprecationWarning</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Specialized Deprecation Warning for fine grained filtering control&quot;&quot;&quot;</span>
 
     <span class="k">pass</span>
@@ -1510,7 +1510,7 @@ document.write(`
 
 <div class="viewcode-block" id="Deprecated">
 <a class="viewcode-back" href="../../../ray-contribute/stability.html#ray.util.annotations.Deprecated">[docs]</a>
-<span class="k">def</span> <span class="nf">Deprecated</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">Deprecated</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Annotation for documenting a deprecated API.</span>
 
 <span class="sd">    Deprecated APIs may be removed in future releases of Ray.</span>
@@ -1553,7 +1553,7 @@ document.write(`
     <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown kwargs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
 
-    <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inner</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
         <span class="n">_append_doc</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">doc_message</span><span class="p">,</span> <span class="n">directive</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">)</span>
         <span class="n">_mark_annotated</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">AnnotationType</span><span class="o">.</span><span class="n">DEPRECATED</span><span class="p">)</span>
 
@@ -1563,7 +1563,7 @@ document.write(`
         <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
             <span class="n">obj_init</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="fm">__init__</span>
 
-            <span class="k">def</span> <span class="nf">patched_init</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">patched_init</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">warning_message</span><span class="p">,</span> <span class="n">RayDeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">obj_init</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -1572,7 +1572,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># class method or function.</span>
             <span class="nd">@wraps</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-            <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">warning_message</span><span class="p">,</span> <span class="n">RayDeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">obj</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -1582,7 +1582,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_append_doc</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">directive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_append_doc</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">directive</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">:</span>
         <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
@@ -1602,7 +1602,7 @@ document.write(`
     <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">indent</span><span class="si">}</span><span class="s2">&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_get_indent</span><span class="p">(</span><span class="n">docstring</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_indent</span><span class="p">(</span><span class="n">docstring</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    Example:</span>
@@ -1649,7 +1649,7 @@ document.write(`
     <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_empty_lines</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_empty_lines</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">())</span>
 
 
-<span class="k">def</span> <span class="nf">_mark_annotated</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_mark_annotated</span><span class="p">(</span>
     <span class="n">obj</span><span class="p">,</span> <span class="nb">type</span><span class="p">:</span> <span class="n">AnnotationType</span> <span class="o">=</span> <span class="n">AnnotationType</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">,</span> <span class="n">api_group</span><span class="o">=</span><span class="s2">&quot;Others&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># Set magic token for check_api_annotations linter.</span>
@@ -1659,12 +1659,12 @@ document.write(`
         <span class="n">obj</span><span class="o">.</span><span class="n">_annotated_api_group</span> <span class="o">=</span> <span class="n">api_group</span>
 
 
-<span class="k">def</span> <span class="nf">_is_annotated</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_annotated</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="c1"># Check the magic token exists and applies to this class (not a subclass).</span>
     <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;_annotated&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">_annotated</span> <span class="o">==</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span>
 
 
-<span class="k">def</span> <span class="nf">_get_annotation_type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_annotation_type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_annotated</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
 

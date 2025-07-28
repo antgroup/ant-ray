@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1422,13 +1422,13 @@ or <code class="code docutils literal notranslate"><span class="pre">batch_wait_
 methods from the batch_handler (<code class="code docutils literal notranslate"><span class="pre">set_max_batch_size</span></code> and
 <code class="code docutils literal notranslate"><span class="pre">set_batch_wait_timeout_s</span></code>).</p>
 <p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">starlette.requests</span> <span class="kn">import</span> <span class="n">Request</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">starlette.requests</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span>
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">BatchedDeployment</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BatchedDeployment</span><span class="p">:</span>
     <span class="nd">@serve</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">max_batch_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">batch_wait_timeout_s</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">batch_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requests</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Request</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">batch_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requests</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Request</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="n">response_batch</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">requests</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="p">(</span><span class="k">await</span> <span class="n">requests</span><span class="o">.</span><span class="n">json</span><span class="p">())[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
@@ -1436,11 +1436,11 @@ methods from the batch_handler (<code class="code docutils literal notranslate">
 
         <span class="k">return</span> <span class="n">response_batch</span>
 
-    <span class="k">def</span> <span class="nf">update_batch_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_batch_size</span><span class="p">,</span> <span class="n">batch_wait_timeout_s</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_batch_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_batch_size</span><span class="p">,</span> <span class="n">batch_wait_timeout_s</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_handler</span><span class="o">.</span><span class="n">set_max_batch_size</span><span class="p">(</span><span class="n">max_batch_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_handler</span><span class="o">.</span><span class="n">set_batch_wait_timeout_s</span><span class="p">(</span><span class="n">batch_wait_timeout_s</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">):</span>
         <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_handler</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
 
 <span class="n">app</span> <span class="o">=</span> <span class="n">BatchedDeployment</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span>

@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1521,7 +1521,7 @@ python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> <
 <h2>Code Style<a class="headerlink" href="#code-style" title="Link to this heading">#</a></h2>
 <p>In general, we follow the <a class="reference external" href="https://google.github.io/styleguide/">Google style guide</a> for C++ code and the <a class="reference external" href="https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html">Black code style</a> for Python code. Python imports follow <a class="reference external" href="https://peps.python.org/pep-0008/#imports">PEP8 style</a>. However, it is more important for code to be in a locally consistent style than to strictly follow guidelines. Whenever in doubt, follow the local code style of the component.</p>
 <p>For Python documentation, we follow a subset of the <a class="reference external" href="https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html">Google pydoc format</a>. The following code snippets demonstrate the canonical Ray pydoc formatting:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">ray_canonical_doc_style</span><span class="p">(</span><span class="n">param1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">param2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">ray_canonical_doc_style</span><span class="p">(</span><span class="n">param1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">param2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;First sentence MUST be inline with the quotes and fit on one line.</span>
 
 <span class="sd">    Additional explanatory text can be added in paragraphs such as this one.</span>
@@ -1549,7 +1549,7 @@ python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> <
 <span class="sd">    &quot;&quot;&quot;</span>
 </pre></div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RayClass</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">RayClass</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The summary line for a class docstring should fit on one line.</span>
 
 <span class="sd">    Additional explanatory text can be added in paragraphs such as this one.</span>
@@ -1572,14 +1572,14 @@ python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> <
 <span class="sd">        param2: The second parameter.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">param2</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">param2</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="c1">#: Public attribute is documented here.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attr1</span> <span class="o">=</span> <span class="n">param1</span>
         <span class="c1">#: Public attribute is documented here.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attr2</span> <span class="o">=</span> <span class="n">param2</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">attr3</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">attr3</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Public property of the class.</span>
 
 <span class="sd">        Properties created with the @property decorator</span>
@@ -1587,7 +1587,7 @@ python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> <
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s2">&quot;hello&quot;</span>
 
-    <span class="k">def</span> <span class="nf">increment_attr1</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">increment_attr1</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Class methods are similar to regular functions.</span>
 
 <span class="sd">        See above about how to document functions.</span>
@@ -1684,12 +1684,12 @@ check recent tests known to be flaky.</p>
 <p>It’s hard to fully capture the semantics of API compatibility into a single annotation (for example, public APIs may have “experimental” arguments). For more granular stability contracts, those can be noted in the pydoc (e.g., “the <code class="docutils literal notranslate"><span class="pre">random_shuffle</span></code> option is experimental”). When possible, experimental arguments should also be prefixed by underscores in Python (e.g., <code class="code docutils literal notranslate"><span class="pre">_owner=</span></code>).</p>
 <p><strong>Other recommendations</strong>:</p>
 <p>In Python APIs, consider forcing the use of kwargs instead of positional arguments (with the <code class="docutils literal notranslate"><span class="pre">*</span></code> operator). Kwargs are easier to keep backwards compatible than positional arguments, e.g. imagine if you needed to deprecate “opt1” below, it’s easier with forced kwargs:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">foo_bar</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">opt1</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">opt2</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">foo_bar</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">opt1</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">opt2</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
     <span class="k">pass</span>
 </pre></div>
 </div>
 <p>For callback APIs, consider adding a <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> placeholder as a “forward compatibility placeholder” in case more args need to be passed to the callback in the future, e.g.:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">tune_user_callback</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="o">**</span><span class="n">future_kwargs</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">tune_user_callback</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="o">**</span><span class="n">future_kwargs</span><span class="p">):</span>
     <span class="k">pass</span>
 </pre></div>
 </div>

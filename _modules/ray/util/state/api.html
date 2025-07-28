@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,24 +1392,24 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.util.state.api</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">import</span> <span class="nn">urllib</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">fields</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">fields</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.dashboard.modules.dashboard_sdk</span> <span class="kn">import</span> <span class="n">SubmissionClient</span>
-<span class="kn">from</span> <span class="nn">ray.dashboard.utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dashboard.modules.dashboard_sdk</span><span class="w"> </span><span class="kn">import</span> <span class="n">SubmissionClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dashboard.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_address_for_submission_client</span><span class="p">,</span>
     <span class="n">ray_address_to_api_server_url</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
-<span class="kn">from</span> <span class="nn">ray.util.state.common</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state.common</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_LIMIT</span><span class="p">,</span>
     <span class="n">DEFAULT_RPC_TIMEOUT</span><span class="p">,</span>
     <span class="n">ActorState</span><span class="p">,</span>
@@ -1432,13 +1432,13 @@ document.write(`
     <span class="n">WorkerState</span><span class="p">,</span>
     <span class="n">dict_to_state</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.state.exception</span> <span class="kn">import</span> <span class="n">RayStateApiException</span><span class="p">,</span> <span class="n">ServerUnavailable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">RayStateApiException</span><span class="p">,</span> <span class="n">ServerUnavailable</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <span class="nd">@contextmanager</span>
-<span class="k">def</span> <span class="nf">warnings_on_slow_request</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">warnings_on_slow_request</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span> <span class="n">address</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">explain</span><span class="p">:</span> <span class="nb">bool</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A context manager to print warnings if the request is replied slowly.</span>
@@ -1458,7 +1458,7 @@ document.write(`
 
     <span class="c1"># Prepare timers to print warning.</span>
     <span class="c1"># Print 3 times with exponential backoff. timeout / 2, timeout / 4, timeout / 8</span>
-    <span class="k">def</span> <span class="nf">print_warning</span><span class="p">(</span><span class="n">elapsed</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_warning</span><span class="p">(</span><span class="n">elapsed</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">elapsed</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2"> seconds) &quot;</span>
             <span class="s2">&quot;Waiting for the response from the API server &quot;</span>
@@ -1502,10 +1502,10 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">StateApiClient</span><span class="p">(</span><span class="n">SubmissionClient</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StateApiClient</span><span class="p">(</span><span class="n">SubmissionClient</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;State API Client issues REST GET requests to the server for resource states.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cookies</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1542,7 +1542,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_make_param</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ListApiOptions</span><span class="p">,</span> <span class="n">GetApiOptions</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_param</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ListApiOptions</span><span class="p">,</span> <span class="n">GetApiOptions</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
         <span class="n">options_dict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="n">options</span><span class="p">):</span>
             <span class="c1"># TODO(rickyyx): We will need to find a way to pass server side timeout</span>
@@ -1572,7 +1572,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">options_dict</span>
 
-    <span class="k">def</span> <span class="nf">_make_http_get_request</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_http_get_request</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
@@ -1615,7 +1615,7 @@ document.write(`
                     <span class="k">raise</span> <span class="n">ServerUnavailable</span><span class="p">(</span><span class="n">err_str</span><span class="p">)</span>
 
                 <span class="n">err_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Response(url=</span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">,status=</span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">)&quot;</span>
-                <span class="k">raise</span> <span class="n">RayStateApiException</span><span class="p">(</span><span class="n">err_str</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="k">raise</span> <span class="n">RayStateApiException</span><span class="p">(</span><span class="n">err_str</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
         <span class="c1"># Process the response.</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
@@ -1628,7 +1628,7 @@ document.write(`
         <span class="c1"># Dictionary of `ListApiResponse` or `SummaryApiResponse`</span>
         <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;result&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resource</span><span class="p">:</span> <span class="n">StateResource</span><span class="p">,</span>
         <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1732,7 +1732,7 @@ document.write(`
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_print_api_warning</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_print_api_warning</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resource</span><span class="p">:</span> <span class="n">StateResource</span><span class="p">,</span>
         <span class="n">api_response</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
@@ -1804,7 +1804,7 @@ document.write(`
                 <span class="k">for</span> <span class="n">warning_to_print</span> <span class="ow">in</span> <span class="n">warnings_to_print</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">warning_to_print</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_raise_on_missing_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">:</span> <span class="n">StateResource</span><span class="p">,</span> <span class="n">api_response</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_raise_on_missing_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">:</span> <span class="n">StateResource</span><span class="p">,</span> <span class="n">api_response</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Raise an exception when the API resopnse contains a missing output.</span>
 
 <span class="sd">        Output can be missing if (1) Failures on some of data source queries (e.g.,</span>
@@ -1843,7 +1843,7 @@ document.write(`
                 <span class="s2">&quot;set `raise_on_missing_output=False`. &quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">list</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resource</span><span class="p">:</span> <span class="n">StateResource</span><span class="p">,</span>
         <span class="n">options</span><span class="p">:</span> <span class="n">ListApiOptions</span><span class="p">,</span>
@@ -1904,7 +1904,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_print_api_warning</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">list_api_response</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">dict_to_state</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">resource</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">list_api_response</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">]]</span>
 
-    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">summary</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">resource</span><span class="p">:</span> <span class="n">SummaryResource</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1952,7 +1952,7 @@ document.write(`
 <div class="viewcode-block" id="get_actor">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.get_actor.html#ray.util.state.get_actor">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">get_actor</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_actor</span><span class="p">(</span>
     <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_RPC_TIMEOUT</span><span class="p">,</span>
@@ -1982,7 +1982,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">get_job</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_job</span><span class="p">(</span>
     <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_RPC_TIMEOUT</span><span class="p">,</span>
@@ -2016,7 +2016,7 @@ document.write(`
 <div class="viewcode-block" id="get_placement_group">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.get_placement_group.html#ray.util.state.get_placement_group">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">get_placement_group</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_placement_group</span><span class="p">(</span>
     <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_RPC_TIMEOUT</span><span class="p">,</span>
@@ -2051,7 +2051,7 @@ document.write(`
 <div class="viewcode-block" id="get_node">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.get_node.html#ray.util.state.get_node">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">get_node</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_node</span><span class="p">(</span>
     <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_RPC_TIMEOUT</span><span class="p">,</span>
@@ -2086,7 +2086,7 @@ document.write(`
 <div class="viewcode-block" id="get_worker">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.get_worker.html#ray.util.state.get_worker">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">get_worker</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_worker</span><span class="p">(</span>
     <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_RPC_TIMEOUT</span><span class="p">,</span>
@@ -2121,7 +2121,7 @@ document.write(`
 <div class="viewcode-block" id="get_task">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.get_task.html#ray.util.state.get_task">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">get_task</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_task</span><span class="p">(</span>
     <span class="nb">id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;ray.ObjectRef&quot;</span><span class="p">],</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_RPC_TIMEOUT</span><span class="p">,</span>
@@ -2162,7 +2162,7 @@ document.write(`
 <div class="viewcode-block" id="get_objects">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.get_objects.html#ray.util.state.get_objects">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">get_objects</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_objects</span><span class="p">(</span>
     <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_RPC_TIMEOUT</span><span class="p">,</span>
@@ -2200,7 +2200,7 @@ document.write(`
 <div class="viewcode-block" id="list_actors">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.list_actors.html#ray.util.state.list_actors">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">list_actors</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_actors</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PredicateType</span><span class="p">,</span> <span class="n">SupportedFilterType</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_LIMIT</span><span class="p">,</span>
@@ -2251,7 +2251,7 @@ document.write(`
 <div class="viewcode-block" id="list_placement_groups">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.list_placement_groups.html#ray.util.state.list_placement_groups">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">list_placement_groups</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_placement_groups</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PredicateType</span><span class="p">,</span> <span class="n">SupportedFilterType</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_LIMIT</span><span class="p">,</span>
@@ -2298,7 +2298,7 @@ document.write(`
 <div class="viewcode-block" id="list_nodes">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.list_nodes.html#ray.util.state.list_nodes">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">list_nodes</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_nodes</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PredicateType</span><span class="p">,</span> <span class="n">SupportedFilterType</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_LIMIT</span><span class="p">,</span>
@@ -2346,7 +2346,7 @@ document.write(`
 <div class="viewcode-block" id="list_jobs">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.list_jobs.html#ray.util.state.list_jobs">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">list_jobs</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_jobs</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PredicateType</span><span class="p">,</span> <span class="n">SupportedFilterType</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_LIMIT</span><span class="p">,</span>
@@ -2394,7 +2394,7 @@ document.write(`
 <div class="viewcode-block" id="list_workers">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.list_workers.html#ray.util.state.list_workers">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">list_workers</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_workers</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PredicateType</span><span class="p">,</span> <span class="n">SupportedFilterType</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_LIMIT</span><span class="p">,</span>
@@ -2442,7 +2442,7 @@ document.write(`
 <div class="viewcode-block" id="list_tasks">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.list_tasks.html#ray.util.state.list_tasks">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">list_tasks</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_tasks</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PredicateType</span><span class="p">,</span> <span class="n">SupportedFilterType</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_LIMIT</span><span class="p">,</span>
@@ -2490,7 +2490,7 @@ document.write(`
 <div class="viewcode-block" id="list_objects">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.list_objects.html#ray.util.state.list_objects">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">list_objects</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_objects</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PredicateType</span><span class="p">,</span> <span class="n">SupportedFilterType</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_LIMIT</span><span class="p">,</span>
@@ -2536,7 +2536,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">list_vclusters</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_vclusters</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PredicateType</span><span class="p">,</span> <span class="n">SupportedFilterType</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_LIMIT</span><span class="p">,</span>
@@ -2583,7 +2583,7 @@ document.write(`
 <div class="viewcode-block" id="list_runtime_envs">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.list_runtime_envs.html#ray.util.state.list_runtime_envs">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">list_runtime_envs</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_runtime_envs</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PredicateType</span><span class="p">,</span> <span class="n">SupportedFilterType</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_LIMIT</span><span class="p">,</span>
@@ -2629,7 +2629,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">list_cluster_events</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_cluster_events</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PredicateType</span><span class="p">,</span> <span class="n">SupportedFilterType</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_LIMIT</span><span class="p">,</span>
@@ -2656,7 +2656,7 @@ document.write(`
 <div class="viewcode-block" id="get_log">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.get_log.html#ray.util.state.get_log">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">get_log</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_log</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">node_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">node_ip</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2789,7 +2789,7 @@ document.write(`
 <div class="viewcode-block" id="list_logs">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.list_logs.html#ray.util.state.list_logs">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">list_logs</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_logs</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">node_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">node_ip</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2859,7 +2859,7 @@ document.write(`
 <div class="viewcode-block" id="summarize_tasks">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.summarize_tasks.html#ray.util.state.summarize_tasks">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">summarize_tasks</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">summarize_tasks</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_RPC_TIMEOUT</span><span class="p">,</span>
     <span class="n">raise_on_missing_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -2895,7 +2895,7 @@ document.write(`
 <div class="viewcode-block" id="summarize_actors">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.summarize_actors.html#ray.util.state.summarize_actors">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">summarize_actors</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">summarize_actors</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_RPC_TIMEOUT</span><span class="p">,</span>
     <span class="n">raise_on_missing_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -2931,7 +2931,7 @@ document.write(`
 <div class="viewcode-block" id="summarize_objects">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.summarize_objects.html#ray.util.state.summarize_objects">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">summarize_objects</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">summarize_objects</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_RPC_TIMEOUT</span><span class="p">,</span>
     <span class="n">raise_on_missing_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>

@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,14 +1389,14 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.serve.schema</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">from</span> <span class="nn">zlib</span> <span class="kn">import</span> <span class="n">crc32</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">crc32</span>
 
-<span class="kn">from</span> <span class="nn">ray._private.pydantic_compat</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.pydantic_compat</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BaseModel</span><span class="p">,</span>
     <span class="n">Extra</span><span class="p">,</span>
     <span class="n">Field</span><span class="p">,</span>
@@ -1406,25 +1406,25 @@ document.write(`
     <span class="n">root_validator</span><span class="p">,</span>
     <span class="n">validator</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray._private.ray_logging.constants</span> <span class="kn">import</span> <span class="n">LOGRECORD_STANDARD_ATTRS</span>
-<span class="kn">from</span> <span class="nn">ray._private.runtime_env.packaging</span> <span class="kn">import</span> <span class="n">parse_uri</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.common</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.ray_logging.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGRECORD_STANDARD_ATTRS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.runtime_env.packaging</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_uri</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.common</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DeploymentStatus</span><span class="p">,</span>
     <span class="n">DeploymentStatusTrigger</span><span class="p">,</span>
     <span class="n">ReplicaState</span><span class="p">,</span>
     <span class="n">ServeDeployMode</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_GRPC_PORT</span><span class="p">,</span>
     <span class="n">DEFAULT_MAX_ONGOING_REQUESTS</span><span class="p">,</span>
     <span class="n">DEFAULT_UVICORN_KEEP_ALIVE_TIMEOUT_S</span><span class="p">,</span>
     <span class="n">RAY_SERVE_LOG_ENCODING</span><span class="p">,</span>
     <span class="n">SERVE_DEFAULT_APP_NAME</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.deployment_info</span> <span class="kn">import</span> <span class="n">DeploymentInfo</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.utils</span> <span class="kn">import</span> <span class="n">DEFAULT</span>
-<span class="kn">from</span> <span class="nn">ray.serve.config</span> <span class="kn">import</span> <span class="n">ProxyLocation</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.deployment_info</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentInfo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProxyLocation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="c1"># Shared amongst multiple schemas.</span>
 <span class="n">TARGET_CAPACITY_FIELD</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
@@ -1439,7 +1439,7 @@ document.write(`
 <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_route_prefix_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_route_prefix_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The route_prefix</span>
 <span class="sd">    1. must start with a / character</span>
@@ -1473,7 +1473,7 @@ document.write(`
 <div class="viewcode-block" id="EncodingType">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.EncodingType.html#ray.serve.schema.EncodingType">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">EncodingType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EncodingType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Encoding type for the serve logs.&quot;&quot;&quot;</span>
 
     <span class="n">TEXT</span> <span class="o">=</span> <span class="s2">&quot;TEXT&quot;</span>
@@ -1484,7 +1484,7 @@ document.write(`
 <div class="viewcode-block" id="LoggingConfig">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.LoggingConfig.html#ray.serve.schema.LoggingConfig">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">LoggingConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LoggingConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Logging config schema for configuring serve components logs.</span>
 
 <span class="sd">    Example:</span>
@@ -1505,7 +1505,7 @@ document.write(`
 <span class="sd">                    return &quot;Hello world!&quot;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="n">Extra</span><span class="o">.</span><span class="n">forbid</span>
 
     <span class="n">encoding</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EncodingType</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
@@ -1548,7 +1548,7 @@ document.write(`
     <span class="p">)</span>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;encoding&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">valid_encoding_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">valid_encoding_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">EncodingType</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Got &#39;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&#39; for encoding. Encoding must be one &quot;</span>
@@ -1558,7 +1558,7 @@ document.write(`
         <span class="k">return</span> <span class="n">v</span>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;log_level&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">valid_log_level</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">valid_log_level</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">_levelToName</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1575,7 +1575,7 @@ document.write(`
         <span class="k">return</span> <span class="n">v</span>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;additional_log_standard_attrs&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">valid_additional_log_standard_attrs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">valid_additional_log_standard_attrs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">attr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">LOGRECORD_STANDARD_ATTRS</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1584,7 +1584,7 @@ document.write(`
                 <span class="p">)</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">_compute_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">crc32</span><span class="p">(</span>
             <span class="p">(</span>
                 <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">)</span>
@@ -1594,7 +1594,7 @@ document.write(`
             <span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">LoggingConfig</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_hash</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_compute_hash</span><span class="p">()</span></div>
@@ -1604,7 +1604,7 @@ document.write(`
 <div class="viewcode-block" id="RayActorOptionsSchema">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.RayActorOptionsSchema.html#ray.serve.schema.RayActorOptionsSchema">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RayActorOptionsSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RayActorOptionsSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Options with which to start a replica actor.&quot;&quot;&quot;</span>
 
     <span class="n">runtime_env</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
@@ -1652,7 +1652,7 @@ document.write(`
     <span class="p">)</span>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;runtime_env&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">runtime_env_contains_remote_uris</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">runtime_env_contains_remote_uris</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
         <span class="c1"># Ensure that all uris in py_modules and working_dir are remote</span>
 
         <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1680,7 +1680,7 @@ document.write(`
 <div class="viewcode-block" id="DeploymentSchema">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.DeploymentSchema.html#ray.serve.schema.DeploymentSchema">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">DeploymentSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">allow_population_by_field_name</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DeploymentSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">allow_population_by_field_name</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Specifies options for one deployment within a Serve application. For each deployment</span>
 <span class="sd">    this can optionally be included in `ServeApplicationSchema` to override deployment</span>
@@ -1808,7 +1808,7 @@ document.write(`
     <span class="p">)</span>
 
     <span class="nd">@root_validator</span>
-    <span class="k">def</span> <span class="nf">validate_num_replicas_and_autoscaling_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_num_replicas_and_autoscaling_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="n">num_replicas</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;num_replicas&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">autoscaling_config</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;autoscaling_config&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
@@ -1830,7 +1830,7 @@ document.write(`
         <span class="k">return</span> <span class="n">values</span>
 
     <span class="nd">@root_validator</span>
-    <span class="k">def</span> <span class="nf">validate_max_replicas_per_node_and_placement_group_bundles</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_max_replicas_per_node_and_placement_group_bundles</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="n">max_replicas_per_node</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_replicas_per_node&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">placement_group_bundles</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;placement_group_bundles&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
@@ -1846,7 +1846,7 @@ document.write(`
         <span class="k">return</span> <span class="n">values</span>
 
     <span class="nd">@root_validator</span>
-    <span class="k">def</span> <span class="nf">validate_max_queued_requests</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_max_queued_requests</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="n">max_queued_requests</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_queued_requests&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">max_queued_requests</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">max_queued_requests</span> <span class="o">==</span> <span class="n">DEFAULT</span><span class="o">.</span><span class="n">VALUE</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">values</span>
@@ -1858,7 +1858,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">values</span>
 
-    <span class="k">def</span> <span class="nf">_get_user_configured_option_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_user_configured_option_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get set of names for all user-configured options.</span>
 
 <span class="sd">        Any field not set to DEFAULT.VALUE is considered a user-configured option.</span>
@@ -1870,7 +1870,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_deployment_info_to_schema</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">DeploymentInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DeploymentSchema</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_deployment_info_to_schema</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">DeploymentInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DeploymentSchema</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a DeploymentInfo object to DeploymentSchema.&quot;&quot;&quot;</span>
 
     <span class="n">schema</span> <span class="o">=</span> <span class="n">DeploymentSchema</span><span class="p">(</span>
@@ -1898,7 +1898,7 @@ document.write(`
 <div class="viewcode-block" id="ServeApplicationSchema">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.ServeApplicationSchema.html#ray.serve.schema.ServeApplicationSchema">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ServeApplicationSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ServeApplicationSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Describes one Serve application, and currently can also be used as a standalone</span>
 <span class="sd">    config to deploy a single application to a Ray cluster.</span>
@@ -1969,11 +1969,11 @@ document.write(`
     <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">deployment_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">deployment_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deployments</span><span class="p">]</span>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;runtime_env&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">runtime_env_contains_remote_uris</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">runtime_env_contains_remote_uris</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
         <span class="c1"># Ensure that all uris in py_modules and working_dir are remote.</span>
         <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
@@ -1996,7 +1996,7 @@ document.write(`
         <span class="k">return</span> <span class="n">v</span>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;import_path&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">import_path_format_valid</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">import_path_format_valid</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -2031,7 +2031,7 @@ document.write(`
 <div class="viewcode-block" id="ServeApplicationSchema.get_empty_schema_dict">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.ServeApplicationSchema.get_empty_schema_dict.html#ray.serve.schema.ServeApplicationSchema.get_empty_schema_dict">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">get_empty_schema_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_empty_schema_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an empty app schema dictionary.</span>
 
 <span class="sd">        Schema can be used as a representation of an empty Serve application config.</span>
@@ -2049,7 +2049,7 @@ document.write(`
 <div class="viewcode-block" id="gRPCOptionsSchema">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.gRPCOptionsSchema.html#ray.serve.schema.gRPCOptionsSchema">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">gRPCOptionsSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">gRPCOptionsSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Options to start the gRPC Proxy with.&quot;&quot;&quot;</span>
 
     <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
@@ -2075,7 +2075,7 @@ document.write(`
 <div class="viewcode-block" id="HTTPOptionsSchema">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.HTTPOptionsSchema.html#ray.serve.schema.HTTPOptionsSchema">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">HTTPOptionsSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HTTPOptionsSchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Options to start the HTTP Proxy with.</span>
 
 <span class="sd">    NOTE: This config allows extra parameters to make it forward-compatible (ie</span>
@@ -2123,7 +2123,7 @@ document.write(`
 <div class="viewcode-block" id="ServeDeploySchema">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.ServeDeploySchema.html#ray.serve.schema.ServeDeploySchema">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ServeDeploySchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ServeDeploySchema</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Multi-application config for deploying a list of Serve applications to the Ray</span>
 <span class="sd">    cluster.</span>
@@ -2158,7 +2158,7 @@ document.write(`
     <span class="n">target_capacity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">TARGET_CAPACITY_FIELD</span>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;applications&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">application_names_unique</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">application_names_unique</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
         <span class="c1"># Ensure there are no duplicate applications listed</span>
         <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">app</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">app</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
         <span class="n">duplicates</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span> <span class="k">if</span> <span class="n">names</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">}</span>
@@ -2172,7 +2172,7 @@ document.write(`
         <span class="k">return</span> <span class="n">v</span>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;applications&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">application_routes_unique</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">application_routes_unique</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
         <span class="c1"># Ensure each application with a non-null route prefix has unique route prefixes</span>
         <span class="n">routes</span> <span class="o">=</span> <span class="p">[</span><span class="n">app</span><span class="o">.</span><span class="n">route_prefix</span> <span class="k">for</span> <span class="n">app</span> <span class="ow">in</span> <span class="n">v</span> <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">route_prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">duplicates</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">route</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="n">routes</span> <span class="k">if</span> <span class="n">routes</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">route</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">}</span>
@@ -2187,14 +2187,14 @@ document.write(`
         <span class="k">return</span> <span class="n">v</span>
 
     <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;applications&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">application_names_nonempty</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">application_names_nonempty</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">app</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Application names must be nonempty.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">v</span>
 
     <span class="nd">@root_validator</span>
-    <span class="k">def</span> <span class="nf">nested_host_and_port</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nested_host_and_port</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="c1"># TODO (zcin): ServeApplicationSchema still needs to have host and port</span>
         <span class="c1"># fields to support single-app mode, but in multi-app mode the host and port</span>
         <span class="c1"># fields at the top-level deploy config is used instead. Eventually, after</span>
@@ -2217,7 +2217,7 @@ document.write(`
 <div class="viewcode-block" id="ServeDeploySchema.get_empty_schema_dict">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.ServeDeploySchema.get_empty_schema_dict.html#ray.serve.schema.ServeDeploySchema.get_empty_schema_dict">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">get_empty_schema_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_empty_schema_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an empty deploy schema dictionary.</span>
 
 <span class="sd">        Schema can be used as a representation of an empty Serve deploy config.</span>
@@ -2233,7 +2233,7 @@ document.write(`
 <div class="viewcode-block" id="ProxyStatus">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.ProxyStatus.html#ray.serve.schema.ProxyStatus">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ProxyStatus</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProxyStatus</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The current status of the proxy.&quot;&quot;&quot;</span>
 
     <span class="n">STARTING</span> <span class="o">=</span> <span class="s2">&quot;STARTING&quot;</span>
@@ -2251,7 +2251,7 @@ document.write(`
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.DeploymentStatusOverview.html#ray.serve.schema.DeploymentStatusOverview">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">DeploymentStatusOverview</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DeploymentStatusOverview</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Describes the status of a deployment.</span>
 
 <span class="sd">    Attributes:</span>
@@ -2272,7 +2272,7 @@ document.write(`
 <div class="viewcode-block" id="ApplicationStatus">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.ApplicationStatus.html#ray.serve.schema.ApplicationStatus">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ApplicationStatus</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ApplicationStatus</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The current status of the application.&quot;&quot;&quot;</span>
 
     <span class="n">NOT_STARTED</span> <span class="o">=</span> <span class="s2">&quot;NOT_STARTED&quot;</span>
@@ -2288,7 +2288,7 @@ document.write(`
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.ApplicationStatusOverview.html#ray.serve.schema.ApplicationStatusOverview">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ApplicationStatusOverview</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ApplicationStatusOverview</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Describes the status of an application and all its deployments.</span>
 
 <span class="sd">    Attributes:</span>
@@ -2311,7 +2311,7 @@ document.write(`
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.ServeStatus.html#ray.serve.schema.ServeStatus">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ServeStatus</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ServeStatus</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Describes the status of Serve.</span>
 
 <span class="sd">    Attributes:</span>
@@ -2331,7 +2331,7 @@ document.write(`
 <div class="viewcode-block" id="ServeActorDetails">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.ServeActorDetails.html#ray.serve.schema.ServeActorDetails">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ServeActorDetails</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ServeActorDetails</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Detailed info about a Ray Serve actor.</span>
 
 <span class="sd">    Attributes:</span>
@@ -2365,7 +2365,7 @@ document.write(`
 <div class="viewcode-block" id="ReplicaDetails">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.ReplicaDetails.html#ray.serve.schema.ReplicaDetails">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ReplicaDetails</span><span class="p">(</span><span class="n">ServeActorDetails</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ReplicaDetails</span><span class="p">(</span><span class="n">ServeActorDetails</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Detailed info about a single deployment replica.&quot;&quot;&quot;</span>
 
     <span class="n">replica_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Unique ID for the replica.&quot;</span><span class="p">)</span>
@@ -2384,7 +2384,7 @@ document.write(`
 <div class="viewcode-block" id="DeploymentDetails">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.DeploymentDetails.html#ray.serve.schema.DeploymentDetails">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">DeploymentDetails</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="n">Extra</span><span class="o">.</span><span class="n">forbid</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DeploymentDetails</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="n">Extra</span><span class="o">.</span><span class="n">forbid</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Detailed info about a deployment within a Serve application.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2428,7 +2428,7 @@ document.write(`
 <div class="viewcode-block" id="APIType">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.APIType.html#ray.serve.schema.APIType">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">APIType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">APIType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracks the type of API that an application originates from.&quot;&quot;&quot;</span>
 
     <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
@@ -2440,7 +2440,7 @@ document.write(`
 <div class="viewcode-block" id="ApplicationDetails">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.ApplicationDetails.html#ray.serve.schema.ApplicationDetails">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ApplicationDetails</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="n">Extra</span><span class="o">.</span><span class="n">forbid</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ApplicationDetails</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="n">Extra</span><span class="o">.</span><span class="n">forbid</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Detailed info about a Serve application.&quot;&quot;&quot;</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Application name.&quot;</span><span class="p">)</span>
@@ -2507,7 +2507,7 @@ document.write(`
 <div class="viewcode-block" id="ProxyDetails">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.ProxyDetails.html#ray.serve.schema.ProxyDetails">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ProxyDetails</span><span class="p">(</span><span class="n">ServeActorDetails</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProxyDetails</span><span class="p">(</span><span class="n">ServeActorDetails</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Detailed info about a Ray Serve ProxyActor.</span>
 
 <span class="sd">    Attributes:</span>
@@ -2521,7 +2521,7 @@ document.write(`
 <div class="viewcode-block" id="ServeInstanceDetails">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.ServeInstanceDetails.html#ray.serve.schema.ServeInstanceDetails">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;stable&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ServeInstanceDetails</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="n">Extra</span><span class="o">.</span><span class="n">forbid</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ServeInstanceDetails</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="n">Extra</span><span class="o">.</span><span class="n">forbid</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Serve metadata with system-level info and details on all applications deployed to</span>
 <span class="sd">    the Ray cluster.</span>
@@ -2562,7 +2562,7 @@ document.write(`
 <div class="viewcode-block" id="ServeInstanceDetails.get_empty_schema_dict">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.schema.ServeInstanceDetails.get_empty_schema_dict.html#ray.serve.schema.ServeInstanceDetails.get_empty_schema_dict">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">get_empty_schema_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_empty_schema_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Empty Serve instance details dictionary.</span>
 
 <span class="sd">        Represents no Serve instance running on the cluster.</span>
@@ -2577,7 +2577,7 @@ document.write(`
         <span class="p">}</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ServeStatus</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ServeStatus</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">ServeStatus</span><span class="p">(</span>
             <span class="n">target_capacity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_capacity</span><span class="p">,</span>
             <span class="n">proxies</span><span class="o">=</span><span class="p">{</span><span class="n">node_id</span><span class="p">:</span> <span class="n">proxy</span><span class="o">.</span><span class="n">status</span> <span class="k">for</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">proxy</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxies</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
@@ -2602,7 +2602,7 @@ document.write(`
             <span class="p">},</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_user_facing_json_serializable_dict</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_user_facing_json_serializable_dict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates json serializable dictionary with user facing data.&quot;&quot;&quot;</span>

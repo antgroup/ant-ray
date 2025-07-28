@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,13 +1389,13 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data.block</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">fields</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">fields</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -1409,25 +1409,25 @@ document.write(`
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">DynamicObjectRefGenerator</span>
-<span class="kn">from</span> <span class="nn">ray.air.util.tensor_extensions.arrow</span> <span class="kn">import</span> <span class="n">ArrowConversionError</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.util</span> <span class="kn">import</span> <span class="n">_check_pyarrow_version</span><span class="p">,</span> <span class="n">_truncated_repr</span>
-<span class="kn">from</span> <span class="nn">ray.types</span> <span class="kn">import</span> <span class="n">ObjectRef</span>
-<span class="kn">from</span> <span class="nn">ray.util</span> <span class="kn">import</span> <span class="n">log_once</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">DynamicObjectRefGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.util.tensor_extensions.arrow</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrowConversionError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">_check_pyarrow_version</span><span class="p">,</span> <span class="n">_truncated_repr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObjectRef</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_once</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
-<span class="kn">import</span> <span class="nn">psutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pandas</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span>
 
-    <span class="kn">from</span> <span class="nn">ray.data._internal.block_builder</span> <span class="kn">import</span> <span class="n">BlockBuilder</span>
-    <span class="kn">from</span> <span class="nn">ray.data._internal.planner.exchange.sort_task_spec</span> <span class="kn">import</span> <span class="n">SortKey</span>
-    <span class="kn">from</span> <span class="nn">ray.data.aggregate</span> <span class="kn">import</span> <span class="n">AggregateFn</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.block_builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockBuilder</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.planner.exchange.sort_task_spec</span><span class="w"> </span><span class="kn">import</span> <span class="n">SortKey</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.aggregate</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregateFn</span>
 
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">contravariant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1448,7 +1448,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">BlockType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BlockType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">ARROW</span> <span class="o">=</span> <span class="s2">&quot;arrow&quot;</span>
     <span class="n">PANDAS</span> <span class="o">=</span> <span class="s2">&quot;pandas&quot;</span>
 
@@ -1468,8 +1468,8 @@ document.write(`
 <span class="n">CallableClass</span> <span class="o">=</span> <span class="nb">type</span>
 
 
-<span class="k">class</span> <span class="nc">_CallableClassProtocol</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">U</span><span class="p">]):</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__arg</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">U</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">U</span><span class="p">]]:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_CallableClassProtocol</span><span class="p">(</span><span class="n">Protocol</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">U</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__arg</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">U</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">U</span><span class="p">]]:</span>
         <span class="o">...</span>
 
 
@@ -1497,7 +1497,7 @@ document.write(`
 <span class="n">DEFAULT_BATCH_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;numpy&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_apply_batch_format</span><span class="p">(</span><span class="n">given_batch_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_apply_batch_format</span><span class="p">(</span><span class="n">given_batch_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">given_batch_format</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span>
         <span class="n">given_batch_format</span> <span class="o">=</span> <span class="n">DEFAULT_BATCH_FORMAT</span>
     <span class="k">if</span> <span class="n">given_batch_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">VALID_BATCH_FORMATS</span><span class="p">:</span>
@@ -1509,14 +1509,14 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">to_stats</span><span class="p">(</span><span class="n">metas</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;BlockMetadata&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;BlockStats&quot;</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_stats</span><span class="p">(</span><span class="n">metas</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;BlockMetadata&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;BlockStats&quot;</span><span class="p">]:</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">to_stats</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metas</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="BlockExecStats">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockExecStats.html#ray.data.block.BlockExecStats">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">BlockExecStats</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BlockExecStats</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Execution stats for this block.</span>
 
 <span class="sd">    Attributes:</span>
@@ -1525,7 +1525,7 @@ document.write(`
 <span class="sd">        node_id: A unique id for the node that computed this block.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_time_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">end_time_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wall_time_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1536,10 +1536,10 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">task_idx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">builder</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="s2">&quot;_BlockExecStatsBuilder&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">builder</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="s2">&quot;_BlockExecStatsBuilder&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_BlockExecStatsBuilder</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span>
             <span class="p">{</span>
                 <span class="s2">&quot;wall_time_s&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">wall_time_s</span><span class="p">,</span>
@@ -1551,18 +1551,18 @@ document.write(`
 
 
 
-<span class="k">class</span> <span class="nc">_BlockExecStatsBuilder</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_BlockExecStatsBuilder</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper class for building block stats.</span>
 
 <span class="sd">    When this class is created, we record the start time. When build() is</span>
 <span class="sd">    called, the time delta is saved as part of the stats.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_cpu</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">process_time</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BlockExecStats&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BlockExecStats&quot;</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">end_cpu</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">process_time</span><span class="p">()</span>
 
@@ -1579,7 +1579,7 @@ document.write(`
 
 <span class="nd">@DeveloperAPI</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">BlockStats</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BlockStats</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Statistics about the block produced&quot;&quot;&quot;</span>
 
     <span class="c1">#: The number of rows contained in this block, or None.</span>
@@ -1589,7 +1589,7 @@ document.write(`
     <span class="c1">#: Execution stats for this block.</span>
     <span class="n">exec_stats</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BlockExecStats</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_bytes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Require size_bytes to be int, ray.util.metrics objects</span>
             <span class="c1"># will not take other types like numpy.int64</span>
@@ -1603,7 +1603,7 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockMetadata.html#ray.data.block.BlockMetadata">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">BlockMetadata</span><span class="p">(</span><span class="n">BlockStats</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BlockMetadata</span><span class="p">(</span><span class="n">BlockStats</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Metadata about the block.&quot;&quot;&quot;</span>
 
     <span class="c1">#: The pyarrow schema or types of the block elements, or None.</span>
@@ -1612,12 +1612,12 @@ document.write(`
     <span class="c1">#: the empty list if indeterminate.</span>
     <span class="n">input_files</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
 
-    <span class="k">def</span> <span class="nf">to_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">BlockStats</span><span class="p">(</span>
             <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_BLOCK_STATS_FIELD_NAMES</span><span class="p">}</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__post_init__</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_files</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1628,7 +1628,7 @@ document.write(`
 <div class="viewcode-block" id="BlockAccessor">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.html#ray.data.block.BlockAccessor">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">BlockAccessor</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BlockAccessor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Provides accessor methods for a specific block.</span>
 
 <span class="sd">    Ideally, we wouldn&#39;t need a separate accessor classes for blocks. However,</span>
@@ -1638,14 +1638,14 @@ document.write(`
 
 <div class="viewcode-block" id="BlockAccessor.num_rows">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.num_rows.html#ray.data.block.BlockAccessor.num_rows">[docs]</a>
-    <span class="k">def</span> <span class="nf">num_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the number of rows contained in this block.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.iter_rows">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.iter_rows.html#ray.data.block.BlockAccessor.iter_rows">[docs]</a>
-    <span class="k">def</span> <span class="nf">iter_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">public_row_format</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iter_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">public_row_format</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterate over the rows of this block.</span>
 
 <span class="sd">        Args:</span>
@@ -1657,7 +1657,7 @@ document.write(`
 
 <div class="viewcode-block" id="BlockAccessor.slice">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.slice.html#ray.data.block.BlockAccessor.slice">[docs]</a>
-    <span class="k">def</span> <span class="nf">slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a slice of this block.</span>
 
 <span class="sd">        Args:</span>
@@ -1673,7 +1673,7 @@ document.write(`
 
 <div class="viewcode-block" id="BlockAccessor.take">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.take.html#ray.data.block.BlockAccessor.take">[docs]</a>
-    <span class="k">def</span> <span class="nf">take</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">take</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new block containing the provided row indices.</span>
 
 <span class="sd">        Args:</span>
@@ -1687,35 +1687,35 @@ document.write(`
 
 <div class="viewcode-block" id="BlockAccessor.select">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.select.html#ray.data.block.BlockAccessor.select">[docs]</a>
-    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new block containing the provided columns.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.rename_columns">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.rename_columns.html#ray.data.block.BlockAccessor.rename_columns">[docs]</a>
-    <span class="k">def</span> <span class="nf">rename_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_rename</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rename_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_rename</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the block reflecting the renamed columns.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.random_shuffle">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.random_shuffle.html#ray.data.block.BlockAccessor.random_shuffle">[docs]</a>
-    <span class="k">def</span> <span class="nf">random_shuffle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">random_seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">random_shuffle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">random_seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Randomly shuffle this block.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.to_pandas">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.to_pandas.html#ray.data.block.BlockAccessor.to_pandas">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pandas.DataFrame&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pandas.DataFrame&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert this block into a Pandas dataframe.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.to_numpy">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.to_numpy.html#ray.data.block.BlockAccessor.to_numpy">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_numpy</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_numpy</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert this block (or columns of block) into a NumPy ndarray.</span>
@@ -1728,28 +1728,28 @@ document.write(`
 
 <div class="viewcode-block" id="BlockAccessor.to_arrow">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.to_arrow.html#ray.data.block.BlockAccessor.to_arrow">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_arrow</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_arrow</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pyarrow.Table&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert this block into an Arrow table.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.to_block">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.to_block.html#ray.data.block.BlockAccessor.to_block">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_block</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_block</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the base block that this accessor wraps.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.to_default">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.to_default.html#ray.data.block.BlockAccessor.to_default">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_default</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_default</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the default data format for this accessor.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_block</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.to_batch_format">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.to_batch_format.html#ray.data.block.BlockAccessor.to_batch_format">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_batch_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DataBatch</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_batch_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DataBatch</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert this block into the provided batch format.</span>
 
 <span class="sd">        Args:</span>
@@ -1777,21 +1777,21 @@ document.write(`
 
 <div class="viewcode-block" id="BlockAccessor.size_bytes">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.size_bytes.html#ray.data.block.BlockAccessor.size_bytes">[docs]</a>
-    <span class="k">def</span> <span class="nf">size_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the approximate size in bytes of this block.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.schema">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.schema.html#ray.data.block.BlockAccessor.schema">[docs]</a>
-    <span class="k">def</span> <span class="nf">schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="s2">&quot;pyarrow.lib.Schema&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="s2">&quot;pyarrow.lib.Schema&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the Python type or pyarrow schema of this block.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.get_metadata">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.get_metadata.html#ray.data.block.BlockAccessor.get_metadata">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metadata</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">input_files</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">exec_stats</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BlockExecStats</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1808,7 +1808,7 @@ document.write(`
 
 <div class="viewcode-block" id="BlockAccessor.zip">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.zip.html#ray.data.block.BlockAccessor.zip">[docs]</a>
-    <span class="k">def</span> <span class="nf">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Block&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Block&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Block&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Block&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Zip this block with another block of the same type and size.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
@@ -1816,7 +1816,7 @@ document.write(`
 <div class="viewcode-block" id="BlockAccessor.builder">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.builder.html#ray.data.block.BlockAccessor.builder">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">builder</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="s2">&quot;BlockBuilder&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">builder</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="s2">&quot;BlockBuilder&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a builder for this block type.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
@@ -1824,7 +1824,7 @@ document.write(`
 <div class="viewcode-block" id="BlockAccessor.batch_to_block">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.batch_to_block.html#ray.data.block.BlockAccessor.batch_to_block">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">batch_to_block</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">batch_to_block</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">batch</span><span class="p">:</span> <span class="n">DataBatch</span><span class="p">,</span>
         <span class="n">block_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BlockType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1863,9 +1863,9 @@ document.write(`
 <div class="viewcode-block" id="BlockAccessor.batch_to_arrow_block">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.batch_to_arrow_block.html#ray.data.block.BlockAccessor.batch_to_arrow_block">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">batch_to_arrow_block</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">batch_to_arrow_block</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an Arrow block from user-facing data formats.&quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.data._internal.arrow_block</span> <span class="kn">import</span> <span class="n">ArrowBlockBuilder</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.arrow_block</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrowBlockBuilder</span>
 
         <span class="k">return</span> <span class="n">ArrowBlockBuilder</span><span class="o">.</span><span class="n">_table_from_pydict</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span></div>
 
@@ -1873,9 +1873,9 @@ document.write(`
 <div class="viewcode-block" id="BlockAccessor.batch_to_pandas_block">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.batch_to_pandas_block.html#ray.data.block.BlockAccessor.batch_to_pandas_block">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">batch_to_pandas_block</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">batch_to_pandas_block</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a Pandas block from user-facing data formats.&quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.data._internal.pandas_block</span> <span class="kn">import</span> <span class="n">PandasBlockBuilder</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.pandas_block</span><span class="w"> </span><span class="kn">import</span> <span class="n">PandasBlockBuilder</span>
 
         <span class="k">return</span> <span class="n">PandasBlockBuilder</span><span class="o">.</span><span class="n">_table_from_pydict</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span></div>
 
@@ -1883,22 +1883,22 @@ document.write(`
 <div class="viewcode-block" id="BlockAccessor.for_block">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.for_block.html#ray.data.block.BlockAccessor.for_block">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BlockAccessor[T]&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">for_block</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BlockAccessor[T]&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a block accessor for the given block.&quot;&quot;&quot;</span>
         <span class="n">_check_pyarrow_version</span><span class="p">()</span>
-        <span class="kn">import</span> <span class="nn">pandas</span>
-        <span class="kn">import</span> <span class="nn">pyarrow</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">Table</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">ray.data._internal.arrow_block</span> <span class="kn">import</span> <span class="n">ArrowBlockAccessor</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.arrow_block</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrowBlockAccessor</span>
 
             <span class="k">return</span> <span class="n">ArrowBlockAccessor</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">ray.data._internal.pandas_block</span> <span class="kn">import</span> <span class="n">PandasBlockAccessor</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.pandas_block</span><span class="w"> </span><span class="kn">import</span> <span class="n">PandasBlockAccessor</span>
 
             <span class="k">return</span> <span class="n">PandasBlockAccessor</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">ray.data._internal.arrow_block</span> <span class="kn">import</span> <span class="n">ArrowBlockAccessor</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.arrow_block</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrowBlockAccessor</span>
 
             <span class="k">return</span> <span class="n">ArrowBlockAccessor</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -1915,49 +1915,49 @@ document.write(`
 
 <div class="viewcode-block" id="BlockAccessor.sample">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.sample.html#ray.data.block.BlockAccessor.sample">[docs]</a>
-    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">sort_key</span><span class="p">:</span> <span class="s2">&quot;SortKey&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Block&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">sort_key</span><span class="p">:</span> <span class="s2">&quot;SortKey&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Block&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a random sample of items from this block.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.count">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.count.html#ray.data.block.BlockAccessor.count">[docs]</a>
-    <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a count of the distinct values in the provided column&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.sum">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.sum.html#ray.data.block.BlockAccessor.sum">[docs]</a>
-    <span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a sum of the values in the provided column&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.min">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.min.html#ray.data.block.BlockAccessor.min">[docs]</a>
-    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a min of the values in the provided column&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.max">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.max.html#ray.data.block.BlockAccessor.max">[docs]</a>
-    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a max of the values in the provided column&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.mean">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.mean.html#ray.data.block.BlockAccessor.mean">[docs]</a>
-    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">U</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a mean of the values in the provided column&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.sum_of_squared_diffs_from_mean">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.sum_of_squared_diffs_from_mean.html#ray.data.block.BlockAccessor.sum_of_squared_diffs_from_mean">[docs]</a>
-    <span class="k">def</span> <span class="nf">sum_of_squared_diffs_from_mean</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sum_of_squared_diffs_from_mean</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">on</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">ignore_nulls</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -1969,28 +1969,28 @@ document.write(`
 
 <div class="viewcode-block" id="BlockAccessor.sort">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.sort.html#ray.data.block.BlockAccessor.sort">[docs]</a>
-    <span class="k">def</span> <span class="nf">sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sort_key</span><span class="p">:</span> <span class="s2">&quot;SortKey&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Block&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sort_key</span><span class="p">:</span> <span class="s2">&quot;SortKey&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Block&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns new block sorted according to provided `sort_key`&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="BlockAccessor.sort_and_partition">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.sort_and_partition.html#ray.data.block.BlockAccessor.sort_and_partition">[docs]</a>
-    <span class="k">def</span> <span class="nf">sort_and_partition</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sort_and_partition</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">boundaries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">sort_key</span><span class="p">:</span> <span class="s2">&quot;SortKey&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Block&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a list of sorted partitions of this block.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_aggregate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="s2">&quot;SortKey&quot;</span><span class="p">,</span> <span class="n">aggs</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;AggregateFn&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_aggregate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="s2">&quot;SortKey&quot;</span><span class="p">,</span> <span class="n">aggs</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;AggregateFn&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine rows with the same key into an accumulator.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
 <div class="viewcode-block" id="BlockAccessor.merge_sorted_blocks">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.merge_sorted_blocks.html#ray.data.block.BlockAccessor.merge_sorted_blocks">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">merge_sorted_blocks</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">merge_sorted_blocks</span><span class="p">(</span>
         <span class="n">blocks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Block&quot;</span><span class="p">],</span> <span class="n">sort_key</span><span class="p">:</span> <span class="s2">&quot;SortKey&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Block</span><span class="p">,</span> <span class="n">BlockMetadata</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a sorted block by merging a list of sorted blocks.&quot;&quot;&quot;</span>
@@ -1998,7 +1998,7 @@ document.write(`
 
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_combine_aggregated_blocks</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_combine_aggregated_blocks</span><span class="p">(</span>
         <span class="n">blocks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span>
         <span class="n">sort_key</span><span class="p">:</span> <span class="s2">&quot;SortKey&quot;</span><span class="p">,</span>
         <span class="n">aggs</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;AggregateFn&quot;</span><span class="p">],</span>
@@ -2009,12 +2009,12 @@ document.write(`
 
 <div class="viewcode-block" id="BlockAccessor.block_type">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.block.BlockAccessor.block_type.html#ray.data.block.BlockAccessor.block_type">[docs]</a>
-    <span class="k">def</span> <span class="nf">block_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockType</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">block_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockType</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the block type of this block.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_get_group_boundaries_sorted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_group_boundaries_sorted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        NOTE: THIS METHOD ASSUMES THAT PROVIDED BLOCK IS ALREADY SORTED</span>
 
@@ -2047,7 +2047,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_get_group_boundaries_sorted_numpy</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_group_boundaries_sorted_numpy</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
     <span class="c1"># There are 3 categories: general, numerics with NaN, and categorical with None.</span>
     <span class="c1"># We only needed to check the last element for NaNs/None, as they are assumed to</span>
     <span class="c1"># be sorted.</span>

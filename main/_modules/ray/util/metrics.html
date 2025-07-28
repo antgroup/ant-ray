@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1392,13 +1392,13 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.util.metrics</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">ray._raylet</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._raylet</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Sum</span> <span class="k">as</span> <span class="n">CythonCount</span><span class="p">,</span>
     <span class="n">Histogram</span> <span class="k">as</span> <span class="n">CythonHistogram</span><span class="p">,</span>
     <span class="n">Gauge</span> <span class="k">as</span> <span class="n">CythonGauge</span><span class="p">,</span>
@@ -1406,7 +1406,7 @@ document.write(`
 
 <span class="c1"># Sum is used for CythonCount because it allows incrementing by positive</span>
 <span class="c1"># values that are different from one.</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1416,7 +1416,7 @@ document.write(`
 <span class="n">_VALID_METRIC_NAME_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[a-zA-Z_:][a-zA-Z0-9_:]*$&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_is_invalid_metric_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_invalid_metric_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Empty name is not allowed. Please provide a metric name.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_VALID_METRIC_NAME_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
@@ -1432,14 +1432,14 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Metric</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Metric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The parent class of custom metrics.</span>
 
 <span class="sd">    Ray&#39;s custom metrics APIs are rooted from this class and share</span>
 <span class="sd">    the same public methods.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -1466,7 +1466,7 @@ document.write(`
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tag keys must be str, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">set_default_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_default_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set default tags of metrics.</span>
 
 <span class="sd">        Example:</span>
@@ -1494,7 +1494,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_default_tags</span> <span class="o">=</span> <span class="n">default_tags</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">_record</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_record</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
         <span class="n">tags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1515,7 +1515,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_tags</span><span class="p">(</span><span class="n">final_tags</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="n">final_tags</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_final_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_final_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">tags</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_tags</span>
 
@@ -1525,7 +1525,7 @@ document.write(`
 
         <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_default_tags</span><span class="p">,</span> <span class="o">**</span><span class="n">tags</span><span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">_validate_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">final_tags</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">final_tags</span><span class="p">):</span>
         <span class="n">missing_tags</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">tag_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tag_keys</span><span class="p">:</span>
             <span class="c1"># Prefer passed tags over default tags.</span>
@@ -1536,7 +1536,7 @@ document.write(`
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing value for tag key(s): </span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing_tags</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the information of this metric.</span>
 
 <span class="sd">        Example:</span>
@@ -1556,7 +1556,7 @@ document.write(`
 <div class="viewcode-block" id="Counter">
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.metrics.Counter.html#ray.util.metrics.Counter">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Counter</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Counter</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A cumulative metric that is monotonically increasing.</span>
 
 <span class="sd">    This corresponds to Prometheus&#39; counter metric:</span>
@@ -1574,7 +1574,7 @@ document.write(`
 <span class="sd">        tag_keys: Tag keys of the metric.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -1586,14 +1586,14 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="o">=</span> <span class="n">CythonCount</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tag_keys</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">deserializer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
         <span class="n">serialized_data</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tag_keys</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">deserializer</span><span class="p">,</span> <span class="n">serialized_data</span>
 
 <div class="viewcode-block" id="Counter.inc">
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.metrics.Counter.inc.html#ray.util.metrics.Counter.inc">[docs]</a>
-    <span class="k">def</span> <span class="nf">inc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Increment the counter by `value` (defaults to 1).</span>
 
 <span class="sd">        Tags passed in will take precedence over the metric&#39;s default tags.</span>
@@ -1615,7 +1615,7 @@ document.write(`
 <div class="viewcode-block" id="Histogram">
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.metrics.Histogram.html#ray.util.metrics.Histogram">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Histogram</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Histogram</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracks the size and number of events in buckets.</span>
 
 <span class="sd">    Histograms allow you to calculate aggregate quantiles</span>
@@ -1631,7 +1631,7 @@ document.write(`
 <span class="sd">        tag_keys: Tag keys of the metric.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -1662,7 +1662,7 @@ document.write(`
 
 <div class="viewcode-block" id="Histogram.observe">
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.metrics.Histogram.observe.html#ray.util.metrics.Histogram.observe">[docs]</a>
-    <span class="k">def</span> <span class="nf">observe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">observe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Observe a given `value` and add it to the appropriate bucket.</span>
 
 <span class="sd">        Tags passed in will take precedence over the metric&#39;s default tags.</span>
@@ -1677,7 +1677,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">deserializer</span> <span class="o">=</span> <span class="n">Histogram</span>
         <span class="n">serialized_data</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span>
@@ -1688,7 +1688,7 @@ document.write(`
         <span class="k">return</span> <span class="n">deserializer</span><span class="p">,</span> <span class="n">serialized_data</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return information about histogram metric.&quot;&quot;&quot;</span>
         <span class="n">info</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">info</span>
         <span class="n">info</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;boundaries&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundaries</span><span class="p">})</span>
@@ -1699,7 +1699,7 @@ document.write(`
 <div class="viewcode-block" id="Gauge">
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.metrics.Gauge.html#ray.util.metrics.Gauge">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">Gauge</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Gauge</span><span class="p">(</span><span class="n">Metric</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gauges keep the last recorded value and drop everything before.</span>
 
 <span class="sd">    Unlike counters, gauges can go up or down over time.</span>
@@ -1713,7 +1713,7 @@ document.write(`
 <span class="sd">        tag_keys: Tag keys of the metric.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -1727,7 +1727,7 @@ document.write(`
 
 <div class="viewcode-block" id="Gauge.set">
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.metrics.Gauge.set.html#ray.util.metrics.Gauge.set">[docs]</a>
-    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the gauge to the given `value`.</span>
 
 <span class="sd">        Tags passed in will take precedence over the metric&#39;s default tags.</span>
@@ -1746,7 +1746,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">deserializer</span> <span class="o">=</span> <span class="n">Gauge</span>
         <span class="n">serialized_data</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tag_keys</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">deserializer</span><span class="p">,</span> <span class="n">serialized_data</span></div>

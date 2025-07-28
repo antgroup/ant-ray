@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1414,8 +1414,8 @@ document.write(`
 <p>Use <code class="docutils literal notranslate"><span class="pre">ray.init()</span></code> to initialize a local cluster. By default, this cluster contains only the machine you are running this notebook on. You can also run this notebook on an <a class="reference external" href="https://www.anyscale.com/">Anyscale</a> cluster.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 </pre></div>
@@ -1491,7 +1491,7 @@ document.write(`
 <p>Run the normal HF Datasets code to load the dataset from the Hub.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
 
 <span class="n">actual_task</span> <span class="o">=</span> <span class="s2">&quot;mnli&quot;</span> <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;mnli-mm&quot;</span> <span class="k">else</span> <span class="n">task</span>
 <span class="n">datasets</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;glue&quot;</span><span class="p">,</span> <span class="n">actual_task</span><span class="p">)</span>
@@ -1516,7 +1516,7 @@ document.write(`
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span>
 
 <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_checkpoint</span><span class="p">,</span> <span class="n">use_fast</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -1546,7 +1546,7 @@ document.write(`
 <p>Instead of using HF Dataset objects directly, convert them to <a class="reference internal" href="../../../data/data.html#data"><span class="std std-ref">Ray Data</span></a>. Arrow tables back both of them, so the conversion is straightforward. Use the built-in <a class="reference internal" href="../../../data/api/doc/ray.data.from_huggingface.html#ray.data.from_huggingface" title="ray.data.from_huggingface"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_huggingface()</span></code></a> function.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray.data</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray.data</span>
 
 <span class="n">ray_datasets</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">from_huggingface</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]),</span>
@@ -1580,12 +1580,12 @@ document.write(`
 <p>You can then write the function that preprocesses the samples. Feed them to the <code class="docutils literal notranslate"><span class="pre">tokenizer</span></code> with the argument <code class="docutils literal notranslate"><span class="pre">truncation=True</span></code>. This configuration ensures that the <code class="docutils literal notranslate"><span class="pre">tokenizer</span></code> truncates and pads to the longest sequence in the batch, any input longer than what the model selected can handle.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>
 
 
 <span class="c1"># Tokenize input sentences</span>
-<span class="k">def</span> <span class="nf">collate_fn</span><span class="p">(</span><span class="n">examples</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">collate_fn</span><span class="p">(</span><span class="n">examples</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]):</span>
     <span class="n">sentence1_key</span><span class="p">,</span> <span class="n">sentence2_key</span> <span class="o">=</span> <span class="n">task_to_keys</span><span class="p">[</span><span class="n">task</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">sentence2_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span>
@@ -1626,14 +1626,14 @@ document.write(`
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_metric</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoModelForSequenceClassification</span><span class="p">,</span> <span class="n">TrainingArguments</span><span class="p">,</span> <span class="n">Trainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_metric</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoModelForSequenceClassification</span><span class="p">,</span> <span class="n">TrainingArguments</span><span class="p">,</span> <span class="n">Trainer</span>
 
-<span class="kn">import</span> <span class="nn">ray.train</span>
-<span class="kn">from</span> <span class="nn">ray.train.huggingface.transformers</span> <span class="kn">import</span> <span class="n">prepare_trainer</span><span class="p">,</span> <span class="n">RayTrainReportCallback</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.train</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.huggingface.transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">prepare_trainer</span><span class="p">,</span> <span class="n">RayTrainReportCallback</span>
 
 <span class="n">num_labels</span> <span class="o">=</span> <span class="mi">3</span> <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;mnli&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;stsb&quot;</span> <span class="k">else</span> <span class="mi">2</span>
 <span class="n">metric_name</span> <span class="o">=</span> <span class="p">(</span>
@@ -1658,7 +1658,7 @@ document.write(`
 <span class="n">max_steps_per_epoch</span> <span class="o">=</span> <span class="n">ray_datasets</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">//</span> <span class="p">(</span><span class="n">batch_size</span> <span class="o">*</span> <span class="n">num_workers</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_func</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Is CUDA available: </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="n">metric</span> <span class="o">=</span> <span class="n">load_metric</span><span class="p">(</span><span class="s2">&quot;glue&quot;</span><span class="p">,</span> <span class="n">actual_task</span><span class="p">)</span>
@@ -1696,7 +1696,7 @@ document.write(`
         <span class="n">report_to</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">compute_metrics</span><span class="p">(</span><span class="n">eval_pred</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_metrics</span><span class="p">(</span><span class="n">eval_pred</span><span class="p">):</span>
         <span class="n">predictions</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">eval_pred</span>
         <span class="k">if</span> <span class="n">task</span> <span class="o">!=</span> <span class="s2">&quot;stsb&quot;</span><span class="p">:</span>
             <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -1737,8 +1737,8 @@ comet_ml is installed but `COMET_API_KEY` is not set.
 <p>With your <code class="docutils literal notranslate"><span class="pre">train_func</span></code> complete, you can now instantiate the <a class="reference internal" href="../../api/doc/ray.train.torch.TorchTrainer.html#ray.train.torch.TorchTrainer" title="ray.train.torch.TorchTrainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">TorchTrainer</span></code></a>. Aside from calling the function, set the <code class="docutils literal notranslate"><span class="pre">scaling_config</span></code>, which controls the amount of workers and resources used, and the <code class="docutils literal notranslate"><span class="pre">datasets</span></code> to use for training and evaluation.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">TorchTrainer</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">ScalingConfig</span><span class="p">,</span> <span class="n">CheckpointConfig</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">ScalingConfig</span><span class="p">,</span> <span class="n">CheckpointConfig</span>
 
 <span class="n">trainer</span> <span class="o">=</span> <span class="n">TorchTrainer</span><span class="p">(</span>
     <span class="n">train_func</span><span class="p">,</span>
@@ -1976,9 +1976,9 @@ comet_ml is installed but `COMET_API_KEY` is not set.
 <p>You can also take advantage of the advanced search algorithms and schedulers from Ray Tune. This example uses an <code class="docutils literal notranslate"><span class="pre">ASHAScheduler</span></code> to aggresively terminate underperforming trials.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">Tuner</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers.async_hyperband</span> <span class="kn">import</span> <span class="n">ASHAScheduler</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers.async_hyperband</span><span class="w"> </span><span class="kn">import</span> <span class="n">ASHAScheduler</span>
 
 <span class="n">tune_epochs</span> <span class="o">=</span> <span class="mi">4</span>
 <span class="n">tuner</span> <span class="o">=</span> <span class="n">Tuner</span><span class="p">(</span>
@@ -2437,7 +2437,7 @@ arning_rate</th><th style="text-align: right;">  iter</th><th style="text-align:
 <p>First, store your authentication token from the Hugging Face website. Sign up <a class="reference external" href="https://huggingface.co/join">here</a> if you haven’t already. Then execute the following cell and input your username and password:</p>
 <div class="cell tag_remove-cell-ci docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">huggingface_hub</span> <span class="kn">import</span> <span class="n">notebook_login</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">huggingface_hub</span><span class="w"> </span><span class="kn">import</span> <span class="n">notebook_login</span>
 
 <span class="n">notebook_login</span><span class="p">()</span>
 </pre></div>
@@ -2455,8 +2455,8 @@ arning_rate</th><th style="text-align: right;">  iter</th><th style="text-align:
 <p>Load the model with the best-performing checkpoint:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">ray.train</span> <span class="kn">import</span> <span class="n">Checkpoint</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span>
 
 <span class="n">checkpoint</span><span class="p">:</span> <span class="n">Checkpoint</span> <span class="o">=</span> <span class="n">best_result</span><span class="o">.</span><span class="n">checkpoint</span>
 
@@ -2476,7 +2476,7 @@ arning_rate</th><th style="text-align: right;">  iter</th><th style="text-align:
 </div>
 </div>
 <p>You can now share this model. Others can load it with the identifier <code class="docutils literal notranslate"><span class="pre">&quot;your-username/the-name-you-picked&quot;</span></code>. For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoModelForSequenceClassification</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoModelForSequenceClassification</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForSequenceClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;sgugger/my-awesome-model&quot;</span><span class="p">)</span>
 </pre></div>

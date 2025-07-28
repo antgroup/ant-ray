@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1405,10 +1405,10 @@ These Trial Schedulers can early terminate bad trials, pause trials, clone trial
 and alter hyperparameters of a running trial.</p>
 <p>All Trial Schedulers take in a <code class="docutils literal notranslate"><span class="pre">metric</span></code>, which is a value returned in the result dict of your
 Trainable and is maximized or minimized according to <code class="docutils literal notranslate"><span class="pre">mode</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers</span> <span class="kn">import</span> <span class="n">ASHAScheduler</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ASHAScheduler</span>
 
-<span class="k">def</span> <span class="nf">train_fn</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_fn</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="c1"># This objective function is just for demonstration purposes</span>
     <span class="n">tune</span><span class="o">.</span><span class="n">report</span><span class="p">({</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;param&quot;</span><span class="p">]})</span>
 
@@ -1429,8 +1429,8 @@ Trainable and is maximized or minimized according to <code class="docutils liter
 <span id="tune-scheduler-hyperband"></span><h2>ASHA (tune.schedulers.ASHAScheduler)<a class="headerlink" href="#asha-tune-schedulers-ashascheduler" title="Link to this heading">#</a></h2>
 <p>The <a class="reference external" href="https://openreview.net/forum?id=S1Y7OOlRZ">ASHA</a> scheduler can be used by
 setting the <code class="docutils literal notranslate"><span class="pre">scheduler</span></code> parameter of <code class="docutils literal notranslate"><span class="pre">tune.TuneConfig</span></code>, which is taken in by <code class="docutils literal notranslate"><span class="pre">Tuner</span></code>, e.g.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">tune.schedulers</span> <span class="kn">import</span> <span class="n">ASHAScheduler</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tune.schedulers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ASHAScheduler</span>
 
 <span class="n">asha_scheduler</span> <span class="o">=</span> <span class="n">ASHAScheduler</span><span class="p">(</span>
     <span class="n">time_attr</span><span class="o">=</span><span class="s1">&#39;training_iteration&#39;</span><span class="p">,</span>
@@ -1533,8 +1533,8 @@ below the median of other trials at similar points in time.</p>
 <span id="tune-scheduler-pbt"></span><h2>Population Based Training (tune.schedulers.PopulationBasedTraining)<a class="headerlink" href="#population-based-training-tune-schedulers-populationbasedtraining" title="Link to this heading">#</a></h2>
 <p>Tune includes a distributed implementation of <a class="reference external" href="https://www.deepmind.com/blog/population-based-training-of-neural-networks">Population Based Training (PBT)</a>.
 This can be enabled by setting the <code class="docutils literal notranslate"><span class="pre">scheduler</span></code> parameter of <code class="docutils literal notranslate"><span class="pre">tune.TuneConfig</span></code>, which is taken in by <code class="docutils literal notranslate"><span class="pre">Tuner</span></code>, e.g.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers</span> <span class="kn">import</span> <span class="n">PopulationBasedTraining</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers</span><span class="w"> </span><span class="kn">import</span> <span class="n">PopulationBasedTraining</span>
 
 <span class="n">pbt_scheduler</span> <span class="o">=</span> <span class="n">PopulationBasedTraining</span><span class="p">(</span>
     <span class="n">time_attr</span><span class="o">=</span><span class="s1">&#39;training_iteration&#39;</span><span class="p">,</span>
@@ -1581,8 +1581,8 @@ of PBT usage.</p>
 You just specify an existing experiment directory and the ID of the trial you would
 like to replay. The scheduler accepts only one trial, and it will update its
 config according to the obtained schedule.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers</span> <span class="kn">import</span> <span class="n">PopulationBasedTrainingReplay</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers</span><span class="w"> </span><span class="kn">import</span> <span class="n">PopulationBasedTrainingReplay</span>
 
 <span class="n">replay</span> <span class="o">=</span> <span class="n">PopulationBasedTrainingReplay</span><span class="p">(</span>
     <span class="n">experiment_dir</span><span class="o">=</span><span class="s2">&quot;~/ray_results/pbt_experiment/&quot;</span><span class="p">,</span>
@@ -1615,7 +1615,7 @@ PB2 selects new hyperparameter configurations using a Gaussian Process model.</p
 </pre></div>
 </div>
 <p>PB2 can be enabled by setting the <code class="docutils literal notranslate"><span class="pre">scheduler</span></code> parameter of <code class="docutils literal notranslate"><span class="pre">tune.TuneConfig</span></code> which is taken in by <code class="docutils literal notranslate"><span class="pre">Tuner</span></code>, e.g.:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.tune.schedulers.pb2</span> <span class="kn">import</span> <span class="n">PB2</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers.pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">PB2</span>
 
 <span class="n">pb2_scheduler</span> <span class="o">=</span> <span class="n">PB2</span><span class="p">(</span>
     <span class="n">time_attr</span><span class="o">=</span><span class="s1">&#39;time_total_s&#39;</span><span class="p">,</span>

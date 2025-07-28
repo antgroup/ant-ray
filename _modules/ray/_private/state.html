@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,32 +1389,32 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray._private.state</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">ray._private.protobuf_compat</span> <span class="kn">import</span> <span class="n">message_to_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.protobuf_compat</span><span class="w"> </span><span class="kn">import</span> <span class="n">message_to_dict</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray._private.client_mode_hook</span> <span class="kn">import</span> <span class="n">client_mode_hook</span>
-<span class="kn">from</span> <span class="nn">ray._private.resource_spec</span> <span class="kn">import</span> <span class="n">NODE_ID_PREFIX</span><span class="p">,</span> <span class="n">HEAD_NODE_RESOURCE_NAME</span>
-<span class="kn">from</span> <span class="nn">ray._private.utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.client_mode_hook</span><span class="w"> </span><span class="kn">import</span> <span class="n">client_mode_hook</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.resource_spec</span><span class="w"> </span><span class="kn">import</span> <span class="n">NODE_ID_PREFIX</span><span class="p">,</span> <span class="n">HEAD_NODE_RESOURCE_NAME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">binary_to_hex</span><span class="p">,</span>
     <span class="n">decode</span><span class="p">,</span>
     <span class="n">hex_to_binary</span><span class="p">,</span>
     <span class="n">validate_actor_state_name</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray._raylet</span> <span class="kn">import</span> <span class="n">GlobalStateAccessor</span>
-<span class="kn">from</span> <span class="nn">ray.core.generated</span> <span class="kn">import</span> <span class="n">common_pb2</span>
-<span class="kn">from</span> <span class="nn">ray.core.generated</span> <span class="kn">import</span> <span class="n">gcs_pb2</span>
-<span class="kn">from</span> <span class="nn">ray.core.generated</span> <span class="kn">import</span> <span class="n">autoscaler_pb2</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._raylet</span><span class="w"> </span><span class="kn">import</span> <span class="n">GlobalStateAccessor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.core.generated</span><span class="w"> </span><span class="kn">import</span> <span class="n">common_pb2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.core.generated</span><span class="w"> </span><span class="kn">import</span> <span class="n">gcs_pb2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.core.generated</span><span class="w"> </span><span class="kn">import</span> <span class="n">autoscaler_pb2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">GlobalState</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GlobalState</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class used to interface with the Ray control state.</span>
 
 <span class="sd">    Attributes:</span>
@@ -1422,13 +1422,13 @@ document.write(`
 <span class="sd">            server.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a GlobalState object.&quot;&quot;&quot;</span>
         <span class="c1"># Args used for lazy init of this object.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gcs_options</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">global_state_accessor</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_check_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensure that the object has been initialized before it is used.</span>
 
 <span class="sd">        This lazily initializes clients needed for state accessors.</span>
@@ -1446,14 +1446,14 @@ document.write(`
                 <span class="s2">&quot;Ray has not been started yet. You can start Ray with &#39;ray.init()&#39;.&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Disconnect global state from GCS.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gcs_options</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_state_accessor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">global_state_accessor</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">global_state_accessor</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_initialize_global_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gcs_options</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_global_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gcs_options</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set args for lazily initialization of the GlobalState object.</span>
 
 <span class="sd">        It&#39;s possible that certain keys in gcs kv may not have been fully</span>
@@ -1468,11 +1468,11 @@ document.write(`
         <span class="c1"># gcs connections from each worker until needed.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gcs_options</span> <span class="o">=</span> <span class="n">gcs_options</span>
 
-    <span class="k">def</span> <span class="nf">_really_init_global_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_really_init_global_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">global_state_accessor</span> <span class="o">=</span> <span class="n">GlobalStateAccessor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gcs_options</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">global_state_accessor</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">actor_table</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">actor_table</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">actor_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">job_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ray</span><span class="o">.</span><span class="n">JobID</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1518,7 +1518,7 @@ document.write(`
 
             <span class="k">return</span> <span class="n">results</span>
 
-    <span class="k">def</span> <span class="nf">_gen_actor_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor_table_data</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gen_actor_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor_table_data</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse actor table data.</span>
 
 <span class="sd">        Returns:</span>
@@ -1552,7 +1552,7 @@ document.write(`
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">actor_info</span>
 
-    <span class="k">def</span> <span class="nf">node_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">node_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch and parse the Gcs node info table.</span>
 
 <span class="sd">        Returns:</span>
@@ -1562,7 +1562,7 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_state_accessor</span><span class="o">.</span><span class="n">get_node_table</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">job_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">job_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch and parse the gcs job table.</span>
 
 <span class="sd">        Returns:</span>
@@ -1596,7 +1596,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">results</span>
 
-    <span class="k">def</span> <span class="nf">next_job_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">next_job_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get next job id from GCS.</span>
 
 <span class="sd">        Returns:</span>
@@ -1606,7 +1606,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">JobID</span><span class="o">.</span><span class="n">from_int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">global_state_accessor</span><span class="o">.</span><span class="n">get_next_job_id</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">profile_events</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">profile_events</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve and return task profiling events from GCS.</span>
 
 <span class="sd">        Return:</span>
@@ -1658,7 +1658,7 @@ document.write(`
 
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_placement_group_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement_group_name</span><span class="p">,</span> <span class="n">ray_namespace</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_placement_group_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement_group_name</span><span class="p">,</span> <span class="n">ray_namespace</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_connected</span><span class="p">()</span>
 
         <span class="n">placement_group_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_state_accessor</span><span class="o">.</span><span class="n">get_placement_group_by_name</span><span class="p">(</span>
@@ -1672,7 +1672,7 @@ document.write(`
             <span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gen_placement_group_info</span><span class="p">(</span><span class="n">placement_group_table_data</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">placement_group_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">placement_group_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement_group_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_connected</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">placement_group_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1707,11 +1707,11 @@ document.write(`
 
             <span class="k">return</span> <span class="n">results</span>
 
-    <span class="k">def</span> <span class="nf">_gen_placement_group_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement_group_info</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gen_placement_group_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement_group_info</span><span class="p">):</span>
         <span class="c1"># This should be imported here, otherwise, it will error doc build.</span>
-        <span class="kn">from</span> <span class="nn">ray.core.generated.common_pb2</span> <span class="kn">import</span> <span class="n">PlacementStrategy</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.core.generated.common_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementStrategy</span>
 
-        <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="n">gcs_pb2</span><span class="o">.</span><span class="n">PlacementGroupTableData</span><span class="o">.</span><span class="n">PENDING</span><span class="p">:</span>
                 <span class="k">return</span> <span class="s2">&quot;PENDING&quot;</span>
             <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="n">gcs_pb2</span><span class="o">.</span><span class="n">PlacementGroupTableData</span><span class="o">.</span><span class="n">PREPARED</span><span class="p">:</span>
@@ -1723,7 +1723,7 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="s2">&quot;REMOVED&quot;</span>
 
-        <span class="k">def</span> <span class="nf">get_strategy</span><span class="p">(</span><span class="n">strategy</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_strategy</span><span class="p">(</span><span class="n">strategy</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">PlacementStrategy</span><span class="o">.</span><span class="n">PACK</span><span class="p">:</span>
                 <span class="k">return</span> <span class="s2">&quot;PACK&quot;</span>
             <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">PlacementStrategy</span><span class="o">.</span><span class="n">STRICT_PACK</span><span class="p">:</span>
@@ -1767,7 +1767,7 @@ document.write(`
             <span class="p">},</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">_nanoseconds_to_microseconds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_in_nanoseconds</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_nanoseconds_to_microseconds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_in_nanoseconds</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;A helper function for converting nanoseconds to microseconds.&quot;&quot;&quot;</span>
         <span class="n">time_in_microseconds</span> <span class="o">=</span> <span class="n">time_in_nanoseconds</span> <span class="o">/</span> <span class="mi">1000</span>
         <span class="k">return</span> <span class="n">time_in_microseconds</span>
@@ -1830,7 +1830,7 @@ document.write(`
         <span class="s2">&quot;cq_build_attempt_failed&quot;</span><span class="p">,</span>
     <span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">chrome_tracing_dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chrome_tracing_dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a list of profiling events that can viewed as a timeline.</span>
 
 <span class="sd">        To view this information as a timeline, simply dump it as a json file</span>
@@ -1856,7 +1856,7 @@ document.write(`
         <span class="c1"># Add a small delay to account for propagation delay of events to the GCS.</span>
         <span class="c1"># This should be harmless enough but prevents calls to timeline() from</span>
         <span class="c1"># missing recent timeline data.</span>
-        <span class="kn">import</span> <span class="nn">time</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
@@ -1916,7 +1916,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">all_events</span>
 
-    <span class="k">def</span> <span class="nf">chrome_tracing_object_transfer_dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chrome_tracing_object_transfer_dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a list of transfer events that can viewed as a timeline.</span>
 
 <span class="sd">        To view this information as a timeline, simply dump it as a json file</span>
@@ -2011,7 +2011,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">all_events</span>
 
-    <span class="k">def</span> <span class="nf">workers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">workers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a dictionary mapping worker ID to worker information.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_connected</span><span class="p">()</span>
 
@@ -2041,7 +2041,7 @@ document.write(`
                     <span class="p">)</span>
         <span class="k">return</span> <span class="n">workers_data</span>
 
-    <span class="k">def</span> <span class="nf">add_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_id</span><span class="p">,</span> <span class="n">worker_type</span><span class="p">,</span> <span class="n">worker_info</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_id</span><span class="p">,</span> <span class="n">worker_type</span><span class="p">,</span> <span class="n">worker_info</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a worker to the cluster.</span>
 
 <span class="sd">        Args:</span>
@@ -2063,7 +2063,7 @@ document.write(`
             <span class="n">worker_data</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">()</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">update_worker_debugger_port</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_id</span><span class="p">,</span> <span class="n">debugger_port</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_worker_debugger_port</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_id</span><span class="p">,</span> <span class="n">debugger_port</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the debugger port of a worker.</span>
 
 <span class="sd">        Args:</span>
@@ -2084,7 +2084,7 @@ document.write(`
             <span class="n">worker_id</span><span class="p">,</span> <span class="n">debugger_port</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_worker_debugger_port</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_id</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_worker_debugger_port</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_id</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the debugger port of a worker.</span>
 
 <span class="sd">        Args:</span>
@@ -2099,7 +2099,7 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_state_accessor</span><span class="o">.</span><span class="n">get_worker_debugger_port</span><span class="p">(</span><span class="n">worker_id</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">update_worker_num_paused_threads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_id</span><span class="p">,</span> <span class="n">num_paused_threads_delta</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_worker_num_paused_threads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker_id</span><span class="p">,</span> <span class="n">num_paused_threads_delta</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the number of paused threads of a worker.</span>
 
 <span class="sd">        Args:</span>
@@ -2118,7 +2118,7 @@ document.write(`
             <span class="n">worker_id</span><span class="p">,</span> <span class="n">num_paused_threads_delta</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">cluster_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cluster_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current total cluster resources.</span>
 
 <span class="sd">        Note that this information can grow stale as nodes are added to or</span>
@@ -2140,11 +2140,11 @@ document.write(`
 
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">total_resources</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_live_node_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_live_node_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a set of node IDs corresponding to nodes still alive.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_resources_per_node</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">available_resources_per_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">available_resources_per_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a dictionary mapping node id to available resources.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_connected</span><span class="p">()</span>
         <span class="n">available_resources_by_id</span> <span class="o">=</span> <span class="p">{}</span>
@@ -2165,7 +2165,7 @@ document.write(`
         <span class="k">return</span> <span class="n">available_resources_by_id</span>
 
     <span class="c1"># returns a dict that maps node_id(hex string) to a dict of {resource_id: capacity}</span>
-    <span class="k">def</span> <span class="nf">total_resources_per_node</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">total_resources_per_node</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_connected</span><span class="p">()</span>
@@ -2186,7 +2186,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">total_resources_by_node</span>
 
-    <span class="k">def</span> <span class="nf">available_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">available_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current available cluster resources.</span>
 
 <span class="sd">        This is different from `cluster_resources` in that this will return</span>
@@ -2214,24 +2214,24 @@ document.write(`
 
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">total_available_resources</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_system_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_system_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the system config of the cluster.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_connected</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">global_state_accessor</span><span class="o">.</span><span class="n">get_system_config</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">get_node_to_connect_for_driver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_ip_address</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_node_to_connect_for_driver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_ip_address</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the node to connect for a Ray driver.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_connected</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_state_accessor</span><span class="o">.</span><span class="n">get_node_to_connect_for_driver</span><span class="p">(</span>
             <span class="n">node_ip_address</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the node information for a node id.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_connected</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_state_accessor</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_draining_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_draining_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all the hex ids of nodes that are being drained</span>
 <span class="sd">        and the corresponding draining deadline timestamps in ms.</span>
 
@@ -2240,7 +2240,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_connected</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_state_accessor</span><span class="o">.</span><span class="n">get_draining_nodes</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">get_cluster_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">autoscaler_pb2</span><span class="o">.</span><span class="n">ClusterConfig</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cluster_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">autoscaler_pb2</span><span class="o">.</span><span class="n">ClusterConfig</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the cluster config of the current cluster.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_connected</span><span class="p">()</span>
         <span class="n">serialized_cluster_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_state_accessor</span><span class="o">.</span><span class="n">get_internal_kv</span><span class="p">(</span>
@@ -2256,7 +2256,7 @@ document.write(`
 <span class="sd">&quot;&quot;&quot;A global object used to access the cluster&#39;s global state.&quot;&quot;&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">jobs</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">jobs</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a list of the jobs in the cluster (for debugging only).</span>
 
 <span class="sd">    Returns:</span>
@@ -2270,7 +2270,7 @@ document.write(`
     <span class="k">return</span> <span class="n">state</span><span class="o">.</span><span class="n">job_table</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">next_job_id</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">next_job_id</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get next job id from GCS.</span>
 
 <span class="sd">    Returns:</span>
@@ -2283,7 +2283,7 @@ document.write(`
 <a class="viewcode-back" href="../../../ray-core/miscellaneous.html#ray.nodes">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
 <span class="nd">@client_mode_hook</span>
-<span class="k">def</span> <span class="nf">nodes</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">nodes</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a list of the nodes in the cluster (for debugging only).</span>
 
 <span class="sd">    Returns:</span>
@@ -2301,7 +2301,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">workers</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">workers</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a list of the workers in the cluster.</span>
 
 <span class="sd">    Returns:</span>
@@ -2310,7 +2310,7 @@ document.write(`
     <span class="k">return</span> <span class="n">state</span><span class="o">.</span><span class="n">workers</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">current_node_id</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">current_node_id</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the node id of the current node.</span>
 
 <span class="sd">    For example, &quot;node:172.10.5.34&quot;. This can be used as a custom resource,</span>
@@ -2323,7 +2323,7 @@ document.write(`
     <span class="k">return</span> <span class="n">NODE_ID_PREFIX</span> <span class="o">+</span> <span class="n">ray</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_node_ip_address</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">node_ids</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">node_ids</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a list of the node ids in the cluster.</span>
 
 <span class="sd">    For example, [&quot;node:172.10.5.34&quot;, &quot;node:172.42.3.77&quot;]. These can be used</span>
@@ -2344,7 +2344,7 @@ document.write(`
     <span class="k">return</span> <span class="n">node_ids</span>
 
 
-<span class="k">def</span> <span class="nf">actors</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">actors</span><span class="p">(</span>
     <span class="n">actor_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">job_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ray</span><span class="o">.</span><span class="n">JobID</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">actor_state_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2374,7 +2374,7 @@ document.write(`
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.timeline.html#ray.timeline">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
 <span class="nd">@client_mode_hook</span>
-<span class="k">def</span> <span class="nf">timeline</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">timeline</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a list of profiling events that can viewed as a timeline.</span>
 
 <span class="sd">    Ray profiling must be enabled by setting the RAY_PROFILING=1 environment</span>
@@ -2396,7 +2396,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">object_transfer_timeline</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">object_transfer_timeline</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a list of transfer events that can viewed as a timeline.</span>
 
 <span class="sd">    To view this information as a timeline, simply dump it as a json file by</span>
@@ -2419,7 +2419,7 @@ document.write(`
 <a class="viewcode-back" href="../../../ray-core/miscellaneous.html#ray.cluster_resources">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
 <span class="nd">@client_mode_hook</span>
-<span class="k">def</span> <span class="nf">cluster_resources</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cluster_resources</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the current total cluster resources.</span>
 
 <span class="sd">    Note that this information can grow stale as nodes are added to or removed</span>
@@ -2445,7 +2445,7 @@ document.write(`
 <a class="viewcode-back" href="../../../ray-core/miscellaneous.html#ray.available_resources">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
 <span class="nd">@client_mode_hook</span>
-<span class="k">def</span> <span class="nf">available_resources</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">available_resources</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the current available cluster resources.</span>
 
 <span class="sd">    This is different from `cluster_resources` in that this will return idle</span>
@@ -2472,7 +2472,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">available_resources_per_node</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">available_resources_per_node</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the current available resources of each live node.</span>
 
 <span class="sd">    Note that this information can grow stale as tasks start and finish.</span>
@@ -2485,7 +2485,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">total_resources_per_node</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">total_resources_per_node</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the current total resources of each live node.</span>
 
 <span class="sd">    Note that this information can grow stale as tasks start and finish.</span>
@@ -2505,7 +2505,7 @@ document.write(`
     <span class="k">return</span> <span class="n">state</span><span class="o">.</span><span class="n">total_resources_per_node</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">update_worker_debugger_port</span><span class="p">(</span><span class="n">worker_id</span><span class="p">,</span> <span class="n">debugger_port</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_worker_debugger_port</span><span class="p">(</span><span class="n">worker_id</span><span class="p">,</span> <span class="n">debugger_port</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Update the debugger port of a worker.</span>
 
 <span class="sd">    Args:</span>
@@ -2518,7 +2518,7 @@ document.write(`
     <span class="k">return</span> <span class="n">state</span><span class="o">.</span><span class="n">update_worker_debugger_port</span><span class="p">(</span><span class="n">worker_id</span><span class="p">,</span> <span class="n">debugger_port</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">update_worker_num_paused_threads</span><span class="p">(</span><span class="n">worker_id</span><span class="p">,</span> <span class="n">num_paused_threads_delta</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_worker_num_paused_threads</span><span class="p">(</span><span class="n">worker_id</span><span class="p">,</span> <span class="n">num_paused_threads_delta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Update the number of paused threads of a worker.</span>
 
 <span class="sd">    Args:</span>
@@ -2531,7 +2531,7 @@ document.write(`
     <span class="k">return</span> <span class="n">state</span><span class="o">.</span><span class="n">update_worker_num_paused_threads</span><span class="p">(</span><span class="n">worker_id</span><span class="p">,</span> <span class="n">num_paused_threads_delta</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">get_worker_debugger_port</span><span class="p">(</span><span class="n">worker_id</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_worker_debugger_port</span><span class="p">(</span><span class="n">worker_id</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the debugger port of a worker.</span>
 
 <span class="sd">    Args:</span>

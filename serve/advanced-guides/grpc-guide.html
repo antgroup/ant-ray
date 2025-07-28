@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1509,8 +1509,8 @@ serve<span class="w"> </span>start<span class="w"> </span><span class="se">\</sp
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-1">
 Python API</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray.serve.config</span> <span class="kn">import</span> <span class="n">gRPCOptions</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">gRPCOptions</span>
 
 
 <span class="n">grpc_port</span> <span class="o">=</span> <span class="mi">9000</span>
@@ -1567,23 +1567,23 @@ be <code class="docutils literal notranslate"><span class="pre">UserDefinedMessa
 passes the protobuf object into the method and expects the protobuf object back
 from the method.</p>
 <p>Example deployment:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generator</span>
-<span class="kn">from</span> <span class="nn">user_defined_protos_pb2</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">user_defined_protos_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">UserDefinedMessage</span><span class="p">,</span>
     <span class="n">UserDefinedMessage2</span><span class="p">,</span>
     <span class="n">UserDefinedResponse</span><span class="p">,</span>
     <span class="n">UserDefinedResponse2</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">GrpcDeployment</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_message</span><span class="p">:</span> <span class="n">UserDefinedMessage</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UserDefinedResponse</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GrpcDeployment</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_message</span><span class="p">:</span> <span class="n">UserDefinedMessage</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UserDefinedResponse</span><span class="p">:</span>
         <span class="n">greeting</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Hello </span><span class="si">{</span><span class="n">user_message</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">user_message</span><span class="o">.</span><span class="n">origin</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">num</span> <span class="o">=</span> <span class="n">user_message</span><span class="o">.</span><span class="n">num</span> <span class="o">*</span> <span class="mi">2</span>
         <span class="n">user_response</span> <span class="o">=</span> <span class="n">UserDefinedResponse</span><span class="p">(</span>
@@ -1593,10 +1593,10 @@ from the method.</p>
         <span class="k">return</span> <span class="n">user_response</span>
 
     <span class="nd">@serve</span><span class="o">.</span><span class="n">multiplexed</span><span class="p">(</span><span class="n">max_num_models_per_replica</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;loading model: </span><span class="si">{</span><span class="n">model_id</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">Multiplexing</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">Multiplexing</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">user_message</span><span class="p">:</span> <span class="n">UserDefinedMessage2</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UserDefinedResponse2</span><span class="p">:</span>
         <span class="n">model_id</span> <span class="o">=</span> <span class="n">serve</span><span class="o">.</span><span class="n">get_multiplexed_model_id</span><span class="p">()</span>
@@ -1606,7 +1606,7 @@ from the method.</p>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">user_response</span>
 
-    <span class="k">def</span> <span class="nf">Streaming</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Streaming</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">user_message</span><span class="p">:</span> <span class="n">UserDefinedMessage</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">UserDefinedResponse</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
@@ -1642,9 +1642,9 @@ any other gRPC server. Create a gRPC channel and stub, then call the RPC
 method on the stub with the appropriate input. The output is the protobuf object
 that your Serve application returns.</p>
 <p>Sending a gRPC request:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">grpc</span>
-<span class="kn">from</span> <span class="nn">user_defined_protos_pb2_grpc</span> <span class="kn">import</span> <span class="n">UserDefinedServiceStub</span>
-<span class="kn">from</span> <span class="nn">user_defined_protos_pb2</span> <span class="kn">import</span> <span class="n">UserDefinedMessage</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">grpc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">user_defined_protos_pb2_grpc</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserDefinedServiceStub</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">user_defined_protos_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserDefinedMessage</span>
 
 
 <span class="n">channel</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">insecure_channel</span><span class="p">(</span><span class="s2">&quot;localhost:9000&quot;</span><span class="p">)</span>
@@ -1689,9 +1689,9 @@ It returns <code class="docutils literal notranslate"><span class="pre">OK</span
 </pre></div>
 </div>
 <p>You can call the service method with the following code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">grpc</span>
-<span class="kn">from</span> <span class="nn">ray.serve.generated.serve_pb2_grpc</span> <span class="kn">import</span> <span class="n">RayServeAPIServiceStub</span>
-<span class="kn">from</span> <span class="nn">ray.serve.generated.serve_pb2</span> <span class="kn">import</span> <span class="n">HealthzRequest</span><span class="p">,</span> <span class="n">ListApplicationsRequest</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">grpc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.generated.serve_pb2_grpc</span><span class="w"> </span><span class="kn">import</span> <span class="n">RayServeAPIServiceStub</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.generated.serve_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">HealthzRequest</span><span class="p">,</span> <span class="n">ListApplicationsRequest</span>
 
 
 <span class="n">channel</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">insecure_channel</span><span class="p">(</span><span class="s2">&quot;localhost:9000&quot;</span><span class="p">)</span>
@@ -1729,9 +1729,9 @@ one application is deployed, serve routes to the only deployed app automatically
 <li><p><code class="docutils literal notranslate"><span class="pre">request_id</span></code>: The request ID to track the request.</p></li>
 </ul>
 <p>Example of using metadata:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">grpc</span>
-<span class="kn">from</span> <span class="nn">user_defined_protos_pb2_grpc</span> <span class="kn">import</span> <span class="n">UserDefinedServiceStub</span>
-<span class="kn">from</span> <span class="nn">user_defined_protos_pb2</span> <span class="kn">import</span> <span class="n">UserDefinedMessage2</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">grpc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">user_defined_protos_pb2_grpc</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserDefinedServiceStub</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">user_defined_protos_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserDefinedMessage2</span>
 
 
 <span class="n">channel</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">insecure_channel</span><span class="p">(</span><span class="s2">&quot;localhost:9000&quot;</span><span class="p">)</span>
@@ -1761,9 +1761,9 @@ gRPC proxy for getting streaming response as well as doing model composition.</p
 <h3>Streaming<a class="headerlink" href="#streaming" title="Link to this heading">#</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">Steaming</span></code> method is deployed with the app named “app1” above. The following code
 gets a streaming response.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">grpc</span>
-<span class="kn">from</span> <span class="nn">user_defined_protos_pb2_grpc</span> <span class="kn">import</span> <span class="n">UserDefinedServiceStub</span>
-<span class="kn">from</span> <span class="nn">user_defined_protos_pb2</span> <span class="kn">import</span> <span class="n">UserDefinedMessage</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">grpc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">user_defined_protos_pb2_grpc</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserDefinedServiceStub</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">user_defined_protos_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserDefinedMessage</span>
 
 
 <span class="n">channel</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">insecure_channel</span><span class="p">(</span><span class="s2">&quot;localhost:9000&quot;</span><span class="p">)</span>
@@ -1785,24 +1785,24 @@ separate steps to download and process the image before PyTorch can run inferenc
 The <code class="docutils literal notranslate"><span class="pre">ImageClassifier</span></code> deployment initializes the model, calls both
 <code class="docutils literal notranslate"><span class="pre">ImageDownloader</span></code> and <code class="docutils literal notranslate"><span class="pre">DataPreprocessor</span></code>, and feed into the resnet model to get the
 classes and probabilities of the given image.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
-<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">transforms</span>
-<span class="kn">from</span> <span class="nn">user_defined_protos_pb2</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision</span><span class="w"> </span><span class="kn">import</span> <span class="n">transforms</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">user_defined_protos_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ImageClass</span><span class="p">,</span>
     <span class="n">ImageData</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray.serve.handle</span> <span class="kn">import</span> <span class="n">DeploymentHandle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.handle</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentHandle</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">ImageClassifier</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ImageClassifier</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">_image_downloader</span><span class="p">:</span> <span class="n">DeploymentHandle</span><span class="p">,</span>
         <span class="n">_data_preprocessor</span><span class="p">:</span> <span class="n">DeploymentHandle</span><span class="p">,</span>
@@ -1815,7 +1815,7 @@ classes and probabilities of the given image.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">categories</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_labels</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_image_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_image_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="n">categories</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">url</span> <span class="o">=</span> <span class="p">(</span>
             <span class="s2">&quot;https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt&quot;</span>
@@ -1825,7 +1825,7 @@ classes and probabilities of the given image.</p>
             <span class="n">categories</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">categories</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">Predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_data</span><span class="p">:</span> <span class="n">ImageData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImageClass</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">Predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_data</span><span class="p">:</span> <span class="n">ImageData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImageClass</span><span class="p">:</span>
         <span class="c1"># Download image</span>
         <span class="n">image</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_downloader</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">image_data</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
 
@@ -1838,7 +1838,7 @@ classes and probabilities of the given image.</p>
         <span class="n">probabilities</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_model_outputs</span><span class="p">(</span><span class="n">probabilities</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">process_model_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probabilities</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImageClass</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">process_model_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">probabilities</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImageClass</span><span class="p">:</span>
         <span class="n">image_classes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">image_probabilities</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># Show top categories per image</span>
@@ -1854,15 +1854,15 @@ classes and probabilities of the given image.</p>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">ImageDownloader</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ImageDownloader</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">image_bytes</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">image_url</span><span class="p">)</span><span class="o">.</span><span class="n">content</span>
         <span class="k">return</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">image_bytes</span><span class="p">))</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">DataPreprocessor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataPreprocessor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span>
@@ -1874,7 +1874,7 @@ classes and probabilities of the given image.</p>
             <span class="p">]</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Image</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Image</span><span class="p">):</span>
         <span class="n">input_tensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">input_tensor</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># create a mini-batch as expected by the model</span>
 
@@ -1892,9 +1892,9 @@ classes and probabilities of the given image.</p>
 </pre></div>
 </div>
 <p>The client code to call the application looks like the following:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">grpc</span>
-<span class="kn">from</span> <span class="nn">user_defined_protos_pb2_grpc</span> <span class="kn">import</span> <span class="n">ImageClassificationServiceStub</span>
-<span class="kn">from</span> <span class="nn">user_defined_protos_pb2</span> <span class="kn">import</span> <span class="n">ImageData</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">grpc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">user_defined_protos_pb2_grpc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageClassificationServiceStub</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">user_defined_protos_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageData</span>
 
 
 <span class="n">channel</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">insecure_channel</span><span class="p">(</span><span class="s2">&quot;localhost:9000&quot;</span><span class="p">)</span>
@@ -1921,9 +1921,9 @@ metadata so Serve knows which application to route to.</p>
 <p>Similar to any other gRPC server, request throws a <code class="docutils literal notranslate"><span class="pre">grpc.RpcError</span></code> when the response
 code is not “OK”. Put your request code in a try-except block and handle
 the error accordingly.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">grpc</span>
-<span class="kn">from</span> <span class="nn">user_defined_protos_pb2_grpc</span> <span class="kn">import</span> <span class="n">UserDefinedServiceStub</span>
-<span class="kn">from</span> <span class="nn">user_defined_protos_pb2</span> <span class="kn">import</span> <span class="n">UserDefinedMessage</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">grpc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">user_defined_protos_pb2_grpc</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserDefinedServiceStub</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">user_defined_protos_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserDefinedMessage</span>
 
 
 <span class="n">channel</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">insecure_channel</span><span class="p">(</span><span class="s2">&quot;localhost:9000&quot;</span><span class="p">)</span>
@@ -1957,21 +1957,21 @@ If the handler function is defined with a <code class="docutils literal notransl
 <a class="reference internal" href="../api/doc/ray.serve.grpc_util.RayServegRPCContext.html"><span class="std std-doc">RayServegRPCContext</span></a> object
 in for each request. Below is an example of how to set a custom status code,
 details, and trailing metadata.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">user_defined_protos_pb2</span> <span class="kn">import</span> <span class="n">UserDefinedMessage</span><span class="p">,</span> <span class="n">UserDefinedResponse</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">user_defined_protos_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserDefinedMessage</span><span class="p">,</span> <span class="n">UserDefinedResponse</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray.serve.grpc_util</span> <span class="kn">import</span> <span class="n">RayServegRPCContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.grpc_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">RayServegRPCContext</span>
 
-<span class="kn">import</span> <span class="nn">grpc</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">grpc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">GrpcDeployment</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GrpcDeployment</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nums</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">num_lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nums</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nums</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nums</span><span class="p">)</span>
             <span class="n">code</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">INVALID_ARGUMENT</span>
@@ -1981,7 +1981,7 @@ details, and trailing metadata.</p>
             <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> found.&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nums</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">code</span><span class="p">,</span> <span class="n">message</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">user_message</span><span class="p">:</span> <span class="n">UserDefinedMessage</span><span class="p">,</span>
         <span class="n">grpc_context</span><span class="p">:</span> <span class="n">RayServegRPCContext</span><span class="p">,</span>  <span class="c1"># to use grpc context, add this kwarg</span>
@@ -2007,9 +2007,9 @@ details, and trailing metadata.</p>
 </pre></div>
 </div>
 <p>The client code is defined like the following to get those attributes.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">grpc</span>
-<span class="kn">from</span> <span class="nn">user_defined_protos_pb2_grpc</span> <span class="kn">import</span> <span class="n">UserDefinedServiceStub</span>
-<span class="kn">from</span> <span class="nn">user_defined_protos_pb2</span> <span class="kn">import</span> <span class="n">UserDefinedMessage</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">grpc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">user_defined_protos_pb2_grpc</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserDefinedServiceStub</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">user_defined_protos_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserDefinedMessage</span>
 
 
 <span class="n">channel</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">insecure_channel</span><span class="p">(</span><span class="s2">&quot;localhost:9000&quot;</span><span class="p">)</span>

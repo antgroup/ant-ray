@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1444,15 +1444,15 @@ It is installed dynamically on the cluster at runtime and cached for future use 
 For example, you can use the Cluster launcher to install a base set of packages, and then use runtime environments to install additional packages.
 In contrast with the base cluster environment, a runtime environment will only be active for Ray processes.  (For example, if using a runtime environment specifying a <code class="docutils literal notranslate"><span class="pre">pip</span></code> package <code class="docutils literal notranslate"><span class="pre">my_pkg</span></code>, the statement <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">my_pkg</span></code> will fail if called outside of a Ray task, actor, or job.)</p>
 <p>Runtime environments also allow you to set dependencies per-task, per-actor, and per-job on a long-running Ray cluster.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">runtime_env</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pip&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;emoji&quot;</span><span class="p">]}</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">runtime_env</span><span class="o">=</span><span class="n">runtime_env</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
-  <span class="kn">import</span> <span class="nn">emoji</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
+  <span class="kn">import</span><span class="w"> </span><span class="nn">emoji</span>
   <span class="k">return</span> <span class="n">emoji</span><span class="o">.</span><span class="n">emojize</span><span class="p">(</span><span class="s1">&#39;Python is :thumbs_up:&#39;</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">remote</span><span class="p">()))</span>
@@ -1469,7 +1469,7 @@ In contrast with the base cluster environment, a runtime environment will only b
 </pre></div>
 </div>
 <p>Alternatively, you can use <a class="reference internal" href="api/doc/ray.runtime_env.RuntimeEnv.html#ray.runtime_env.RuntimeEnv" title="ray.runtime_env.RuntimeEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">ray.runtime_env.RuntimeEnv</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.runtime_env</span> <span class="kn">import</span> <span class="n">RuntimeEnv</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.runtime_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">RuntimeEnv</span>
 <span class="n">runtime_env</span> <span class="o">=</span> <span class="n">RuntimeEnv</span><span class="p">(</span>
     <span class="n">pip</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;emoji&quot;</span><span class="p">],</span>
     <span class="n">env_vars</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;TF_WARNINGS&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">}</span>
@@ -1490,7 +1490,7 @@ In contrast with the base cluster environment, a runtime environment will only b
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Option 2: Using Ray Jobs API (Python SDK)</span>
-<span class="kn">from</span> <span class="nn">ray.job_submission</span> <span class="kn">import</span> <span class="n">JobSubmissionClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.job_submission</span><span class="w"> </span><span class="kn">import</span> <span class="n">JobSubmissionClient</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">JobSubmissionClient</span><span class="p">(</span><span class="s2">&quot;http://&lt;head-node-ip&gt;:8265&quot;</span><span class="p">)</span>
 <span class="n">job_id</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">submit_job</span><span class="p">(</span>
@@ -1543,14 +1543,14 @@ $<span class="w"> </span>ray<span class="w"> </span>job<span class="w"> </span>s
 <span class="c1"># `g.remote()` will use this runtime environment unless overridden by using</span>
 <span class="c1"># `.options()` as above.</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">runtime_env</span><span class="o">=</span><span class="n">runtime_env</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">g</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">():</span>
     <span class="k">pass</span>
 
 <span class="c1"># Specify a runtime environment in the actor definition.  Future instantiations</span>
 <span class="c1"># via `MyClass.remote()` will use this runtime environment unless overridden by</span>
 <span class="c1"># using `.options()` as above.</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">runtime_env</span><span class="o">=</span><span class="n">runtime_env</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">MyClass</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="p">:</span>
     <span class="k">pass</span>
 </pre></div>
 </div>
@@ -1569,8 +1569,8 @@ For example, if an actor whose runtime environment contains a <code class="docut
 <p>Your Ray application might depend on source files or data files.
 For a development workflow, these might live on your local machine, but when it comes time to run things at scale, you will need to get them to your remote cluster.</p>
 <p>The following simple example explains how to get your local files on the cluster.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s2">&quot;/tmp/runtime_env_working_dir&quot;</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/tmp/runtime_env_working_dir/hello.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">hello_file</span><span class="p">:</span>
@@ -1581,7 +1581,7 @@ For a development workflow, these might live on your local machine, but when it 
 
 <span class="c1"># Create a Ray task, which inherits the above runtime env.</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="c1"># The function will have its working directory changed to its node&#39;s</span>
     <span class="c1"># local copy of /tmp/runtime_env_working_dir.</span>
     <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;hello.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -1606,15 +1606,15 @@ For a development workflow, these might live on your local machine, but when it 
 <p>Your Ray application might depend on Python packages (for example, <code class="docutils literal notranslate"><span class="pre">pendulum</span></code> or <code class="docutils literal notranslate"><span class="pre">requests</span></code>) via <code class="docutils literal notranslate"><span class="pre">import</span></code> statements.</p>
 <p>Ray ordinarily expects all imported packages to be preinstalled on every node of the cluster; in particular, these packages are not automatically shipped from your local machine to the cluster or downloaded from any repository.</p>
 <p>However, using runtime environments you can dynamically specify packages to be automatically downloaded and installed in a virtual environment for your Ray job, or for specific Ray tasks or actors.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">requests</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 
 <span class="c1"># This example runs on a local machine, but you can also do</span>
 <span class="c1"># ray.init(address=..., runtime_env=...) to connect to a cluster.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">runtime_env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;pip&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;requests&quot;</span><span class="p">]})</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">reqs</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reqs</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://www.ray.io/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reqs</span><span class="o">.</span><span class="n">remote</span><span class="p">()))</span>
@@ -1664,22 +1664,22 @@ well as <a class="reference external" href="https://www.anyscale.com/blog/uv-ray
 <p>Create a file <code class="code docutils literal notranslate"><span class="pre">pyproject.toml</span></code> in your working directory like the following:</p>
 <div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[project]</span>
 
-<span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;test&quot;</span>
+<span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;test&quot;</span>
 
-<span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;0.1&quot;</span>
+<span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.1&quot;</span>
 
 <span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
-<span class="w">  </span><span class="s">&quot;emoji&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="s">&quot;ray&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="s2">&quot;emoji&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="s2">&quot;ray&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 </pre></div>
 </div>
 <p>And then a <code class="code docutils literal notranslate"><span class="pre">test.py</span></code> like the following:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">emoji</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">emoji</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">emoji</span><span class="o">.</span><span class="n">emojize</span><span class="p">(</span><span class="s1">&#39;Python is :thumbs_up:&#39;</span><span class="p">)</span>
 
 <span class="c1"># Execute 1000 copies of f across a cluster.</span>
@@ -1743,13 +1743,13 @@ multiple processes in more complex ways.</p></li>
 <li><p>Running a Ray script to test the changes, perhaps on a distributed cluster.</p></li>
 </ol>
 <p>To ensure your local changes show up across all Ray workers and can be imported properly, use the <code class="docutils literal notranslate"><span class="pre">py_modules</span></code> field.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">my_module</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">my_module</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="s2">&quot;ray://123.456.7.89:10001&quot;</span><span class="p">,</span> <span class="n">runtime_env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;py_modules&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">my_module</span><span class="p">]})</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">test_my_module</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_my_module</span><span class="p">():</span>
     <span class="c1"># No need to import my_module inside this function.</span>
     <span class="n">my_module</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
 
@@ -1892,7 +1892,7 @@ user can use <code class="code docutils literal notranslate"><span class="pre">g
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">get_archives_context</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_archives_context</span><span class="p">():</span>
     <span class="n">archive_path</span> <span class="o">=</span> <span class="n">get_context</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">archive_path</span>
 
@@ -2502,16 +2502,16 @@ remotely on GitHub!</p>
 <p>If runtime_env cannot be set up (e.g., network issues, download failures, etc.), Ray will fail to schedule tasks/actors
 that require the runtime_env. If you call <code class="docutils literal notranslate"><span class="pre">ray.get</span></code>, it will raise <code class="docutils literal notranslate"><span class="pre">RuntimeEnvSetupError</span></code> with
 the error message in detail.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="k">pass</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">A</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
 <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>

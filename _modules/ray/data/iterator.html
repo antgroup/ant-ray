@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,9 +1389,9 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data.iterator</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">abc</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -1405,22 +1405,22 @@ document.write(`
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">ray.data._internal.block_batching.iter_batches</span> <span class="kn">import</span> <span class="n">iter_batches</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.execution.interfaces</span> <span class="kn">import</span> <span class="n">RefBundle</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.logical.operators.input_data_operator</span> <span class="kn">import</span> <span class="n">InputData</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.logical.optimizers</span> <span class="kn">import</span> <span class="n">LogicalPlan</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.plan</span> <span class="kn">import</span> <span class="n">ExecutionPlan</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.stats</span> <span class="kn">import</span> <span class="n">DatasetStats</span><span class="p">,</span> <span class="n">StatsManager</span>
-<span class="kn">from</span> <span class="nn">ray.data.block</span> <span class="kn">import</span> <span class="n">BlockAccessor</span><span class="p">,</span> <span class="n">DataBatch</span><span class="p">,</span> <span class="n">_apply_batch_format</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.block_batching.iter_batches</span><span class="w"> </span><span class="kn">import</span> <span class="n">iter_batches</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.execution.interfaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">RefBundle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.logical.operators.input_data_operator</span><span class="w"> </span><span class="kn">import</span> <span class="n">InputData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.logical.optimizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogicalPlan</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.plan</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExecutionPlan</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetStats</span><span class="p">,</span> <span class="n">StatsManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">BlockAccessor</span><span class="p">,</span> <span class="n">DataBatch</span><span class="p">,</span> <span class="n">_apply_batch_format</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
-    <span class="kn">import</span> <span class="nn">torch</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
-    <span class="kn">from</span> <span class="nn">ray.data.dataset</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">CollatedData</span><span class="p">,</span>
         <span class="n">MaterializedDataset</span><span class="p">,</span>
         <span class="n">Schema</span><span class="p">,</span>
@@ -1432,8 +1432,8 @@ document.write(`
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_IterableFromIterator</span><span class="p">(</span><span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterator_gen</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">T</span><span class="p">]]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_IterableFromIterator</span><span class="p">(</span><span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterator_gen</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">T</span><span class="p">]]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs an Iterable from an iterator generator.</span>
 
 <span class="sd">        Args:</span>
@@ -1442,14 +1442,14 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">iterator_gen</span> <span class="o">=</span> <span class="n">iterator_gen</span>
 
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterator_gen</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="DataIterator">
 <a class="viewcode-back" href="../../../data/api/data_iterator.html#ray.data.DataIterator">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">DataIterator</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataIterator</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An iterator for reading records from a :class:`~Dataset`.</span>
 
 <span class="sd">    For Datasets, each iteration call represents a complete read of all items in the</span>
@@ -1469,7 +1469,7 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">_to_ref_bundle_iterator</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_to_ref_bundle_iterator</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Iterator</span><span class="p">[</span><span class="n">RefBundle</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DatasetStats</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the iterator to use for `iter_batches`.</span>
@@ -1486,7 +1486,7 @@ document.write(`
 <div class="viewcode-block" id="DataIterator.iter_batches">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.DataIterator.iter_batches.html#ray.data.DataIterator.iter_batches">[docs]</a>
     <span class="nd">@PublicAPI</span>
-    <span class="k">def</span> <span class="nf">iter_batches</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iter_batches</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">prefetch_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -1536,7 +1536,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">batch_format</span> <span class="o">=</span> <span class="n">_apply_batch_format</span><span class="p">(</span><span class="n">batch_format</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_create_iterator</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">DataBatch</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_create_iterator</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">DataBatch</span><span class="p">]:</span>
             <span class="n">time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
             <span class="c1"># Iterate through the dataset from the start each time</span>
             <span class="c1"># _iterator_gen is called.</span>
@@ -1580,13 +1580,13 @@ document.write(`
         <span class="k">return</span> <span class="n">_IterableFromIterator</span><span class="p">(</span><span class="n">_create_iterator</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_get_dataset_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_dataset_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;unknown_dataset&quot;</span>
 
 <div class="viewcode-block" id="DataIterator.iter_rows">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.DataIterator.iter_rows.html#ray.data.DataIterator.iter_rows">[docs]</a>
     <span class="nd">@PublicAPI</span>
-    <span class="k">def</span> <span class="nf">iter_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iter_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a local row iterable over the dataset.</span>
 
 <span class="sd">        If the dataset is a tabular dataset (Arrow/Pandas blocks), dicts</span>
@@ -1608,7 +1608,7 @@ document.write(`
             <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">batch_format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefetch_batches</span><span class="o">=</span><span class="mi">1</span>
         <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_wrapped_iterator</span><span class="p">():</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_wrapped_iterator</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">batch_iterable</span><span class="p">:</span>
                 <span class="n">batch</span> <span class="o">=</span> <span class="n">BlockAccessor</span><span class="o">.</span><span class="n">for_block</span><span class="p">(</span><span class="n">BlockAccessor</span><span class="o">.</span><span class="n">batch_to_block</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
                 <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">iter_rows</span><span class="p">(</span><span class="n">public_row_format</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -1621,20 +1621,20 @@ document.write(`
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.DataIterator.stats.html#ray.data.DataIterator.stats">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="nd">@PublicAPI</span>
-    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a string containing execution timing information.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Schema&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Schema&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the schema of the dataset iterated over.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
 <div class="viewcode-block" id="DataIterator.iter_torch_batches">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.DataIterator.iter_torch_batches.html#ray.data.DataIterator.iter_torch_batches">[docs]</a>
     <span class="nd">@PublicAPI</span>
-    <span class="k">def</span> <span class="nf">iter_torch_batches</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iter_torch_batches</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">prefetch_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -1726,10 +1726,10 @@ document.write(`
 <span class="sd">            An iterable over Torch Tensor batches.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="kn">from</span> <span class="nn">ray.air._internal.torch_utils</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.torch_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">convert_ndarray_batch_to_torch_tensor_batch</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="kn">from</span> <span class="nn">ray.train.torch</span> <span class="kn">import</span> <span class="n">get_device</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_device</span>
 
         <span class="k">if</span> <span class="n">collate_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dtypes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">device</span> <span class="o">!=</span> <span class="s2">&quot;auto&quot;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1747,7 +1747,7 @@ document.write(`
             <span class="c1"># The default collate_fn handles formatting and Tensor creation.</span>
             <span class="c1"># Here, we set device=None to defer host to device data transfer</span>
             <span class="c1"># to the subsequent finalize_fn.</span>
-            <span class="k">def</span> <span class="nf">collate_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">collate_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]):</span>
                 <span class="k">return</span> <span class="n">convert_ndarray_batch_to_torch_tensor_batch</span><span class="p">(</span>
                     <span class="n">batch</span><span class="p">,</span>
                     <span class="n">dtypes</span><span class="o">=</span><span class="n">dtypes</span><span class="p">,</span>
@@ -1757,7 +1757,7 @@ document.write(`
             <span class="c1"># The default finalize_fn handles the host to device data transfer.</span>
             <span class="c1"># This is executed in a 1-thread pool separately from collate_fn</span>
             <span class="c1"># to allow independent parallelism of these steps.</span>
-            <span class="k">def</span> <span class="nf">finalize_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;torch.Tensor&quot;</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;torch.Tensor&quot;</span><span class="p">]]):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">finalize_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;torch.Tensor&quot;</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;torch.Tensor&quot;</span><span class="p">]]):</span>
                 <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1780,7 +1780,7 @@ document.write(`
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">iter_tf_batches</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">iter_tf_batches</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">prefetch_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -1838,7 +1838,7 @@ document.write(`
 <span class="sd">        Returns:</span>
 <span class="sd">            An iterator over TensorFlow Tensor batches.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.air._internal.tensorflow_utils</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.tensorflow_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">convert_ndarray_batch_to_tf_tensor_batch</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -1858,7 +1858,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">mapped_iterable</span>
 
-    <span class="k">def</span> <span class="nf">to_torch</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_torch</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">label_column</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1966,10 +1966,10 @@ document.write(`
 <span class="sd">        Returns:</span>
 <span class="sd">            A torch IterableDataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">torch</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
-        <span class="kn">from</span> <span class="nn">ray.air._internal.torch_utils</span> <span class="kn">import</span> <span class="n">convert_pandas_to_torch_tensor</span>
-        <span class="kn">from</span> <span class="nn">ray.data._internal.torch_iterable_dataset</span> <span class="kn">import</span> <span class="n">TorchIterableDataset</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.torch_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert_pandas_to_torch_tensor</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.torch_iterable_dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchIterableDataset</span>
 
         <span class="c1"># If an empty collection is passed in, treat it the same as None</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">feature_columns</span><span class="p">:</span>
@@ -2005,7 +2005,7 @@ document.write(`
                 <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="n">subcolumns</span> <span class="k">for</span> <span class="n">subcolumns</span> <span class="ow">in</span> <span class="n">feature_columns</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;column list may not be empty&quot;</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">make_generator</span><span class="p">():</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">make_generator</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_batches</span><span class="p">(</span>
                 <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
                 <span class="n">batch_format</span><span class="o">=</span><span class="s2">&quot;pandas&quot;</span><span class="p">,</span>
@@ -2054,7 +2054,7 @@ document.write(`
 <div class="viewcode-block" id="DataIterator.to_tf">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.DataIterator.to_tf.html#ray.data.DataIterator.to_tf">[docs]</a>
     <span class="nd">@PublicAPI</span>
-    <span class="k">def</span> <span class="nf">to_tf</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_tf</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">feature_columns</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
         <span class="n">label_columns</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
@@ -2203,17 +2203,17 @@ document.write(`
 <span class="sd">            A ``tf.data.Dataset`` that yields inputs and targets.</span>
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
-        <span class="kn">from</span> <span class="nn">ray.air._internal.tensorflow_utils</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.tensorflow_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">convert_ndarray_to_tf_tensor</span><span class="p">,</span>
             <span class="n">get_type_spec</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;tensorflow must be installed!&quot;</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">validate_column</span><span class="p">(</span><span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">validate_column</span><span class="p">(</span><span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_columns</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;You specified &#39;</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2">&#39; in `feature_columns`, &quot;</span>
@@ -2222,14 +2222,14 @@ document.write(`
                     <span class="sa">f</span><span class="s2">&quot;Valid column names are: </span><span class="si">{</span><span class="n">valid_columns</span><span class="si">}</span><span class="s2">.&quot;</span>
                 <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">validate_columns</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">validate_columns</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
                     <span class="n">validate_column</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">validate_column</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">convert_batch_to_tensors</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">convert_batch_to_tensors</span><span class="p">(</span>
             <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
             <span class="o">*</span><span class="p">,</span>
             <span class="n">columns</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
@@ -2244,7 +2244,7 @@ document.write(`
                 <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span>
             <span class="p">}</span>
 
-        <span class="k">def</span> <span class="nf">generator</span><span class="p">():</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">generator</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_batches</span><span class="p">(</span>
                 <span class="n">prefetch_batches</span><span class="o">=</span><span class="n">prefetch_batches</span><span class="p">,</span>
                 <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
@@ -2308,7 +2308,7 @@ document.write(`
 <div class="viewcode-block" id="DataIterator.materialize">
 <a class="viewcode-back" href="../../../data/api/doc/ray.data.DataIterator.materialize.html#ray.data.DataIterator.materialize">[docs]</a>
     <span class="nd">@PublicAPI</span>
-    <span class="k">def</span> <span class="nf">materialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MaterializedDataset&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">materialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MaterializedDataset&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute and materialize this data iterator into object store memory.</span>
 
 <span class="sd">        .. note::</span>
@@ -2317,7 +2317,7 @@ document.write(`
 <span class="sd">            :class:`~ray.data.dataset.MaterializedDataset` for further processing.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="kn">from</span> <span class="nn">ray.data.dataset</span> <span class="kn">import</span> <span class="n">MaterializedDataset</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaterializedDataset</span>
 
         <span class="n">ref_bundles_iter</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_ref_bundle_iterator</span><span class="p">()</span>
 
@@ -2333,7 +2333,7 @@ document.write(`
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Clear metrics on deletion in case the iterator was not fully consumed.</span>
         <span class="n">StatsManager</span><span class="o">.</span><span class="n">clear_iteration_metrics</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_dataset_tag</span><span class="p">())</span></div>
 

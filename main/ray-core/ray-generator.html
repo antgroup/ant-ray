@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1451,11 +1451,11 @@ before the task <code class="docutils literal notranslate"><span class="pre">f</
 <h2>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h2>
 <p>Define a Python generator function and decorate it with <code class="docutils literal notranslate"><span class="pre">ray.remote</span></code>
 to create a Ray generator.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
         <span class="k">yield</span> <span class="n">i</span>
@@ -1501,7 +1501,7 @@ called on a generator. Ray eagerly executes a generator task to completion regar
 the <code class="docutils literal notranslate"><span class="pre">next(gen)</span></code> returns an object reference that contains an exception. When you call <code class="docutils literal notranslate"><span class="pre">ray.get</span></code>,
 Ray raises the exception.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -1533,20 +1533,20 @@ It means when you have N yields, the generator can create from 1 to N + 1 object
 <p>The Ray generator is compatible with <strong>all actor execution models</strong>. It seamlessly works with
 regular actors, <a class="reference internal" href="actors/async_api.html#async-actors"><span class="std std-ref">async actors</span></a>, and <a class="reference internal" href="actors/async_api.html#threaded-actors"><span class="std std-ref">threaded actors</span></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">i</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">AsyncActor</span><span class="p">:</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AsyncActor</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">i</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">max_concurrency</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ThreadedActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ThreadedActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">i</span>
 
@@ -1569,16 +1569,16 @@ regular actors, <a class="reference internal" href="actors/async_api.html#async-
 <h2>Using the Ray generator with asyncio<a class="headerlink" href="#using-the-ray-generator-with-asyncio" title="Link to this heading">#</a></h2>
 <p>The returned <code class="docutils literal notranslate"><span class="pre">ObjectRefGenerator</span></code> is also compatible with asyncio. You can
 use <code class="docutils literal notranslate"><span class="pre">__anext__</span></code> or <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">for</span></code> loops.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">yield</span> <span class="n">i</span>
 
 
-<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="k">async</span> <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">task</span><span class="o">.</span><span class="n">remote</span><span class="p">():</span>
         <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">ref</span><span class="p">)</span>
 
@@ -1592,7 +1592,7 @@ use <code class="docutils literal notranslate"><span class="pre">__anext__</span
 <p>The returned ref from <code class="docutils literal notranslate"><span class="pre">next(generator)</span></code> is just a regular Ray object reference and is distributed ref counted in the same way.
 If references are not consumed from a generator by the <code class="docutils literal notranslate"><span class="pre">next</span></code> API, references are garbage collected (GC’ed) when the generator is GC’ed.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">yield</span> <span class="n">i</span>
@@ -1633,20 +1633,20 @@ For example, you can do <code class="docutils literal notranslate"><span class="
 <p><strong>Use asyncio and await</strong></p>
 <p><code class="docutils literal notranslate"><span class="pre">ObjectRefGenerator</span></code> is compatible with asyncio. You can create multiple asyncio tasks that create a generator task
 and wait for it to avoid blocking a thread.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">yield</span> <span class="n">i</span>
 
 
-<span class="k">async</span> <span class="k">def</span> <span class="nf">async_task</span><span class="p">():</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">async_task</span><span class="p">():</span>
     <span class="k">async</span> <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">task</span><span class="o">.</span><span class="n">remote</span><span class="p">():</span>
         <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">ref</span><span class="p">)</span>
 
-<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">t1</span> <span class="o">=</span> <span class="n">async_task</span><span class="p">()</span>
     <span class="n">t2</span> <span class="o">=</span> <span class="n">async_task</span><span class="p">()</span>
     <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>
@@ -1658,7 +1658,7 @@ and wait for it to avoid blocking a thread.</p>
 <p>You can pass <code class="docutils literal notranslate"><span class="pre">ObjectRefGenerator</span></code> as an input to <code class="docutils literal notranslate"><span class="pre">ray.wait</span></code>. The generator is “ready” if a <code class="code docutils literal notranslate"><span class="pre">next</span> <span class="pre">item</span></code>
 is available. Once Ray finds from a ready list, <code class="docutils literal notranslate"><span class="pre">next(gen)</span></code> returns the next object reference immediately without blocking. See the example below for more details.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
         <span class="k">yield</span> <span class="n">i</span>
@@ -1693,16 +1693,16 @@ is available. Once Ray finds from a ready list, <code class="docutils literal no
 <p>All the input arguments (such as <code class="docutils literal notranslate"><span class="pre">timeout</span></code>, <code class="docutils literal notranslate"><span class="pre">num_returns</span></code>, and <code class="docutils literal notranslate"><span class="pre">fetch_local</span></code>) from <code class="docutils literal notranslate"><span class="pre">ray.wait</span></code> works with a generator.</p>
 <p><code class="docutils literal notranslate"><span class="pre">ray.wait</span></code> can mix regular Ray object references with generators for inputs. In this case, the application should handle
 all input arguments (such as <code class="docutils literal notranslate"><span class="pre">timeout</span></code>, <code class="docutils literal notranslate"><span class="pre">num_returns</span></code>, and <code class="docutils literal notranslate"><span class="pre">fetch_local</span></code>) from <code class="docutils literal notranslate"><span class="pre">ray.wait</span></code> work with generators.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray._raylet</span> <span class="kn">import</span> <span class="n">ObjectRefGenerator</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray._raylet</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObjectRefGenerator</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">generator_task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">generator_task</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
         <span class="k">yield</span> <span class="n">i</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">regular_task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">regular_task</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
     <span class="k">return</span>

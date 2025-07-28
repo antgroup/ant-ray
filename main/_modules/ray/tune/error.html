@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1392,50 +1392,50 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.error</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 
 <div class="viewcode-block" id="TuneError">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.TuneError.html#ray.tune.TuneError">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">TuneError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TuneError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;General error class raised by ray.tune.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
 
 
 
-<span class="k">class</span> <span class="nc">_AbortTrialExecution</span><span class="p">(</span><span class="n">TuneError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_AbortTrialExecution</span><span class="p">(</span><span class="n">TuneError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Error that indicates a trial should not be retried.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span>
 
 
-<span class="k">class</span> <span class="nc">_SubCategoryTuneError</span><span class="p">(</span><span class="n">TuneError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_SubCategoryTuneError</span><span class="p">(</span><span class="n">TuneError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The more specific TuneError that happens for a certain Tune</span>
 <span class="sd">    subroutine. For example starting/stopping a trial.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traceback_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traceback_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">traceback_str</span> <span class="o">=</span> <span class="n">traceback_str</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">traceback_str</span>
 
 
-<span class="k">class</span> <span class="nc">_TuneStopTrialError</span><span class="p">(</span><span class="n">_SubCategoryTuneError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_TuneStopTrialError</span><span class="p">(</span><span class="n">_SubCategoryTuneError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Error that happens when stopping a tune trial.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span>
 
 
-<span class="k">class</span> <span class="nc">_TuneStartTrialError</span><span class="p">(</span><span class="n">_SubCategoryTuneError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_TuneStartTrialError</span><span class="p">(</span><span class="n">_SubCategoryTuneError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Error that happens when starting a tune trial.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span>
 
 
-<span class="k">class</span> <span class="nc">_TuneNoNextExecutorEventError</span><span class="p">(</span><span class="n">_SubCategoryTuneError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_TuneNoNextExecutorEventError</span><span class="p">(</span><span class="n">_SubCategoryTuneError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Error that happens when waiting to get the next event to</span>
 <span class="sd">    handle from RayTrialExecutor.</span>
 

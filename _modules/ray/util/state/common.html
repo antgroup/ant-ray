@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1392,21 +1392,21 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.util.state.common</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">fields</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">unique</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">fields</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">unique</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">ray.dashboard.utils</span> <span class="k">as</span> <span class="nn">dashboard_utils</span>
-<span class="kn">from</span> <span class="nn">ray._private.ray_constants</span> <span class="kn">import</span> <span class="n">env_integer</span>
-<span class="kn">from</span> <span class="nn">ray.core.generated.common_pb2</span> <span class="kn">import</span> <span class="n">TaskStatus</span><span class="p">,</span> <span class="n">TaskType</span>
-<span class="kn">from</span> <span class="nn">ray.core.generated.gcs_pb2</span> <span class="kn">import</span> <span class="n">TaskEvents</span>
-<span class="kn">from</span> <span class="nn">ray._private.custom_types</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.dashboard.utils</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dashboard_utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.ray_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">env_integer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.core.generated.common_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskStatus</span><span class="p">,</span> <span class="n">TaskType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.core.generated.gcs_pb2</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskEvents</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.custom_types</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TypeActorStatus</span><span class="p">,</span>
     <span class="n">TypeNodeStatus</span><span class="p">,</span>
     <span class="n">TypePlacementGroupStatus</span><span class="p">,</span>
@@ -1416,24 +1416,24 @@ document.write(`
     <span class="n">TypeWorkerExitType</span><span class="p">,</span>
     <span class="n">TypeWorkerType</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.state.exception</span> <span class="kn">import</span> <span class="n">RayStateApiException</span>
-<span class="kn">from</span> <span class="nn">ray.dashboard.modules.job.pydantic_models</span> <span class="kn">import</span> <span class="n">JobDetails</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.state.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">RayStateApiException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dashboard.modules.job.pydantic_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">JobDetails</span>
 
 <span class="c1"># TODO(aguo): Instead of a version check, modify the below models</span>
 <span class="c1"># to use pydantic BaseModel instead of dataclass.</span>
 <span class="c1"># In pydantic 2, dataclass no longer needs the `init=True` kwarg to</span>
 <span class="c1"># generate an __init__ method. Additionally, it will raise an error if</span>
 <span class="c1"># it detects `init=True` to be set.</span>
-<span class="kn">from</span> <span class="nn">ray._private.pydantic_compat</span> <span class="kn">import</span> <span class="n">IS_PYDANTIC_2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.pydantic_compat</span><span class="w"> </span><span class="kn">import</span> <span class="n">IS_PYDANTIC_2</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">pydantic.dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 
 
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># pydantic is not available in the dashboard.</span>
     <span class="c1"># We will use the dataclass from the standard library.</span>
-    <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -1455,7 +1455,7 @@ document.write(`
 
 
 <span class="nd">@unique</span>
-<span class="k">class</span> <span class="nc">StateResource</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StateResource</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">ACTORS</span> <span class="o">=</span> <span class="s2">&quot;actors&quot;</span>
     <span class="n">JOBS</span> <span class="o">=</span> <span class="s2">&quot;jobs&quot;</span>
     <span class="n">PLACEMENT_GROUPS</span> <span class="o">=</span> <span class="s2">&quot;placement_groups&quot;</span>
@@ -1469,7 +1469,7 @@ document.write(`
 
 
 <span class="nd">@unique</span>
-<span class="k">class</span> <span class="nc">SummaryResource</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SummaryResource</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">ACTORS</span> <span class="o">=</span> <span class="s2">&quot;actors&quot;</span>
     <span class="n">TASKS</span> <span class="o">=</span> <span class="s2">&quot;tasks&quot;</span>
     <span class="n">OBJECTS</span> <span class="o">=</span> <span class="s2">&quot;objects&quot;</span>
@@ -1481,15 +1481,15 @@ document.write(`
 <span class="n">PredicateType</span> <span class="o">=</span> <span class="nb">str</span>  <span class="c1"># Literal[&quot;=&quot;, &quot;!=&quot;]</span>
 
 
-<span class="k">class</span> <span class="nc">Humanify</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Humanify</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class containing default methods to</span>
 <span class="sd">    convert units into a human readable string.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">timestamp</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">timestamp</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts milliseconds to a datetime object.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">memory</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">memory</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts raw bytes to a human readable memory size.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">30</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">format</span><span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">30</span><span class="p">),</span> <span class="s2">&quot;.3f&quot;</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; GiB&quot;</span>
@@ -1499,18 +1499,18 @@ document.write(`
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">format</span><span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">10</span><span class="p">),</span> <span class="s2">&quot;.3f&quot;</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; KiB&quot;</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">format</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;.3f&quot;</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; B&quot;</span>
 
-    <span class="k">def</span> <span class="nf">duration</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">duration</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts milliseconds to a human readable duration.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">milliseconds</span><span class="o">=</span><span class="n">x</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">events</span><span class="p">(</span><span class="n">events</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">events</span><span class="p">(</span><span class="n">events</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts a list of task events into a human readable format.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
             <span class="k">if</span> <span class="s2">&quot;created_ms&quot;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
                 <span class="n">event</span><span class="p">[</span><span class="s2">&quot;created_ms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Humanify</span><span class="o">.</span><span class="n">timestamp</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;created_ms&quot;</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">events</span>
 
-    <span class="k">def</span> <span class="nf">node_resources</span><span class="p">(</span><span class="n">resources</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">node_resources</span><span class="p">(</span><span class="n">resources</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts a node&#39;s resources into a human readable format.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="n">resources</span><span class="p">:</span>
             <span class="k">if</span> <span class="s2">&quot;memory&quot;</span> <span class="ow">in</span> <span class="n">resource</span><span class="p">:</span>
@@ -1519,7 +1519,7 @@ document.write(`
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ListApiOptions</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ListApiOptions</span><span class="p">:</span>
     <span class="c1"># Maximum number of entries to return</span>
     <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_LIMIT</span>
     <span class="c1"># The timeout for the API call.</span>
@@ -1542,7 +1542,7 @@ document.write(`
     <span class="c1"># timeout will always lead Http timeout.</span>
     <span class="n">server_timeout_multiplier</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># To return the data to users, when there&#39;s a partial failure</span>
         <span class="c1"># we need to have a timeout that&#39;s smaller than the users&#39; timeout.</span>
         <span class="c1"># 80% is configured arbitrarily.</span>
@@ -1559,7 +1559,7 @@ document.write(`
                     <span class="s2">&quot;Available predicates: =, !=.&quot;</span>
                 <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">has_conflicting_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_conflicting_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="c1"># Check the filters in the ListApiOptions conflicts. Specifically for:</span>
         <span class="c1"># - multiple &#39;=&#39; filters with the same key but different values.</span>
         <span class="c1"># TODO(myan): More conflicts situation can be added for further optimization.</span>
@@ -1588,13 +1588,13 @@ document.write(`
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">GetApiOptions</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GetApiOptions</span><span class="p">:</span>
     <span class="c1"># Timeout for the HTTP request</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_RPC_TIMEOUT</span>
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">SummaryApiOptions</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SummaryApiOptions</span><span class="p">:</span>
     <span class="c1"># Timeout for the HTTP request</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_RPC_TIMEOUT</span>
 
@@ -1614,7 +1614,7 @@ document.write(`
     <span class="n">summary_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">state_column</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">filterable</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">format_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">state_column</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">filterable</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">format_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A wrapper around dataclass.field to add additional metadata.</span>
 
 <span class="sd">    The metadata is used to define detail / filterable option of</span>
@@ -1639,7 +1639,7 @@ document.write(`
     <span class="k">return</span> <span class="n">field</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">StateSchema</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StateSchema</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Schema class for Ray resource abstraction.</span>
 
 <span class="sd">    The child class must be dataclass. All child classes</span>
@@ -1676,7 +1676,7 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">humanify</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">humanify</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the given state object into something human readable.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
             <span class="k">if</span> <span class="p">(</span>
@@ -1691,7 +1691,7 @@ document.write(`
         <span class="k">return</span> <span class="n">state</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">list_columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a list of columns.&quot;&quot;&quot;</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
@@ -1703,12 +1703,12 @@ document.write(`
         <span class="k">return</span> <span class="n">cols</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of all columns.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">list_columns</span><span class="p">(</span><span class="n">detail</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">filterable_columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filterable_columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a list of filterable columns&quot;&quot;&quot;</span>
         <span class="n">filterable</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
@@ -1717,7 +1717,7 @@ document.write(`
         <span class="k">return</span> <span class="n">filterable</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">base_columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">base_columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a list of base columns.</span>
 
 <span class="sd">        Base columns mean columns to return when detail == False.</span>
@@ -1725,28 +1725,28 @@ document.write(`
         <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">list_columns</span><span class="p">(</span><span class="n">detail</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">detail_columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">detail_columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a list of detail columns.</span>
 
 <span class="sd">        Detail columns mean columns to return when detail == True.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">list_columns</span><span class="p">(</span><span class="n">detail</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="c1"># Allow dict like access on the class directly for backward compatibility.</span>
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">filter_fields</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">state_dataclass</span><span class="p">:</span> <span class="n">StateSchema</span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">filter_fields</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">state_dataclass</span><span class="p">:</span> <span class="n">StateSchema</span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter the given data&#39;s columns based on the given schema.</span>
 
 <span class="sd">    Args:</span>
@@ -1765,7 +1765,7 @@ document.write(`
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">GetLogOptions</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GetLogOptions</span><span class="p">:</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">node_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">node_ip</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1794,7 +1794,7 @@ document.write(`
     <span class="c1"># since Ray doesn&#39;t log driver logs to file in the ray logs directory.</span>
     <span class="n">submission_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">:</span>
@@ -1838,7 +1838,7 @@ document.write(`
 <div class="viewcode-block" id="ActorState">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.ActorState.html#ray.util.state.common.ActorState">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ActorState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ActorState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Actor State&quot;&quot;&quot;</span>
 
     <span class="c1">#: The id of the actor.</span>
@@ -1900,7 +1900,7 @@ document.write(`
 <div class="viewcode-block" id="PlacementGroupState">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.PlacementGroupState.html#ray.util.state.common.PlacementGroupState">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">PlacementGroupState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlacementGroupState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;PlacementGroup State&quot;&quot;&quot;</span>
 
     <span class="c1">#: The id of the placement group.</span>
@@ -1932,7 +1932,7 @@ document.write(`
 <div class="viewcode-block" id="NodeState">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.NodeState.html#ray.util.state.common.NodeState">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">NodeState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NodeState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Node State&quot;&quot;&quot;</span>
 
     <span class="c1">#: The id of the node.</span>
@@ -1975,16 +1975,16 @@ document.write(`
 <span class="c1">#       installed. Inheriting from `None` raises an exception.</span>
 <div class="viewcode-block" id="JobState">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.JobState.html#ray.util.state.common.JobState">[docs]</a>
-<span class="k">class</span> <span class="nc">JobState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">,</span> <span class="n">JobDetails</span> <span class="k">if</span> <span class="n">JobDetails</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JobState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">,</span> <span class="n">JobDetails</span> <span class="k">if</span> <span class="n">JobDetails</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The state of the job that&#39;s submitted by Ray&#39;s Job APIs or driver jobs&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">JobDetails</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="JobState.filterable_columns">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.JobState.html#ray.util.state.common.JobState.filterable_columns">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">filterable_columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filterable_columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="c1"># We are not doing any filtering since filtering is currently done</span>
         <span class="c1"># at the backend.</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;job_id&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;submission_id&quot;</span><span class="p">}</span></div>
@@ -1993,14 +1993,14 @@ document.write(`
 <div class="viewcode-block" id="JobState.humanify">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.JobState.html#ray.util.state.common.JobState.humanify">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">humanify</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">humanify</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">state</span></div>
 
 
 <div class="viewcode-block" id="JobState.list_columns">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.JobState.html#ray.util.state.common.JobState.list_columns">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">list_columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">detail</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span>
                 <span class="s2">&quot;job_id&quot;</span><span class="p">,</span>
@@ -2027,11 +2027,11 @@ document.write(`
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">JobDetails</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">schema_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">schema_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="n">schema_types</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">schema</span><span class="p">()[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span>
         <span class="c1"># Get type name to actual type mapping.</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -2043,7 +2043,7 @@ document.write(`
 <div class="viewcode-block" id="WorkerState">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.WorkerState.html#ray.util.state.common.WorkerState">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">WorkerState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WorkerState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Worker State&quot;&quot;&quot;</span>
 
     <span class="c1">#: The id of the worker.</span>
@@ -2114,7 +2114,7 @@ document.write(`
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ClusterEventState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ClusterEventState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
     <span class="n">severity</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">state_column</span><span class="p">(</span><span class="n">filterable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">state_column</span><span class="p">(</span><span class="n">filterable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">source_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">state_column</span><span class="p">(</span><span class="n">filterable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -2126,7 +2126,7 @@ document.write(`
 <div class="viewcode-block" id="TaskState">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.TaskState.html#ray.util.state.common.TaskState">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TaskState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TaskState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Task State&quot;&quot;&quot;</span>
 
     <span class="c1">#: The id of the task.</span>
@@ -2219,7 +2219,7 @@ document.write(`
 <div class="viewcode-block" id="ObjectState">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.ObjectState.html#ray.util.state.common.ObjectState">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ObjectState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Object State&quot;&quot;&quot;</span>
 
     <span class="c1">#: The id of the object.</span>
@@ -2278,7 +2278,7 @@ document.write(`
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">VirtualClusterState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">VirtualClusterState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Virtual Cluster State&quot;&quot;&quot;</span>
 
     <span class="c1">#: The virtual cluster id.</span>
@@ -2302,7 +2302,7 @@ document.write(`
 <div class="viewcode-block" id="RuntimeEnvState">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.RuntimeEnvState.html#ray.util.state.common.RuntimeEnvState">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">RuntimeEnvState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RuntimeEnvState</span><span class="p">(</span><span class="n">StateSchema</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Runtime Environment State&quot;&quot;&quot;</span>
 
     <span class="c1">#: The runtime environment spec.</span>
@@ -2359,7 +2359,7 @@ document.write(`
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ListApiResponse</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ListApiResponse</span><span class="p">:</span>
     <span class="c1"># NOTE(rickyyx): We currently perform hard truncation when querying</span>
     <span class="c1"># resources which could have a large number (e.g. asking raylets for</span>
     <span class="c1"># the number of all objects).</span>
@@ -2407,7 +2407,7 @@ document.write(`
 <div class="viewcode-block" id="TaskSummaryPerFuncOrClassName">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.TaskSummaryPerFuncOrClassName.html#ray.util.state.common.TaskSummaryPerFuncOrClassName">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TaskSummaryPerFuncOrClassName</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TaskSummaryPerFuncOrClassName</span><span class="p">:</span>
     <span class="c1">#: The function or class name of this task.</span>
     <span class="n">func_or_class_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="c1">#: The type of the class. Equivalent to protobuf TaskType.</span>
@@ -2419,7 +2419,7 @@ document.write(`
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Link</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Link</span><span class="p">:</span>
     <span class="c1">#: The type of entity to link to</span>
     <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span>
     <span class="c1">#: The id of the entity to link to</span>
@@ -2427,7 +2427,7 @@ document.write(`
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">NestedTaskSummary</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NestedTaskSummary</span><span class="p">:</span>
     <span class="c1">#: The name of this task group</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="c1">#: A unique identifier for this group</span>
@@ -2449,7 +2449,7 @@ document.write(`
 <div class="viewcode-block" id="TaskSummaries">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.TaskSummaries.html#ray.util.state.common.TaskSummaries">[docs]</a>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">TaskSummaries</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TaskSummaries</span><span class="p">:</span>
     <span class="c1">#: Group key -&gt; summary.</span>
     <span class="c1">#: Right now, we only have func_class_name as a key.</span>
     <span class="c1"># TODO(sang): Support the task group abstraction.</span>
@@ -2463,7 +2463,7 @@ document.write(`
     <span class="n">summary_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;func_name&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">to_summary_by_func_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">tasks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;TaskSummaries&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_summary_by_func_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">tasks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;TaskSummaries&quot;</span><span class="p">:</span>
         <span class="c1"># NOTE: The argument tasks contains a list of dictionary</span>
         <span class="c1"># that have the same k/v as TaskState.</span>
         <span class="n">summary</span> <span class="o">=</span> <span class="p">{}</span>
@@ -2504,7 +2504,7 @@ document.write(`
 <div class="viewcode-block" id="TaskSummaries.to_summary_by_lineage">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.TaskSummaries.html#ray.util.state.common.TaskSummaries.to_summary_by_lineage">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">to_summary_by_lineage</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_summary_by_lineage</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">tasks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">actors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;TaskSummaries&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2549,7 +2549,7 @@ document.write(`
 
         <span class="n">actor_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">actor</span><span class="p">[</span><span class="s2">&quot;actor_id&quot;</span><span class="p">]:</span> <span class="n">actor</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">}</span>
 
-        <span class="k">def</span> <span class="nf">get_or_create_task_group</span><span class="p">(</span><span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NestedTaskSummary</span><span class="p">]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_or_create_task_group</span><span class="p">(</span><span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NestedTaskSummary</span><span class="p">]:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Gets an already created task_group</span>
 <span class="sd">            OR</span>
@@ -2608,7 +2608,7 @@ document.write(`
 
             <span class="k">return</span> <span class="n">task_group_by_id</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span>
 
-        <span class="k">def</span> <span class="nf">get_or_create_actor_task_group</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_or_create_actor_task_group</span><span class="p">(</span>
             <span class="n">actor_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NestedTaskSummary</span><span class="p">]:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2690,7 +2690,7 @@ document.write(`
             <span class="k">elif</span> <span class="n">type_enum</span> <span class="o">==</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">ACTOR_TASK</span><span class="p">:</span>
                 <span class="n">total_actor_tasks</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="k">def</span> <span class="nf">merge_sibings_for_task_group</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">merge_sibings_for_task_group</span><span class="p">(</span>
             <span class="n">siblings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">NestedTaskSummary</span><span class="p">],</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">NestedTaskSummary</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2745,14 +2745,14 @@ document.write(`
         <span class="c1"># Step 3</span>
         <span class="n">summary</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">merge_sibings_for_task_group</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">get_running_tasks_count</span><span class="p">(</span><span class="n">task_group</span><span class="p">:</span> <span class="n">NestedTaskSummary</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_running_tasks_count</span><span class="p">(</span><span class="n">task_group</span><span class="p">:</span> <span class="n">NestedTaskSummary</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span>
                 <span class="n">task_group</span><span class="o">.</span><span class="n">state_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;RUNNING&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
                 <span class="o">+</span> <span class="n">task_group</span><span class="o">.</span><span class="n">state_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;RUNNING_IN_RAY_GET&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
                 <span class="o">+</span> <span class="n">task_group</span><span class="o">.</span><span class="n">state_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;RUNNING_IN_RAY_WAIT&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">get_pending_tasks_count</span><span class="p">(</span><span class="n">task_group</span><span class="p">:</span> <span class="n">NestedTaskSummary</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_pending_tasks_count</span><span class="p">(</span><span class="n">task_group</span><span class="p">:</span> <span class="n">NestedTaskSummary</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span>
                 <span class="n">task_group</span><span class="o">.</span><span class="n">state_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PENDING_ARGS_AVAIL&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
                 <span class="o">+</span> <span class="n">task_group</span><span class="o">.</span><span class="n">state_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PENDING_NODE_ASSIGNMENT&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -2760,7 +2760,7 @@ document.write(`
                 <span class="o">+</span> <span class="n">task_group</span><span class="o">.</span><span class="n">state_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PENDING_ARGS_FETCH&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">sort_task_groups</span><span class="p">(</span><span class="n">task_groups</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">NestedTaskSummary</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">sort_task_groups</span><span class="p">(</span><span class="n">task_groups</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">NestedTaskSummary</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Sort by running tasks, pending tasks, failed tasks, timestamp,</span>
             <span class="c1"># and actor_creation_task</span>
             <span class="c1"># Put actor creation tasks above other tasks with the same timestamp</span>
@@ -2772,7 +2772,7 @@ document.write(`
             <span class="n">task_groups</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">get_pending_tasks_count</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">task_groups</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">get_running_tasks_count</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">calc_total_for_task_group</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">calc_total_for_task_group</span><span class="p">(</span>
             <span class="n">task_group</span><span class="p">:</span> <span class="n">NestedTaskSummary</span><span class="p">,</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NestedTaskSummary</span><span class="p">:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2812,7 +2812,7 @@ document.write(`
 <div class="viewcode-block" id="ActorSummaryPerClass">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.ActorSummaryPerClass.html#ray.util.state.common.ActorSummaryPerClass">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ActorSummaryPerClass</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ActorSummaryPerClass</span><span class="p">:</span>
     <span class="c1">#: The class name of the actor.</span>
     <span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="c1">#: State name to the count dict. State name is equivalent to</span>
@@ -2824,7 +2824,7 @@ document.write(`
 <div class="viewcode-block" id="ActorSummaries">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.ActorSummaries.html#ray.util.state.common.ActorSummaries">[docs]</a>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ActorSummaries</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ActorSummaries</span><span class="p">:</span>
     <span class="c1">#: Group key (actor class name) -&gt; summary</span>
     <span class="n">summary</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ActorSummaryPerClass</span><span class="p">]</span>
     <span class="c1">#: Total number of actors</span>
@@ -2832,7 +2832,7 @@ document.write(`
     <span class="n">summary_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;class&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">to_summary</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">actors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_summary</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">actors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]):</span>
         <span class="c1"># NOTE: The argument tasks contains a list of dictionary</span>
         <span class="c1"># that have the same k/v as ActorState.</span>
         <span class="n">summary</span> <span class="o">=</span> <span class="p">{}</span>
@@ -2863,7 +2863,7 @@ document.write(`
 <div class="viewcode-block" id="ObjectSummaryPerKey">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.ObjectSummaryPerKey.html#ray.util.state.common.ObjectSummaryPerKey">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ObjectSummaryPerKey</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectSummaryPerKey</span><span class="p">:</span>
     <span class="c1">#: Total number of objects of the type.</span>
     <span class="n">total_objects</span><span class="p">:</span> <span class="nb">int</span>
     <span class="c1">#: Total size in mb.</span>
@@ -2887,7 +2887,7 @@ document.write(`
 <div class="viewcode-block" id="ObjectSummaries">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.ObjectSummaries.html#ray.util.state.common.ObjectSummaries">[docs]</a>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ObjectSummaries</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectSummaries</span><span class="p">:</span>
     <span class="c1">#: Group key (actor class name) -&gt; summary</span>
     <span class="n">summary</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObjectSummaryPerKey</span><span class="p">]</span>
     <span class="c1">#: Total number of referenced objects in the cluster.</span>
@@ -2899,7 +2899,7 @@ document.write(`
     <span class="n">summary_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;callsite&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">to_summary</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">objects</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_summary</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">objects</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]):</span>
         <span class="c1"># NOTE: The argument tasks contains a list of dictionary</span>
         <span class="c1"># that have the same k/v as ObjectState.</span>
         <span class="n">summary</span> <span class="o">=</span> <span class="p">{}</span>
@@ -2970,7 +2970,7 @@ document.write(`
 <div class="viewcode-block" id="StateSummary">
 <a class="viewcode-back" href="../../../../ray-observability/reference/doc/ray.util.state.common.StateSummary.html#ray.util.state.common.StateSummary">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">StateSummary</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StateSummary</span><span class="p">:</span>
     <span class="c1">#: Node ID -&gt; summary per node</span>
     <span class="c1">#: If the data is not required to be orgnized per node, it will contain</span>
     <span class="c1">#: a single key, &quot;cluster&quot;.</span>
@@ -2979,7 +2979,7 @@ document.write(`
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="ow">not</span> <span class="n">IS_PYDANTIC_2</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">SummaryApiResponse</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SummaryApiResponse</span><span class="p">:</span>
     <span class="c1"># Carried over from ListApiResponse</span>
     <span class="c1"># We currently use list API for listing the resources</span>
     <span class="n">total</span><span class="p">:</span> <span class="nb">int</span>
@@ -2994,7 +2994,7 @@ document.write(`
     <span class="n">warnings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">resource_to_schema</span><span class="p">(</span><span class="n">resource</span><span class="p">:</span> <span class="n">StateResource</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StateSchema</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">resource_to_schema</span><span class="p">(</span><span class="n">resource</span><span class="p">:</span> <span class="n">StateResource</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StateSchema</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">resource</span> <span class="o">==</span> <span class="n">StateResource</span><span class="o">.</span><span class="n">ACTORS</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">ActorState</span>
     <span class="k">elif</span> <span class="n">resource</span> <span class="o">==</span> <span class="n">StateResource</span><span class="o">.</span><span class="n">JOBS</span><span class="p">:</span>
@@ -3019,7 +3019,7 @@ document.write(`
         <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Unreachable&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">protobuf_message_to_dict</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">protobuf_message_to_dict</span><span class="p">(</span>
     <span class="n">message</span><span class="p">,</span>
     <span class="n">fields_to_decode</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">preserving_proto_field_name</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -3042,7 +3042,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">protobuf_to_task_state_dict</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="n">TaskEvents</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">protobuf_to_task_state_dict</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="n">TaskEvents</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a TaskEvents to a dic repr of `TaskState`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -3169,14 +3169,14 @@ document.write(`
     <span class="k">return</span> <span class="n">task_state</span>
 
 
-<span class="k">def</span> <span class="nf">remove_ansi_escape_codes</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_ansi_escape_codes</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove ANSI escape codes from a string.&quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">re</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 
     <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\x1b[^m]*m&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">dict_to_state</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">state_resource</span><span class="p">:</span> <span class="n">StateResource</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StateSchema</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">dict_to_state</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">state_resource</span><span class="p">:</span> <span class="n">StateResource</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StateSchema</span><span class="p">:</span>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a dict to a state schema.</span>
 
@@ -3191,7 +3191,7 @@ document.write(`
         <span class="k">return</span> <span class="n">resource_to_schema</span><span class="p">(</span><span class="n">state_resource</span><span class="p">)(</span><span class="o">**</span><span class="n">d</span><span class="p">)</span>
 
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">RayStateApiException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to convert </span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2"> to StateSchema: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">raise</span> <span class="n">RayStateApiException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to convert </span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2"> to StateSchema: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 </pre></div>
 
                 </article>

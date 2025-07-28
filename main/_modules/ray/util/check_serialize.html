@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1393,39 +1393,39 @@ document.write(`
                   
   <h1>Source code for ray.util.check_serialize</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;A utility for debugging serialization issues.&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="c1"># Import ray first to use the bundled colorama</span>
-<span class="kn">import</span> <span class="nn">ray</span>  <span class="c1"># noqa: F401</span>
-<span class="kn">import</span> <span class="nn">colorama</span>
-<span class="kn">import</span> <span class="nn">ray.cloudpickle</span> <span class="k">as</span> <span class="nn">cp</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>  <span class="c1"># noqa: F401</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">colorama</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.cloudpickle</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 
 <span class="nd">@contextmanager</span>
-<span class="k">def</span> <span class="nf">_indent</span><span class="p">(</span><span class="n">printer</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_indent</span><span class="p">(</span><span class="n">printer</span><span class="p">):</span>
     <span class="n">printer</span><span class="o">.</span><span class="n">level</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">yield</span>
     <span class="n">printer</span><span class="o">.</span><span class="n">level</span> <span class="o">-=</span> <span class="mi">1</span>
 
 
-<span class="k">class</span> <span class="nc">_Printer</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_file</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Printer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_file</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">print_file</span> <span class="o">=</span> <span class="n">print_file</span>
 
-    <span class="k">def</span> <span class="nf">indent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">indent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_indent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;    &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="n">msg</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">print_file</span><span class="p">)</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">FailureTuple</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FailureTuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents the serialization &#39;frame&#39;.</span>
 
 <span class="sd">    Attributes:</span>
@@ -1434,16 +1434,16 @@ document.write(`
 <span class="sd">        parent: The object that references the `obj`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;FailTuple(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> [obj=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="si">}</span><span class="s2">, parent=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2">])&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_inspect_func_serialization</span><span class="p">(</span><span class="n">base_obj</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">failure_set</span><span class="p">,</span> <span class="n">printer</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_inspect_func_serialization</span><span class="p">(</span><span class="n">base_obj</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">failure_set</span><span class="p">,</span> <span class="n">printer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds the first-found non-serializable element to the failure_set.&quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">base_obj</span><span class="p">)</span>
     <span class="n">closure</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getclosurevars</span><span class="p">(</span><span class="n">base_obj</span><span class="p">)</span>
@@ -1494,7 +1494,7 @@ document.write(`
     <span class="k">return</span> <span class="n">found</span>
 
 
-<span class="k">def</span> <span class="nf">_inspect_generic_serialization</span><span class="p">(</span><span class="n">base_obj</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">failure_set</span><span class="p">,</span> <span class="n">printer</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_inspect_generic_serialization</span><span class="p">(</span><span class="n">base_obj</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">failure_set</span><span class="p">,</span> <span class="n">printer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds the first-found non-serializable element to the failure_set.&quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">base_obj</span><span class="p">)</span>
     <span class="n">functions</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">base_obj</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">)</span>
@@ -1540,7 +1540,7 @@ document.write(`
 <div class="viewcode-block" id="inspect_serializability">
 <a class="viewcode-back" href="../../../ray-core/api/doc/ray.util.inspect_serializability.html#ray.util.inspect_serializability">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">inspect_serializability</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">inspect_serializability</span><span class="p">(</span>
     <span class="n">base_obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
@@ -1566,7 +1566,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_inspect_serializability</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_inspect_serializability</span><span class="p">(</span>
     <span class="n">base_obj</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">failure_set</span><span class="p">,</span> <span class="n">printer</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="n">FailureTuple</span><span class="p">]]:</span>
     <span class="n">colorama</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>

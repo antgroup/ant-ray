@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1417,8 +1417,8 @@ This can lead to slow performance or even OOM since Ray is not designed to handl
 <section id="code-example">
 <h2>Code example<a class="headerlink" href="#code-example" title="Link to this heading">#</a></h2>
 <p><strong>Anti-pattern:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
@@ -1426,7 +1426,7 @@ This can lead to slow performance or even OOM since Ray is not designed to handl
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f1</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f1</span><span class="p">():</span>
     <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">large_object</span><span class="p">)</span>  <span class="c1"># large_object is serialized along with f1!</span>
 
 
@@ -1438,7 +1438,7 @@ This can lead to slow performance or even OOM since Ray is not designed to handl
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f2</span><span class="p">(</span><span class="n">large_object</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f2</span><span class="p">(</span><span class="n">large_object</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">large_object</span><span class="p">)</span>
 
 
@@ -1451,7 +1451,7 @@ This can lead to slow performance or even OOM since Ray is not designed to handl
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f3</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f3</span><span class="p">():</span>
     <span class="n">large_object</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">large_object_creator</span><span class="p">()</span>
     <span class="p">)</span>  <span class="c1"># Lambda is small compared with the large object.</span>

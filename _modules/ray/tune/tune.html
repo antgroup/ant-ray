@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1392,17 +1392,17 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.tune</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">abc</span>
-<span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">signal</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">signal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Callable</span><span class="p">,</span>
@@ -1414,41 +1414,41 @@ document.write(`
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.air._internal</span> <span class="kn">import</span> <span class="n">usage</span> <span class="k">as</span> <span class="n">air_usage</span>
-<span class="kn">from</span> <span class="nn">ray.air._internal.usage</span> <span class="kn">import</span> <span class="n">AirEntrypoint</span>
-<span class="kn">from</span> <span class="nn">ray.air.util.node</span> <span class="kn">import</span> <span class="n">_force_on_current_node</span>
-<span class="kn">from</span> <span class="nn">ray.tune</span> <span class="kn">import</span> <span class="n">CheckpointConfig</span><span class="p">,</span> <span class="n">SyncConfig</span>
-<span class="kn">from</span> <span class="nn">ray.train.constants</span> <span class="kn">import</span> <span class="n">_DEPRECATED_VALUE</span><span class="p">,</span> <span class="n">RAY_CHDIR_TO_TRIAL_DIR</span>
-<span class="kn">from</span> <span class="nn">ray.tune.analysis</span> <span class="kn">import</span> <span class="n">ExperimentAnalysis</span>
-<span class="kn">from</span> <span class="nn">ray.tune.callback</span> <span class="kn">import</span> <span class="n">Callback</span>
-<span class="kn">from</span> <span class="nn">ray.tune.error</span> <span class="kn">import</span> <span class="n">TuneError</span>
-<span class="kn">from</span> <span class="nn">ray.tune.execution.placement_groups</span> <span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
-<span class="kn">from</span> <span class="nn">ray.tune.execution.tune_controller</span> <span class="kn">import</span> <span class="n">TuneController</span>
-<span class="kn">from</span> <span class="nn">ray.tune.experiment</span> <span class="kn">import</span> <span class="n">Experiment</span><span class="p">,</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">_convert_to_experiment_list</span>
-<span class="kn">from</span> <span class="nn">ray.tune.experimental.output</span> <span class="kn">import</span> <span class="n">IS_NOTEBOOK</span><span class="p">,</span> <span class="n">AirVerbosity</span><span class="p">,</span> <span class="n">get_air_verbosity</span>
-<span class="kn">from</span> <span class="nn">ray.tune.impl.placeholder</span> <span class="kn">import</span> <span class="n">create_resolvers_map</span><span class="p">,</span> <span class="n">inject_placeholders</span>
-<span class="kn">from</span> <span class="nn">ray.tune.logger</span> <span class="kn">import</span> <span class="n">TBXLoggerCallback</span>
-<span class="kn">from</span> <span class="nn">ray.tune.progress_reporter</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal</span><span class="w"> </span><span class="kn">import</span> <span class="n">usage</span> <span class="k">as</span> <span class="n">air_usage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air._internal.usage</span><span class="w"> </span><span class="kn">import</span> <span class="n">AirEntrypoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.util.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">_force_on_current_node</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">CheckpointConfig</span><span class="p">,</span> <span class="n">SyncConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.train.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">_DEPRECATED_VALUE</span><span class="p">,</span> <span class="n">RAY_CHDIR_TO_TRIAL_DIR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExperimentAnalysis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.callback</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.error</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.placement_groups</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.tune_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneController</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Experiment</span><span class="p">,</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">_convert_to_experiment_list</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experimental.output</span><span class="w"> </span><span class="kn">import</span> <span class="n">IS_NOTEBOOK</span><span class="p">,</span> <span class="n">AirVerbosity</span><span class="p">,</span> <span class="n">get_air_verbosity</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.impl.placeholder</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_resolvers_map</span><span class="p">,</span> <span class="n">inject_placeholders</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">TBXLoggerCallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.progress_reporter</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ProgressReporter</span><span class="p">,</span>
     <span class="n">_detect_progress_metrics</span><span class="p">,</span>
     <span class="n">_detect_reporter</span><span class="p">,</span>
     <span class="n">_prepare_progress_reporter_for_ray_client</span><span class="p">,</span>
     <span class="n">_stream_client_output</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.registry</span> <span class="kn">import</span> <span class="n">get_trainable_cls</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_trainable_cls</span>
 
 <span class="c1"># Must come last to avoid circular imports</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">FIFOScheduler</span><span class="p">,</span>
     <span class="n">PopulationBasedTraining</span><span class="p">,</span>
     <span class="n">PopulationBasedTrainingReplay</span><span class="p">,</span>
     <span class="n">TrialScheduler</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers.util</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers.util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_set_search_properties_backwards_compatible</span> <span class="k">as</span> <span class="n">scheduler_set_search_props</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BasicVariantGenerator</span><span class="p">,</span>
     <span class="n">ConcurrencyLimiter</span><span class="p">,</span>
     <span class="n">SearchAlgorithm</span><span class="p">,</span>
@@ -1456,27 +1456,27 @@ document.write(`
     <span class="n">SearchGenerator</span><span class="p">,</span>
     <span class="n">create_searcher</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.util</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_set_search_properties_backwards_compatible</span> <span class="k">as</span> <span class="n">searcher_set_search_props</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.variant_generator</span> <span class="kn">import</span> <span class="n">_has_unresolved_values</span>
-<span class="kn">from</span> <span class="nn">ray.tune.stopper</span> <span class="kn">import</span> <span class="n">Stopper</span>
-<span class="kn">from</span> <span class="nn">ray.tune.trainable</span> <span class="kn">import</span> <span class="n">Trainable</span>
-<span class="kn">from</span> <span class="nn">ray.tune.tune_config</span> <span class="kn">import</span> <span class="n">ResumeConfig</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils.callback</span> <span class="kn">import</span> <span class="n">_create_default_callbacks</span>
-<span class="kn">from</span> <span class="nn">ray.tune.utils.log</span> <span class="kn">import</span> <span class="n">Verbosity</span><span class="p">,</span> <span class="n">has_verbosity</span><span class="p">,</span> <span class="n">set_verbosity</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
-<span class="kn">from</span> <span class="nn">ray.util.queue</span> <span class="kn">import</span> <span class="n">Queue</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.variant_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">_has_unresolved_values</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.stopper</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stopper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trainable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.tune_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResumeConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils.callback</span><span class="w"> </span><span class="kn">import</span> <span class="n">_create_default_callbacks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.utils.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">Verbosity</span><span class="p">,</span> <span class="n">has_verbosity</span><span class="p">,</span> <span class="n">set_verbosity</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.queue</span><span class="w"> </span><span class="kn">import</span> <span class="n">Queue</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pyarrow.fs</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow.fs</span>
 
-    <span class="kn">from</span> <span class="nn">ray.tune.experimental.output</span> <span class="kn">import</span> <span class="n">ProgressReporter</span> <span class="k">as</span> <span class="n">AirProgressReporter</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experimental.output</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProgressReporter</span> <span class="k">as</span> <span class="n">AirProgressReporter</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_trainable</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_trainable</span><span class="p">(</span>
     <span class="n">run_identifier</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Experiment</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Trainable</span><span class="p">]]:</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">run_identifier</span><span class="p">,</span> <span class="n">Experiment</span><span class="p">):</span>
@@ -1497,7 +1497,7 @@ document.write(`
     <span class="k">return</span> <span class="n">trainable_cls</span>
 
 
-<span class="k">def</span> <span class="nf">_build_resume_config_from_legacy_config</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_resume_config_from_legacy_config</span><span class="p">(</span>
     <span class="n">resume</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ResumeConfig</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts the legacy resume (str, bool) to a ResumeConfig object.</span>
@@ -1540,7 +1540,7 @@ document.write(`
     <span class="k">return</span> <span class="n">resume_config</span>
 
 
-<span class="k">def</span> <span class="nf">_check_default_resources_override</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_default_resources_override</span><span class="p">(</span>
     <span class="n">run_identifier</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Experiment</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="n">trainable_cls</span> <span class="o">=</span> <span class="n">_get_trainable</span><span class="p">(</span><span class="n">run_identifier</span><span class="p">)</span>
@@ -1554,7 +1554,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_check_mixin</span><span class="p">(</span><span class="n">run_identifier</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Experiment</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Callable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_mixin</span><span class="p">(</span><span class="n">run_identifier</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Experiment</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Callable</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="n">trainable_cls</span> <span class="o">=</span> <span class="n">_get_trainable</span><span class="p">(</span><span class="n">run_identifier</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">trainable_cls</span><span class="p">:</span>
         <span class="c1"># Default to True</span>
@@ -1565,7 +1565,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_check_gpus_in_resources</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_gpus_in_resources</span><span class="p">(</span>
     <span class="n">resources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">PlacementGroupFactory</span><span class="p">]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">resources</span><span class="p">:</span>
@@ -1578,7 +1578,7 @@ document.write(`
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">_report_progress</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_report_progress</span><span class="p">(</span>
     <span class="n">runner</span><span class="p">:</span> <span class="n">TuneController</span><span class="p">,</span> <span class="n">reporter</span><span class="p">:</span> <span class="n">ProgressReporter</span><span class="p">,</span> <span class="n">done</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reports experiment progress.</span>
@@ -1595,7 +1595,7 @@ document.write(`
         <span class="n">reporter</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">trials</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">sched_debug_str</span><span class="p">,</span> <span class="n">used_resources_str</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_report_air_progress</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_report_air_progress</span><span class="p">(</span>
     <span class="n">runner</span><span class="p">:</span> <span class="n">TuneController</span><span class="p">,</span> <span class="n">reporter</span><span class="p">:</span> <span class="s2">&quot;AirProgressReporter&quot;</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">):</span>
     <span class="n">trials</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">get_trials</span><span class="p">()</span>
@@ -1605,11 +1605,11 @@ document.write(`
     <span class="n">reporter</span><span class="o">.</span><span class="n">print_heartbeat</span><span class="p">(</span><span class="n">trials</span><span class="p">,</span> <span class="o">*</span><span class="n">reporter_args</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_setup_signal_catching</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_setup_signal_catching</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">:</span>
     <span class="n">original_handler</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">getsignal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">)</span>
     <span class="n">experiment_interrupted_event</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">signal_interrupt_tune_run</span><span class="p">(</span><span class="n">sig</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">signal_interrupt_tune_run</span><span class="p">(</span><span class="n">sig</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
             <span class="s2">&quot;Stop signal received (e.g. via SIGINT/Ctrl+C), ending Ray Tune run. &quot;</span>
             <span class="s2">&quot;This will try to checkpoint the experiment state one last time. &quot;</span>
@@ -1638,7 +1638,7 @@ document.write(`
     <span class="k">return</span> <span class="n">experiment_interrupted_event</span>
 
 
-<span class="k">def</span> <span class="nf">_ray_auto_init</span><span class="p">(</span><span class="n">entrypoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_ray_auto_init</span><span class="p">(</span><span class="n">entrypoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize Ray unless already configured.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TUNE_DISABLE_AUTO_INIT&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;1&quot;</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&#39;TUNE_DISABLE_AUTO_INIT=1&#39; detected.&quot;</span><span class="p">)</span>
@@ -1651,8 +1651,8 @@ document.write(`
         <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_Config</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Config</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts this configuration to a dict format.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
@@ -1660,7 +1660,7 @@ document.write(`
 <div class="viewcode-block" id="run">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.run.html#ray.tune.run">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span>
     <span class="n">run_or_experiment</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span><span class="p">],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2098,7 +2098,7 @@ document.write(`
     <span class="c1"># Create scheduler here as we need access to some of its properties</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scheduler</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="c1"># importing at top level causes a recursive dependency</span>
-        <span class="kn">from</span> <span class="nn">ray.tune.schedulers</span> <span class="kn">import</span> <span class="n">create_scheduler</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_scheduler</span>
 
         <span class="n">scheduler</span> <span class="o">=</span> <span class="n">create_scheduler</span><span class="p">(</span><span class="n">scheduler</span><span class="p">)</span>
     <span class="n">scheduler</span> <span class="o">=</span> <span class="n">scheduler</span> <span class="ow">or</span> <span class="n">FIFOScheduler</span><span class="p">()</span>
@@ -2357,7 +2357,7 @@ document.write(`
             <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">ray.tune.experimental.output</span> <span class="kn">import</span> <span class="n">ProgressReporter</span> <span class="k">as</span> <span class="n">AirProgressReporter</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experimental.output</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProgressReporter</span> <span class="k">as</span> <span class="n">AirProgressReporter</span>
 
         <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">callbacks</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="n">AirProgressReporter</span><span class="p">):</span>
@@ -2467,7 +2467,7 @@ document.write(`
 <div class="viewcode-block" id="run_experiments">
 <a class="viewcode-back" href="../../../tune/api/doc/ray.tune.run_experiments.html#ray.tune.run_experiments">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">run_experiments</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_experiments</span><span class="p">(</span>
     <span class="n">experiments</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Experiment</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Experiment</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">]]],</span>
     <span class="n">scheduler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TrialScheduler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">AirVerbosity</span><span class="p">,</span> <span class="n">Verbosity</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1413,7 +1413,7 @@ document.write(`
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-0">
 Python</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">job_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">job_config</span><span class="o">.</span><span class="n">JobConfig</span><span class="p">(</span><span class="n">code_search_path</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/path/to/code&quot;</span><span class="p">]))</span>
 </pre></div>
@@ -1435,7 +1435,7 @@ Java</label><div class="sd-tab-content docutils">
 <input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-2">
 Python</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">job_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">job_config</span><span class="o">.</span><span class="n">JobConfig</span><span class="p">(</span><span class="n">code_search_path</span><span class="o">=</span><span class="s2">&quot;/path/to/jars:/path/to/pys&quot;</span><span class="p">))</span>
 </pre></div>
@@ -1482,7 +1482,7 @@ Java</label><div class="sd-tab-content docutils">
 </div>
 <p>Then, in Python, we can call the above Java remote function, or create an actor
 from the above Java class.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="k">with</span> <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">job_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">job_config</span><span class="o">.</span><span class="n">JobConfig</span><span class="p">(</span><span class="n">code_search_path</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/path/to/code&quot;</span><span class="p">])):</span>
   <span class="c1"># Define a Java class.</span>
@@ -1511,19 +1511,19 @@ from the above Java class.</p>
 <p>Suppose we have a Python module as follows:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># /path/to/the_dir/ray_demo.py</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Counter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Counter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
 
-  <span class="k">def</span> <span class="nf">increment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">increment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="mi">1</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
 </pre></div>
 </div>
@@ -1663,10 +1663,10 @@ return these types.</p>
 <p>You can write a Python function which returns the input data:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ray_serialization.py</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">py_return_input</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">py_return_input</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">v</span>
 </pre></div>
 </div>
@@ -1732,17 +1732,17 @@ to Java:</p>
 <p>and a Python module as follows:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ray_exception.py</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">raise_exception</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">raise_exception</span><span class="p">():</span>
     <span class="mi">1</span> <span class="o">/</span> <span class="mi">0</span>
 </pre></div>
 </div>
 <p>Then, run the following code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ray_exception_demo.py</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="k">with</span> <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">job_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">job_config</span><span class="o">.</span><span class="n">JobConfig</span><span class="p">(</span><span class="n">code_search_path</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/path/to/ray_exception&quot;</span><span class="p">])):</span>
   <span class="n">obj_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">cross_language</span><span class="o">.</span><span class="n">java_function</span><span class="p">(</span>

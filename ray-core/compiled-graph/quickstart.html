@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1415,19 +1415,19 @@ document.write(`
 </pre></div>
 </div>
 <p>First, define a simple actor that echoes its argument.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">SimpleActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">echo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SimpleActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">echo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">msg</span>
 
 
 </pre></div>
 </div>
 <p>Next instantiate the actor and use the classic Ray Core APIs <code class="docutils literal notranslate"><span class="pre">remote</span></code> and <code class="docutils literal notranslate"><span class="pre">ray.get</span></code> to execute tasks on the actor.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 <span class="n">a</span> <span class="o">=</span> <span class="n">SimpleActor</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
 
@@ -1458,7 +1458,7 @@ Note 3 key differences with the classic Ray Core APIs:</p>
 </ol>
 <p>Here, define a graph and execute it.
 Note that there is <strong>no</strong> compilation happening here. This uses the same execution backend as the preceding example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray.dag</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray.dag</span>
 
 <span class="k">with</span> <span class="n">ray</span><span class="o">.</span><span class="n">dag</span><span class="o">.</span><span class="n">InputNode</span><span class="p">()</span> <span class="k">as</span> <span class="n">inp</span><span class="p">:</span>
     <span class="c1"># Note that it uses `bind` instead of `remote`.</span>
@@ -1536,7 +1536,7 @@ For example, the following uses the preceding example to create a DAG that passe
 <p>Here is another example that passes the same message to both actors, which can then execute in parallel.
 It uses <a class="reference internal" href="doc/ray.dag.output_node.MultiOutputNode.html#ray.dag.output_node.MultiOutputNode" title="ray.dag.output_node.MultiOutputNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">ray.dag.MultiOutputNode</span></code></a> to indicate that this DAG returns multiple outputs.
 Then, <a class="reference internal" href="doc/ray.dag.compiled_dag_node.CompiledDAG.execute.html#ray.dag.compiled_dag_node.CompiledDAG.execute" title="ray.dag.compiled_dag_node.CompiledDAG.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">dag.execute()</span></code></a> returns multiple <a class="reference internal" href="doc/ray.experimental.compiled_dag_ref.CompiledDAGRef.html#ray.experimental.compiled_dag_ref.CompiledDAGRef" title="ray.experimental.compiled_dag_ref.CompiledDAGRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompiledDAGRef</span></code></a> objects, one per node:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray.dag</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray.dag</span>
 
 <span class="n">a</span> <span class="o">=</span> <span class="n">SimpleActor</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
 <span class="n">b</span> <span class="o">=</span> <span class="n">SimpleActor</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
@@ -1563,12 +1563,12 @@ Then, <a class="reference internal" href="doc/ray.dag.compiled_dag_node.Compiled
 <p>If your Compiled Graph driver is running in an <code class="docutils literal notranslate"><span class="pre">asyncio</span></code> event loop, use the <code class="docutils literal notranslate"><span class="pre">async</span></code> APIs to ensure that executing
 the Compiled Graph and getting the results doesn’t block the event loop.
 First, pass <code class="docutils literal notranslate"><span class="pre">enable_async=True</span></code> to the <code class="docutils literal notranslate"><span class="pre">dag.experimental_compile()</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">EchoActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">echo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EchoActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">echo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">msg</span>
 
 
@@ -1582,10 +1582,10 @@ First, pass <code class="docutils literal notranslate"><span class="pre">enable_
 <p>Next, use <code class="code docutils literal notranslate"><span class="pre">execute_async</span></code> to invoke the Compiled Graph. Calling <code class="docutils literal notranslate"><span class="pre">await</span></code> on <code class="docutils literal notranslate"><span class="pre">execute_async</span></code> will return once
 the input has been submitted, and it returns a future that can be used to get the result. Finally,
 use <code class="code docutils literal notranslate"><span class="pre">await</span></code> to get the result of the Compiled Graph.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
 
-<span class="k">async</span> <span class="k">def</span> <span class="nf">async_method</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">async_method</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
     <span class="n">fut</span> <span class="o">=</span> <span class="k">await</span> <span class="n">cdag</span><span class="o">.</span><span class="n">execute_async</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">fut</span>
     <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="n">i</span>
@@ -1617,12 +1617,12 @@ automatically shuts down in the case of system exceptions. If an actor’s death
 the graph to shut down, the remaining actors stay alive.</p>
 <p>For example, this example explicitly destroys an actor while it’s participating in a Compiled Graph.
 The remaining actors are reusable:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.dag</span> <span class="kn">import</span> <span class="n">InputNode</span><span class="p">,</span> <span class="n">MultiOutputNode</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag</span><span class="w"> </span><span class="kn">import</span> <span class="n">InputNode</span><span class="p">,</span> <span class="n">MultiOutputNode</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">EchoActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">echo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EchoActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">echo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">msg</span>
 
 
@@ -1676,14 +1676,14 @@ Therefore, you may see unnecessary copies across devices other than the source a
 <p>Ray Compiled Graph ships with native support for passing <code class="docutils literal notranslate"><span class="pre">torch.Tensors</span></code> between actors executing on different
 devices. Developers can now use type hint annotations in the Compiled Graph declaration to indicate the final
 destination device of a <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray.dag</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.dag</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">GPUActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GPUActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">tensor</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span>
         <span class="k">return</span> <span class="n">tensor</span><span class="o">.</span><span class="n">shape</span>
 
@@ -1727,10 +1727,10 @@ operation scheduling ahead of time, avoiding deadlock and <a class="reference in
 <p>Ray Compiled Graph uses <a class="reference external" href="https://cupy.dev/">cupy</a> under the hood to support NCCL operations.
 The cupy version affects the NCCL version. The Ray team is also planning to support custom communicators in the future, for example to support collectives across CPUs or to reuse existing collective groups.</p>
 <p>First, create sender and receiver actors. Note that this example requires at least 2 GPUs.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">ray.dag</span>
-<span class="kn">from</span> <span class="nn">ray.experimental.channel.torch_tensor_type</span> <span class="kn">import</span> <span class="n">TorchTensorType</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.dag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.channel.torch_tensor_type</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTensorType</span>
 
 
 <span class="c1"># Note that the following example requires at least 2 GPUs.</span>
@@ -1740,14 +1740,14 @@ The cupy version affects the NCCL version. The Ray team is also planning to supp
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">GPUSender</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GPUSender</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_gpus</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">GPUReceiver</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GPUReceiver</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">tensor</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span>
         <span class="k">return</span> <span class="n">tensor</span><span class="o">.</span><span class="n">shape</span>
 

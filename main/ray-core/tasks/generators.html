@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1430,11 +1430,11 @@ Compared to setting the number of return values dynamically, this adds less comp
 The generator should yield the same number of return values specified by the caller, and these will be stored one at a time in Ray’s object store.
 An error will be raised for generators that yield a different number of values from the one specified by the caller.</p>
 <p>For example, we can swap the following code that returns a list of return values:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">large_values</span><span class="p">(</span><span class="n">num_returns</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">large_values</span><span class="p">(</span><span class="n">num_returns</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span>
         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100_000_000</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_returns</span><span class="p">)</span>
@@ -1443,7 +1443,7 @@ An error will be raised for generators that yield a different number of values f
 </div>
 <p>for this code, which uses a generator function:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">large_values_generator</span><span class="p">(</span><span class="n">num_returns</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">large_values_generator</span><span class="p">(</span><span class="n">num_returns</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_returns</span><span class="p">):</span>
         <span class="k">yield</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100_000_000</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span>
@@ -1463,11 +1463,11 @@ We may not know the size of the argument until we execute the task, so we don’
 To use this feature, set <code class="docutils literal notranslate"><span class="pre">num_returns=&quot;dynamic&quot;</span></code> in the <code class="docutils literal notranslate"><span class="pre">&#64;ray.remote</span></code> decorator or the remote function’s <code class="docutils literal notranslate"><span class="pre">.options()</span></code>.
 Then, when invoking the remote function, Ray will return a <em>single</em> <code class="docutils literal notranslate"><span class="pre">ObjectRef</span></code> that will get populated with an <code class="docutils literal notranslate"><span class="pre">DynamicObjectRefGenerator</span></code> when the task completes.
 The <code class="docutils literal notranslate"><span class="pre">DynamicObjectRefGenerator</span></code> can be used to iterate over a list of <code class="docutils literal notranslate"><span class="pre">ObjectRefs</span></code> containing the actual values returned by the task.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_returns</span><span class="o">=</span><span class="s2">&quot;dynamic&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">split</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">):</span>
     <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">yield</span> <span class="n">array</span><span class="p">[:</span><span class="n">chunk_size</span><span class="p">]</span>
         <span class="n">array</span> <span class="o">=</span> <span class="n">array</span><span class="p">[</span><span class="n">chunk_size</span><span class="p">:]</span>
@@ -1503,7 +1503,7 @@ The <code class="docutils literal notranslate"><span class="pre">DynamicObjectRe
 </div>
 <p>We can also pass the <code class="docutils literal notranslate"><span class="pre">ObjectRef</span></code> returned by a task with <code class="docutils literal notranslate"><span class="pre">num_returns=&quot;dynamic&quot;</span></code> to another task. The task will receive the <code class="docutils literal notranslate"><span class="pre">DynamicObjectRefGenerator</span></code>, which it can use to iterate over the task’s return values. Similarly, you can also pass an <code class="docutils literal notranslate"><span class="pre">ObjectRefGenerator</span></code> as a task argument.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">get_size</span><span class="p">(</span><span class="n">ref_generator</span> <span class="p">:</span> <span class="n">DynamicObjectRefGenerator</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_size</span><span class="p">(</span><span class="n">ref_generator</span> <span class="p">:</span> <span class="n">DynamicObjectRefGenerator</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">ref_generator</span><span class="p">)</span>
     <span class="n">num_elements</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">ref_generator</span><span class="p">:</span>
@@ -1535,7 +1535,7 @@ The remaining <code class="docutils literal notranslate"><span class="pre">Objec
 This is true for both static and dynamic <code class="docutils literal notranslate"><span class="pre">num_returns</span></code>.
 If the task was called with <code class="docutils literal notranslate"><span class="pre">num_returns=&quot;dynamic&quot;</span></code>, the exception will be stored as an additional final <code class="docutils literal notranslate"><span class="pre">ObjectRef</span></code> in the <code class="docutils literal notranslate"><span class="pre">DynamicObjectRefGenerator</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">generator</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">generator</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
         <span class="k">yield</span> <span class="n">i</span>
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>

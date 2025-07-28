@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1420,15 +1420,15 @@ information about blocks, see <a class="reference internal" href="../../data-int
 <p class="rubric">Example</p>
 <p>This snippet shows you how to encode labels in written files. For example, if
 <code class="code docutils literal notranslate"><span class="pre">&quot;cat&quot;</span></code> is a label, you might write a file named <code class="code docutils literal notranslate"><span class="pre">cat_000000_000000_000000.png</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource</span> <span class="kn">import</span> <span class="n">FilenameProvider</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource</span><span class="w"> </span><span class="kn">import</span> <span class="n">FilenameProvider</span>
 
-<span class="k">class</span> <span class="nc">ImageFilenameProvider</span><span class="p">(</span><span class="n">FilenameProvider</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ImageFilenameProvider</span><span class="p">(</span><span class="n">FilenameProvider</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_format</span> <span class="o">=</span> <span class="n">file_format</span>
 
-    <span class="k">def</span> <span class="nf">get_filename_for_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">task_index</span><span class="p">,</span> <span class="n">block_index</span><span class="p">,</span> <span class="n">row_index</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_filename_for_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">task_index</span><span class="p">,</span> <span class="n">block_index</span><span class="p">,</span> <span class="n">row_index</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">task_index</span><span class="si">:</span><span class="s2">06</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">block_index</span><span class="si">:</span><span class="s2">06</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">row_index</span><span class="si">:</span><span class="s2">06</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">file_format</span><span class="si">}</span><span class="s2">&quot;</span>

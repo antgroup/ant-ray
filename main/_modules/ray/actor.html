@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1389,45 +1389,45 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.actor</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">weakref</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">weakref</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">ray._private.ray_constants</span> <span class="k">as</span> <span class="nn">ray_constants</span>
-<span class="kn">import</span> <span class="nn">ray._private.signature</span> <span class="k">as</span> <span class="nn">signature</span>
-<span class="kn">import</span> <span class="nn">ray._private.worker</span>
-<span class="kn">import</span> <span class="nn">ray._raylet</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">ActorClassID</span><span class="p">,</span> <span class="n">Language</span><span class="p">,</span> <span class="n">cross_language</span>
-<span class="kn">from</span> <span class="nn">ray._private</span> <span class="kn">import</span> <span class="n">ray_option_utils</span>
-<span class="kn">from</span> <span class="nn">ray._private.async_compat</span> <span class="kn">import</span> <span class="n">has_async_methods</span>
-<span class="kn">from</span> <span class="nn">ray._private.auto_init_hook</span> <span class="kn">import</span> <span class="n">wrap_auto_init</span>
-<span class="kn">from</span> <span class="nn">ray._private.client_mode_hook</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray._private.ray_constants</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ray_constants</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray._private.signature</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">signature</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray._private.worker</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray._raylet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActorClassID</span><span class="p">,</span> <span class="n">Language</span><span class="p">,</span> <span class="n">cross_language</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private</span><span class="w"> </span><span class="kn">import</span> <span class="n">ray_option_utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.async_compat</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_async_methods</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.auto_init_hook</span><span class="w"> </span><span class="kn">import</span> <span class="n">wrap_auto_init</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.client_mode_hook</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">client_mode_convert_actor</span><span class="p">,</span>
     <span class="n">client_mode_hook</span><span class="p">,</span>
     <span class="n">client_mode_should_convert</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray._private.inspect_util</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.inspect_util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">is_class_method</span><span class="p">,</span>
     <span class="n">is_function_or_method</span><span class="p">,</span>
     <span class="n">is_static_method</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray._private.ray_option_utils</span> <span class="kn">import</span> <span class="n">_warn_if_using_deprecated_placement_group</span>
-<span class="kn">from</span> <span class="nn">ray._private.utils</span> <span class="kn">import</span> <span class="n">get_runtime_env_info</span><span class="p">,</span> <span class="n">parse_runtime_env</span>
-<span class="kn">from</span> <span class="nn">ray._raylet</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.ray_option_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_warn_if_using_deprecated_placement_group</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_runtime_env_info</span><span class="p">,</span> <span class="n">parse_runtime_env</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._raylet</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">STREAMING_GENERATOR_RETURN</span><span class="p">,</span>
     <span class="n">ObjectRefGenerator</span><span class="p">,</span>
     <span class="n">PythonFunctionDescriptor</span><span class="p">,</span>
     <span class="n">raise_sys_exit_with_custom_error_message</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.exceptions</span> <span class="kn">import</span> <span class="n">AsyncioActorExit</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
-<span class="kn">from</span> <span class="nn">ray.util.placement_group</span> <span class="kn">import</span> <span class="n">_configure_placement_group_based_on_context</span>
-<span class="kn">from</span> <span class="nn">ray.util.scheduling_strategies</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncioActorExit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span><span class="p">,</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.placement_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">_configure_placement_group_based_on_context</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.scheduling_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">PlacementGroupSchedulingStrategy</span><span class="p">,</span>
     <span class="n">SchedulingStrategyT</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.tracing.tracing_helper</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.tracing.tracing_helper</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_inject_tracing_into_class</span><span class="p">,</span>
     <span class="n">_tracing_actor_creation</span><span class="p">,</span>
     <span class="n">_tracing_actor_method_invocation</span><span class="p">,</span>
@@ -1443,7 +1443,7 @@ document.write(`
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.method.html#ray.actor.method">[docs]</a>
 <span class="nd">@PublicAPI</span>
 <span class="nd">@client_mode_hook</span>
-<span class="k">def</span> <span class="nf">method</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Annotate an actor method.</span>
 
 <span class="sd">    .. code-block:: python</span>
@@ -1483,7 +1483,7 @@ document.write(`
         <span class="p">)</span>
         <span class="k">assert</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">valid_kwargs</span><span class="p">,</span> <span class="n">key_error_string</span>
 
-    <span class="k">def</span> <span class="nf">annotate_method</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">annotate_method</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
         <span class="k">if</span> <span class="s2">&quot;num_returns&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">method</span><span class="o">.</span><span class="n">__ray_num_returns__</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;num_returns&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="s2">&quot;max_task_retries&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
@@ -1509,7 +1509,7 @@ document.write(`
 <div class="viewcode-block" id="ActorMethod">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.actor.ActorMethod.html#ray.actor.ActorMethod">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">ActorMethod</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ActorMethod</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class used to invoke an actor method.</span>
 
 <span class="sd">    Note: This class only keeps a weak ref to the actor, unless it has been</span>
@@ -1542,7 +1542,7 @@ document.write(`
 <span class="sd">            &quot;test_decorated_method&quot; in &quot;python/ray/tests/test_actor.py&quot;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">actor</span><span class="p">,</span>
         <span class="n">method_name</span><span class="p">,</span>
@@ -1587,7 +1587,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_actor_hard_ref</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="s2">&quot;Actor methods cannot be called directly. Instead &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;of running &#39;object.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_method_name</span><span class="si">}</span><span class="s2">()&#39;, try &quot;</span>
@@ -1597,7 +1597,7 @@ document.write(`
 <div class="viewcode-block" id="ActorMethod.bind">
 <a class="viewcode-back" href="../../ray-core/compiled-graph/doc/ray.actor.ActorMethod.bind.html#ray.actor.ActorMethod.bind">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Bind arguments to the actor method for Ray DAG building.</span>
 
@@ -1611,7 +1611,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bind</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_get_callee_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_callee_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        get the callee info of the actor method</span>
 <span class="sd">        this is needed for the insight monitor to record the call</span>
@@ -1633,8 +1633,8 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">callee_class</span><span class="p">,</span> <span class="n">callee_func</span>
 
-    <span class="k">def</span> <span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">ray.util.insight</span> <span class="kn">import</span> <span class="n">record_control_flow</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.insight</span><span class="w"> </span><span class="kn">import</span> <span class="n">record_control_flow</span>
 
         <span class="n">callee_class</span><span class="p">,</span> <span class="n">callee_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_callee_info</span><span class="p">()</span>
         <span class="c1"># report the call info to the insight monitor</span>
@@ -1643,7 +1643,7 @@ document.write(`
 
 <div class="viewcode-block" id="ActorMethod.options">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.actor.ActorMethod.options.html#ray.actor.ActorMethod.options">[docs]</a>
-    <span class="k">def</span> <span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convenience method for executing an actor method call with options.</span>
 
 <span class="sd">        Same arguments as func._remote(), but returns a wrapped function</span>
@@ -1657,12 +1657,12 @@ document.write(`
 
         <span class="n">func_cls</span> <span class="o">=</span> <span class="bp">self</span>
 
-        <span class="k">class</span> <span class="nc">FuncWrapper</span><span class="p">:</span>
-            <span class="k">def</span> <span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">FuncWrapper</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">func_cls</span><span class="o">.</span><span class="n">_remote</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
 
             <span class="nd">@DeveloperAPI</span>
-            <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">func_cls</span><span class="o">.</span><span class="n">_bind</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">FuncWrapper</span><span class="p">()</span></div>
@@ -1670,7 +1670,7 @@ document.write(`
 
     <span class="nd">@wrap_auto_init</span>
     <span class="nd">@_tracing_actor_method_invocation</span>
-    <span class="k">def</span> <span class="nf">_bind</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_bind</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1679,7 +1679,7 @@ document.write(`
         <span class="n">concurrency_group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">_generator_backpressure_num_objects</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;ray.dag.ClassMethodNode&quot;</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;ray.dag.ClassMethodNode&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
-        <span class="kn">from</span> <span class="nn">ray.dag.class_node</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.class_node</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">BIND_INDEX_KEY</span><span class="p">,</span>
             <span class="n">IS_CLASS_METHOD_OUTPUT_KEY</span><span class="p">,</span>
             <span class="n">PARENT_CLASS_NODE_KEY</span><span class="p">,</span>
@@ -1723,7 +1723,7 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">. The function `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_method_name</span><span class="si">}</span><span class="s2">` has a signature &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">signature_copy</span><span class="si">}</span><span class="s2">`, but the given arguments to `bind` doesn&#39;t &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;match. args: </span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s2">. kwargs: </span><span class="si">{</span><span class="n">kwargs</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 
         <span class="n">node</span> <span class="o">=</span> <span class="n">ClassMethodNode</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_method_name</span><span class="p">,</span>
@@ -1750,7 +1750,7 @@ document.write(`
 
     <span class="nd">@wrap_auto_init</span>
     <span class="nd">@_tracing_actor_method_invocation</span>
-    <span class="k">def</span> <span class="nf">_remote</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remote</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1777,7 +1777,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">_generator_backpressure_num_objects</span>
             <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">invocation</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">invocation</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
             <span class="n">actor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actor_hard_ref</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actor_ref</span><span class="p">()</span>
 
             <span class="k">if</span> <span class="n">actor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1804,7 +1804,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">invocation</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;actor&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actor_ref</span><span class="p">(),</span>
             <span class="s2">&quot;method_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method_name</span><span class="p">,</span>
@@ -1817,7 +1817,7 @@ document.write(`
             <span class="s2">&quot;enable_task_events&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enable_task_events</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">state</span><span class="p">[</span><span class="s2">&quot;actor&quot;</span><span class="p">],</span>
             <span class="n">state</span><span class="p">[</span><span class="s2">&quot;method_name&quot;</span><span class="p">],</span>
@@ -1833,7 +1833,7 @@ document.write(`
 
 
 
-<span class="k">class</span> <span class="nc">_ActorClassMethodMetadata</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_ActorClassMethodMetadata</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Metadata for all methods in an actor class. This data can be cached.</span>
 
 <span class="sd">    Attributes:</span>
@@ -1854,7 +1854,7 @@ document.write(`
 
     <span class="n">_cache</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># This cache will be cleared in ray._private.worker.disconnect()</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">class_name</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s2"> can not be constructed directly, &quot;</span>
@@ -1863,11 +1863,11 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">reset_cache</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_cache</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">modified_class</span><span class="p">,</span> <span class="n">actor_creation_function_descriptor</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">modified_class</span><span class="p">,</span> <span class="n">actor_creation_function_descriptor</span><span class="p">):</span>
         <span class="c1"># Try to create an instance from cache.</span>
         <span class="n">cached_meta</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">actor_creation_function_descriptor</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">cached_meta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1951,7 +1951,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span>
 
 
-<span class="k">class</span> <span class="nc">_ActorClassMetadata</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_ActorClassMetadata</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Metadata for an actor class.</span>
 
 <span class="sd">    Attributes:</span>
@@ -1982,7 +1982,7 @@ document.write(`
 <span class="sd">        method_meta: The actor method metadata.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">language</span><span class="p">,</span>
         <span class="n">modified_class</span><span class="p">,</span>
@@ -2026,12 +2026,12 @@ document.write(`
 <div class="viewcode-block" id="ActorClassInheritanceException">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.actor.ActorClassInheritanceException.html#ray.actor.ActorClassInheritanceException">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">ActorClassInheritanceException</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ActorClassInheritanceException</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>
     <span class="k">pass</span></div>
 
 
 
-<span class="k">def</span> <span class="nf">_process_option_dict</span><span class="p">(</span><span class="n">actor_options</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_process_option_dict</span><span class="p">(</span><span class="n">actor_options</span><span class="p">):</span>
     <span class="n">_filled_options</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">arg_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">_ActorClassMetadata</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ray_option_utils</span><span class="o">.</span><span class="n">actor_options</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -2044,7 +2044,7 @@ document.write(`
 <div class="viewcode-block" id="ActorClass">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.actor.ActorClass.html#ray.actor.ActorClass">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">ActorClass</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ActorClass</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An actor class.</span>
 
 <span class="sd">    This is a decorated class. It can be used to create actors.</span>
@@ -2055,7 +2055,7 @@ document.write(`
 
 <div class="viewcode-block" id="ActorClass.__init__">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.actor.ActorClass.__init__.html#ray.actor.ActorClass.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prevents users from directly inheriting from an ActorClass.</span>
 
 <span class="sd">        This will be called when a class is defined with an ActorClass object</span>
@@ -2089,7 +2089,7 @@ document.write(`
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prevents users from directly instantiating an ActorClass.</span>
 
 <span class="sd">        This will be called instead of __init__ when &#39;ActorClass()&#39; is executed</span>
@@ -2106,7 +2106,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_ray_from_modified_class</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_from_modified_class</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">modified_class</span><span class="p">,</span>
         <span class="n">class_id</span><span class="p">,</span>
@@ -2127,8 +2127,8 @@ document.write(`
 
         <span class="c1"># Make sure the actor class we are constructing inherits from the</span>
         <span class="c1"># original class so it retains all class properties.</span>
-        <span class="k">class</span> <span class="nc">DerivedActorClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">modified_class</span><span class="p">):</span>
-            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">DerivedActorClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">modified_class</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="bp">cls</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -2168,7 +2168,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_ray_from_function_descriptor</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_from_function_descriptor</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">language</span><span class="p">,</span>
         <span class="n">actor_creation_function_descriptor</span><span class="p">,</span>
@@ -2189,7 +2189,7 @@ document.write(`
 
 <div class="viewcode-block" id="ActorClass.remote">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.actor.ActorClass.remote.html#ray.actor.ActorClass.remote">[docs]</a>
-    <span class="k">def</span> <span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an actor.</span>
 
 <span class="sd">        Args:</span>
@@ -2206,7 +2206,7 @@ document.write(`
 
 <div class="viewcode-block" id="ActorClass.options">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.actor.ActorClass.options.html#ray.actor.ActorClass.options">[docs]</a>
-    <span class="k">def</span> <span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">actor_options</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">actor_options</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Configures and overrides the actor instantiation parameters.</span>
 
 <span class="sd">        The arguments are the same as those that can be passed</span>
@@ -2317,17 +2317,17 @@ document.write(`
                 <span class="n">updated_options</span><span class="p">[</span><span class="s2">&quot;runtime_env&quot;</span><span class="p">]</span>
             <span class="p">)</span>
 
-        <span class="k">class</span> <span class="nc">ActorOptionWrapper</span><span class="p">:</span>
-            <span class="k">def</span> <span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">ActorOptionWrapper</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">actor_cls</span><span class="o">.</span><span class="n">_remote</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">updated_options</span><span class="p">)</span>
 
             <span class="nd">@DeveloperAPI</span>
-            <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">                For Ray DAG building that creates static graph from decorated</span>
 <span class="sd">                class or functions.</span>
 <span class="sd">                &quot;&quot;&quot;</span>
-                <span class="kn">from</span> <span class="nn">ray.dag.class_node</span> <span class="kn">import</span> <span class="n">ClassNode</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.class_node</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassNode</span>
 
                 <span class="k">return</span> <span class="n">ClassNode</span><span class="p">(</span>
                     <span class="n">actor_cls</span><span class="o">.</span><span class="n">__ray_metadata__</span><span class="o">.</span><span class="n">modified_class</span><span class="p">,</span>
@@ -2341,7 +2341,7 @@ document.write(`
 
     <span class="nd">@wrap_auto_init</span>
     <span class="nd">@_tracing_actor_creation</span>
-    <span class="k">def</span> <span class="nf">_remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">actor_options</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">actor_options</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an actor.</span>
 
 <span class="sd">        This method allows more flexibility than the remote method because</span>
@@ -2483,7 +2483,7 @@ document.write(`
         <span class="n">worker</span><span class="o">.</span><span class="n">check_connected</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">worker</span><span class="o">.</span><span class="n">mode</span> <span class="o">!=</span> <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">WORKER_MODE</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray._private.usage</span> <span class="kn">import</span> <span class="n">usage_lib</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.usage</span><span class="w"> </span><span class="kn">import</span> <span class="n">usage_lib</span>
 
             <span class="n">usage_lib</span><span class="o">.</span><span class="n">record_library_usage</span><span class="p">(</span><span class="s2">&quot;core&quot;</span><span class="p">)</span>
 
@@ -2706,14 +2706,14 @@ document.write(`
         <span class="p">)</span>
 
         <span class="n">callee_class</span><span class="p">,</span> <span class="n">callee_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_callee_info</span><span class="p">(</span><span class="n">actor_handle</span><span class="p">)</span>
-        <span class="kn">from</span> <span class="nn">ray.util.insight</span> <span class="kn">import</span> <span class="n">record_control_flow</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.insight</span><span class="w"> </span><span class="kn">import</span> <span class="n">record_control_flow</span>
 
         <span class="c1"># report the call info to the insight monitor</span>
         <span class="n">record_control_flow</span><span class="p">(</span><span class="n">callee_class</span><span class="p">,</span> <span class="n">callee_func</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">actor_handle</span>
 
-    <span class="k">def</span> <span class="nf">_get_callee_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor_handle</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_callee_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor_handle</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        get the callee info of the actor method</span>
 <span class="sd">        this is needed for the insight monitor to record the call</span>
@@ -2739,12 +2739,12 @@ document.write(`
 <div class="viewcode-block" id="ActorClass.bind">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.actor.ActorClass.bind.html#ray.actor.ActorClass.bind">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
-    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For Ray DAG building that creates static graph from decorated</span>
 <span class="sd">        class or functions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.dag.class_node</span> <span class="kn">import</span> <span class="n">ClassNode</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.class_node</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassNode</span>
 
         <span class="k">return</span> <span class="n">ClassNode</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__ray_metadata__</span><span class="o">.</span><span class="n">modified_class</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_options</span>
@@ -2756,7 +2756,7 @@ document.write(`
 <div class="viewcode-block" id="ActorHandle">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.actor.ActorHandle.html#ray.actor.ActorHandle">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">class</span> <span class="nc">ActorHandle</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ActorHandle</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A handle to an actor.</span>
 
 <span class="sd">    The fields in this class are prefixed with _ray_ to hide them from the user</span>
@@ -2807,7 +2807,7 @@ document.write(`
 <span class="sd">            of the actor creation task.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">language</span><span class="p">,</span>
         <span class="n">actor_id</span><span class="p">,</span>
@@ -2890,7 +2890,7 @@ document.write(`
                 <span class="p">)</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_name</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Weak references don&#39;t count towards the distributed ref count, so no</span>
         <span class="c1"># need to decrement the ref count.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ray_weak_ref</span><span class="p">:</span>
@@ -2909,7 +2909,7 @@ document.write(`
             <span class="c1"># It only happen when python exits.</span>
             <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">_actor_method_call</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_actor_method_call</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">method_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3023,15 +3023,15 @@ document.write(`
 
         <span class="k">return</span> <span class="n">object_refs</span>
 
-    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ray_is_cross_language</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39; object has &quot;</span> <span class="sa">f</span><span class="s2">&quot;no attribute &#39;</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;__ray_terminate__&quot;</span><span class="p">]:</span>
 
-            <span class="k">class</span> <span class="nc">FakeActorMethod</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-                <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">class</span><span class="w"> </span><span class="nc">FakeActorMethod</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+                <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                         <span class="s2">&quot;Actor methods cannot be called directly. Instead &quot;</span>
                         <span class="s2">&quot;of running &#39;object.</span><span class="si">{}</span><span class="s2">()&#39;, try &#39;object.</span><span class="si">{}</span><span class="s2">.remote()&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -3039,7 +3039,7 @@ document.write(`
                         <span class="p">)</span>
                     <span class="p">)</span>
 
-                <span class="k">def</span> <span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="k">def</span><span class="w"> </span><span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;Actor method </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2"> is not supported by cross language.&quot;</span>
                     <span class="p">)</span>
@@ -3061,27 +3061,27 @@ document.write(`
         <span class="p">)</span>
 
     <span class="c1"># Make tab completion work.</span>
-    <span class="k">def</span> <span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ray_method_signatures</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="s2">&quot;Actor(&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ray_actor_creation_function_descriptor</span><span class="o">.</span><span class="n">class_name</span><span class="si">}</span><span class="s2">, &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_actor_id</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_actor_id</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__value</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="nb">hash</span><span class="p">(</span><span class="n">__value</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_actor_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_actor_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ray_actor_id</span>
 
-    <span class="k">def</span> <span class="nf">_get_local_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_local_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the local actor state.</span>
 
 <span class="sd">        NOTE: this method only returns accurate actor state</span>
@@ -3095,7 +3095,7 @@ document.write(`
         <span class="n">worker</span><span class="o">.</span><span class="n">check_connected</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">worker</span><span class="o">.</span><span class="n">core_worker</span><span class="o">.</span><span class="n">get_local_actor_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ray_actor_id</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_serialization_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_serialization_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;This is defined in order to make pickling work.</span>
 
 <span class="sd">        Returns:</span>
@@ -3134,7 +3134,7 @@ document.write(`
         <span class="k">return</span> <span class="p">(</span><span class="o">*</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ray_weak_ref</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_deserialization_helper</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">weak_ref</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">outer_object_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_deserialization_helper</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">weak_ref</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">outer_object_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;This is defined in order to make pickling work.</span>
 
 <span class="sd">        Args:</span>
@@ -3179,7 +3179,7 @@ document.write(`
                 <span class="n">state</span><span class="p">[</span><span class="s2">&quot;current_cluster_and_job&quot;</span><span class="p">],</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;This code path is used by pickling but not by Ray forking.&quot;&quot;&quot;</span>
         <span class="p">(</span><span class="n">serialized</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">weak_ref</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serialization_helper</span><span class="p">()</span>
         <span class="c1"># There is no outer object ref when the actor handle is</span>
@@ -3188,7 +3188,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_modify_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_modify_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
     <span class="c1"># cls has been modified.</span>
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;__ray_actor_class__&quot;</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">cls</span>
@@ -3202,16 +3202,16 @@ document.write(`
         <span class="p">)</span>
 
     <span class="c1"># Modify the class to have additional default methods.</span>
-    <span class="k">class</span> <span class="nc">Class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="n">__ray_actor_class__</span> <span class="o">=</span> <span class="bp">cls</span>  <span class="c1"># The original actor class</span>
 
-        <span class="k">def</span> <span class="nf">__ray_ready__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">__ray_ready__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span>
 
-        <span class="k">def</span> <span class="nf">__ray_call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">__ray_call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">__ray_terminate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">__ray_terminate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="n">worker</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">global_worker</span>
             <span class="k">if</span> <span class="n">worker</span><span class="o">.</span><span class="n">mode</span> <span class="o">!=</span> <span class="n">ray</span><span class="o">.</span><span class="n">LOCAL_MODE</span><span class="p">:</span>
                 <span class="n">ray</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">exit_actor</span><span class="p">()</span>
@@ -3224,7 +3224,7 @@ document.write(`
         <span class="c1"># Actor creation will be executed with __init__ together.</span>
 
         <span class="c1"># Assign an __init__ function will avoid many checks later on.</span>
-        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">pass</span>
 
         <span class="n">Class</span><span class="o">.</span><span class="fm">__init__</span> <span class="o">=</span> <span class="fm">__init__</span>
@@ -3232,7 +3232,7 @@ document.write(`
     <span class="k">return</span> <span class="n">Class</span>
 
 
-<span class="k">def</span> <span class="nf">_make_actor</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">actor_options</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_actor</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">actor_options</span><span class="p">):</span>
     <span class="n">Class</span> <span class="o">=</span> <span class="n">_modify_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
     <span class="n">_inject_tracing_into_class</span><span class="p">(</span><span class="n">Class</span><span class="p">)</span>
 
@@ -3254,7 +3254,7 @@ document.write(`
 <div class="viewcode-block" id="exit_actor">
 <a class="viewcode-back" href="../../ray-core/api/doc/ray.actor.exit_actor.html#ray.actor.exit_actor">[docs]</a>
 <span class="nd">@PublicAPI</span>
-<span class="k">def</span> <span class="nf">exit_actor</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">exit_actor</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Intentionally exit the current actor.</span>
 
 <span class="sd">    This API can be used only inside an actor. Use ray.kill</span>

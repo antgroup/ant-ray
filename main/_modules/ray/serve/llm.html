@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,28 +1389,28 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.serve.llm</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.configs.server_models</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.configs.server_models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LLMConfig</span> <span class="k">as</span> <span class="n">_LLMConfig</span><span class="p">,</span>
     <span class="n">LLMServingArgs</span> <span class="k">as</span> <span class="n">_LLMServingArgs</span><span class="p">,</span>
     <span class="n">ModelLoadingConfig</span> <span class="k">as</span> <span class="n">_ModelLoadingConfig</span><span class="p">,</span>
     <span class="n">CloudMirrorConfig</span> <span class="k">as</span> <span class="n">_CloudMirrorConfig</span><span class="p">,</span>
     <span class="n">LoraConfig</span> <span class="k">as</span> <span class="n">_LoraConfig</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.deployments.llm.llm_server</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.deployments.llm.llm_server</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LLMServer</span> <span class="k">as</span> <span class="n">_LLMServer</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.llm._internal.serve.deployments.routers.router</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.deployments.routers.router</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LLMRouter</span> <span class="k">as</span> <span class="n">_LLMRouter</span><span class="p">,</span>
 <span class="p">)</span>
 
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.serve.deployment</span> <span class="kn">import</span> <span class="n">Application</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.deployment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Application</span>
 
 
 <span class="c1">##########</span>
@@ -1421,7 +1421,7 @@ document.write(`
 <div class="viewcode-block" id="LLMConfig">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.llm.LLMConfig.html#ray.serve.llm.LLMConfig">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">LLMConfig</span><span class="p">(</span><span class="n">_LLMConfig</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LLMConfig</span><span class="p">(</span><span class="n">_LLMConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The configuration for starting an LLM deployment.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
@@ -1431,7 +1431,7 @@ document.write(`
 <div class="viewcode-block" id="LLMServingArgs">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.llm.LLMServingArgs.html#ray.serve.llm.LLMServingArgs">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">LLMServingArgs</span><span class="p">(</span><span class="n">_LLMServingArgs</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LLMServingArgs</span><span class="p">(</span><span class="n">_LLMServingArgs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The configuration for starting an LLM deployment application.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
@@ -1441,7 +1441,7 @@ document.write(`
 <div class="viewcode-block" id="ModelLoadingConfig">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.llm.ModelLoadingConfig.html#ray.serve.llm.ModelLoadingConfig">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ModelLoadingConfig</span><span class="p">(</span><span class="n">_ModelLoadingConfig</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelLoadingConfig</span><span class="p">(</span><span class="n">_ModelLoadingConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The configuration for loading an LLM model.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
@@ -1451,7 +1451,7 @@ document.write(`
 <div class="viewcode-block" id="CloudMirrorConfig">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.llm.CloudMirrorConfig.html#ray.serve.llm.CloudMirrorConfig">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">CloudMirrorConfig</span><span class="p">(</span><span class="n">_CloudMirrorConfig</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CloudMirrorConfig</span><span class="p">(</span><span class="n">_CloudMirrorConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The configuration for mirroring an LLM model from cloud storage.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
@@ -1461,7 +1461,7 @@ document.write(`
 <div class="viewcode-block" id="LoraConfig">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.llm.LoraConfig.html#ray.serve.llm.LoraConfig">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">LoraConfig</span><span class="p">(</span><span class="n">_LoraConfig</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LoraConfig</span><span class="p">(</span><span class="n">_LoraConfig</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The configuration for loading an LLM model with LoRA.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
@@ -1476,7 +1476,7 @@ document.write(`
 <div class="viewcode-block" id="build_llm_deployment">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.llm.build_llm_deployment.html#ray.serve.llm.build_llm_deployment">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">build_llm_deployment</span><span class="p">(</span><span class="n">llm_config</span><span class="p">:</span> <span class="s2">&quot;LLMConfig&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Application&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_llm_deployment</span><span class="p">(</span><span class="n">llm_config</span><span class="p">:</span> <span class="s2">&quot;LLMConfig&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Application&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper to build a single vllm deployment from the given llm config.</span>
 
 <span class="sd">    Examples:</span>
@@ -1535,7 +1535,7 @@ document.write(`
 <span class="sd">    Returns:</span>
 <span class="sd">        The configured Ray Serve Application for vllm deployment.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">ray.llm._internal.serve.builders</span> <span class="kn">import</span> <span class="n">build_llm_deployment</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.builders</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_llm_deployment</span>
 
     <span class="k">return</span> <span class="n">build_llm_deployment</span><span class="p">(</span><span class="n">llm_config</span><span class="o">=</span><span class="n">llm_config</span><span class="p">)</span></div>
 
@@ -1544,7 +1544,7 @@ document.write(`
 <div class="viewcode-block" id="build_openai_app">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.llm.build_openai_app.html#ray.serve.llm.build_openai_app">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">build_openai_app</span><span class="p">(</span><span class="n">llm_serving_args</span><span class="p">:</span> <span class="s2">&quot;LLMServingArgs&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Application&quot;</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_openai_app</span><span class="p">(</span><span class="n">llm_serving_args</span><span class="p">:</span> <span class="s2">&quot;LLMServingArgs&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Application&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper to build an OpenAI compatible app with the llm deployment setup from</span>
 <span class="sd">    the given llm serving args. This is the main entry point for users to create a</span>
 <span class="sd">    Serve application serving LLMs.</span>
@@ -1642,7 +1642,7 @@ document.write(`
 <span class="sd">    Returns:</span>
 <span class="sd">        The configured Ray Serve Application router.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">ray.llm._internal.serve.builders</span> <span class="kn">import</span> <span class="n">build_openai_app</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.llm._internal.serve.builders</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_openai_app</span>
 
     <span class="k">return</span> <span class="n">build_openai_app</span><span class="p">(</span><span class="n">llm_serving_args</span><span class="o">=</span><span class="n">llm_serving_args</span><span class="p">)</span></div>
 
@@ -1656,7 +1656,7 @@ document.write(`
 <div class="viewcode-block" id="LLMServer">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.llm.LLMServer.html#ray.serve.llm.LLMServer">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">LLMServer</span><span class="p">(</span><span class="n">_LLMServer</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LLMServer</span><span class="p">(</span><span class="n">_LLMServer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The implementation of the vLLM engine deployment.</span>
 
 <span class="sd">    To build a Deployment object you should use `build_llm_deployment` function.</span>
@@ -1712,7 +1712,7 @@ document.write(`
 <div class="viewcode-block" id="LLMRouter">
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.llm.LLMRouter.html#ray.serve.llm.LLMRouter">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">LLMRouter</span><span class="p">(</span><span class="n">_LLMRouter</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LLMRouter</span><span class="p">(</span><span class="n">_LLMRouter</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The implementation of the OpenAI compatiple model router.</span>
 

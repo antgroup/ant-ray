@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1479,12 +1479,12 @@ with slightly different maps that the agent has to navigate.</p>
 </div>
 <p>Then, define the central piece controlling the curriculum, which is a custom callbacks class
 overriding the <a class="reference internal" href="package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_train_result.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_train_result" title="ray.rllib.callbacks.callbacks.RLlibCallback.on_train_result"><code class="xref py py-meth docutils literal notranslate"><span class="pre">on_train_result()</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.rllib.callbacks.callbacks</span> <span class="kn">import</span> <span class="n">RLlibCallback</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.callbacks.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLlibCallback</span>
 
-<span class="k">class</span> <span class="nc">MyCallbacks</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">on_train_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyCallbacks</span><span class="p">(</span><span class="n">RLlibCallback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_train_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;env_runners&quot;</span><span class="p">][</span><span class="s2">&quot;episode_return_mean&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">:</span>
             <span class="n">task</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="k">elif</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;env_runners&quot;</span><span class="p">][</span><span class="s2">&quot;episode_return_mean&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
@@ -1517,18 +1517,18 @@ Ray provides a general way to achieve this coordination through <em>named actors
 RLlib assigns these actors a global name. You can retrieve handles to them using
 these names. As an example, consider maintaining a shared global counter that’s
 environments increment and read periodically from the driver program:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Counter</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Counter</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">def</span> <span class="nf">inc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">+=</span> <span class="n">n</span>
 
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span>
 
 
@@ -1564,7 +1564,7 @@ the config instead.</p>
 <p>Every policy has an Exploration object, which RLlib creates from the AlgorithmConfig’s
 <code class="docutils literal notranslate"><span class="pre">.env_runners(exploration_config=...)</span></code> method. The method specifies the class to use through the
 special “type” key, as well as constructor arguments through all other keys. For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">AlgorithmConfig</span><span class="p">()</span><span class="o">.</span><span class="n">env_runners</span><span class="p">(</span>
     <span class="n">exploration_config</span><span class="o">=</span><span class="p">{</span>
@@ -1585,7 +1585,7 @@ a timestep, like the global env-sampling steps already taken,
 and an <code class="docutils literal notranslate"><span class="pre">explore</span></code> switch. It outputs a tuple of a) action and
 b) log-likelihood:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
-    <span class="k">def</span> <span class="nf">get_exploration_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_exploration_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                <span class="o">*</span><span class="p">,</span>
                                <span class="n">action_distribution</span><span class="p">:</span> <span class="n">ActionDistribution</span><span class="p">,</span>
                                <span class="n">timestep</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">TensorType</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
@@ -1679,7 +1679,7 @@ of environment configurations. You can activate evaluating policies during train
 (<code class="docutils literal notranslate"><span class="pre">Algorithm.train()</span></code>) by setting the <code class="docutils literal notranslate"><span class="pre">evaluation_interval</span></code> to a positive integer.
 This value specifies how many <code class="docutils literal notranslate"><span class="pre">Algorithm.train()</span></code> calls should occur each time
 RLlib runs an “evaluation step”:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.algorithm_config</span> <span class="kn">import</span> <span class="n">AlgorithmConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AlgorithmConfig</span>
 
 <span class="c1"># Run one evaluation step on every 3rd `Algorithm.train()` call.</span>
 <span class="n">config</span> <span class="o">=</span> <span class="n">AlgorithmConfig</span><span class="p">()</span><span class="o">.</span><span class="n">evaluation</span><span class="p">(</span>
@@ -1898,7 +1898,7 @@ rewrite the trajectory, which has a number of uses including:</p>
 <code class="docutils literal notranslate"><span class="pre">info['pre_batch']</span></code> returns a tuple where the first element is a policy and the
 second one is the batch itself. You can also access all the rollout worker state
 using the following call:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.evaluation.rollout_worker</span> <span class="kn">import</span> <span class="n">get_global_worker</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.evaluation.rollout_worker</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_global_worker</span>
 
 <span class="c1"># You can use this call from any callback to get a reference to the</span>
 <span class="c1"># RolloutWorker running in the process. The RolloutWorker has references to</span>

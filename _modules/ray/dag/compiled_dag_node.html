@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1389,12 +1389,12 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.dag.compiled_dag_node</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">weakref</span>
-<span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">nullcontext</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">asdict</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">weakref</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">nullcontext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">asdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">TYPE_CHECKING</span><span class="p">,</span>
     <span class="n">Any</span><span class="p">,</span>
     <span class="n">Dict</span><span class="p">,</span>
@@ -1405,38 +1405,38 @@ document.write(`
     <span class="n">Optional</span><span class="p">,</span>
     <span class="n">Set</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
 
-<span class="kn">from</span> <span class="nn">ray.experimental.channel.auto_transport_type</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.channel.auto_transport_type</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AutoTransportType</span><span class="p">,</span>
     <span class="n">TypeHintResolver</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">import</span> <span class="nn">ray.exceptions</span>
-<span class="kn">from</span> <span class="nn">ray.dag.dag_operation_future</span> <span class="kn">import</span> <span class="n">GPUFuture</span><span class="p">,</span> <span class="n">DAGOperationFuture</span><span class="p">,</span> <span class="n">ResolvedFuture</span>
-<span class="kn">from</span> <span class="nn">ray.experimental.channel.cached_channel</span> <span class="kn">import</span> <span class="n">CachedChannel</span>
-<span class="kn">from</span> <span class="nn">ray.experimental.channel.communicator</span> <span class="kn">import</span> <span class="n">Communicator</span>
-<span class="kn">from</span> <span class="nn">ray.dag.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray.exceptions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.dag_operation_future</span><span class="w"> </span><span class="kn">import</span> <span class="n">GPUFuture</span><span class="p">,</span> <span class="n">DAGOperationFuture</span><span class="p">,</span> <span class="n">ResolvedFuture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.channel.cached_channel</span><span class="w"> </span><span class="kn">import</span> <span class="n">CachedChannel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.channel.communicator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Communicator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">RAY_CGRAPH_ENABLE_NVTX_PROFILING</span><span class="p">,</span>
     <span class="n">RAY_CGRAPH_ENABLE_TORCH_PROFILING</span><span class="p">,</span>
     <span class="n">RAY_CGRAPH_VISUALIZE_SCHEDULE</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">RayCgraphCapacityExceeded</span><span class="p">,</span>
     <span class="n">RayTaskError</span><span class="p">,</span>
     <span class="n">RayChannelError</span><span class="p">,</span>
     <span class="n">RayChannelTimeoutError</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.experimental.compiled_dag_ref</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.compiled_dag_ref</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">CompiledDAGRef</span><span class="p">,</span>
     <span class="n">CompiledDAGFuture</span><span class="p">,</span>
     <span class="n">_process_return_vals</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.experimental.channel</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.channel</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ChannelContext</span><span class="p">,</span>
     <span class="n">ChannelInterface</span><span class="p">,</span>
     <span class="n">ChannelOutputType</span><span class="p">,</span>
@@ -1450,19 +1450,19 @@ document.write(`
     <span class="n">CompositeChannel</span><span class="p">,</span>
     <span class="n">IntraProcessChannel</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
-<span class="kn">from</span> <span class="nn">ray.experimental.channel.shared_memory_channel</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.channel.shared_memory_channel</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">SharedMemoryType</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.experimental.channel.torch_tensor_type</span> <span class="kn">import</span> <span class="n">TorchTensorType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.channel.torch_tensor_type</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchTensorType</span>
 
-<span class="kn">from</span> <span class="nn">ray.experimental.channel.torch_tensor_nccl_channel</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.channel.torch_tensor_nccl_channel</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_init_communicator</span><span class="p">,</span>
     <span class="n">_destroy_communicator</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">ray.dag.dag_node_operation</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.dag_node_operation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_DAGNodeOperation</span><span class="p">,</span>
     <span class="n">_DAGNodeOperationType</span><span class="p">,</span>
     <span class="n">_DAGOperationGraphNode</span><span class="p">,</span>
@@ -1473,10 +1473,10 @@ document.write(`
     <span class="n">_visualize_execution_schedule</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">ray.util.scheduling_strategies</span> <span class="kn">import</span> <span class="n">NodeAffinitySchedulingStrategy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.scheduling_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">NodeAffinitySchedulingStrategy</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">cupy</span> <span class="k">as</span> <span class="nn">cp</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1491,7 +1491,7 @@ document.write(`
 <span class="c1"># the destructor order is not guaranteed. We call this function</span>
 <span class="c1"># upon `ray.worker.shutdown` which is registered to atexit handler</span>
 <span class="c1"># so that teardown is properly called before objects are destructed.</span>
-<span class="k">def</span> <span class="nf">_shutdown_all_compiled_dags</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_shutdown_all_compiled_dags</span><span class="p">():</span>
     <span class="k">global</span> <span class="n">_compiled_dags</span>
     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">compiled_dag</span> <span class="ow">in</span> <span class="n">_compiled_dags</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="c1"># Kill DAG actors to avoid hanging during shutdown if the actor tasks</span>
@@ -1500,7 +1500,7 @@ document.write(`
     <span class="n">_compiled_dags</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">WeakValueDictionary</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_check_unused_dag_input_attributes</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_unused_dag_input_attributes</span><span class="p">(</span>
     <span class="n">output_node</span><span class="p">:</span> <span class="s2">&quot;ray.dag.MultiOutputNode&quot;</span><span class="p">,</span> <span class="n">input_attributes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1514,7 +1514,7 @@ document.write(`
 <span class="sd">        output_node: The starting node for the traversal.</span>
 <span class="sd">        input_attributes: A set of attributes accessed by the InputNode.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">ray.dag</span> <span class="kn">import</span> <span class="n">InputAttributeNode</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag</span><span class="w"> </span><span class="kn">import</span> <span class="n">InputAttributeNode</span>
 
     <span class="n">used_attributes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">visited_nodes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -1547,7 +1547,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">do_allocate_channel</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">do_allocate_channel</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">reader_and_node_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;ray.actor.ActorHandle&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span>
     <span class="n">typ</span><span class="p">:</span> <span class="n">ChannelOutputType</span><span class="p">,</span>
@@ -1582,7 +1582,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">do_exec_tasks</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">do_exec_tasks</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">tasks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ExecutableTask&quot;</span><span class="p">],</span>
     <span class="n">schedule</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">_DAGNodeOperation</span><span class="p">],</span>
@@ -1608,7 +1608,7 @@ document.write(`
                 <span class="ow">not</span> <span class="n">RAY_CGRAPH_ENABLE_TORCH_PROFILING</span>
             <span class="p">),</span> <span class="s2">&quot;NVTX and torch profiling cannot be enabled at the same time.&quot;</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="kn">import</span> <span class="nn">nvtx</span>
+                <span class="kn">import</span><span class="w"> </span><span class="nn">nvtx</span>
             <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
                     <span class="s2">&quot;Please install nvtx to enable nsight profiling. &quot;</span>
@@ -1622,7 +1622,7 @@ document.write(`
                 <span class="ow">not</span> <span class="n">RAY_CGRAPH_ENABLE_NVTX_PROFILING</span>
             <span class="p">),</span> <span class="s2">&quot;NVTX and torch profiling cannot be enabled at the same time.&quot;</span>
 
-            <span class="kn">import</span> <span class="nn">torch</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
             <span class="n">torch_profile</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">profile</span><span class="p">(</span>
                 <span class="n">activities</span><span class="o">=</span><span class="p">[</span>
@@ -1660,7 +1660,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">do_profile_tasks</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">do_profile_tasks</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">tasks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ExecutableTask&quot;</span><span class="p">],</span>
     <span class="n">schedule</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">_DAGNodeOperation</span><span class="p">],</span>
@@ -1714,7 +1714,7 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">do_cancel_executable_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tasks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ExecutableTask&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">do_cancel_executable_tasks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tasks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ExecutableTask&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># CUDA events should be destroyed before other CUDA resources.</span>
     <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
         <span class="n">task</span><span class="o">.</span><span class="n">destroy_cuda_event</span><span class="p">()</span>
@@ -1722,7 +1722,7 @@ document.write(`
         <span class="n">task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_wrap_exception</span><span class="p">(</span><span class="n">exc</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_wrap_exception</span><span class="p">(</span><span class="n">exc</span><span class="p">):</span>
     <span class="n">backtrace</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">_private</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">format_error_message</span><span class="p">(</span>
         <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exception</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span> <span class="n">exc</span><span class="p">,</span> <span class="n">exc</span><span class="o">.</span><span class="n">__traceback__</span><span class="p">)),</span>
         <span class="n">task_exception</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -1735,7 +1735,7 @@ document.write(`
     <span class="k">return</span> <span class="n">wrapped</span>
 
 
-<span class="k">def</span> <span class="nf">_get_nccl_group_id</span><span class="p">(</span><span class="n">type_hint</span><span class="p">:</span> <span class="n">ChannelOutputType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_nccl_group_id</span><span class="p">(</span><span class="n">type_hint</span><span class="p">:</span> <span class="n">ChannelOutputType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the NCCL group ID from the type hint. If the type hint does not</span>
 <span class="sd">    require NCCL, return None.</span>
@@ -1752,7 +1752,7 @@ document.write(`
     <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">_device_context_manager</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_device_context_manager</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return a context manager for executing communication operations</span>
 <span class="sd">    (i.e., READ and WRITE). For NCCL operations, the context manager</span>
@@ -1762,7 +1762,7 @@ document.write(`
     <span class="k">if</span> <span class="ow">not</span> <span class="n">ChannelContext</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span><span class="o">.</span><span class="n">torch_available</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">nullcontext</span><span class="p">()</span>
 
-    <span class="kn">import</span> <span class="nn">torch</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
     <span class="n">device</span> <span class="o">=</span> <span class="n">ChannelContext</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span><span class="o">.</span><span class="n">torch_device</span>
 
@@ -1777,10 +1777,10 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">CompiledTask</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CompiledTask</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Wraps the normal Ray DAGNode with some metadata.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dag_node</span><span class="p">:</span> <span class="s2">&quot;ray.dag.DAGNode&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dag_node</span><span class="p">:</span> <span class="s2">&quot;ray.dag.DAGNode&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            idx: A unique index into the original DAG.</span>
@@ -1813,22 +1813,22 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">output_node_idxs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dag_node</span><span class="o">.</span><span class="n">get_args</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dag_node</span><span class="o">.</span><span class="n">get_kwargs</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">num_readers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_readers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">downstream_task_idxs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">arg_type_hints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ChannelOutputType&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">arg_type_hints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ChannelOutputType&quot;</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">arg_node</span><span class="o">.</span><span class="n">type_hint</span> <span class="k">for</span> <span class="n">arg_node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_nodes</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">            Node: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dag_node</span><span class="si">}</span>
 <span class="s2">            Arguments: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="si">}</span>
@@ -1836,7 +1836,7 @@ document.write(`
 <span class="s2">            &quot;&quot;&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">_ExecutableTaskInput</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_ExecutableTaskInput</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents an input to an ExecutableTask.</span>
 
 <span class="sd">    Args:</span>
@@ -1846,7 +1846,7 @@ document.write(`
 <span class="sd">            into the input channels list.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">input_variant</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ChannelInterface</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
         <span class="n">channel_idx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
@@ -1854,7 +1854,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">input_variant</span> <span class="o">=</span> <span class="n">input_variant</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">channel_idx</span> <span class="o">=</span> <span class="n">channel_idx</span>
 
-    <span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel_results</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel_results</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Resolve the input value from the channel results.</span>
 
@@ -1870,12 +1870,12 @@ document.write(`
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">ExecutableTask</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExecutableTask</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A task that can be executed in a compiled DAG, and it</span>
 <span class="sd">    corresponds to an actor method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">task</span><span class="p">:</span> <span class="s2">&quot;CompiledTask&quot;</span><span class="p">,</span>
         <span class="n">resolved_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
@@ -1892,7 +1892,7 @@ document.write(`
 <span class="sd">                do not support binding kwargs to other DAG nodes, so the values</span>
 <span class="sd">                of the dictionary cannot be Channels.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.dag</span> <span class="kn">import</span> <span class="n">CollectiveOutputNode</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag</span><span class="w"> </span><span class="kn">import</span> <span class="n">CollectiveOutputNode</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">method_name</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">dag_node</span><span class="o">.</span><span class="n">get_method_name</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bind_index</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">dag_node</span><span class="o">.</span><span class="n">_get_bind_index</span><span class="p">()</span>
@@ -1950,7 +1950,7 @@ document.write(`
         <span class="c1"># and the result of a COMPUTE operation will be used by a WRITE operation.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_intermediate_future</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DAGOperationFuture</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Close all the input channels and the output channel. The exact behavior</span>
 <span class="sd">        depends on the type of channel. Typically, it will release the resources</span>
@@ -1959,7 +1959,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">input_reader</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">destroy_cuda_event</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">destroy_cuda_event</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If this executable task has created a GPU future that is not yet waited on,</span>
 <span class="sd">        that future is in the channel context cache. Remove the future from the cache</span>
@@ -1967,7 +1967,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">GPUFuture</span><span class="o">.</span><span class="n">remove_gpu_future</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_idx</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">overlap_gpu_communication</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">overlap_gpu_communication</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prepare the task for execution. The `exec_operation` function can only</span>
 <span class="sd">        be called after `prepare` has been called.</span>
@@ -2009,7 +2009,7 @@ document.write(`
                         <span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_recv_stream</span> <span class="o">=</span> <span class="n">nccl_group</span><span class="o">.</span><span class="n">recv_stream</span>
 
-    <span class="k">def</span> <span class="nf">wrap_and_set_intermediate_future</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrap_and_set_intermediate_future</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">wrap_in_gpu_future</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2031,7 +2031,7 @@ document.write(`
             <span class="n">future</span> <span class="o">=</span> <span class="n">ResolvedFuture</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_intermediate_future</span> <span class="o">=</span> <span class="n">future</span>
 
-    <span class="k">def</span> <span class="nf">reset_and_wait_intermediate_future</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_and_wait_intermediate_future</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reset the intermediate future and wait for the result.</span>
 
@@ -2047,7 +2047,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_intermediate_future</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">future</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">overlap_gpu_communication</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">overlap_gpu_communication</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read input data from upstream DAG nodes and cache the intermediate result.</span>
 
@@ -2073,7 +2073,7 @@ document.write(`
             <span class="n">exit</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">exit</span>
 
-    <span class="k">def</span> <span class="nf">_compute</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">overlap_gpu_communication</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">class_handle</span><span class="p">,</span>
@@ -2128,7 +2128,7 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve the intermediate result from the COMPUTE operation and write to its</span>
 <span class="sd">        downstream DAG nodes. The caller must ensure that the last operation executed</span>
@@ -2146,7 +2146,7 @@ document.write(`
             <span class="n">exit</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">exit</span>
 
-    <span class="k">def</span> <span class="nf">exec_operation</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exec_operation</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">class_handle</span><span class="p">,</span>
         <span class="n">op_type</span><span class="p">:</span> <span class="n">_DAGNodeOperationType</span><span class="p">,</span>
@@ -2179,7 +2179,7 @@ document.write(`
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">_ExecutableTaskRecord</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_ExecutableTaskRecord</span><span class="p">:</span>
     <span class="n">actor_classname</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">actor_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">actor_id</span><span class="p">:</span> <span class="nb">str</span>
@@ -2189,12 +2189,12 @@ document.write(`
     <span class="n">start_t</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">end_t</span><span class="p">:</span> <span class="nb">float</span>
 
-    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">CompiledDAG</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CompiledDAG</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Experimental class for accelerated execution.</span>
 
 <span class="sd">    This class should not be called directly. Instead, create</span>
@@ -2205,7 +2205,7 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">num_cpus</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">class</span> <span class="nc">DAGDriverProxyActor</span><span class="p">:</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">DAGDriverProxyActor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        To support the driver as a reader, the output writer needs to be able to invoke</span>
 <span class="sd">        remote functions on the driver. This is necessary so that the output writer can</span>
@@ -2221,7 +2221,7 @@ document.write(`
 
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">submit_timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">buffer_size_bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2281,7 +2281,7 @@ document.write(`
 <span class="sd">        Returns:</span>
 <span class="sd">            Channel: A wrapper around ray.ObjectRef.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.dag</span> <span class="kn">import</span> <span class="n">DAGContext</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag</span><span class="w"> </span><span class="kn">import</span> <span class="n">DAGContext</span>
 
         <span class="n">ctx</span> <span class="o">=</span> <span class="n">DAGContext</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span>
 
@@ -2424,7 +2424,7 @@ document.write(`
         <span class="c1"># channel to possible inner channel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_channel_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ChannelInterface</span><span class="p">,</span> <span class="n">ChannelInterface</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="k">def</span> <span class="nf">_create_proxy_actor</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="s2">&quot;ray.actor.ActorHandle&quot;</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_create_proxy_actor</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="s2">&quot;ray.actor.ActorHandle&quot;</span><span class="p">:</span>
             <span class="c1"># Creates the driver actor on the same node as the driver.</span>
             <span class="c1">#</span>
             <span class="c1"># To support the driver as a reader, the output writer needs to be able to</span>
@@ -2453,32 +2453,32 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_got_ref_idxs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_teardown</span>
 
-    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the unique ID of the compiled DAG.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dag_id</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;CompiledDAG(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dag_id</span><span class="si">}</span><span class="s2">)&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="s2">&quot;ray.dag.DAGNode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="s2">&quot;ray.dag.DAGNode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">counter</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">idx_to_task</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">CompiledTask</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dag_node_to_idx</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="k">def</span> <span class="nf">_preprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_preprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Before compiling, preprocess the DAG to build an index from task to</span>
 <span class="sd">        upstream and downstream tasks, and to set the input and output node(s)</span>
 <span class="sd">        of the DAG.</span>
 
 <span class="sd">        This function is idempotent.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.dag</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">DAGNode</span><span class="p">,</span>
             <span class="n">ClassMethodNode</span><span class="p">,</span>
             <span class="n">CollectiveOutputNode</span><span class="p">,</span>
@@ -2698,7 +2698,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_input_num_positional_args</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">input_positional_args</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_input_kwargs</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">input_kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_init_communicators</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_communicators</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize communicators for the DAG.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -2753,7 +2753,7 @@ document.write(`
             <span class="k">for</span> <span class="n">dag_node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p2p_dag_nodes_with_unresolved_communicators</span><span class="p">:</span>
                 <span class="n">dag_node</span><span class="o">.</span><span class="n">type_hint</span><span class="o">.</span><span class="n">set_communicator_id</span><span class="p">(</span><span class="n">p2p_communicator_id</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_track_communicator_usage</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_track_communicator_usage</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dag_node</span><span class="p">:</span> <span class="s2">&quot;ray.dag.DAGNode&quot;</span><span class="p">,</span>
         <span class="n">actors</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="s2">&quot;ray.actor.ActorHandle&quot;</span><span class="p">],</span>
@@ -2833,7 +2833,7 @@ document.write(`
                     <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_communicator_to_type_hints</span><span class="p">[</span><span class="n">communicator</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">type_hint</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_resolve_auto_transport</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_auto_transport</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">auto_transport_tasks</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="s2">&quot;CompiledTask&quot;</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -2865,11 +2865,11 @@ document.write(`
                     <span class="nb">set</span><span class="p">(</span><span class="n">readers</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">({</span><span class="n">writer</span><span class="p">}),</span>
                 <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_check_leaf_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_leaf_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if there are leaf nodes in the DAG and raise an error if there are.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.dag</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">DAGNode</span><span class="p">,</span>
             <span class="n">ClassMethodNode</span><span class="p">,</span>
         <span class="p">)</span>
@@ -2895,7 +2895,7 @@ document.write(`
             <span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_get_gpu_ids</span><span class="p">(</span><span class="n">actor_handle</span><span class="p">:</span> <span class="s2">&quot;ray.actor.ActorHandle&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_gpu_ids</span><span class="p">(</span><span class="n">actor_handle</span><span class="p">:</span> <span class="s2">&quot;ray.actor.ActorHandle&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the GPU IDs of an actor handle.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -2906,7 +2906,7 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">accelerator_ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GPU&quot;</span><span class="p">,</span> <span class="p">[])</span>
 
-    <span class="k">def</span> <span class="nf">_get_node_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor_handle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;ray.actor.ActorHandle&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_node_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor_handle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;ray.actor.ActorHandle&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the node ID of an actor handle and cache it.</span>
 
@@ -2930,7 +2930,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">actor_to_node_id</span><span class="p">[</span><span class="n">actor_handle</span><span class="p">]</span> <span class="o">=</span> <span class="n">node_id</span>
         <span class="k">return</span> <span class="n">node_id</span>
 
-    <span class="k">def</span> <span class="nf">_get_or_compile</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_or_compile</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compile an execution path. This allocates channels for adjacent</span>
@@ -2943,7 +2943,7 @@ document.write(`
 <span class="sd">        _dag_output_fetcher will be set and can be used to invoke and fetch</span>
 <span class="sd">        outputs for the DAG.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.dag</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">DAGNode</span><span class="p">,</span>
             <span class="n">InputNode</span><span class="p">,</span>
             <span class="n">InputAttributeNode</span><span class="p">,</span>
@@ -3152,7 +3152,7 @@ document.write(`
                         <span class="s2">&quot;Please bind the task to proper DAG nodes.&quot;</span>
                     <span class="p">)</span>
 
-        <span class="kn">from</span> <span class="nn">ray.dag.constants</span> <span class="kn">import</span> <span class="n">RAY_CGRAPH_ENABLE_DETECT_DEADLOCK</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">RAY_CGRAPH_ENABLE_DETECT_DEADLOCK</span>
 
         <span class="k">if</span> <span class="n">RAY_CGRAPH_ENABLE_DETECT_DEADLOCK</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_deadlock</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -3238,7 +3238,7 @@ document.write(`
             <span class="n">executable_tasks</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">task</span><span class="p">:</span> <span class="n">task</span><span class="o">.</span><span class="n">bind_index</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">actor_to_executable_tasks</span><span class="p">[</span><span class="n">actor_handle</span><span class="p">]</span> <span class="o">=</span> <span class="n">executable_tasks</span>
 
-        <span class="kn">from</span> <span class="nn">ray.dag.constants</span> <span class="kn">import</span> <span class="n">RAY_CGRAPH_ENABLE_PROFILING</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">RAY_CGRAPH_ENABLE_PROFILING</span>
 
         <span class="k">if</span> <span class="n">RAY_CGRAPH_ENABLE_PROFILING</span><span class="p">:</span>
             <span class="n">exec_task_func</span> <span class="o">=</span> <span class="n">do_profile_tasks</span>
@@ -3302,7 +3302,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_dag_submitter</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dag_output_fetcher</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_generate_dag_operation_graph_node</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_dag_operation_graph_node</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;ray.actor.ActorHandle&quot;</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">_DAGOperationGraphNode</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -3324,7 +3324,7 @@ document.write(`
 <span class="sd">                ]</span>
 <span class="sd">            }</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">ray.dag.collective_node</span> <span class="kn">import</span> <span class="n">CollectiveOutputNode</span><span class="p">,</span> <span class="n">_CollectiveOperation</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag.collective_node</span><span class="w"> </span><span class="kn">import</span> <span class="n">CollectiveOutputNode</span><span class="p">,</span> <span class="n">_CollectiveOperation</span>
 
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx_to_task</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">actor_to_executable_tasks</span>
@@ -3396,7 +3396,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">actor_to_operation_nodes</span>
 
-    <span class="k">def</span> <span class="nf">_build_execution_schedule</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_execution_schedule</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;ray.actor.ActorHandle&quot;</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">_DAGNodeOperation</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -3450,7 +3450,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">_extract_execution_schedule</span><span class="p">(</span><span class="n">actor_to_execution_schedule</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_detect_deadlock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_detect_deadlock</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        TODO (kevin85421): Avoid false negatives.</span>
 
@@ -3474,11 +3474,11 @@ document.write(`
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Deadlock detection has not been implemented yet.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">_monitor_failures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_monitor_failures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">get_outer</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="k">class</span> <span class="nc">Monitor</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
-            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Monitor</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;CompiledGraphMonitorThread&quot;</span>
                 <span class="c1"># Lock to make sure that we only perform teardown for this DAG</span>
@@ -3486,7 +3486,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">_in_teardown_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_teardown_done</span> <span class="o">=</span> <span class="kc">False</span>
 
-            <span class="k">def</span> <span class="nf">_outer_ref_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_outer_ref_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">get_outer</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
                         <span class="s2">&quot;CompiledDAG has been destructed before teardown. &quot;</span>
@@ -3497,12 +3497,12 @@ document.write(`
                     <span class="k">return</span> <span class="kc">False</span>
                 <span class="k">return</span> <span class="kc">True</span>
 
-            <span class="k">def</span> <span class="nf">wait_teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kill_actors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">wait_teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kill_actors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="n">outer</span> <span class="o">=</span> <span class="n">get_outer</span><span class="p">()</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outer_ref_alive</span><span class="p">():</span>
                     <span class="k">return</span>
 
-                <span class="kn">from</span> <span class="nn">ray.dag</span> <span class="kn">import</span> <span class="n">DAGContext</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag</span><span class="w"> </span><span class="kn">import</span> <span class="n">DAGContext</span>
 
                 <span class="n">ctx</span> <span class="o">=</span> <span class="n">DAGContext</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span>
                 <span class="n">teardown_timeout</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">teardown_timeout</span>
@@ -3552,7 +3552,7 @@ document.write(`
                         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Killing actor: </span><span class="si">{</span><span class="n">actor</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                         <span class="n">ray</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">actor</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kill_actors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kill_actors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_in_teardown_lock</span><span class="p">:</span>
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_teardown_done</span><span class="p">:</span>
                         <span class="k">return</span>
@@ -3594,7 +3594,7 @@ document.write(`
                     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Teardown complete&quot;</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_teardown_done</span> <span class="o">=</span> <span class="kc">True</span>
 
-            <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">outer</span> <span class="o">=</span> <span class="n">get_outer</span><span class="p">()</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outer_ref_alive</span><span class="p">():</span>
@@ -3613,7 +3613,7 @@ document.write(`
         <span class="n">monitor</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">monitor</span>
 
-    <span class="k">def</span> <span class="nf">_raise_if_too_many_inflight_executions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_raise_if_too_many_inflight_executions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">num_inflight_executions</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_execution_index</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_finished_execution_index</span>
         <span class="p">)</span>
@@ -3627,7 +3627,7 @@ document.write(`
                 <span class="s2">&quot;`dag.experimental_compile(_max_inflight_executions=...)`&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_has_execution_results</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_has_execution_results</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">execution_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -3643,7 +3643,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">execution_index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_result_buffer</span>
 
-    <span class="k">def</span> <span class="nf">_cache_execution_results</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cache_execution_results</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">execution_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">result</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -3665,7 +3665,7 @@ document.write(`
                 <span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_result_buffer</span><span class="p">[</span><span class="n">execution_index</span><span class="p">][</span><span class="n">chan_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
 
-    <span class="k">def</span> <span class="nf">_get_execution_results</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_execution_results</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">execution_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">channel_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve execution results from self._result_buffer and return the result.</span>
@@ -3708,7 +3708,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_clean_up_buffers</span><span class="p">(</span><span class="n">execution_index</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span>
 
-    <span class="k">def</span> <span class="nf">_delete_execution_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">execution_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">channel_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_delete_execution_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">execution_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">channel_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Delete the execution results for the given execution index and channel index.</span>
 <span class="sd">        This method should be called when a CompiledDAGRef or CompiledDAGFuture is</span>
@@ -3727,7 +3727,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_destructed_ref_idxs</span><span class="p">[</span><span class="n">execution_index</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">channel_index</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_clean_up_buffers</span><span class="p">(</span><span class="n">execution_index</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_try_release_result_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">execution_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_try_release_result_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">execution_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Try to release the result buffer for the given execution index.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -3758,7 +3758,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_got_ref_idxs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">execution_index</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_try_release_native_buffer</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_try_release_native_buffer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">idx_to_release</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -3803,12 +3803,12 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;RAY_CGRAPH_get_timeout which is currently </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_timeout</span><span class="si">}</span><span class="s2"> &quot;</span>
                 <span class="s2">&quot;seconds. Otherwise, this may indicate that the execution &quot;</span>
                 <span class="s2">&quot;is hanging.&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_destructed_ref_idxs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">idx_to_release</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_try_release_buffer</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_try_release_buffer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">idx_to_release</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -3829,7 +3829,7 @@ document.write(`
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_try_release_result_buffer</span><span class="p">(</span><span class="n">idx_to_release</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_try_release_buffers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_try_release_buffers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Repeatedly release buffer if possible.</span>
 
@@ -3849,7 +3849,7 @@ document.write(`
                 <span class="n">timeout</span> <span class="o">-=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
                 <span class="n">timeout</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_clean_up_buffers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx_to_release</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_clean_up_buffers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx_to_release</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clean up native and result buffers.</span>
 
@@ -3869,7 +3869,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_try_release_buffer</span><span class="p">(</span><span class="n">idx_to_release</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_try_release_buffers</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_execute_until</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_execute_until</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">execution_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">channel_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3934,7 +3934,7 @@ document.write(`
                     <span class="sa">f</span><span class="s2">&quot;RAY_CGRAPH_get_timeout which is currently </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_timeout</span><span class="si">}</span><span class="s2"> &quot;</span>
                     <span class="s2">&quot;seconds. Otherwise, this may indicate that the execution is &quot;</span>
                     <span class="s2">&quot;hanging.&quot;</span>
-                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
             <span class="k">if</span> <span class="n">timeout</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="n">timeout</span> <span class="o">-=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
@@ -3942,7 +3942,7 @@ document.write(`
 
 <div class="viewcode-block" id="CompiledDAG.execute">
 <a class="viewcode-back" href="../../../ray-core/compiled-graph/doc/ray.dag.compiled_dag_node.CompiledDAG.execute.html#ray.dag.compiled_dag_node.CompiledDAG.execute">[docs]</a>
-    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
@@ -3990,7 +3990,7 @@ document.write(`
                 <span class="s2">&quot;If the execution is expected to take a long time, increase &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;RAY_CGRAPH_submit_timeout which is currently </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_submit_timeout</span><span class="si">}</span><span class="s2"> &quot;</span>
                 <span class="s2">&quot;seconds. Otherwise, this may indicate that execution is hanging.&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_execution_index</span> <span class="o">+=</span> <span class="mi">1</span>
 
@@ -4005,7 +4005,7 @@ document.write(`
         <span class="k">return</span> <span class="n">ref</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_check_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper method to check that the DAG args provided by the user during</span>
 <span class="sd">        execution are valid according to the defined DAG.</span>
@@ -4024,7 +4024,7 @@ document.write(`
                     <span class="sa">f</span><span class="s2">&quot;must be called with kwarg `</span><span class="si">{</span><span class="n">kwarg</span><span class="si">}</span><span class="s2">`&quot;</span>
                 <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">execute_async</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">execute_async</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
@@ -4075,7 +4075,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">fut</span>
 
-    <span class="k">def</span> <span class="nf">_visualize_ascii</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_visualize_ascii</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Visualize the compiled graph in</span>
 <span class="sd">        ASCII format with directional markers.</span>
@@ -4184,7 +4184,7 @@ document.write(`
 <span class="sd">            ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="kn">from</span> <span class="nn">ray.dag</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">InputAttributeNode</span><span class="p">,</span>
             <span class="n">InputNode</span><span class="p">,</span>
             <span class="n">MultiOutputNode</span><span class="p">,</span>
@@ -4207,7 +4207,7 @@ document.write(`
                     <span class="s2">&quot;Ensure that &#39;experimental_compile()&#39; completed successfully.&quot;</span>
                 <span class="p">)</span>
 
-        <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
 
         <span class="c1"># Create adjacency list representation of the DAG</span>
         <span class="c1"># Adjacency list for DAG; maps a node index to its downstream nodes.</span>
@@ -4410,7 +4410,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">ascii_visualization</span>
 
-    <span class="k">def</span> <span class="nf">get_channel_details</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_channel_details</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">:</span> <span class="n">ChannelInterface</span><span class="p">,</span> <span class="n">downstream_actor_id</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -4444,7 +4444,7 @@ document.write(`
 
 <div class="viewcode-block" id="CompiledDAG.visualize">
 <a class="viewcode-back" href="../../../ray-core/compiled-graph/doc/ray.dag.compiled_dag_node.CompiledDAG.visualize.html#ray.dag.compiled_dag_node.CompiledDAG.visualize">[docs]</a>
-    <span class="k">def</span> <span class="nf">visualize</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">visualize</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;compiled_graph&quot;</span><span class="p">,</span>
         <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;png&quot;</span><span class="p">,</span>
@@ -4488,13 +4488,13 @@ document.write(`
                 <span class="nb">print</span><span class="p">(</span><span class="n">ascii_visualiztion_str</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ascii_visualiztion_str</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">graphviz</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">graphviz</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
                 <span class="s2">&quot;Please install graphviz to visualize the compiled graph. &quot;</span>
                 <span class="s2">&quot;You can install it by running `pip install graphviz`.&quot;</span>
             <span class="p">)</span>
-        <span class="kn">from</span> <span class="nn">ray.dag</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">InputAttributeNode</span><span class="p">,</span>
             <span class="n">InputNode</span><span class="p">,</span>
             <span class="n">MultiOutputNode</span><span class="p">,</span>
@@ -4632,7 +4632,7 @@ document.write(`
         <span class="k">return</span> <span class="n">dot</span><span class="o">.</span><span class="n">source</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_register_input_output_custom_serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_register_input_output_custom_serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Register custom serializers for input, input attribute, and output nodes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -4652,7 +4652,7 @@ document.write(`
         <span class="k">for</span> <span class="n">output</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx_to_task</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">output_task_idx</span><span class="p">]</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
             <span class="n">output</span><span class="o">.</span><span class="n">type_hint</span><span class="o">.</span><span class="n">register_custom_serializer</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kill_actors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kill_actors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Teardown and cancel all actor tasks for this DAG. After this</span>
 <span class="sd">        function returns, the actors should be available to execute new tasks</span>
@@ -4668,7 +4668,7 @@ document.write(`
 
         <span class="n">monitor</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_monitor&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">monitor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">ray.dag</span> <span class="kn">import</span> <span class="n">DAGContext</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.dag</span><span class="w"> </span><span class="kn">import</span> <span class="n">DAGContext</span>
 
             <span class="n">ctx</span> <span class="o">=</span> <span class="n">DAGContext</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span>
             <span class="n">monitor</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span><span class="n">kill_actors</span><span class="o">=</span><span class="n">kill_actors</span><span class="p">)</span>
@@ -4678,12 +4678,12 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_teardown</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">teardown</span><span class="p">()</span>
 
 
 <span class="nd">@DeveloperAPI</span>
-<span class="k">def</span> <span class="nf">build_compiled_dag_from_ray_dag</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_compiled_dag_from_ray_dag</span><span class="p">(</span>
     <span class="n">dag</span><span class="p">:</span> <span class="s2">&quot;ray.dag.DAGNode&quot;</span><span class="p">,</span>
     <span class="n">submit_timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">buffer_size_bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4703,7 +4703,7 @@ document.write(`
         <span class="n">default_communicator</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_build_compiled_dag</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_compiled_dag</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
         <span class="n">compiled_dag</span><span class="o">.</span><span class="n">_add_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">node</span>
 

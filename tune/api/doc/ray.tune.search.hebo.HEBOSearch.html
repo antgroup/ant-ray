@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1458,8 +1458,8 @@ value passed here.</p></li>
 </dd>
 </dl>
 <p>Tune automatically converts search spaces to HEBO’s format:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.hebo</span> <span class="kn">import</span> <span class="n">HEBOSearch</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.hebo</span><span class="w"> </span><span class="kn">import</span> <span class="n">HEBOSearch</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
@@ -1479,9 +1479,9 @@ value passed here.</p></li>
 </div>
 <p>Alternatively, you can pass a HEBO <code class="code docutils literal notranslate"><span class="pre">DesignSpace</span></code> object manually to the
 Searcher:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.hebo</span> <span class="kn">import</span> <span class="n">HEBOSearch</span>
-<span class="kn">from</span> <span class="nn">hebo.design_space.design_space</span> <span class="kn">import</span> <span class="n">DesignSpace</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.hebo</span><span class="w"> </span><span class="kn">import</span> <span class="n">HEBOSearch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hebo.design_space.design_space</span><span class="w"> </span><span class="kn">import</span> <span class="n">DesignSpace</span>
 
 <span class="n">space_config</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span><span class="s1">&#39;name&#39;</span> <span class="p">:</span> <span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span> <span class="p">:</span> <span class="s1">&#39;num&#39;</span><span class="p">,</span> <span class="s1">&#39;lb&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ub&#39;</span> <span class="p">:</span> <span class="mi">20</span><span class="p">},</span>

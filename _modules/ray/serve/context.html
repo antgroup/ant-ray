@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
@@ -1394,26 +1394,26 @@ document.write(`
 <span class="sd">can use this state to access metadata or the Serve controller.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">import</span> <span class="nn">contextvars</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">contextvars</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.exceptions</span> <span class="kn">import</span> <span class="n">RayActorError</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.client</span> <span class="kn">import</span> <span class="n">ServeControllerClient</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.common</span> <span class="kn">import</span> <span class="n">ReplicaID</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.config</span> <span class="kn">import</span> <span class="n">DeploymentConfig</span>
-<span class="kn">from</span> <span class="nn">ray.serve._private.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">RayActorError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServeControllerClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReplicaID</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve._private.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">SERVE_CONTROLLER_NAME</span><span class="p">,</span>
     <span class="n">SERVE_LOGGER_NAME</span><span class="p">,</span>
     <span class="n">SERVE_NAMESPACE</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.serve.exceptions</span> <span class="kn">import</span> <span class="n">RayServeException</span>
-<span class="kn">from</span> <span class="nn">ray.serve.grpc_util</span> <span class="kn">import</span> <span class="n">RayServegRPCContext</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">RayServeException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.grpc_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">RayServegRPCContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">SERVE_LOGGER_NAME</span><span class="p">)</span>
 
@@ -1425,7 +1425,7 @@ document.write(`
 <a class="viewcode-back" href="../../../serve/api/doc/ray.serve.context.ReplicaContext.html#ray.serve.context.ReplicaContext">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ReplicaContext</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ReplicaContext</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Stores runtime context info for replicas.</span>
 
 <span class="sd">    Fields:</span>
@@ -1440,20 +1440,20 @@ document.write(`
     <span class="n">_deployment_config</span><span class="p">:</span> <span class="n">DeploymentConfig</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">app_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">app_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">replica_id</span><span class="o">.</span><span class="n">deployment_id</span><span class="o">.</span><span class="n">app_name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">replica_id</span><span class="o">.</span><span class="n">deployment_id</span><span class="o">.</span><span class="n">name</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">replica_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">replica_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">replica_id</span><span class="o">.</span><span class="n">unique_id</span></div>
 
 
 
-<span class="k">def</span> <span class="nf">_get_global_client</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_global_client</span><span class="p">(</span>
     <span class="n">_health_check_controller</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">raise_if_no_controller_running</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ServeControllerClient</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the global client, which stores the controller&#39;s handle.</span>
@@ -1487,16 +1487,16 @@ document.write(`
     <span class="k">return</span> <span class="n">_connect</span><span class="p">(</span><span class="n">raise_if_no_controller_running</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_set_global_client</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_global_client</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">_global_client</span>
     <span class="n">_global_client</span> <span class="o">=</span> <span class="n">client</span>
 
 
-<span class="k">def</span> <span class="nf">_get_internal_replica_context</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_internal_replica_context</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">_INTERNAL_REPLICA_CONTEXT</span>
 
 
-<span class="k">def</span> <span class="nf">_set_internal_replica_context</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_internal_replica_context</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">replica_id</span><span class="p">:</span> <span class="n">ReplicaID</span><span class="p">,</span>
     <span class="n">servable_object</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
@@ -1510,7 +1510,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_connect</span><span class="p">(</span><span class="n">raise_if_no_controller_running</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ServeControllerClient</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_connect</span><span class="p">(</span><span class="n">raise_if_no_controller_running</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ServeControllerClient</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Connect to an existing Serve application on this Ray cluster.</span>
 
 <span class="sd">    If called from within a replica, this will connect to the same Serve</span>
@@ -1564,7 +1564,7 @@ document.write(`
 
 
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">_RequestContext</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_RequestContext</span><span class="p">:</span>
     <span class="n">route</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">_internal_request_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -1579,7 +1579,7 @@ document.write(`
 <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_serve_request_context</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_serve_request_context</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the current request context.</span>
 
 <span class="sd">    Returns:</span>
@@ -1591,7 +1591,7 @@ document.write(`
     <span class="k">return</span> <span class="n">_serve_request_context</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_set_request_context</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_request_context</span><span class="p">(</span>
     <span class="n">route</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">_internal_request_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -1634,20 +1634,20 @@ document.write(`
 <span class="c1"># expected to be called from the same thread/asyncio event-loop.</span>
 
 
-<span class="k">def</span> <span class="nf">_get_requests_pending_assignment</span><span class="p">(</span><span class="n">parent_request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_requests_pending_assignment</span><span class="p">(</span><span class="n">parent_request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span><span class="p">]:</span>
     <span class="k">if</span> <span class="n">parent_request_id</span> <span class="ow">in</span> <span class="n">_requests_pending_assignment</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_requests_pending_assignment</span><span class="p">[</span><span class="n">parent_request_id</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="p">{}</span>
 
 
-<span class="k">def</span> <span class="nf">_add_request_pending_assignment</span><span class="p">(</span><span class="n">parent_request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">response_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_request_pending_assignment</span><span class="p">(</span><span class="n">parent_request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">response_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">task</span><span class="p">):</span>
     <span class="c1"># NOTE: `parent_request_id` is the `internal_request_id` corresponding</span>
     <span class="c1"># to an ongoing Serve request, so it is always non-empty.</span>
     <span class="n">_requests_pending_assignment</span><span class="p">[</span><span class="n">parent_request_id</span><span class="p">][</span><span class="n">response_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">task</span>
 
 
-<span class="k">def</span> <span class="nf">_remove_request_pending_assignment</span><span class="p">(</span><span class="n">parent_request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">response_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_remove_request_pending_assignment</span><span class="p">(</span><span class="n">parent_request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">response_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">response_id</span> <span class="ow">in</span> <span class="n">_requests_pending_assignment</span><span class="p">[</span><span class="n">parent_request_id</span><span class="p">]:</span>
         <span class="k">del</span> <span class="n">_requests_pending_assignment</span><span class="p">[</span><span class="n">parent_request_id</span><span class="p">][</span><span class="n">response_id</span><span class="p">]</span>
 

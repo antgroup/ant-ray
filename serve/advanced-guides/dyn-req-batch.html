@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1407,13 +1407,13 @@ When a request arrives, Serve puts the request in a queue. This queue buffers th
 <section id="enable-batching-for-your-deployment">
 <h2>Enable batching for your deployment<a class="headerlink" href="#enable-batching-for-your-deployment" title="Link to this heading">#</a></h2>
 <p>You can enable batching by using the <a class="reference internal" href="../api/doc/ray.serve.batch.html#ray.serve.batch" title="ray.serve.batch"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ray.serve.batch</span></code></a> decorator. Let’s take a look at a simple example by modifying the <code class="docutils literal notranslate"><span class="pre">Model</span></code> class to accept a batch.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="kn">from</span> <span class="nn">ray.serve.handle</span> <span class="kn">import</span> <span class="n">DeploymentHandle</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.handle</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentHandle</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">Model</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">single_sample</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Model</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">single_sample</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">single_sample</span> <span class="o">*</span> <span class="mi">2</span>
 
 
@@ -1427,18 +1427,18 @@ When a request arrives, Serve puts the request in a queue. This queue buffers th
 <li><p>The method accepts a list of its original input types as input. For example, <code class="docutils literal notranslate"><span class="pre">arg1:</span> <span class="pre">int,</span> <span class="pre">arg2:</span> <span class="pre">str</span></code> should be changed to <code class="docutils literal notranslate"><span class="pre">arg1:</span> <span class="pre">List[int],</span> <span class="pre">arg2:</span> <span class="pre">List[str]</span></code>.</p></li>
 <li><p>The method returns a list. The length of the return list and the input list must be of equal lengths for the decorator to split the output evenly and return a corresponding response back to its respective request.</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
-<span class="hll"><span class="kn">from</span> <span class="nn">ray.serve.handle</span> <span class="kn">import</span> <span class="n">DeploymentHandle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+<span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">ray.serve.handle</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeploymentHandle</span>
 </span><span class="hll">
 </span><span class="hll">
 </span><span class="hll"><span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-</span><span class="k">class</span> <span class="nc">Model</span><span class="p">:</span>
+</span><span class="k">class</span><span class="w"> </span><span class="nc">Model</span><span class="p">:</span>
     <span class="nd">@serve</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">max_batch_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">batch_wait_timeout_s</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiple_samples</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiple_samples</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
         <span class="c1"># Use numpy&#39;s vectorized computation to efficiently process a batch.</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">multiple_samples</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
 
@@ -1457,7 +1457,7 @@ Once the first request arrives, the batching decorator will wait for a full batc
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>You can reconfigure your <code class="docutils literal notranslate"><span class="pre">batch_wait_timeout_s</span></code> and <code class="docutils literal notranslate"><span class="pre">max_batch_size</span></code> parameters using the <code class="docutils literal notranslate"><span class="pre">set_batch_wait_timeout_s</span></code> and <code class="docutils literal notranslate"><span class="pre">set_max_batch_size</span></code> methods:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span><span class="p">(</span>
@@ -1467,13 +1467,13 @@ Once the first request arrives, the batching decorator will wait for a full batc
         <span class="s2">&quot;batch_wait_timeout_s&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
-<span class="k">class</span> <span class="nc">Model</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Model</span><span class="p">:</span>
     <span class="nd">@serve</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">max_batch_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">batch_wait_timeout_s</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiple_samples</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiple_samples</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
         <span class="c1"># Use numpy&#39;s vectorized computation to efficiently process a batch.</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">multiple_samples</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
 
-    <span class="k">def</span> <span class="nf">reconfigure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reconfigure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="fm">__call__</span><span class="o">.</span><span class="n">set_max_batch_size</span><span class="p">(</span><span class="n">user_config</span><span class="p">[</span><span class="s2">&quot;max_batch_size&quot;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="fm">__call__</span><span class="o">.</span><span class="n">set_batch_wait_timeout_s</span><span class="p">(</span><span class="n">user_config</span><span class="p">[</span><span class="s2">&quot;batch_wait_timeout_s&quot;</span><span class="p">])</span>
 
@@ -1486,22 +1486,22 @@ Once the first request arrives, the batching decorator will wait for a full batc
 <section id="streaming-batched-requests">
 <span id="serve-streaming-batched-requests-guide"></span><h2>Streaming batched requests<a class="headerlink" href="#streaming-batched-requests" title="Link to this heading">#</a></h2>
 <p>Use an async generator to stream the outputs from your batched requests. Let’s convert the <code class="docutils literal notranslate"><span class="pre">StreamingResponder</span></code> class to accept a batch.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">AsyncGenerator</span>
-<span class="kn">from</span> <span class="nn">starlette.requests</span> <span class="kn">import</span> <span class="n">Request</span>
-<span class="kn">from</span> <span class="nn">starlette.responses</span> <span class="kn">import</span> <span class="n">StreamingResponse</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">starlette.requests</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">starlette.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">StreamingResponse</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">StreamingResponder</span><span class="p">:</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">generate_numbers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">max</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StreamingResponder</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">generate_numbers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">max</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">):</span>
             <span class="k">yield</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StreamingResponse</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StreamingResponse</span><span class="p">:</span>
         <span class="nb">max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">query_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;25&quot;</span><span class="p">))</span>
         <span class="n">gen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_numbers</span><span class="p">(</span><span class="nb">max</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span><span class="n">gen</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">media_type</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">)</span>
@@ -1510,18 +1510,18 @@ Once the first request arrives, the batching decorator will wait for a full batc
 </pre></div>
 </div>
 <p>Decorate async generator functions with the <a class="reference internal" href="../api/doc/ray.serve.batch.html#ray.serve.batch" title="ray.serve.batch"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ray.serve.batch</span></code></a> decorator. Similar to non-streaming methods, the function takes in a <code class="docutils literal notranslate"><span class="pre">List</span></code> of inputs and in each iteration it <code class="docutils literal notranslate"><span class="pre">yield</span></code>s an iterable of outputs with the same length as the input batch size.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">AsyncGenerator</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">from</span> <span class="nn">starlette.requests</span> <span class="kn">import</span> <span class="n">Request</span>
-<span class="kn">from</span> <span class="nn">starlette.responses</span> <span class="kn">import</span> <span class="n">StreamingResponse</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">AsyncGenerator</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">starlette.requests</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">starlette.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">StreamingResponse</span>
 
-<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">serve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
 
 
 <span class="nd">@serve</span><span class="o">.</span><span class="n">deployment</span>
-<span class="k">class</span> <span class="nc">StreamingResponder</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StreamingResponder</span><span class="p">:</span>
     <span class="nd">@serve</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">max_batch_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">batch_wait_timeout_s</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">generate_numbers</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">generate_numbers</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">max_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="ne">StopIteration</span><span class="p">]],</span> <span class="kc">None</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">max_list</span><span class="p">)):</span>
@@ -1534,7 +1534,7 @@ Once the first request arrives, the batching decorator will wait for a full batc
             <span class="k">yield</span> <span class="n">next_numbers</span>
             <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StreamingResponse</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StreamingResponse</span><span class="p">:</span>
         <span class="nb">max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">query_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;25&quot;</span><span class="p">))</span>
         <span class="n">gen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_numbers</span><span class="p">(</span><span class="nb">max</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span><span class="n">gen</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">media_type</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">)</span>

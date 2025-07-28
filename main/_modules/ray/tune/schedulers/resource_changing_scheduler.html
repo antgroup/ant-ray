@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1397,22 +1397,22 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.tune.schedulers.resource_changing_scheduler</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">ray.air.execution.resources.request</span> <span class="kn">import</span> <span class="n">_sum_bundles</span>
-<span class="kn">from</span> <span class="nn">ray.tune.execution.placement_groups</span> <span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
-<span class="kn">from</span> <span class="nn">ray.tune.experiment</span> <span class="kn">import</span> <span class="n">Trial</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers.trial_scheduler</span> <span class="kn">import</span> <span class="n">FIFOScheduler</span><span class="p">,</span> <span class="n">TrialScheduler</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">PublicAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.execution.resources.request</span><span class="w"> </span><span class="kn">import</span> <span class="n">_sum_bundles</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.placement_groups</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers.trial_scheduler</span><span class="w"> </span><span class="kn">import</span> <span class="n">FIFOScheduler</span><span class="p">,</span> <span class="n">TrialScheduler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublicAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ray.tune.execution.tune_controller</span> <span class="kn">import</span> <span class="n">TuneController</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.tune_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneController</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -1420,7 +1420,7 @@ document.write(`
 <div class="viewcode-block" id="DistributeResources">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.resource_changing_scheduler.DistributeResources.html#ray.tune.schedulers.resource_changing_scheduler.DistributeResources">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">DistributeResources</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DistributeResources</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class creates a basic uniform resource allocation function.</span>
 
 <span class="sd">    The function naively balances free resources (CPUs and GPUs) between</span>
@@ -1460,7 +1460,7 @@ document.write(`
 <span class="sd">            that will not be allocated to resized trials.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">add_bundles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">increase_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1472,7 +1472,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">increase_by_times</span> <span class="o">=</span> <span class="n">increase_by_times</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reserve_resources</span> <span class="o">=</span> <span class="n">reserve_resources</span> <span class="ow">or</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">base_trial_resource</span><span class="p">:</span> <span class="n">PlacementGroupFactory</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return False if we should keep the current resources outright.&quot;&quot;&quot;</span>
@@ -1493,7 +1493,7 @@ document.write(`
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_get_total_available_resources</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_total_available_resources</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the number of CPUs and GPUs avaialble in total (not just free)&quot;&quot;&quot;</span>
@@ -1507,14 +1507,14 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">total_available_cpus</span><span class="p">,</span> <span class="n">total_available_gpus</span>
 
-    <span class="k">def</span> <span class="nf">_get_used_cpus_and_gpus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Trial</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_used_cpus_and_gpus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Trial</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check how many CPUs and GPUs a trial is using currently&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">t</span><span class="o">.</span><span class="n">placement_group_factory</span><span class="o">.</span><span class="n">required_resources</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;CPU&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
             <span class="n">t</span><span class="o">.</span><span class="n">placement_group_factory</span><span class="o">.</span><span class="n">required_resources</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GPU&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_resources_from_bundles</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_resources_from_bundles</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">bundles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get total sums of resources in bundles&quot;&quot;&quot;</span>
@@ -1522,10 +1522,10 @@ document.write(`
             <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;CPU&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;GPU&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">_sum_bundles</span><span class="p">(</span><span class="n">bundles</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_is_bundle_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_bundle_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="n">bundle</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;CPU&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GPU&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">_add_two_bundles</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_two_bundles</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">bundles_a</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
         <span class="n">bundles_b</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
@@ -1578,7 +1578,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">bundles</span>
 
-    <span class="k">def</span> <span class="nf">_get_multiplier</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_multiplier</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">increase_by</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
         <span class="n">cpus</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -1601,7 +1601,7 @@ document.write(`
             <span class="n">multiplier</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">max_multiplier</span><span class="p">,</span> <span class="n">multiplier</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">multiplier</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_remove_bundles</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remove_bundles</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">bundles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
         <span class="n">increase_by</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
@@ -1619,7 +1619,7 @@ document.write(`
             <span class="n">bundles</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;GPU&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">bundles</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;GPU&quot;</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">bundles</span>
 
-    <span class="k">def</span> <span class="nf">_create_new_bundles</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_new_bundles</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">increase_by</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
         <span class="n">multiplier</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1636,7 +1636,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">bundles</span>
 
-    <span class="k">def</span> <span class="nf">_modify_bundles_with_free_resources</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_modify_bundles_with_free_resources</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">bundles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
         <span class="n">increase_by</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
@@ -1660,7 +1660,7 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">bundles</span>
 
-    <span class="k">def</span> <span class="nf">_get_added_bundles</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_added_bundles</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">bundles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span> <span class="n">base_bundles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the difference between bundles and base_bundles&quot;&quot;&quot;</span>
@@ -1679,7 +1679,7 @@ document.write(`
             <span class="p">]</span>
         <span class="k">return</span> <span class="n">added_bundles</span>
 
-    <span class="k">def</span> <span class="nf">_are_bundles_below_limit</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_are_bundles_below_limit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">bundles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
         <span class="n">base_bundles</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1705,7 +1705,7 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span>
 
-    <span class="k">def</span> <span class="nf">_get_new_added_bundles</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_new_added_bundles</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span>
         <span class="n">all_trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span>
@@ -1780,7 +1780,7 @@ document.write(`
             <span class="n">max_increase_by_times</span><span class="o">=</span><span class="n">max_increase_by_times</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span>
         <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span>
@@ -1868,7 +1868,7 @@ document.write(`
 <div class="viewcode-block" id="DistributeResourcesToTopJob">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.resource_changing_scheduler.DistributeResourcesToTopJob.html#ray.tune.schedulers.resource_changing_scheduler.DistributeResourcesToTopJob">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">DistributeResourcesToTopJob</span><span class="p">(</span><span class="n">DistributeResources</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DistributeResourcesToTopJob</span><span class="p">(</span><span class="n">DistributeResources</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class creates a &quot;TopJob&quot; resource allocation function.</span>
 
 <span class="sd">    The function will assign all of the free resources to the best</span>
@@ -1911,7 +1911,7 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">add_bundles</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">increase_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1925,14 +1925,14 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_metric_op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_metric_op</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The mode parameter can only be either min or max.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="mf">1.0</span>
         <span class="k">return</span> <span class="o">-</span><span class="mf">1.0</span>
 
-    <span class="k">def</span> <span class="nf">_get_new_added_bundles</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_new_added_bundles</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span>
         <span class="n">all_trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Trial</span><span class="p">],</span>
@@ -1996,7 +1996,7 @@ document.write(`
 <div class="viewcode-block" id="ResourceChangingScheduler">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.ResourceChangingScheduler.html#ray.tune.schedulers.resource_changing_scheduler.ResourceChangingScheduler">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ResourceChangingScheduler</span><span class="p">(</span><span class="n">TrialScheduler</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResourceChangingScheduler</span><span class="p">(</span><span class="n">TrialScheduler</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A utility scheduler to dynamically change resources of live trials.</span>
 
 <span class="sd">    .. versionadded:: 1.5.0</span>
@@ -2070,7 +2070,7 @@ document.write(`
 <span class="sd">        more detailed example.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">base_scheduler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TrialScheduler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">resources_allocation_function</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
@@ -2103,21 +2103,21 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_scheduler</span><span class="o">.</span><span class="n">_metric</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">base_trial_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PlacementGroupFactory</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">base_trial_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PlacementGroupFactory</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_trial_resources</span>
 
-    <span class="k">def</span> <span class="nf">set_search_properties</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_search_properties</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">**</span><span class="n">spec</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="o">=</span> <span class="n">metric</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">=</span> <span class="n">mode</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_scheduler</span><span class="o">.</span><span class="n">set_search_properties</span><span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="o">**</span><span class="n">spec</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># use the first trial resources as the base</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_trial_resources</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_base_trial_resources</span> <span class="o">=</span> <span class="n">trial</span><span class="o">.</span><span class="n">placement_group_factory</span>
@@ -2137,10 +2137,10 @@ document.write(`
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_scheduler</span><span class="o">.</span><span class="n">on_trial_add</span><span class="p">(</span><span class="n">tune_controller</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_scheduler</span><span class="o">.</span><span class="n">on_trial_error</span><span class="p">(</span><span class="n">tune_controller</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_result</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_result</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">base_scheduler_decision</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_scheduler</span><span class="o">.</span><span class="n">on_trial_result</span><span class="p">(</span>
@@ -2155,7 +2155,7 @@ document.write(`
                 <span class="k">return</span> <span class="n">TrialScheduler</span><span class="o">.</span><span class="n">PAUSE</span>
         <span class="k">return</span> <span class="n">base_scheduler_decision</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_complete</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_complete</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span>
         <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span>
@@ -2166,12 +2166,12 @@ document.write(`
             <span class="n">tune_controller</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_trial_remove</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_remove</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_scheduler</span><span class="o">.</span><span class="n">on_trial_remove</span><span class="p">(</span><span class="n">tune_controller</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">choose_trial_to_run</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">choose_trial_to_run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Trial</span><span class="p">]:</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">tune_controller</span><span class="p">,</span> <span class="s2">&quot;_reuse_actors&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
@@ -2197,22 +2197,22 @@ document.write(`
         <span class="n">trial</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_scheduler</span><span class="o">.</span><span class="n">choose_trial_to_run</span><span class="p">(</span><span class="n">tune_controller</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">trial</span>
 
-    <span class="k">def</span> <span class="nf">debug_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">debug_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;(ResourceChangingScheduler) &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_base_scheduler</span><span class="o">.</span><span class="n">debug_string</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">save_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outputFile</span><span class="p">:</span>
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">save_object</span><span class="p">,</span> <span class="n">outputFile</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">inputFile</span><span class="p">:</span>
             <span class="n">save_object</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">inputFile</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">save_object</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ResourceChangingScheduler.set_trial_resources">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.ResourceChangingScheduler.set_trial_resources.html#ray.tune.schedulers.resource_changing_scheduler.ResourceChangingScheduler.set_trial_resources">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_trial_resources</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_trial_resources</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">new_resources</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">PlacementGroupFactory</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True if new_resources were set.&quot;&quot;&quot;</span>
@@ -2229,7 +2229,7 @@ document.write(`
         <span class="k">return</span> <span class="kc">False</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_are_resources_the_same</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_are_resources_the_same</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span>
         <span class="n">new_resources</span><span class="p">,</span>
@@ -2254,7 +2254,7 @@ document.write(`
 
 <div class="viewcode-block" id="ResourceChangingScheduler.reallocate_trial_resources_if_needed">
 <a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.schedulers.ResourceChangingScheduler.reallocate_trial_resources_if_needed.html#ray.tune.schedulers.resource_changing_scheduler.ResourceChangingScheduler.reallocate_trial_resources_if_needed">[docs]</a>
-    <span class="k">def</span> <span class="nf">reallocate_trial_resources_if_needed</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reallocate_trial_resources_if_needed</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tune_controller</span><span class="p">:</span> <span class="s2">&quot;TuneController&quot;</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Trial</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">PlacementGroupFactory</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls user defined resources_allocation_function. If the returned</span>

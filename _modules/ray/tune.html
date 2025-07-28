@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1392,37 +1392,37 @@ document.write(`
 <span></span><span class="c1"># isort: off</span>
 <span class="c1"># Try import ray[tune] core requirements (defined in setup.py)</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">fsspec</span>  <span class="c1"># noqa: F401</span>
-    <span class="kn">import</span> <span class="nn">pandas</span>  <span class="c1"># noqa: F401</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span>  <span class="c1"># noqa: F401</span>
-    <span class="kn">import</span> <span class="nn">requests</span>  <span class="c1"># noqa: F401</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">fsspec</span>  <span class="c1"># noqa: F401</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>  <span class="c1"># noqa: F401</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span>  <span class="c1"># noqa: F401</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>  <span class="c1"># noqa: F401</span>
 <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
         <span class="s2">&quot;Can&#39;t import ray.tune as some dependencies are missing. &quot;</span>
         <span class="s1">&#39;Run `pip install &quot;ray[tune]&quot;` to fix.&#39;</span>
-    <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 <span class="c1"># isort: on</span>
 
-<span class="kn">from</span> <span class="nn">ray.tune.trainable.trainable_fn_utils</span> <span class="kn">import</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">get_checkpoint</span><span class="p">,</span> <span class="n">report</span>
-<span class="kn">from</span> <span class="nn">ray.tune.impl.config</span> <span class="kn">import</span> <span class="n">CheckpointConfig</span><span class="p">,</span> <span class="n">FailureConfig</span><span class="p">,</span> <span class="n">RunConfig</span>
-<span class="kn">from</span> <span class="nn">ray.tune.syncer</span> <span class="kn">import</span> <span class="n">SyncConfig</span>
-<span class="kn">from</span> <span class="nn">ray.air.result</span> <span class="kn">import</span> <span class="n">Result</span>
-<span class="kn">from</span> <span class="nn">ray.tune.analysis</span> <span class="kn">import</span> <span class="n">ExperimentAnalysis</span>
-<span class="kn">from</span> <span class="nn">ray.tune.callback</span> <span class="kn">import</span> <span class="n">Callback</span>
-<span class="kn">from</span> <span class="nn">ray.tune.context</span> <span class="kn">import</span> <span class="n">TuneContext</span><span class="p">,</span> <span class="n">get_context</span>
-<span class="kn">from</span> <span class="nn">ray.tune.error</span> <span class="kn">import</span> <span class="n">TuneError</span>
-<span class="kn">from</span> <span class="nn">ray.tune.execution.placement_groups</span> <span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
-<span class="kn">from</span> <span class="nn">ray.tune.experiment</span> <span class="kn">import</span> <span class="n">Experiment</span>
-<span class="kn">from</span> <span class="nn">ray.tune.progress_reporter</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable.trainable_fn_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Checkpoint</span><span class="p">,</span> <span class="n">get_checkpoint</span><span class="p">,</span> <span class="n">report</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.impl.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">CheckpointConfig</span><span class="p">,</span> <span class="n">FailureConfig</span><span class="p">,</span> <span class="n">RunConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.syncer</span><span class="w"> </span><span class="kn">import</span> <span class="n">SyncConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.air.result</span><span class="w"> </span><span class="kn">import</span> <span class="n">Result</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExperimentAnalysis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.callback</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneContext</span><span class="p">,</span> <span class="n">get_context</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.error</span><span class="w"> </span><span class="kn">import</span> <span class="n">TuneError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.execution.placement_groups</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroupFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.experiment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Experiment</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.progress_reporter</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">CLIReporter</span><span class="p">,</span>
     <span class="n">JupyterNotebookReporter</span><span class="p">,</span>
     <span class="n">ProgressReporter</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.registry</span> <span class="kn">import</span> <span class="n">register_env</span><span class="p">,</span> <span class="n">register_trainable</span>
-<span class="kn">from</span> <span class="nn">ray.tune.result_grid</span> <span class="kn">import</span> <span class="n">ResultGrid</span>
-<span class="kn">from</span> <span class="nn">ray.tune.schedulers</span> <span class="kn">import</span> <span class="n">create_scheduler</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search</span> <span class="kn">import</span> <span class="n">create_searcher</span><span class="p">,</span> <span class="n">grid_search</span>
-<span class="kn">from</span> <span class="nn">ray.tune.search.sample</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_env</span><span class="p">,</span> <span class="n">register_trainable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResultGrid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.schedulers</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_scheduler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_searcher</span><span class="p">,</span> <span class="n">grid_search</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.search.sample</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">choice</span><span class="p">,</span>
     <span class="n">lograndint</span><span class="p">,</span>
     <span class="n">loguniform</span><span class="p">,</span>
@@ -1436,12 +1436,12 @@ document.write(`
     <span class="n">sample_from</span><span class="p">,</span>
     <span class="n">uniform</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.tune.stopper</span> <span class="kn">import</span> <span class="n">Stopper</span>
-<span class="kn">from</span> <span class="nn">ray.tune.trainable</span> <span class="kn">import</span> <span class="n">Trainable</span>
-<span class="kn">from</span> <span class="nn">ray.tune.trainable.util</span> <span class="kn">import</span> <span class="n">with_parameters</span><span class="p">,</span> <span class="n">with_resources</span>
-<span class="kn">from</span> <span class="nn">ray.tune.tune</span> <span class="kn">import</span> <span class="n">run</span><span class="p">,</span> <span class="n">run_experiments</span>
-<span class="kn">from</span> <span class="nn">ray.tune.tune_config</span> <span class="kn">import</span> <span class="n">ResumeConfig</span><span class="p">,</span> <span class="n">TuneConfig</span>
-<span class="kn">from</span> <span class="nn">ray.tune.tuner</span> <span class="kn">import</span> <span class="n">Tuner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.stopper</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stopper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trainable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.trainable.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">with_parameters</span><span class="p">,</span> <span class="n">with_resources</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">run</span><span class="p">,</span> <span class="n">run_experiments</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.tune_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResumeConfig</span><span class="p">,</span> <span class="n">TuneConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.tuner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuner</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;Trainable&quot;</span><span class="p">,</span>

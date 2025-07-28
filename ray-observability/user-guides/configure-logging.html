@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
@@ -1465,14 +1465,14 @@ The logs of the actual installations for <code class="docutils literal notransla
 <section id="redirecting-worker-logs-to-the-driver">
 <span id="log-redirection-to-driver"></span><h2>Redirecting Worker logs to the Driver<a class="headerlink" href="#redirecting-worker-logs-to-the-driver" title="Link to this heading">#</a></h2>
 <p>By default, Worker stdout and stderr for Tasks and Actors stream to the Ray Driver (the entrypoint script that calls <code class="docutils literal notranslate"><span class="pre">ray.init</span></code>). It helps users aggregate the logs for the distributed Ray application in a single place.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="c1"># Initiate a driver.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">)</span>
 
 
@@ -1480,8 +1480,8 @@ The logs of the actual installations for <code class="docutils literal notransla
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;actor&quot;</span><span class="p">)</span>
 
 
@@ -1497,18 +1497,18 @@ The logs of the actual installations for <code class="docutils literal notransla
 <section id="customizing-prefixes-for-actor-logs">
 <h3>Customizing prefixes for Actor logs<a class="headerlink" href="#customizing-prefixes-for-actor-logs" title="Link to this heading">#</a></h3>
 <p>It’s often useful to distinguish between log messages from different Actors. For example, if you have a large number of worker Actors, you may want to easily see the index of the Actor that logged a particular message. Define the <code class="docutils literal notranslate"><span class="pre">__repr__</span> <span class="pre">&lt;https://docs.python.org/3/library/functions.html#repr&gt;</span></code>__ method for the Actor class to replace the Actor name with the Actor repr. For example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">MyActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
 
-    <span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hello there&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;MyActor(index=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="si">}</span><span class="s2">)&quot;</span>
 
 
@@ -1538,7 +1538,7 @@ this indexes into an array of colors modulo the PID of each process.</p></li>
 <section id="disable-logging-to-the-driver">
 <h3>Disable logging to the driver<a class="headerlink" href="#disable-logging-to-the-driver" title="Link to this heading">#</a></h3>
 <p>In large scale runs, you may not want to route all worker logs to the driver. Disable this feature by setting <code class="docutils literal notranslate"><span class="pre">log_to_driver=False</span></code> in <code class="docutils literal notranslate"><span class="pre">ray.init</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="c1"># Task and Actor logs are not copied to the driver stdout.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">log_to_driver</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -1549,11 +1549,11 @@ this indexes into an array of colors modulo the PID of each process.</p></li>
 <section id="log-deduplication">
 <h2>Log deduplication<a class="headerlink" href="#log-deduplication" title="Link to this heading">#</a></h2>
 <p>By default, Ray deduplicates logs that appear redundantly across multiple processes. The first instance of each log message is always immediately printed. However, Ray buffers subsequent log messages of the same pattern for up to five seconds and prints them in batch. Note that Ray also ignores words with numeric components. For example, for the following code snippet:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">random</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello there, I am a task&quot;</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">())</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="n">task</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)])</span>
@@ -1573,13 +1573,13 @@ this indexes into an array of colors modulo the PID of each process.</p></li>
 <li><p>Set <code class="docutils literal notranslate"><span class="pre">RAY_DEDUP_LOGS_ALLOW_REGEX=&lt;string&gt;</span></code> to specify log messages to never deduplicate.</p>
 <ul>
 <li><p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;RAY_DEDUP_LOGS_ALLOW_REGEX&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ABC&quot;</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ABC&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEF&quot;</span><span class="p">)</span>
 
@@ -1603,13 +1603,13 @@ this indexes into an array of colors modulo the PID of each process.</p></li>
 <li><p>Set <code class="docutils literal notranslate"><span class="pre">RAY_DEDUP_LOGS_SKIP_REGEX=&lt;string&gt;</span></code> to specify log messages to skip printing.</p>
 <ul>
 <li><p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;RAY_DEDUP_LOGS_SKIP_REGEX&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ABC&quot;</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ABC&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEF&quot;</span><span class="p">)</span>
 
@@ -1629,15 +1629,15 @@ this indexes into an array of colors modulo the PID of each process.</p></li>
 <section id="distributed-progress-bars-with-tqdm">
 <h2>Distributed progress bars with tqdm<a class="headerlink" href="#distributed-progress-bars-with-tqdm" title="Link to this heading">#</a></h2>
 <p>When using <a class="reference external" href="https://tqdm.github.io">tqdm</a> in Ray remote Tasks or Actors, you may notice that the progress bar output is corrupted. To avoid this problem, use the Ray distributed tqdm implementation at <code class="docutils literal notranslate"><span class="pre">ray.experimental.tqdm_ray</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="c1"># Instead of &quot;from tqdm import tqdm&quot;, use:</span>
-<span class="kn">from</span> <span class="nn">ray.experimental.tqdm_ray</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.tqdm_ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="n">name</span><span class="p">):</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 
@@ -1663,14 +1663,14 @@ This avoids progress bar corruption on driver print statements. To turn off this
 <h2>Using Ray’s logger<a class="headerlink" href="#using-rays-logger" title="Link to this heading">#</a></h2>
 <p>When Ray executes <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">ray</span></code>, Ray initializes Ray’s logger, generating a default configuration given in <code class="docutils literal notranslate"><span class="pre">python/ray/_private/log.py</span></code>. The default logging level is <code class="docutils literal notranslate"><span class="pre">logging.INFO</span></code>.</p>
 <p>All Ray loggers are automatically configured in <code class="docutils literal notranslate"><span class="pre">ray._private.ray_logging</span></code>. To modify the Ray logger:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;ray&quot;</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span> <span class="c1"># Modify the Ray logging config</span>
 </pre></div>
 </div>
 <p>Similarly, to modify the logging configuration for Ray libraries, specify the appropriate logger name:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 <span class="c1"># First, get the handle for the logger you want to modify</span>
 <span class="n">ray_data_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;ray.data&quot;</span><span class="p">)</span>
@@ -1722,20 +1722,20 @@ Ray libraries</label><div class="sd-tab-content docutils">
 </input><label class="sd-tab-label" for="sd-tab-item-2">
 Ray Core: individual worker process</label><div class="sd-tab-content docutils">
 <p>Customize the logger configuration when you define the Tasks or Actors.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="c1"># Initiate a driver.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">Actor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Actor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Basic config automatically configures logs to</span>
         <span class="c1"># stream to stdout and stderr.</span>
         <span class="c1"># Set the severity to INFO so that info logs are printed to stdout.</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
@@ -1743,7 +1743,7 @@ Ray Core: individual worker process</label><div class="sd-tab-content docutils">
 <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">actor</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="s2">&quot;A log message for an actor.&quot;</span><span class="p">))</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -1766,7 +1766,7 @@ It doesn’t support <a class="reference internal" href="../../cluster/running-a
 </div>
 <p>Use <code class="docutils literal notranslate"><span class="pre">worker_process_setup_hook</span></code> to apply the new logging configuration to all worker processes within a job.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># driver.py</span>
-<span class="k">def</span> <span class="nf">logging_setup_func</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">logging_setup_func</span><span class="p">():</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;ray&quot;</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
     <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
@@ -1831,11 +1831,11 @@ not JSON parsable.</p>
 <h5>Method 2: Configure structured logging with an environment variable<a class="headerlink" href="#method-2-configure-structured-logging-with-an-environment-variable" title="Link to this heading">#</a></h5>
 <p>You can set the <code class="docutils literal notranslate"><span class="pre">RAY_LOGGING_CONFIG_ENCODING</span></code> environment variable to <code class="docutils literal notranslate"><span class="pre">TEXT</span></code> or <code class="docutils literal notranslate"><span class="pre">JSON</span></code> to set the encoding format for the logs.
 Note that you need to set the environment variables before <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">ray</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;RAY_LOGGING_CONFIG_ENCODING&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;JSON&quot;</span>
 
-<span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">log_to_driver</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="c1"># Use the root logger to print log messages.</span>
@@ -1848,14 +1848,14 @@ Note that you need to set the environment variables before <code class="docutils
 <p>The following example configures the <code class="docutils literal notranslate"><span class="pre">LoggingConfig</span></code> to output logs in a structured JSON format and sets the log level to <code class="docutils literal notranslate"><span class="pre">INFO</span></code>.
 It then logs messages with the root loggers in the driver process, Ray tasks, and Ray actors.
 The logs include Ray-specific fields such as <code class="docutils literal notranslate"><span class="pre">job_id</span></code>, <code class="docutils literal notranslate"><span class="pre">worker_id</span></code>, <code class="docutils literal notranslate"><span class="pre">node_id</span></code>, <code class="docutils literal notranslate"><span class="pre">actor_id</span></code>, <code class="docutils literal notranslate"><span class="pre">actor_name</span></code>, <code class="docutils literal notranslate"><span class="pre">task_id</span></code>, <code class="docutils literal notranslate"><span class="pre">task_name</span></code> and <code class="docutils literal notranslate"><span class="pre">task_function_name</span></code> when applicable.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
     <span class="n">logging_config</span><span class="o">=</span><span class="n">ray</span><span class="o">.</span><span class="n">LoggingConfig</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;JSON&quot;</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span> <span class="n">additional_log_standard_attrs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
 <span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">init_logger</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">init_logger</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the root logger&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
 
@@ -1863,13 +1863,13 @@ The logs include Ray-specific fields such as <code class="docutils literal notra
 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Driver process&quot;</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">f</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">():</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">init_logger</span><span class="p">()</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;A Ray task&quot;</span><span class="p">)</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">actor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">print_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">actor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">logger</span> <span class="o">=</span> <span class="n">init_logger</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;A Ray actor&quot;</span><span class="p">)</span>
 
@@ -1890,8 +1890,8 @@ The logs include Ray-specific fields such as <code class="docutils literal notra
 <section id="add-metadata-to-structured-logs">
 <h4>Add metadata to structured logs<a class="headerlink" href="#add-metadata-to-structured-logs" title="Link to this heading">#</a></h4>
 <p>Add extra fields to the log entries by using the <code class="docutils literal notranslate"><span class="pre">extra</span></code> parameter in the <code class="docutils literal notranslate"><span class="pre">logger.info</span></code> method.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span>
     <span class="n">log_to_driver</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1912,7 +1912,7 @@ The logs include Ray-specific fields such as <code class="docutils literal notra
 </input><label class="sd-tab-label" for="sd-tab-item-5">
 Ray Job</label><div class="sd-tab-content docutils">
 <p>Get the job ID.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="c1"># Initiate a driver.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
@@ -1928,11 +1928,11 @@ Ray Job</label><div class="sd-tab-content docutils">
 </input><label class="sd-tab-label" for="sd-tab-item-6">
 Ray Actor</label><div class="sd-tab-content docutils">
 <p>Get the actor ID.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="c1"># Initiate a driver.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">actor</span><span class="p">():</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">actor</span><span class="p">():</span>
     <span class="n">actor_id</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_actor_id</span>
 </pre></div>
 </div>
@@ -1941,11 +1941,11 @@ Ray Actor</label><div class="sd-tab-content docutils">
 </input><label class="sd-tab-label" for="sd-tab-item-7">
 Ray Task</label><div class="sd-tab-content docutils">
 <p>Get the task ID.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="c1"># Initiate a driver.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">():</span>
     <span class="n">task_id</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_task_id</span>
 </pre></div>
 </div>
@@ -1954,7 +1954,7 @@ Ray Task</label><div class="sd-tab-content docutils">
 </input><label class="sd-tab-label" for="sd-tab-item-8">
 Node</label><div class="sd-tab-content docutils">
 <p>Get the node ID.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="c1"># Initiate a driver.</span>
 <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
@@ -1962,7 +1962,7 @@ Node</label><div class="sd-tab-content docutils">
 <span class="n">driver_process_node_id</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_node_id</span>
 
 <span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">def</span> <span class="nf">task</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">():</span>
     <span class="c1"># Get the ID of the node where the worker process is running</span>
     <span class="n">worker_process_node_id</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_node_id</span>
 </pre></div>

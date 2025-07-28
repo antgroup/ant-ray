@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
@@ -1389,37 +1389,37 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <h1>Source code for ray.data.datasource.file_datasink</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">posixpath</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span>
-<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">posixpath</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlparse</span>
 
-<span class="kn">from</span> <span class="nn">ray._private.arrow_utils</span> <span class="kn">import</span> <span class="n">add_creatable_buckets_param_if_s3_uri</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.delegating_block_builder</span> <span class="kn">import</span> <span class="n">DelegatingBlockBuilder</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.execution.interfaces</span> <span class="kn">import</span> <span class="n">TaskContext</span>
-<span class="kn">from</span> <span class="nn">ray.data._internal.util</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray._private.arrow_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_creatable_buckets_param_if_s3_uri</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.delegating_block_builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">DelegatingBlockBuilder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.execution.interfaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data._internal.util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">RetryingPyFileSystem</span><span class="p">,</span>
     <span class="n">_is_local_scheme</span><span class="p">,</span>
     <span class="n">call_with_retry</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data.block</span> <span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">BlockAccessor</span>
-<span class="kn">from</span> <span class="nn">ray.data.context</span> <span class="kn">import</span> <span class="n">DataContext</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource.datasink</span> <span class="kn">import</span> <span class="n">Datasink</span><span class="p">,</span> <span class="n">WriteResult</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource.filename_provider</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.block</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">BlockAccessor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.datasink</span><span class="w"> </span><span class="kn">import</span> <span class="n">Datasink</span><span class="p">,</span> <span class="n">WriteResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.filename_provider</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">FilenameProvider</span><span class="p">,</span>
     <span class="n">_DefaultFilenameProvider</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ray.data.datasource.path_util</span> <span class="kn">import</span> <span class="n">_resolve_paths_and_filesystem</span>
-<span class="kn">from</span> <span class="nn">ray.util.annotations</span> <span class="kn">import</span> <span class="n">DeveloperAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.datasource.path_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">_resolve_paths_and_filesystem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.annotations</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeveloperAPI</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pyarrow</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_FileDatasink</span><span class="p">(</span><span class="n">Datasink</span><span class="p">[</span><span class="kc">None</span><span class="p">]):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_FileDatasink</span><span class="p">(</span><span class="n">Datasink</span><span class="p">[</span><span class="kc">None</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1470,18 +1470,18 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">has_created_dir</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">open_output_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pyarrow.NativeFile&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">open_output_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;pyarrow.NativeFile&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filesystem</span><span class="o">.</span><span class="n">open_output_stream</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">open_stream_args</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_write_start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_write_start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">has_created_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_create_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a directory to write files to.</span>
 
 <span class="sd">        If ``try_create_dir`` is ``False``, this method is a no-op.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pyarrow.fs</span> <span class="kn">import</span> <span class="n">FileType</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pyarrow.fs</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileType</span>
 
         <span class="c1"># We should skip creating directories in s3 unless the user specifically</span>
         <span class="c1"># overrides this behavior. PyArrow&#39;s s3fs implementation for create_dir</span>
@@ -1508,7 +1508,7 @@ document.write(`
 
         <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">blocks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Block</span><span class="p">],</span>
         <span class="n">ctx</span><span class="p">:</span> <span class="n">TaskContext</span><span class="p">,</span>
@@ -1525,23 +1525,23 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">write_block</span><span class="p">(</span><span class="n">block_accessor</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ctx</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">write_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">BlockAccessor</span><span class="p">,</span> <span class="n">block_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">TaskContext</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">BlockAccessor</span><span class="p">,</span> <span class="n">block_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">TaskContext</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-    <span class="k">def</span> <span class="nf">on_write_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_result</span><span class="p">:</span> <span class="n">WriteResult</span><span class="p">[</span><span class="kc">None</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_write_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_result</span><span class="p">:</span> <span class="n">WriteResult</span><span class="p">[</span><span class="kc">None</span><span class="p">]):</span>
         <span class="c1"># If no rows were written, we can delete the directory.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_created_dir</span> <span class="ow">and</span> <span class="n">write_result</span><span class="o">.</span><span class="n">num_rows</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">filesystem</span><span class="o">.</span><span class="n">delete_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">supports_distributed_writes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">supports_distributed_writes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="n">_is_local_scheme</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unresolved_path</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="RowBasedFileDatasink">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.RowBasedFileDatasink.html#ray.data.datasource.RowBasedFileDatasink">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">RowBasedFileDatasink</span><span class="p">(</span><span class="n">_FileDatasink</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RowBasedFileDatasink</span><span class="p">(</span><span class="n">_FileDatasink</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A datasink that writes one row to each file.</span>
 
 <span class="sd">    Subclasses must implement ``write_row_to_file`` and call the superclass constructor.</span>
@@ -1572,7 +1572,7 @@ document.write(`
 
 <div class="viewcode-block" id="RowBasedFileDatasink.write_row_to_file">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.RowBasedFileDatasink.write_row_to_file.html#ray.data.datasource.RowBasedFileDatasink.write_row_to_file">[docs]</a>
-    <span class="k">def</span> <span class="nf">write_row_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">file</span><span class="p">:</span> <span class="s2">&quot;pyarrow.NativeFile&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_row_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">file</span><span class="p">:</span> <span class="s2">&quot;pyarrow.NativeFile&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Write a row to a file.</span>
 
 <span class="sd">        Args:</span>
@@ -1582,7 +1582,7 @@ document.write(`
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
-    <span class="k">def</span> <span class="nf">write_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">BlockAccessor</span><span class="p">,</span> <span class="n">block_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">TaskContext</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">BlockAccessor</span><span class="p">,</span> <span class="n">block_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">TaskContext</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">row_index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">iter_rows</span><span class="p">(</span><span class="n">public_row_format</span><span class="o">=</span><span class="kc">False</span><span class="p">)):</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename_provider</span><span class="o">.</span><span class="n">get_filename_for_row</span><span class="p">(</span>
                 <span class="n">row</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">task_idx</span><span class="p">,</span> <span class="n">block_index</span><span class="p">,</span> <span class="n">row_index</span>
@@ -1590,7 +1590,7 @@ document.write(`
             <span class="n">write_path</span> <span class="o">=</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Writing </span><span class="si">{</span><span class="n">write_path</span><span class="si">}</span><span class="s2"> file.&quot;</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">write_row_to_path</span><span class="p">():</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">write_row_to_path</span><span class="p">():</span>
                 <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_output_stream</span><span class="p">(</span><span class="n">write_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">write_row_to_file</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
 
@@ -1605,7 +1605,7 @@ document.write(`
 <div class="viewcode-block" id="BlockBasedFileDatasink">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.BlockBasedFileDatasink.html#ray.data.datasource.BlockBasedFileDatasink">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
-<span class="k">class</span> <span class="nc">BlockBasedFileDatasink</span><span class="p">(</span><span class="n">_FileDatasink</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BlockBasedFileDatasink</span><span class="p">(</span><span class="n">_FileDatasink</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A datasink that writes multiple rows to each file.</span>
 
 <span class="sd">    Subclasses must implement ``write_block_to_file`` and call the superclass</span>
@@ -1623,7 +1623,7 @@ document.write(`
 <span class="sd">                    csv.write_csv(block.to_arrow(), file)</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">min_rows_per_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">file_datasink_kwargs</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">file_datasink_kwargs</span><span class="p">)</span>
@@ -1632,7 +1632,7 @@ document.write(`
 
 <div class="viewcode-block" id="BlockBasedFileDatasink.write_block_to_file">
 <a class="viewcode-back" href="../../../../data/api/doc/ray.data.datasource.BlockBasedFileDatasink.write_block_to_file.html#ray.data.datasource.BlockBasedFileDatasink.write_block_to_file">[docs]</a>
-    <span class="k">def</span> <span class="nf">write_block_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">BlockAccessor</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="s2">&quot;pyarrow.NativeFile&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_block_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">BlockAccessor</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="s2">&quot;pyarrow.NativeFile&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Write a block of data to a file.</span>
 
 <span class="sd">        Args:</span>
@@ -1642,13 +1642,13 @@ document.write(`
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
-    <span class="k">def</span> <span class="nf">write_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">BlockAccessor</span><span class="p">,</span> <span class="n">block_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">TaskContext</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">BlockAccessor</span><span class="p">,</span> <span class="n">block_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">TaskContext</span><span class="p">):</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename_provider</span><span class="o">.</span><span class="n">get_filename_for_block</span><span class="p">(</span>
             <span class="n">block</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">task_idx</span><span class="p">,</span> <span class="n">block_index</span>
         <span class="p">)</span>
         <span class="n">write_path</span> <span class="o">=</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">write_block_to_path</span><span class="p">():</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">write_block_to_path</span><span class="p">():</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_output_stream</span><span class="p">(</span><span class="n">write_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">write_block_to_file</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
 
@@ -1660,7 +1660,7 @@ document.write(`
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">min_rows_per_write</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">min_rows_per_write</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_rows_per_file</span></div>
 
 </pre></div>

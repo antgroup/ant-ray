@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1421,9 +1421,9 @@ The following example uses the <code class="code docutils literal notranslate"><
 <p>The <code class="code docutils literal notranslate"><span class="pre">vLLMEngineProcessorConfig`</span></code> is a configuration object for the vLLM engine.
 It contains the model name, the number of GPUs to use, and the number of shards to use, along with other vLLM engine configurations.
 Upon execution, the Processor object instantiates replicas of the vLLM engine (using <code class="code docutils literal notranslate"><span class="pre">map_batches</span></code> under the hood).</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.data.llm</span> <span class="kn">import</span> <span class="n">vLLMEngineProcessorConfig</span><span class="p">,</span> <span class="n">build_llm_processor</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.llm</span><span class="w"> </span><span class="kn">import</span> <span class="n">vLLMEngineProcessorConfig</span><span class="p">,</span> <span class="n">build_llm_processor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">vLLMEngineProcessorConfig</span><span class="p">(</span>
     <span class="n">model_source</span><span class="o">=</span><span class="s2">&quot;unsloth/Llama-3.1-8B-Instruct&quot;</span><span class="p">,</span>
@@ -1475,7 +1475,7 @@ Upon execution, the Processor object instantiates replicas of the vLLM engine (u
 <section id="configure-vllm-for-llm-inference">
 <span id="vllm-llm"></span><h2>Configure vLLM for LLM inference<a class="headerlink" href="#configure-vllm-for-llm-inference" title="Link to this heading">#</a></h2>
 <p>Use the <code class="code docutils literal notranslate"><span class="pre">vLLMEngineProcessorConfig</span></code> to configure the vLLM engine.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.data.llm</span> <span class="kn">import</span> <span class="n">vLLMEngineProcessorConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.llm</span><span class="w"> </span><span class="kn">import</span> <span class="n">vLLMEngineProcessorConfig</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">vLLMEngineProcessorConfig</span><span class="p">(</span>
     <span class="n">model_source</span><span class="o">=</span><span class="s2">&quot;unsloth/Llama-3.1-8B-Instruct&quot;</span><span class="p">,</span>
@@ -1529,9 +1529,9 @@ if specified).</p>
 <section id="batch-inference-with-an-openai-compatible-endpoint">
 <span id="openai-compatible-api-endpoint"></span><h2>Batch inference with an OpenAI-compatible endpoint<a class="headerlink" href="#batch-inference-with-an-openai-compatible-endpoint" title="Link to this heading">#</a></h2>
 <p>You can also make calls to deployed models that have an OpenAI compatible API endpoint.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">ray.data.llm</span> <span class="kn">import</span> <span class="n">HttpRequestProcessorConfig</span><span class="p">,</span> <span class="n">build_llm_processor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.llm</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpRequestProcessorConfig</span><span class="p">,</span> <span class="n">build_llm_processor</span>
 
 <span class="n">OPENAI_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">]</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">from_items</span><span class="p">([</span><span class="s2">&quot;Hand me a haiku.&quot;</span><span class="p">])</span>

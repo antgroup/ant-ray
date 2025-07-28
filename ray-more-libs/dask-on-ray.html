@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1512,12 +1512,12 @@ The table below shows the latest Dask versions that are tested with Ray versions
 any Dask <a class="reference external" href="https://docs.dask.org/en/latest/api.html#dask.compute">.compute()</a>
 call.
 Here’s an example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.util.dask</span> <span class="kn">import</span> <span class="n">ray_dask_get</span><span class="p">,</span> <span class="n">enable_dask_on_ray</span><span class="p">,</span> <span class="n">disable_dask_on_ray</span>
-<span class="kn">import</span> <span class="nn">dask.array</span> <span class="k">as</span> <span class="nn">da</span>
-<span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.dask</span><span class="w"> </span><span class="kn">import</span> <span class="n">ray_dask_get</span><span class="p">,</span> <span class="n">enable_dask_on_ray</span><span class="p">,</span> <span class="n">disable_dask_on_ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask.array</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">da</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask.dataframe</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="c1"># Start Ray.</span>
 <span class="c1"># Tip: If connecting to an existing cluster, use ray.init(address=&quot;auto&quot;).</span>
@@ -1603,10 +1603,10 @@ a Dask array), followed by multiple different downstream computations (such as
 aggregations): those downstream computations will be faster since that base collection
 computation was kicked off early and referenced by all downstream computations, often
 via shared memory.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.util.dask</span> <span class="kn">import</span> <span class="n">enable_dask_on_ray</span>
-<span class="kn">import</span> <span class="nn">dask</span>
-<span class="kn">import</span> <span class="nn">dask.array</span> <span class="k">as</span> <span class="nn">da</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.dask</span><span class="w"> </span><span class="kn">import</span> <span class="n">enable_dask_on_ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask.array</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">da</span>
 
 <span class="c1"># Start Ray.</span>
 <span class="c1"># Tip: If connecting to an existing cluster, use ray.init(address=&quot;auto&quot;).</span>
@@ -1652,10 +1652,10 @@ underlying Ray tasks. Resource requests and other Ray task options can also be s
 globally via the <code class="docutils literal notranslate"><span class="pre">.compute(ray_remote_args={...})</span></code> API, which will
 serve as a default for all Ray tasks launched via the Dask workload. Annotations on
 individual Dask operations will override this global default.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.util.dask</span> <span class="kn">import</span> <span class="n">enable_dask_on_ray</span>
-<span class="kn">import</span> <span class="nn">dask</span>
-<span class="kn">import</span> <span class="nn">dask.array</span> <span class="k">as</span> <span class="nn">da</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.dask</span><span class="w"> </span><span class="kn">import</span> <span class="n">enable_dask_on_ray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask.array</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">da</span>
 
 <span class="c1"># Start Ray.</span>
 <span class="c1"># Tip: If connecting to an existing cluster, use ray.init(address=&quot;auto&quot;).</span>
@@ -1714,12 +1714,12 @@ see <a class="reference external" href="https://github.com/dask/dask/issues/7036
 <p id="dask-on-ray-shuffle-optimization">Dask-on-Ray provides a Dask DataFrame optimizer that leverages Ray’s ability to
 execute multiple-return tasks in order to speed up shuffling by as much as 4x on Ray.
 Simply set the <code class="code docutils literal notranslate"><span class="pre">dataframe_optimize</span></code> configuration option to our optimizer function, similar to how you specify the Dask-on-Ray scheduler:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ray</span>
-<span class="kn">from</span> <span class="nn">ray.util.dask</span> <span class="kn">import</span> <span class="n">dataframe_optimize</span><span class="p">,</span> <span class="n">ray_dask_get</span>
-<span class="kn">import</span> <span class="nn">dask</span>
-<span class="kn">import</span> <span class="nn">dask.dataframe</span> <span class="k">as</span> <span class="nn">dd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.dask</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataframe_optimize</span><span class="p">,</span> <span class="n">ray_dask_get</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask.dataframe</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="c1"># Start Ray.</span>
 <span class="c1"># Tip: If connecting to an existing cluster, use ray.init(address=&quot;auto&quot;).</span>
@@ -1756,17 +1756,17 @@ With these hooks, implementing Dask-level scheduler and task introspection,
 such as progress reporting, diagnostics, caching, etc., is simple.</p>
 <p>Here’s an example that measures and logs the execution time of each task using
 the <code class="docutils literal notranslate"><span class="pre">ray_pretask</span></code> and <code class="docutils literal notranslate"><span class="pre">ray_posttask</span></code> hooks:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.util.dask</span> <span class="kn">import</span> <span class="n">RayDaskCallback</span><span class="p">,</span> <span class="n">ray_dask_get</span>
-<span class="kn">from</span> <span class="nn">timeit</span> <span class="kn">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.dask</span><span class="w"> </span><span class="kn">import</span> <span class="n">RayDaskCallback</span><span class="p">,</span> <span class="n">ray_dask_get</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">timeit</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
 
 
-<span class="k">class</span> <span class="nc">MyTimerCallback</span><span class="p">(</span><span class="n">RayDaskCallback</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">_ray_pretask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">object_refs</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyTimerCallback</span><span class="p">(</span><span class="n">RayDaskCallback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_pretask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">object_refs</span><span class="p">):</span>
         <span class="c1"># Executed at the start of the Ray task.</span>
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">start_time</span>
 
-    <span class="k">def</span> <span class="nf">_ray_posttask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">pre_state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_posttask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">pre_state</span><span class="p">):</span>
         <span class="c1"># Executed at the end of the Ray task.</span>
         <span class="n">execution_time</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">pre_state</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Execution time for task </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">execution_time</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
@@ -1806,7 +1806,7 @@ values.</p>
 <p>When creating your own callbacks, you can use
 <a class="reference internal" href="doc/ray.util.dask.RayDaskCallback.html#ray.util.dask.RayDaskCallback" title="ray.util.dask.callbacks.RayDaskCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">RayDaskCallback</span></code></a>
 directly, passing the callback functions as constructor arguments:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">my_presubmit_cb</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">deps</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">my_presubmit_cb</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">deps</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;About to submit task </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">)</span>
 
 <span class="k">with</span> <span class="n">RayDaskCallback</span><span class="p">(</span><span class="n">ray_presubmit</span><span class="o">=</span><span class="n">my_presubmit_cb</span><span class="p">):</span>
@@ -1814,8 +1814,8 @@ directly, passing the callback functions as constructor arguments:</p>
 </pre></div>
 </div>
 <p>or you can subclass it, implementing the callback methods that you need:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyPresubmitCallback</span><span class="p">(</span><span class="n">RayDaskCallback</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">_ray_presubmit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">deps</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyPresubmitCallback</span><span class="p">(</span><span class="n">RayDaskCallback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_presubmit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">deps</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;About to submit task </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">)</span>
 
 <span class="k">with</span> <span class="n">MyPresubmitCallback</span><span class="p">():</span>
@@ -1834,34 +1834,34 @@ aggregation, such as capturing task execution statistics and caching results.
 Here is an example that does both, caching the result of a task if its
 execution time exceeds some user-defined threshold:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ray</span><span class="o">.</span><span class="n">remote</span>
-<span class="k">class</span> <span class="nc">SimpleCacheActor</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SimpleCacheActor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="c1"># Raises KeyError if key isn&#39;t in cache.</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
 
-<span class="k">class</span> <span class="nc">SimpleCacheCallback</span><span class="p">(</span><span class="n">RayDaskCallback</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache_actor_handle</span><span class="p">,</span> <span class="n">put_threshold</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SimpleCacheCallback</span><span class="p">(</span><span class="n">RayDaskCallback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache_actor_handle</span><span class="p">,</span> <span class="n">put_threshold</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache_actor</span> <span class="o">=</span> <span class="n">cache_actor_handle</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">put_threshold</span> <span class="o">=</span> <span class="n">put_threshold</span>
 
-    <span class="k">def</span> <span class="nf">_ray_presubmit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">deps</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_presubmit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">deps</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_actor</span><span class="o">.</span><span class="n">get</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)))</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_ray_pretask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">object_refs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_pretask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">object_refs</span><span class="p">):</span>
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">start_time</span>
 
-    <span class="k">def</span> <span class="nf">_ray_posttask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">pre_state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ray_posttask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">pre_state</span><span class="p">):</span>
         <span class="n">execution_time</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">pre_state</span>
         <span class="k">if</span> <span class="n">execution_time</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">put_threshold</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cache_actor</span><span class="o">.</span><span class="n">put</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">result</span><span class="p">)</span>

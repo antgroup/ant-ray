@@ -29,7 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/autodoc_pydantic.css" />
@@ -1436,7 +1436,7 @@ asynchronous training and (distributed) checkpointing for durability during trai
 <p>Adjust the amount of resources for training using the
 <code class="code docutils literal notranslate"><span class="pre">num_gpus_per_learner</span></code>, <code class="code docutils literal notranslate"><span class="pre">num_cpus_per_learner</span></code>, and <code class="code docutils literal notranslate"><span class="pre">num_learners</span></code>
 arguments in the <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig" title="ray.rllib.algorithms.algorithm_config.AlgorithmConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AlgorithmConfig</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.algorithms.ppo.ppo</span> <span class="kn">import</span> <span class="n">PPOConfig</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.ppo.ppo</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOConfig</span>
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="p">(</span>
@@ -1618,7 +1618,7 @@ all Learners, you can do so through the LearnerGroup APIs
 <input id="sd-tab-item-5" name="sd-tab-set-2" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-5">
 Getting and Setting State for a Learner</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ray.rllib.core</span> <span class="kn">import</span> <span class="n">COMPONENT_RL_MODULE</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">COMPONENT_RL_MODULE</span>
 
 <span class="c1"># Get the Learner&#39;s RLModule weights and optimizer states.</span>
 <span class="n">state</span> <span class="o">=</span> <span class="n">learner</span><span class="o">.</span><span class="n">get_state</span><span class="p">()</span>
@@ -1711,10 +1711,10 @@ A Learner’s state includes the neural network weights and all optimizer states
 <section id="starter-example">
 <h2>Starter Example<a class="headerlink" href="#starter-example" title="Link to this heading">#</a></h2>
 <p>A <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> that implements behavior cloning could look like the following:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">BCTorchLearner</span><span class="p">(</span><span class="n">TorchLearner</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">BCTorchLearner</span><span class="p">(</span><span class="n">TorchLearner</span><span class="p">):</span>
 
     <span class="nd">@override</span><span class="p">(</span><span class="n">Learner</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">compute_loss_for_module</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_loss_for_module</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">module_id</span><span class="p">:</span> <span class="n">ModuleID</span><span class="p">,</span>

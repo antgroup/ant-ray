@@ -108,6 +108,8 @@ class ClusterResourceSchedulerTest : public ::testing::Test {
     is_node_available_fn_ = [this](scheduling::NodeID node_id) {
       return gcs_client_->Nodes().Get(NodeID::FromBinary(node_id.Binary())) != nullptr;
     };
+    is_node_schedulable_fn = [](scheduling::NodeID node_id,
+                                const SchedulingContext *context) { return true; };
     node_name = NodeID::FromRandom().Binary();
     node_info.set_node_id(node_name);
     ON_CALL(*gcs_client_->mock_node_accessor, Get(::testing::_, ::testing::_))
@@ -133,6 +135,8 @@ class ClusterResourceSchedulerTest : public ::testing::Test {
   }
   std::unique_ptr<gcs::MockGcsClient> gcs_client_;
   std::function<bool(scheduling::NodeID)> is_node_available_fn_;
+  std::function<bool(scheduling::NodeID, const SchedulingContext *)>
+      is_node_schedulable_fn;
   std::string node_name;
   rpc::GcsNodeInfo node_info;
 };
@@ -726,15 +730,15 @@ TEST_F(ClusterResourceSchedulerTest, SchedulingResourceRequestTest) {
       is_node_available_fn_,
       true,
       [](scheduling::NodeID, const SchedulingContext *) { return true; });
+  auto node_id = NodeID::FromRandom();
   rpc::SchedulingStrategy scheduling_strategy;
   scheduling_strategy.mutable_default_scheduling_strategy();
   {
-    auto node_id = NodeID::FromRandom();
-    node_resources = CreateNodeResources({{ResourceID::CPU(), 10},
-                                          {ResourceID::Memory(), 2},
-                                          {ResourceID::GPU(), 3},
-                                          {ResourceID("custom1"), 5},
-                                          {ResourceID("custom2"), 5}});
+    NodeResources node_resources = CreateNodeResources({{ResourceID::CPU(), 10},
+                                                        {ResourceID::Memory(), 2},
+                                                        {ResourceID::GPU(), 3},
+                                                        {ResourceID("custom1"), 5},
+                                                        {ResourceID("custom2"), 5}});
     resource_scheduler.GetClusterResourceManager().AddOrUpdateNode(
         scheduling::NodeID(node_id.Binary()), node_resources);
   }
@@ -1859,9 +1863,22 @@ TEST_F(ClusterResourceSchedulerTest, AffinityWithBundleScheduleTest) {
 TEST_F(ClusterResourceSchedulerTest, LabelSelectorIsSchedulableOnNodeTest) {
   absl::flat_hash_map<std::string, double> resource_total({{"CPU", 10}});
   auto node_1 = scheduling::NodeID(NodeID::FromRandom().Binary());
+  const absl::flat_hash_map<std::string, std::string> local_node_labels = {};
   instrumented_io_context io_context;
   ClusterResourceScheduler resource_scheduler(
-      io_context, node_1, resource_total, is_node_available_fn_);
+      io_context,
+      node_1,
+      resource_total,
+      is_node_available_fn_,
+      /*get_used_object_store_memory*/
+      []() -> int64_t { return 0; },
+      /*get_pull_manager_at_capacity*/
+      []() -> bool { return false; },
+      /*shutdown_raylet_gracefully*/
+      [](const rpc::NodeDeathInfo &) {},
+      /*local_node_labels*/
+      local_node_labels,
+      is_node_schedulable_fn);
   resource_scheduler.GetClusterResourceManager().AddOrUpdateNode(
       node_1, resource_total, resource_total);
 

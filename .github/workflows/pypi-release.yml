@@ -173,7 +173,7 @@ jobs:
         env:
           CIBW_BEFORE_BUILD: brew install node && pip install "cython>=0.29.32" wheel && sudo ./ci/env/install-bazel.sh && python -m ensurepip --upgrade && sudo chmod a+x /Users/runner/bin/bazel && sudo chown -R runner /Users/runner/Library/Caches/bazelisk && pushd python/ray/dashboard/client && npm ci && npm run build && popd
           CIBW_BUILD: cp${{ matrix.python-version }}-macosx_*
-          CIBW_ENVIRONMENT: "RAY_INSTALL_CPP=1 LD_LIBRARY_PATH=$(pwd)/python/ray/cpp/lib:$LD_LIBRARY_PATH"
+          CIBW_ENVIRONMENT: "RAY_INSTALL_CPP=1 DYLD_LIBRARY_PATH=$(pwd)/python/ray/cpp/lib:$DYLD_LIBRARY_PATH"
           MACOSX_DEPLOYMENT_TARGET: 14.2
         with:
           package-dir: ./python
@@ -230,7 +230,7 @@ jobs:
         env:
           CIBW_BEFORE_BUILD: brew install node && pip install "cython>=0.29.32" wheel && sudo ./ci/env/install-bazel.sh && python -m ensurepip --upgrade && sudo chmod a+x /Users/runner/bin/bazel && sudo chown -R runner /Users/runner/Library/Caches/bazelisk && pushd python/ray/dashboard/client && npm ci && npm run build && popd
           CIBW_BUILD: cp${{ matrix.python-version }}-macosx_*
-          CIBW_ENVIRONMENT: "RAY_INSTALL_CPP=1 LD_LIBRARY_PATH=$(pwd)/python/ray/cpp/lib:$LD_LIBRARY_PATH"
+          CIBW_ENVIRONMENT: "RAY_INSTALL_CPP=1 DYLD_LIBRARY_PATH=$(pwd)/python/ray/cpp/lib:$DYLD_LIBRARY_PATH"
           MACOSX_DEPLOYMENT_TARGET: 14.5
         with:
           package-dir: ./python

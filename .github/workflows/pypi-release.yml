@@ -14,7 +14,7 @@ on:
 
 jobs:
   build_linux_wheels_aarch64:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build wheels (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -42,7 +42,7 @@ jobs:
           path: ./python/dist/*.whl
 
   build_cpp_linux_wheels_aarch64:
-    name: Build cpp wheels on ${{ matrix.os }}
+    name: Build cpp wheels (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -71,7 +71,7 @@ jobs:
           path: ./python/dist/*.whl
 
   build_linux_wheels:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build wheels (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -99,7 +99,7 @@ jobs:
           path: ./python/dist/*.whl
 
   build_cpp_linux_wheels:
-    name: Build cpp wheels on ${{ matrix.os }}
+    name: Build cpp wheels (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

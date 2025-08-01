@@ -60,7 +60,7 @@ jobs:
         env:
           CIBW_BEFORE_BUILD_LINUX: yum install -y epel-release && yum -y update && yum -y install curl && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash && export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && nvm install 16.20.2 && nvm use 16.20.2 && pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh && pushd python/ray/dashboard/client && npm ci && npm run build && popd
           CIBW_BUILD: cp${{ matrix.python-version }}-manylinux_${{ matrix.arch }}*
-          CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly RAY_INSTALL_CPP=1 LD_LIBRARY_PATH=$GITHUB_WORKSPACE/python/ray/cpp/lib:$LD_LIBRARY_PATH
+          CIBW_ENVIRONMENT: "RAY_DEBUG_BUILD=nightly RAY_INSTALL_CPP=1 LD_LIBRARY_PATH=$(pwd)/python/ray/cpp/lib:$LD_LIBRARY_PATH"
         with:
           package-dir: ./python
           output-dir: ./python/dist
@@ -118,7 +118,7 @@ jobs:
         env:
           CIBW_BEFORE_BUILD_LINUX: yum install -y epel-release && yum -y update && yum -y install npm && pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh && pushd python/ray/dashboard/client && npm -g install npm@8.19.2 && npm ci && npm run build && popd
           CIBW_BUILD: cp${{ matrix.python-version }}-manylinux_${{ matrix.arch }}*
-          CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly RAY_INSTALL_CPP=1 LD_LIBRARY_PATH=$GITHUB_WORKSPACE/python/ray/cpp/lib:$LD_LIBRARY_PATH
+          CIBW_ENVIRONMENT: "RAY_DEBUG_BUILD=nightly RAY_INSTALL_CPP=1 LD_LIBRARY_PATH=$(pwd)/python/ray/cpp/lib:$LD_LIBRARY_PATH"
         with:
           package-dir: ./python
           output-dir: ./python/dist
@@ -176,7 +176,7 @@ jobs:
           CIBW_BEFORE_BUILD: brew install node && pip install "cython>=0.29.32" wheel && sudo ./ci/env/install-bazel.sh && python -m ensurepip --upgrade && sudo chmod a+x /Users/runner/bin/bazel && sudo chown -R runner /Users/runner/Library/Caches/bazelisk && pushd python/ray/dashboard/client && npm ci && npm run build && popd
           CIBW_BUILD: cp${{ matrix.python-version }}-macosx_*
           MACOSX_DEPLOYMENT_TARGET: 14.2
-          CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly RAY_INSTALL_CPP=1 LD_LIBRARY_PATH=$GITHUB_WORKSPACE/python/ray/cpp/lib:$LD_LIBRARY_PATH
+          CIBW_ENVIRONMENT: "RAY_DEBUG_BUILD=nightly RAY_INSTALL_CPP=1 LD_LIBRARY_PATH=$(pwd)/python/ray/cpp/lib:$LD_LIBRARY_PATH"
         with:
           package-dir: ./python
           output-dir: ./python/dist
@@ -234,7 +234,7 @@ jobs:
           CIBW_BEFORE_BUILD: brew install node && pip install "cython>=0.29.32" wheel && sudo ./ci/env/install-bazel.sh && python -m ensurepip --upgrade && sudo chmod a+x /Users/runner/bin/bazel && sudo chown -R runner /Users/runner/Library/Caches/bazelisk && pushd python/ray/dashboard/client && npm ci && npm run build && popd
           CIBW_BUILD: cp${{ matrix.python-version }}-macosx_*
           MACOSX_DEPLOYMENT_TARGET: 14.5
-          CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly RAY_INSTALL_CPP=1 LD_LIBRARY_PATH=$GITHUB_WORKSPACE/python/ray/cpp/lib:$LD_LIBRARY_PATH
+          CIBW_ENVIRONMENT: "RAY_DEBUG_BUILD=nightly RAY_INSTALL_CPP=1 LD_LIBRARY_PATH=$(pwd)/python/ray/cpp/lib:$LD_LIBRARY_PATH"
         with:
           package-dir: ./python
           output-dir: ./python/dist

@@ -28,10 +28,18 @@ jobs:
       - name: Build cpp wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
-          CIBW_BEFORE_BUILD: brew install node && pip install "cython>=0.29.32" wheel && sudo ./ci/env/install-bazel.sh && python -m ensurepip --upgrade && sudo chmod a+x /Users/runner/bin/bazel && sudo chown -R runner /Users/runner/Library/Caches/bazelisk && pushd python/ray/dashboard/client && npm ci && npm run build && popd
+          CIBW_BEFORE_BUILD: |
+            brew install node
+            pip install "cython>=0.29.32" wheel
+            sudo ./ci/env/install-bazel.sh
+            python -m ensurepip --upgrade
+            sudo chmod a+x /Users/runner/bin/bazel
+            sudo chown -R runner /Users/runner/Library/Caches/bazelisk
+            pushd python/ray/dashboard/client && npm ci && npm run build && popd
           CIBW_BUILD: cp${{ matrix.python-version }}-macosx_*
           MACOSX_DEPLOYMENT_TARGET: 14.2
-          CIBW_ENVIRONMENT: "RAY_DEBUG_BUILD=nightly RAY_INSTALL_CPP=1 DYLD_LIBRARY_PATH=$(pwd)/python/ray/cpp/lib:$DYLD_LIBRARY_PATH"
+          CIBW_ENVIRONMENT: "RAY_DEBUG_BUILD=nightly RAY_INSTALL_CPP=1"
+          CIBW_REPAIR_WHEEL_COMMAND: delocate-wheel --lib-sdir $GITHUB_WORKSPACE/python/ray/cpp/lib -w {dest_dir} {wheel}
         with:
           package-dir: ./python
           output-dir: ./python/dist
@@ -65,25 +73,10 @@ jobs:
             sudo chmod a+x /Users/runner/bin/bazel
             sudo chown -R runner /Users/runner/Library/Caches/bazelisk
             pushd python/ray/dashboard/client && npm ci && npm run build && popd
-
-            bazel build //cpp:ray_cpp_pkg
-            find ./python/ray/cpp -type f -executable | while read binary; do
-              install_name_tool -change \
-                "@loader_path/../_solib_darwin_arm64/_U_S_Scpp_Cray_Ucpp_Ulib___Ucpp/libray_api.so" \
-                "@loader_path/lib/libray_api.so" \
-                "$binary"
-            done
-
           CIBW_BUILD: cp${{ matrix.python-version }}-macosx_*
           MACOSX_DEPLOYMENT_TARGET: 14.5
           CIBW_ENVIRONMENT: "RAY_DEBUG_BUILD=nightly RAY_INSTALL_CPP=1"
-          CIBW_REPAIR_WHEEL_COMMAND: >  # 新增修复命令
-            delocate-wheel
-            --require-archs arm64
-            --lib-sdir "ray/cpp/lib"
-            -w {dest_dir}
-            {wheel}
-
+          CIBW_REPAIR_WHEEL_COMMAND: delocate-wheel --lib-sdir {project_dir}/python/ray/cpp/lib -w {dest_dir} {wheel}
         with:
           package-dir: ./python
           output-dir: ./python/dist

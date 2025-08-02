@@ -12,151 +12,6 @@ on:
         default: 'main'
 
 jobs:
-  build_linux_wheels_aarch64:
-    name: Build wheels (${{ matrix.python-version }}, ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-24.04-arm]
-        python-version: [39, 310, 311, 312]
-        arch: [aarch64]
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch || 'main' }}
-
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.22.0
-        env:
-          CIBW_BEFORE_BUILD_LINUX: yum install -y epel-release && yum -y update && yum -y install curl && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash && export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && nvm install 16.20.2 && nvm use 16.20.2 && pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh && pushd python/ray/dashboard/client && npm ci && npm run build && popd
-          CIBW_BUILD: cp${{ matrix.python-version }}-manylinux_${{ matrix.arch }}*
-          CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly
-        with:
-          package-dir: ./python
-          output-dir: ./python/dist
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: ./python/dist/*.whl
-
-  build_cpp_linux_wheels_aarch64:
-    name: Build cpp wheels (${{ matrix.python-version }}, ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-24.04-arm]
-        python-version: [39, 310, 311, 312]
-        arch: [aarch64]
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch || 'main' }}
-
-      - name: Build cpp wheels
-        uses: pypa/cibuildwheel@v2.22.0
-        env:
-          CIBW_BEFORE_BUILD_LINUX: yum install -y epel-release && yum -y update && yum -y install curl && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash && export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && nvm install 16.20.2 && nvm use 16.20.2 && pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh && pushd python/ray/dashboard/client && npm ci && npm run build && popd
-          CIBW_BUILD: cp${{ matrix.python-version }}-manylinux_${{ matrix.arch }}*
-          CIBW_ENVIRONMENT: "RAY_DEBUG_BUILD=nightly RAY_INSTALL_CPP=1 LD_LIBRARY_PATH=$(pwd)/python/ray/cpp/lib:$LD_LIBRARY_PATH"
-        with:
-          package-dir: ./python
-          output-dir: ./python/dist
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: cibw-cpp-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: ./python/dist/*.whl
-
-  build_linux_wheels:
-    name: Build wheels (${{ matrix.python-version }}, ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        python-version: [39, 310, 311, 312]
-        arch: [x86_64]
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch || 'main' }}
-
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.22.0
-        env:
-          CIBW_BEFORE_BUILD_LINUX: yum install -y epel-release && yum -y update && yum -y install npm && pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh && pushd python/ray/dashboard/client && npm -g install npm@8.19.2 && npm ci && npm run build && popd
-          CIBW_BUILD: cp${{ matrix.python-version }}-manylinux_${{ matrix.arch }}*
-          CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly
-        with:
-          package-dir: ./python
-          output-dir: ./python/dist
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: ./python/dist/*.whl
-
-  build_cpp_linux_wheels:
-    name: Build cpp wheels (${{ matrix.python-version }}, ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        python-version: [39, 310, 311, 312]
-        arch: [x86_64]
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch || 'main' }}
-
-      - name: Build cpp wheels
-        uses: pypa/cibuildwheel@v2.22.0
-        env:
-          CIBW_BEFORE_BUILD_LINUX: yum install -y epel-release && yum -y update && yum -y install npm && pip install "cython>=0.29.32" wheel && ./ci/env/install-bazel.sh && pushd python/ray/dashboard/client && npm -g install npm@8.19.2 && npm ci && npm run build && popd
-          CIBW_BUILD: cp${{ matrix.python-version }}-manylinux_${{ matrix.arch }}*
-          CIBW_ENVIRONMENT: "RAY_DEBUG_BUILD=nightly RAY_INSTALL_CPP=1 LD_LIBRARY_PATH=$(pwd)/python/ray/cpp/lib:$LD_LIBRARY_PATH"
-        with:
-          package-dir: ./python
-          output-dir: ./python/dist
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: cibw-cpp-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: ./python/dist/*.whl
-
-  build_macos_wheels13:
-    name: Build macOS wheels (${{ matrix.python-version }}, ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-13]
-        python-version: [39, 310, 311, 312]
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch || 'main' }}
-
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.22.0
-        env:
-          CIBW_BEFORE_BUILD: brew install node && pip install "cython>=0.29.32" wheel && sudo ./ci/env/install-bazel.sh && python -m ensurepip --upgrade && sudo chmod a+x /Users/runner/bin/bazel && sudo chown -R runner /Users/runner/Library/Caches/bazelisk && pushd python/ray/dashboard/client && npm ci && npm run build && popd
-          CIBW_BUILD: cp${{ matrix.python-version }}-macosx_*
-          MACOSX_DEPLOYMENT_TARGET: 14.2
-          CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly
-        with:
-          package-dir: ./python
-          output-dir: ./python/dist
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: ./python/dist/*.whl
-  
   build_cpp_macos_wheels13:
     name: Build cpp macOS wheels (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -186,35 +41,6 @@ jobs:
           name: cibw-cpp-wheels-${{ matrix.os }}-${{ strategy.job-index }}
           path: ./python/dist/*.whl
 
-  build_macos_wheels:
-    name: Build macOS wheels (${{ matrix.python-version }}, ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-14]
-        python-version: [39, 310, 311, 312]
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch || 'main' }}
-
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.22.0
-        env:
-          CIBW_BEFORE_BUILD: brew install node && pip install "cython>=0.29.32" wheel && sudo ./ci/env/install-bazel.sh && python -m ensurepip --upgrade && sudo chmod a+x /Users/runner/bin/bazel && sudo chown -R runner /Users/runner/Library/Caches/bazelisk && pushd python/ray/dashboard/client && npm ci && npm run build && popd
-          CIBW_BUILD: cp${{ matrix.python-version }}-macosx_*
-          MACOSX_DEPLOYMENT_TARGET: 14.5
-          CIBW_ENVIRONMENT: RAY_DEBUG_BUILD=nightly
-        with:
-          package-dir: ./python
-          output-dir: ./python/dist
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: ./python/dist/*.whl
-  
   build_cpp_macos_wheels:
     name: Build cpp macOS wheels (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -231,10 +57,33 @@ jobs:
       - name: Build cpp wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
-          CIBW_BEFORE_BUILD: brew install node && pip install "cython>=0.29.32" wheel && sudo ./ci/env/install-bazel.sh && python -m ensurepip --upgrade && sudo chmod a+x /Users/runner/bin/bazel && sudo chown -R runner /Users/runner/Library/Caches/bazelisk && pushd python/ray/dashboard/client && npm ci && npm run build && popd
+          CIBW_BEFORE_BUILD: |
+            brew install node
+            pip install "cython>=0.29.32" wheel
+            sudo ./ci/env/install-bazel.sh
+            python -m ensurepip --upgrade
+            sudo chmod a+x /Users/runner/bin/bazel
+            sudo chown -R runner /Users/runner/Library/Caches/bazelisk
+            pushd python/ray/dashboard/client && npm ci && npm run build && popd
+
+            bazel build //cpp:ray_cpp_pkg
+            find ./python/ray/cpp -type f -executable | while read binary; do
+              install_name_tool -change \
+                "@loader_path/../_solib_darwin_arm64/_U_S_Scpp_Cray_Ucpp_Ulib___Ucpp/libray_api.so" \
+                "@loader_path/lib/libray_api.so" \
+                "$binary"
+            done
+
           CIBW_BUILD: cp${{ matrix.python-version }}-macosx_*
           MACOSX_DEPLOYMENT_TARGET: 14.5
-          CIBW_ENVIRONMENT: "RAY_DEBUG_BUILD=nightly RAY_INSTALL_CPP=1 DYLD_LIBRARY_PATH=$(pwd)/python/ray/cpp/lib:$DYLD_LIBRARY_PATH"
+          CIBW_ENVIRONMENT: "RAY_DEBUG_BUILD=nightly RAY_INSTALL_CPP=1"
+          CIBW_REPAIR_WHEEL_COMMAND: >  # 新增修复命令
+            delocate-wheel
+            --require-archs arm64
+            --lib-sdir "ray/cpp/lib"
+            -w {dest_dir}
+            {wheel}
+
         with:
           package-dir: ./python
           output-dir: ./python/dist
@@ -245,7 +94,7 @@ jobs:
           path: ./python/dist/*.whl
 
   upload_pypi:
-    needs: [build_macos_wheels, build_cpp_macos_wheels, build_macos_wheels13, build_cpp_macos_wheels13, build_linux_wheels, build_cpp_linux_wheels, build_linux_wheels_aarch64, build_cpp_linux_wheels_aarch64]
+    needs: [build_cpp_macos_wheels, build_cpp_macos_wheels13]
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -267,7 +116,7 @@ jobs:
           skip-existing: true
 
   upload_test_pypi:
-    needs: [build_macos_wheels, build_cpp_macos_wheels, build_macos_wheels13, build_cpp_macos_wheels13, build_linux_wheels, build_cpp_linux_wheels, build_linux_wheels_aarch64, build_cpp_linux_wheels_aarch64]
+    needs: [build_cpp_macos_wheels, build_cpp_macos_wheels13]
     runs-on: ubuntu-latest
     environment: testpypi-publish
     permissions:

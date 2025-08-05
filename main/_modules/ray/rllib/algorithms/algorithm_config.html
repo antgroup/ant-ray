@@ -36,7 +36,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/csat.css?v=c8f39c76" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/assistant.css?v=d345c55e" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css?v=633d7681" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css?v=4676c12b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/docsearch.css?v=45fb5152" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/pydata-docsearch-custom.css?v=7fb92720" />
   
@@ -184,6 +184,12 @@ both in the usual template (layout.html) as well as (index.html). -->
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+
+  <div class="bd-header-announcement container-fluid bd-header-announcement">
+    <div class="bd-header-announcement__content">Try Ray with $100 credit — <a target="_blank" href="https://console.anyscale.com/register/ha?render_flow=ray&utm_source=ray_docs&utm_medium=docs&utm_campaign=banner">Start now</a>.</div>
+  </div>
+
   
     <nav class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
@@ -346,15 +352,6 @@ document.write(`
 `);
 </script></div>
       
-        <div class="navbar-item"><a
-  id="try-anyscale-href"
-  href="https://www.anyscale.com/ray-on-anyscale/?utm_source=ray_docs&utm_medium=docs&utm_campaign=navbar"
->
-  <div id="try-anyscale-text">
-    <span>Try Ray on Anyscale</span>
-  </div>
-</a></div>
-      
     </div>
     
   </div>
@@ -511,15 +508,6 @@ document.write(`
 `);
 </script></div>
         
-          <div class="navbar-item"><a
-  id="try-anyscale-href"
-  href="https://www.anyscale.com/ray-on-anyscale/?utm_source=ray_docs&utm_medium=docs&utm_campaign=navbar"
->
-  <div id="try-anyscale-text">
-    <span>Try Ray on Anyscale</span>
-  </div>
-</a></div>
-        
       </div>
     
   </div>
@@ -535,17 +523,32 @@ document.write(`
 
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ray-overview/examples.html">Example Gallery</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ray-overview/ray-libraries.html">Ecosystem</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../ray-core/walkthrough.html">Ray Core</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../../ray-core/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-core/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/tasks.html">Tasks</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/tasks/nested-tasks.html">Nested Remote Functions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/tasks/generators.html">Dynamic generators</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../ray-overview/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../ray-overview/examples/entity-recognition-with-llms/README.html">Entity Recognition with LLMs</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-overview/examples/e2e-audio/index.html">End-to-end audio</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../ray-overview/examples/e2e-audio/README.html">Audio data curation with Ray</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../ray-overview/examples/e2e-audio/e2e_audio/curation.html">Audio curation with offline batch inference</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/actors.html">Actors</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-overview/examples/e2e-xgboost/index.html">End-to-end distributed XGBoost</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../ray-overview/examples/e2e-xgboost/README.html">Overview</a></li>
+
+<li class="toctree-l3"><a class="reference internal" href="../../../../ray-overview/examples/e2e-xgboost/notebooks/01-Distributed_Training.html">Distributed training of an XGBoost model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../ray-overview/examples/e2e-xgboost/notebooks/02-Validation.html">Model validation using offline batch inference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../ray-overview/examples/e2e-xgboost/notebooks/03-Serving.html">Scalable online XGBoost inference with Ray Serve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ray-overview/ray-libraries.html">Ecosystem</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../ray-core/walkthrough.html">Ray Core</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../ray-core/key-concepts.html">Key Concepts</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-core/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/tasks.html">Tasks</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/tasks/nested-tasks.html">Nested Remote Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/actors.html">Actors</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/actors/named-actors.html">Named Actors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/actors/terminating-actors.html">Terminating Actors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/actors/async_api.html">AsyncIO / Concurrency for Actors</a></li>
@@ -555,13 +558,13 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/actors/task-orders.html">Actor Task Execution Order</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/objects.html">Objects</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/objects.html">Objects</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/objects/serialization.html">Serialization</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/objects/object-spilling.html">Object Spilling</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../ray-core/handling-dependencies.html">Environment Dependencies</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/scheduling/index.html">Scheduling</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/scheduling/index.html">Scheduling</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/scheduling/resources.html">Resources</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/scheduling/accelerators.html">Accelerator Support</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/scheduling/placement-group.html">Placement Groups</a></li>
@@ -569,7 +572,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/scheduling/ray-oom-prevention.html">Out-Of-Memory Prevention</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/fault-tolerance.html">Fault Tolerance</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/fault-tolerance.html">Fault tolerance</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/fault_tolerance/tasks.html">Task Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/fault_tolerance/actors.html">Actor Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/fault_tolerance/objects.html">Object Fault Tolerance</a></li>
@@ -578,7 +581,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/fault_tolerance/head-ha.html">Head High-Availability Feature</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/patterns/nested-tasks.html">Pattern: Using nested tasks to achieve nested parallelism</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/patterns/generators.html">Pattern: Using generators to reduce heap memory usage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/patterns/limit-pending-tasks.html">Pattern: Using ray.wait to limit the number of pending tasks</a></li>
@@ -601,7 +604,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/patterns/fork-new-processes.html">Anti-pattern: Forking new processes in application code</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/overlap.html">Experimental: Overlapping communication and computation</a></li>
@@ -609,12 +612,12 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/compiled-graph-api.html">Compiled Graph API</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/advanced-topics.html">Advanced Topics</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/advanced-topics.html">Advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/tips-for-first-time.html">Tips for first-time users</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/starting-ray.html">Starting Ray</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/ray-generator.html">Ray Generators</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/namespaces.html">Using Namespaces</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/cross-language.html">Cross-Language Programming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/cross-language.html">Cross-language programming</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/using-ray-with-jupyter.html">Working with Jupyter Notebooks &amp; JupyterLab</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/ray-dag.html">Lazy Computation Graphs with the Ray DAG API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/miscellaneous.html">Miscellaneous Topics</a></li>
@@ -624,7 +627,7 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-core/examples/overview.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-core/examples/overview.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../ray-core/examples/automl_for_time_series.html">Simple AutoML for time series with Ray Core</a></li>
 
 <li class="toctree-l3"><a class="reference internal" href="../../../../ray-core/examples/batch_prediction.html">Batch Prediction with Ray Core</a></li>
@@ -638,7 +641,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../../ray-core/examples/web-crawler.html">Speed up your web crawler by parallelizing it with Ray</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-core/api/index.html">Ray Core API</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-core/api/index.html">Ray Core API</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../ray-core/api/core.html">Core API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../ray-core/api/scheduling.html">Scheduling API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../ray-core/api/runtime-env.html">Runtime Env API</a></li>
@@ -651,14 +654,15 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../data/data.html">Ray Data</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../data/data.html">Ray Data</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../data/quickstart.html">Ray Data Quickstart</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../data/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../data/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../data/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/loading-data.html">Loading Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/inspecting-data.html">Inspecting Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/transforming-data.html">Transforming Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/iterating-over-data.html">Iterating over Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../data/joining-data.html">Joining datasets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/shuffling-data.html">Shuffling Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/saving-data.html">Saving Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/working-with-images.html">Working with Images</a></li>
@@ -674,7 +678,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../data/examples.html">Examples</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../data/api/api.html">Ray Data API</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../data/api/api.html">Ray Data API</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/api/input_output.html">Input/Output</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/api/dataset.html">Dataset API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/api/data_iterator.html">DataIterator API</a></li>
@@ -691,12 +695,13 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../data/data-internals.html">Ray Data Internals</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../train/train.html">Ray Train</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../train/train.html">Ray Train</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../train/overview.html">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../train/getting-started-pytorch.html">PyTorch Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../train/getting-started-pytorch-lightning.html">PyTorch Lightning Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../train/getting-started-transformers.html">Hugging Face Transformers Guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../train/more-frameworks.html">More Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../train/getting-started-xgboost.html">XGBoost Guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../train/more-frameworks.html">More Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-21"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../train/huggingface-accelerate.html">Hugging Face Accelerate Guide</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../train/deepspeed.html">DeepSpeed Guide</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../train/distributed-tensorflow-keras.html">TensorFlow and Keras Guide</a></li>
@@ -704,7 +709,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../../train/horovod.html">Horovod Guide</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../train/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../train/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-22"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../train/user-guides/data-loading-preprocessing.html">Data Loading and Preprocessing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../train/user-guides/using-gpus.html">Configuring Scale and GPUs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../train/user-guides/persistent-storage.html">Configuring Persistent Storage</a></li>
@@ -722,23 +727,22 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../train/api/api.html">Ray Train API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../tune/index.html">Ray Tune</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../tune/index.html">Ray Tune</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../tune/getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../tune/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../tune/tutorials/overview.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-21"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../tune/tutorials/overview.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-run.html">Running Basic Experiments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-output.html">Logging and Outputs in Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-resources.html">Setting Trial Resources</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-search-spaces.html">Using Search Spaces</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-stopping.html">How to Define Stopping Criteria for a Ray Tune Experiment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-trial-checkpoints.html">How to Save and Load Trial Checkpoints</a></li>
-
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-storage.html">How to Configure Persistent Storage in Ray Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-fault-tolerance.html">How to Enable Fault Tolerance in Ray Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-metrics.html">Using Callbacks and Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune_get_data_in_and_out.html">Getting Data in and out of Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune_analyze_results.html">Analyzing Tune Experiment Results</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../tune/examples/pbt_guide.html">A Guide to Population Based Training with Tune</a><input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-22"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../tune/examples/pbt_guide.html">A Guide to Population Based Training with Tune</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/pbt_visualization/pbt_visualization.html">Visualizing and Understanding PBT</a></li>
 </ul>
 </li>
@@ -747,36 +751,25 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-scalability.html">Scalability Benchmarks</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../tune/examples/ml-frameworks.html">Examples using Ray Tune with ML Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune-xgboost.html">XGBoost Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/lightgbm_example.html">LightGBM Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/pbt_transformers.html">Hugging Face Transformers Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/horovod_simple.html">Horovod Example</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../tune/examples/experiment-tracking.html">Tune Experiment Tracking Examples</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune-wandb.html">Weights &amp; Biases Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune-mlflow.html">MLflow Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune-aim.html">Aim Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune-comet.html">Comet Example</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../tune/examples/hpo-frameworks.html">Tune Hyperparameter Optimization Framework Examples</a><input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-26"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/ax_example.html">Ax Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/hyperopt_example.html">HyperOpt Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/bayesopt_example.html">Bayesopt Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/bohb_example.html">BOHB Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/nevergrad_example.html">Nevergrad Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/optuna_example.html">Optuna Example</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/other-examples.html">Other Examples</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/exercises.html">Exercises</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-26"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune-xgboost.html">XGBoost Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/lightgbm_example.html">LightGBM Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/pbt_transformers.html">Hugging Face Transformers Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/horovod_simple.html">Horovod Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune-wandb.html">Weights &amp; Biases Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune-mlflow.html">MLflow Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune-aim.html">Aim Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune-comet.html">Comet Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/ax_example.html">Ax Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/hyperopt_example.html">HyperOpt Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/bayesopt_example.html">Bayesopt Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/bohb_example.html">BOHB Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/nevergrad_example.html">Nevergrad Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/optuna_example.html">Optuna Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../tune/faq.html">Ray Tune FAQ</a></li>
@@ -1046,7 +1039,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.html">ray.rllib.utils.schedules.scheduler.Scheduler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.validate.html">ray.rllib.utils.schedules.scheduler.Scheduler.validate</a></li>
@@ -1107,6 +1100,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../ray-more-libs/raydp.html">Using Spark on Ray (RayDP)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../ray-more-libs/mars-on-ray.html">Using Mars on Ray</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../ray-more-libs/modin/index.html">Using Pandas on Ray (Modin)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../ray-more-libs/data_juicer_distributed_data_processing.html">Distributed Data Processing in Data-Juicer</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../workflows/index.html">Ray Workflows (Deprecated)</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../workflows/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../workflows/basics.html">Getting Started</a></li>
@@ -1128,6 +1122,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../cluster/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/getting-started/kuberay-operator-installation.html">KubeRay Operator Installation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/getting-started/raycluster-quick-start.html">RayCluster Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/getting-started/rayjob-quick-start.html">RayJob Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/getting-started/rayservice-quick-start.html">RayService Quickstart</a></li>
@@ -1135,10 +1130,12 @@ document.write(`
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/user-guides/rayservice.html">Deploy Ray Serve Apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/user-guides/rayservice-no-ray-serve-replica.html">RayService worker Pods aren’t ready</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/user-guides/rayservice-high-availability.html">RayService high availability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/user-guides/observability.html">KubeRay Observability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/user-guides/upgrade-guide.html">KubeRay upgrade guide</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/user-guides/k8s-cluster-setup.html">Managed Kubernetes services</a></li>
+
 
 
 
@@ -1283,7 +1280,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../ray-observability/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../../ray-observability/user-guides/debug-apps/general-debugging.html">General Debugging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../ray-observability/user-guides/debug-apps/general-debugging.html">Common Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-observability/user-guides/debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-observability/user-guides/debug-apps/debug-hangs.html">Debugging Hangs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-observability/user-guides/debug-apps/debug-failures.html">Debugging Failures</a></li>
@@ -1414,13 +1411,17 @@ document.write(`
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.callbacks.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLlibCallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.connector_v2</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConnectorV2</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_MODULE_ID</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.columns</span><span class="w"> </span><span class="kn">import</span> <span class="n">Columns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.learner.differentiable_learner_config</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DifferentiableLearnerConfig</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_module_id</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.default_model_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultModelConfig</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.multi_rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiRLModuleSpec</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModuleSpec</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env</span><span class="w"> </span><span class="kn">import</span> <span class="n">INPUT_ENV_SPACES</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env</span><span class="w"> </span><span class="kn">import</span> <span class="n">INPUT_ENV_SPACES</span><span class="p">,</span> <span class="n">INPUT_ENV_SINGLE_SPACES</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.multi_agent_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentEnv</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.wrappers.atari_wrappers</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_atari</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.evaluation.collectors.sample_collector</span><span class="w"> </span><span class="kn">import</span> <span class="n">SampleCollector</span>
@@ -1468,15 +1469,15 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.result</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRIAL_INFO</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.tune.tune</span><span class="w"> </span><span class="kn">import</span> <span class="n">_Config</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_once</span>
-
-<span class="n">Space</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.placement_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlacementGroup</span>
 
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.algorithm</span><span class="w"> </span><span class="kn">import</span> <span class="n">Algorithm</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.connector_v2</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConnectorV2</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.learner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Learner</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.learner.differentiable_learner</span><span class="w"> </span><span class="kn">import</span> <span class="n">DifferentiableLearner</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.learner.learner_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearnerGroup</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.learner.torch.torch_meta_learner</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchMetaLearner</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModule</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">EpisodeType</span>
 
@@ -1719,6 +1720,7 @@ document.write(`
         <span class="c1"># `self.env_runners()`</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_cls</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_env_runners</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_local_env_runner</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_envs_per_env_runner</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="c1"># TODO (sven): Once new ormsgpack system in place, reaplce the string</span>
         <span class="c1">#  with proper `gym.envs.registration.VectorizeMode.SYNC`.</span>
@@ -1735,6 +1737,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">add_default_connectors_to_env_to_module_pipeline</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_module_to_env_connector</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_default_connectors_to_module_to_env_pipeline</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merge_env_runner_states</span> <span class="o">=</span> <span class="s2">&quot;training_only&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">broadcast_env_runner_states</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">episode_lookback_horizon</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="c1"># TODO (sven): Rename into `sample_timesteps` (or `sample_duration`</span>
         <span class="c1">#  and `sample_duration_unit` (replacing batch_mode), like we do it</span>
@@ -1753,6 +1757,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">update_worker_filter_stats</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_worker_filter_stats</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sampler_perf_stats_ema_coef</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_online</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="c1"># `self.learners()`</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_learners</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1811,6 +1816,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_class</span> <span class="o">=</span> <span class="n">RLlibCallback</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_algorithm_init</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_env_runners_recreated</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_offline_eval_runners_recreated</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_checkpoint_loaded</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_environment_created</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_episode_created</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1819,6 +1825,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_episode_end</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_evaluate_start</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_evaluate_end</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_evaluate_offline_start</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_evaluate_offline_end</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_sample_end</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_train_result</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -1874,6 +1882,9 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">materialize_mapped_data</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">map_batches_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">iter_batches_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># Use always the final observation until the user explicitly ask</span>
+        <span class="c1"># to ignore it.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_final_observation</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prelearner_class</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prelearner_buffer_class</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prelearner_buffer_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1901,6 +1912,8 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_duration</span> <span class="o">=</span> <span class="mi">10</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_duration_unit</span> <span class="o">=</span> <span class="s2">&quot;episodes&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_sample_timeout_s</span> <span class="o">=</span> <span class="mf">120.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_auto_duration_min_env_steps_per_sample</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_auto_duration_max_env_steps_per_sample</span> <span class="o">=</span> <span class="mi">2000</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_parallel_to_training</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_force_reset_envs_before_iteration</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1915,6 +1928,31 @@ document.write(`
         <span class="c1">#  way). Replace by logic within `training_step` to merge and broadcast the</span>
         <span class="c1">#  EnvRunner (connector) states.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sync_filters_on_rollout_workers_timeout_s</span> <span class="o">=</span> <span class="mf">10.0</span>
+        <span class="c1"># Offline evaluation.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offline_evaluation_interval</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_offline_eval_runners</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># TODO (simon): Only `_offline_evaluate_with_fixed_duration` works. Also,</span>
+        <span class="c1"># decide, if we use `offline_evaluation_duration` or</span>
+        <span class="c1"># `dataset_num_iters_per_offline_eval_runner`. Should the user decide here?</span>
+        <span class="c1"># The latter will be much faster, but runs per runner call all evaluation.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offline_loss_for_module_fn</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offline_evaluation_duration</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offline_evaluation_parallel_to_training</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offline_evaluation_timeout_s</span> <span class="o">=</span> <span class="mf">120.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_cpus_per_offline_eval_runner</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_gpus_per_offline_eval_runner</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_resources_per_offline_eval_runner</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restart_failed_offline_eval_runners</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_offline_eval_runner_failures</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_num_offline_eval_runner_restarts</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_restore_timeout_s</span> <span class="o">=</span> <span class="mf">1800.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_requests_in_flight_per_offline_eval_runner</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_offline_eval_runners_after_construction</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_health_probe_timeout_s</span> <span class="o">=</span> <span class="mf">30.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_rl_module_inference_only</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">broadcast_offline_eval_runner_states</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_batch_size_per_runner</span> <span class="o">=</span> <span class="mi">256</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_num_iters_per_eval_runner</span> <span class="o">=</span> <span class="mi">1</span>
 
         <span class="c1"># `self.reporting()`</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keep_per_episode_custom_metrics</span> <span class="o">=</span> <span class="kc">False</span>
@@ -2389,7 +2427,12 @@ document.write(`
         <span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">build_env_to_module_connector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_env_to_module_connector</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">spaces</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConnectorV2</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.env_to_module</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">AddObservationsFromEpisodesToBatch</span><span class="p">,</span>
             <span class="n">AddStatesFromEpisodesToBatch</span><span class="p">,</span>
@@ -2404,9 +2447,24 @@ document.write(`
         <span class="c1"># Create an env-to-module connector pipeline (including RLlib&#39;s default</span>
         <span class="c1"># env-&gt;module connector piece) and return it.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_to_module_connector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">val_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_to_module_connector</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
-
-            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.connector_v2</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConnectorV2</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">val_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_to_module_connector</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">spaces</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+            <span class="c1"># Try deprecated signature, if necessary.</span>
+            <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;positional argument&quot;</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">log_once</span><span class="p">(</span><span class="s2">&quot;env-to-module-wrong-signature&quot;</span><span class="p">):</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                            <span class="s2">&quot;Your `config.env_to_module_connector` function seems to &quot;</span>
+                            <span class="s2">&quot;have a wrong or outdated signature! It should be: &quot;</span>
+                            <span class="s2">&quot;`def myfunc(env, spaces, device): ...`, where any of &quot;</span>
+                            <span class="s2">&quot;these arguments are optional and may be None.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                            <span class="s2">&quot;`env` is the (vectorized) gym env.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                            <span class="s2">&quot;`spaces` is a dict of structure `{&#39;__env__&#39;: ([&quot;</span>
+                            <span class="s2">&quot;vectorized env obs. space, vectorized env act. space]),&quot;</span>
+                            <span class="s2">&quot;&#39;__env_single__&#39;: ([env obs. space, env act. space])}`.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                            <span class="s2">&quot;`device` is a (torch) device.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                    <span class="n">val_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_to_module_connector</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
 
             <span class="c1"># ConnectorV2 (piece or pipeline).</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val_</span><span class="p">,</span> <span class="n">ConnectorV2</span><span class="p">):</span>
@@ -2422,7 +2480,11 @@ document.write(`
                     <span class="sa">f</span><span class="s2">&quot;pipeline)! Your function returned </span><span class="si">{</span><span class="n">val_</span><span class="si">}</span><span class="s2">.&quot;</span>
                 <span class="p">)</span>
 
-        <span class="n">obs_space</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s2">&quot;single_observation_space&quot;</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">obs_space</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s2">&quot;single_observation_space&quot;</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">spaces</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">obs_space</span> <span class="o">=</span> <span class="n">spaces</span><span class="p">[</span><span class="n">INPUT_ENV_SINGLE_SPACES</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">obs_space</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_multi_agent</span><span class="p">:</span>
             <span class="n">obs_space</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">Dict</span><span class="p">(</span>
                 <span class="p">{</span>
@@ -2430,7 +2492,11 @@ document.write(`
                     <span class="k">for</span> <span class="n">aid</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">envs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">possible_agents</span>
                 <span class="p">}</span>
             <span class="p">)</span>
-        <span class="n">act_space</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s2">&quot;single_action_space&quot;</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">act_space</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s2">&quot;single_action_space&quot;</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">spaces</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">act_space</span> <span class="o">=</span> <span class="n">spaces</span><span class="p">[</span><span class="n">INPUT_ENV_SINGLE_SPACES</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">act_space</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_multi_agent</span><span class="p">:</span>
             <span class="n">act_space</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">Dict</span><span class="p">(</span>
                 <span class="p">{</span>
@@ -2470,7 +2536,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">pipeline</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">build_module_to_env_connector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_module_to_env_connector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spaces</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConnectorV2</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.module_to_env</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">GetActions</span><span class="p">,</span>
             <span class="n">ListifyDataForVectorEnv</span><span class="p">,</span>
@@ -2486,9 +2552,23 @@ document.write(`
         <span class="c1"># Create a module-to-env connector pipeline (including RLlib&#39;s default</span>
         <span class="c1"># module-&gt;env connector piece) and return it.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_to_env_connector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">val_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_to_env_connector</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
-
-            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.connector_v2</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConnectorV2</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">val_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_to_env_connector</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">spaces</span><span class="p">)</span>
+            <span class="c1"># Try deprecated signature, if necessary.</span>
+            <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;positional argument&quot;</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">log_once</span><span class="p">(</span><span class="s2">&quot;module-to-env-wrong-signature&quot;</span><span class="p">):</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                            <span class="s2">&quot;Your `config.module_to_env_connector` function seems to &quot;</span>
+                            <span class="s2">&quot;have a wrong or outdated signature! It should be: &quot;</span>
+                            <span class="s2">&quot;`def myfunc(env, spaces): ...`, where any of &quot;</span>
+                            <span class="s2">&quot;these arguments are optional and may be None.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                            <span class="s2">&quot;`env` is the (vectorized) gym env.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                            <span class="s2">&quot;`spaces` is a dict of structure `{&#39;__env__&#39;: ([&quot;</span>
+                            <span class="s2">&quot;vectorized env obs. space, vectorized env act. space]),&quot;</span>
+                            <span class="s2">&quot;&#39;__env_single__&#39;: ([env obs. space, env act. space])}`.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                    <span class="n">val_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_module_to_env_connector</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
 
             <span class="c1"># ConnectorV2 (piece or pipeline).</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val_</span><span class="p">,</span> <span class="n">ConnectorV2</span><span class="p">):</span>
@@ -2504,7 +2584,11 @@ document.write(`
                     <span class="sa">f</span><span class="s2">&quot;pipeline)! Your function returned </span><span class="si">{</span><span class="n">val_</span><span class="si">}</span><span class="s2">.&quot;</span>
                 <span class="p">)</span>
 
-        <span class="n">obs_space</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s2">&quot;single_observation_space&quot;</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">obs_space</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s2">&quot;single_observation_space&quot;</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">spaces</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">obs_space</span> <span class="o">=</span> <span class="n">spaces</span><span class="p">[</span><span class="n">INPUT_ENV_SINGLE_SPACES</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">obs_space</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_multi_agent</span><span class="p">:</span>
             <span class="n">obs_space</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">Dict</span><span class="p">(</span>
                 <span class="p">{</span>
@@ -2512,7 +2596,11 @@ document.write(`
                     <span class="k">for</span> <span class="n">aid</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">envs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">possible_agents</span>
                 <span class="p">}</span>
             <span class="p">)</span>
-        <span class="n">act_space</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s2">&quot;single_action_space&quot;</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">act_space</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s2">&quot;single_action_space&quot;</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">spaces</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">act_space</span> <span class="o">=</span> <span class="n">spaces</span><span class="p">[</span><span class="n">INPUT_ENV_SINGLE_SPACES</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">act_space</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_multi_agent</span><span class="p">:</span>
             <span class="n">act_space</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">Dict</span><span class="p">(</span>
                 <span class="p">{</span>
@@ -2566,7 +2654,7 @@ document.write(`
         <span class="n">input_observation_space</span><span class="p">,</span>
         <span class="n">input_action_space</span><span class="p">,</span>
         <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConnectorV2</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.learner</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">AddColumnsFromEpisodesToTrainBatch</span><span class="p">,</span>
             <span class="n">AddObservationsFromEpisodesToBatch</span><span class="p">,</span>
@@ -2587,8 +2675,6 @@ document.write(`
                 <span class="n">input_action_space</span><span class="p">,</span>
                 <span class="c1"># device,  # TODO (sven): Also pass device into custom builder.</span>
             <span class="p">)</span>
-
-            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.connector_v2</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConnectorV2</span>
 
             <span class="c1"># ConnectorV2 (piece or pipeline).</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val_</span><span class="p">,</span> <span class="n">ConnectorV2</span><span class="p">):</span>
@@ -2646,6 +2732,7 @@ document.write(`
         <span class="n">env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EnvType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">ModuleID</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">,</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">rl_module_spec</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RLModuleSpecType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">placement_group</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;PlacementGroup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;LearnerGroup&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds and returns a new LearnerGroup object based on settings in `self`.</span>
 
@@ -2677,7 +2764,11 @@ document.write(`
             <span class="n">rl_module_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_multi_rl_module_spec</span><span class="p">(</span><span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span> <span class="n">spaces</span><span class="o">=</span><span class="n">spaces</span><span class="p">)</span>
 
         <span class="c1"># Construct the actual LearnerGroup.</span>
-        <span class="n">learner_group</span> <span class="o">=</span> <span class="n">LearnerGroup</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">module_spec</span><span class="o">=</span><span class="n">rl_module_spec</span><span class="p">)</span>
+        <span class="n">learner_group</span> <span class="o">=</span> <span class="n">LearnerGroup</span><span class="p">(</span>
+            <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+            <span class="n">module_spec</span><span class="o">=</span><span class="n">rl_module_spec</span><span class="p">,</span>
+            <span class="n">placement_group</span><span class="o">=</span><span class="n">placement_group</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">learner_group</span></div>
 
@@ -3094,8 +3185,8 @@ document.write(`
         <span class="n">env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EnvType</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">env_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EnvConfigDict</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
-        <span class="n">observation_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">gym</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">Space</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
-        <span class="n">action_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">gym</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">Space</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">observation_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">action_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">render_env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">clip_rewards</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">normalize_actions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
@@ -3193,6 +3284,8 @@ document.write(`
         <span class="o">*</span><span class="p">,</span>
         <span class="n">env_runner_cls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">num_env_runners</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">create_local_env_runner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">create_env_on_local_worker</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">num_envs_per_env_runner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">gym_env_vectorize_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">num_cpus_per_env_runner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
@@ -3210,16 +3303,17 @@ document.write(`
         <span class="n">add_default_connectors_to_env_to_module_pipeline</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">add_default_connectors_to_module_to_env_pipeline</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">episode_lookback_horizon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
-        <span class="n">use_worker_filter_stats</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
-        <span class="n">update_worker_filter_stats</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">merge_env_runner_states</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">broadcast_env_runner_states</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">compress_observations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">rollout_fragment_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">batch_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">explore</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">episodes_to_numpy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="c1"># @OldAPIStack settings.</span>
+        <span class="n">use_worker_filter_stats</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">update_worker_filter_stats</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">exploration_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>  <span class="c1"># @OldAPIStack</span>
-        <span class="n">create_env_on_local_worker</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>  <span class="c1"># @OldAPIStack</span>
         <span class="n">sample_collector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">SampleCollector</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>  <span class="c1"># @OldAPIStack</span>
         <span class="n">remote_worker_envs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>  <span class="c1"># @OldAPIStack</span>
         <span class="n">remote_env_batch_wait_ms</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>  <span class="c1"># @OldAPIStack</span>
@@ -3288,6 +3382,10 @@ document.write(`
 <span class="sd">                be used to collect and retrieve environment-, model-, and sampler data.</span>
 <span class="sd">                Override the SampleCollector base class to implement your own</span>
 <span class="sd">                collection/buffering/retrieval logic.</span>
+<span class="sd">            create_local_env_runner: If True, create a local EnvRunner instance, besides</span>
+<span class="sd">                the `num_env_runners` remote EnvRunner actors. If `num_env_runners` is</span>
+<span class="sd">                0, this setting is ignored and one local EnvRunner is created</span>
+<span class="sd">                regardless.</span>
 <span class="sd">            create_env_on_local_worker: When `num_env_runners` &gt; 0, the driver</span>
 <span class="sd">                (local_worker; worker-idx=0) does not need an environment. This is</span>
 <span class="sd">                because it doesn&#39;t have to sample (done by remote_workers;</span>
@@ -3322,6 +3420,13 @@ document.write(`
 <span class="sd">                and compile RLModule input data from this information. For example, if</span>
 <span class="sd">                your custom env-to-module connector (and your custom RLModule) requires</span>
 <span class="sd">                the previous 10 rewards as inputs, you must set this to at least 10.</span>
+<span class="sd">            merge_env_runner_states: True, if remote EnvRunner actor states should be</span>
+<span class="sd">                merged into central connector pipelines. Use &quot;training_only&quot; (default)</span>
+<span class="sd">                for only doing this for the training EnvRunners, NOT for the evaluation</span>
+<span class="sd">                EnvRunners.</span>
+<span class="sd">            broadcast_env_runner_states: True, if merged EnvRunner states (from the</span>
+<span class="sd">                central connector pipelines) should be broadcast back to all remote</span>
+<span class="sd">                EnvRunner actors.</span>
 <span class="sd">            use_worker_filter_stats: Whether to use the workers in the EnvRunnerGroup to</span>
 <span class="sd">                update the central filters (held by the local worker). If False, stats</span>
 <span class="sd">                from the workers aren&#39;t used and are discarded.</span>
@@ -3458,6 +3563,8 @@ document.write(`
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">sample_collector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sample_collector</span> <span class="o">=</span> <span class="n">sample_collector</span>
+        <span class="k">if</span> <span class="n">create_local_env_runner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_local_env_runner</span> <span class="o">=</span> <span class="n">create_local_env_runner</span>
         <span class="k">if</span> <span class="n">create_env_on_local_worker</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">create_env_on_local_worker</span> <span class="o">=</span> <span class="n">create_env_on_local_worker</span>
         <span class="k">if</span> <span class="n">env_to_module_connector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
@@ -3474,6 +3581,10 @@ document.write(`
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">episode_lookback_horizon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">episode_lookback_horizon</span> <span class="o">=</span> <span class="n">episode_lookback_horizon</span>
+        <span class="k">if</span> <span class="n">merge_env_runner_states</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">merge_env_runner_states</span> <span class="o">=</span> <span class="n">merge_env_runner_states</span>
+        <span class="k">if</span> <span class="n">broadcast_env_runner_states</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">broadcast_env_runner_states</span> <span class="o">=</span> <span class="n">broadcast_env_runner_states</span>
         <span class="k">if</span> <span class="n">use_worker_filter_stats</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">use_worker_filter_stats</span> <span class="o">=</span> <span class="n">use_worker_filter_stats</span>
         <span class="k">if</span> <span class="n">update_worker_filter_stats</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
@@ -3893,7 +4004,16 @@ document.write(`
         <span class="n">on_train_result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">on_evaluate_start</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">on_evaluate_end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">on_evaluate_offline_start</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+            <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">]]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">on_evaluate_offline_end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+            <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">]]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">on_env_runners_recreated</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+            <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">]]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">on_offline_eval_runners_recreated</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
             <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">]]</span>
         <span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">on_checkpoint_loaded</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
@@ -3998,8 +4118,16 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_evaluate_start</span> <span class="o">=</span> <span class="n">on_evaluate_start</span>
         <span class="k">if</span> <span class="n">on_evaluate_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_evaluate_end</span> <span class="o">=</span> <span class="n">on_evaluate_end</span>
+        <span class="k">if</span> <span class="n">on_evaluate_offline_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_evaluate_offline_start</span> <span class="o">=</span> <span class="n">on_evaluate_offline_start</span>
+        <span class="k">if</span> <span class="n">on_evaluate_offline_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_evaluate_offline_end</span> <span class="o">=</span> <span class="n">on_evaluate_offline_end</span>
         <span class="k">if</span> <span class="n">on_env_runners_recreated</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_env_runners_recreated</span> <span class="o">=</span> <span class="n">on_env_runners_recreated</span>
+        <span class="k">if</span> <span class="n">on_offline_eval_runners_recreated</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_offline_eval_runners_recreated</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">on_offline_eval_runners_recreated</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">on_checkpoint_loaded</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_checkpoint_loaded</span> <span class="o">=</span> <span class="n">on_checkpoint_loaded</span>
         <span class="k">if</span> <span class="n">on_environment_created</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
@@ -4026,6 +4154,8 @@ document.write(`
         <span class="n">evaluation_interval</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">evaluation_duration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">evaluation_duration_unit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">evaluation_auto_duration_min_env_steps_per_sample</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">evaluation_auto_duration_max_env_steps_per_sample</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">evaluation_sample_timeout_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">evaluation_parallel_to_training</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">evaluation_force_reset_envs_before_iteration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
@@ -4036,6 +4166,27 @@ document.write(`
         <span class="n">ope_split_batch_by_episode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">evaluation_num_env_runners</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">custom_evaluation_function</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="c1"># Offline evaluation.</span>
+        <span class="n">offline_evaluation_interval</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">num_offline_eval_runners</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">offline_loss_for_module_fn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">offline_eval_batch_size_per_runner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">dataset_num_iters_per_offline_eval_runner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">offline_eval_rl_module_inference_only</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">num_cpus_per_offline_eval_runner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">num_gpus_per_offline_eval_runner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">custom_resources_per_offline_eval_runner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+            <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">offline_evaluation_timeout_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">max_requests_in_flight_per_offline_eval_runner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">broadcast_offline_eval_runner_states</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">validate_offline_eval_runners_after_construction</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">restart_failed_offline_eval_runners</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">ignore_offline_eval_runner_failures</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">max_num_offline_eval_runner_restarts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">offline_eval_runner_health_probe_timeout_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">offline_eval_runner_restore_timeout_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="c1"># Deprecated args.</span>
         <span class="n">always_attach_evaluation_results</span><span class="o">=</span><span class="n">DEPRECATED_VALUE</span><span class="p">,</span>
         <span class="n">evaluation_num_workers</span><span class="o">=</span><span class="n">DEPRECATED_VALUE</span><span class="p">,</span>
@@ -4064,6 +4215,14 @@ document.write(`
 <span class="sd">            evaluation_duration_unit: The unit, with which to count the evaluation</span>
 <span class="sd">                duration. Either &quot;episodes&quot; (default) or &quot;timesteps&quot;. Note that this</span>
 <span class="sd">                setting is ignored if `evaluation_duration=&quot;auto&quot;`.</span>
+<span class="sd">            evaluation_auto_duration_min_env_steps_per_sample: If `evaluation_duration`</span>
+<span class="sd">                is &quot;auto&quot; (in which case `evaluation_duration_unit` is always</span>
+<span class="sd">                &quot;timesteps&quot;), at least how many timesteps should be done per remote</span>
+<span class="sd">                `sample()` call.</span>
+<span class="sd">            evaluation_auto_duration_max_env_steps_per_sample: If `evaluation_duration`</span>
+<span class="sd">                is &quot;auto&quot; (in which case `evaluation_duration_unit` is always</span>
+<span class="sd">                &quot;timesteps&quot;), at most how many timesteps should be done per remote</span>
+<span class="sd">                `sample()` call.</span>
 <span class="sd">            evaluation_sample_timeout_s: The timeout (in seconds) for evaluation workers</span>
 <span class="sd">                to sample a complete episode in the case your config settings are:</span>
 <span class="sd">                `evaluation_duration != auto` and `evaluation_duration_unit=episode`.</span>
@@ -4126,6 +4285,88 @@ document.write(`
 <span class="sd">                iteration. See the Algorithm.evaluate() method to see the default</span>
 <span class="sd">                implementation. The Algorithm guarantees all eval workers have the</span>
 <span class="sd">                latest policy state before this function is called.</span>
+<span class="sd">            offline_evaluation_interval: Evaluate offline with every</span>
+<span class="sd">                `offline_evaluation_interval` training iterations. The offline evaluation</span>
+<span class="sd">                stats are reported under the &quot;evaluation/offline_evaluation&quot; metric key. Set</span>
+<span class="sd">                to None (or 0) for no offline evaluation.</span>
+<span class="sd">            num_offline_eval_runners: Number of OfflineEvaluationRunner actors to create</span>
+<span class="sd">                for parallel evaluation. Setting this to 0 forces sampling to be done in the</span>
+<span class="sd">                local OfflineEvaluationRunner (main process or the Algorithm&#39;s actor when</span>
+<span class="sd">                using Tune).</span>
+<span class="sd">            offline_loss_for_module_fn: A callable to compute the loss per `RLModule` in</span>
+<span class="sd">                offline evaluation. If not provided the training loss function (</span>
+<span class="sd">                `Learner.compute_loss_for_module`) is used. The signature must be (</span>
+<span class="sd">                runner: OfflineEvaluationRunner, module_id: ModuleID, config: AlgorithmConfig,</span>
+<span class="sd">                batch: Dict[str, Any], fwd_out: Dict[str, TensorType]).</span>
+<span class="sd">            offline_eval_batch_size_per_runner: Evaluation batch size per individual</span>
+<span class="sd">                OfflineEvaluationRunner worker. This setting only applies to the new API</span>
+<span class="sd">                stack. The number of OfflineEvaluationRunner workers can be set via</span>
+<span class="sd">                `config.evaluation(num_offline_eval_runners=...)`. The total effective batch</span>
+<span class="sd">                size is then `num_offline_eval_runners` x</span>
+<span class="sd">                `offline_eval_batch_size_per_runner`.</span>
+<span class="sd">            dataset_num_iters_per_offline_eval_runner: Number of batches to evaluate in each</span>
+<span class="sd">                OfflineEvaluationRunner during a single evaluation. If None, each learner runs a</span>
+<span class="sd">                complete epoch over its data block (the dataset is partitioned into</span>
+<span class="sd">                at least as many blocks as there are runners). The default is `1`.</span>
+<span class="sd">            offline_eval_rl_module_inference_only: If `True`, the module spec is used in an</span>
+<span class="sd">                inference-only setting (no-loss) and the RLModule can thus be built in</span>
+<span class="sd">                its light version (if available). For example, the `inference_only`</span>
+<span class="sd">                version of an RLModule might only contain the networks required for</span>
+<span class="sd">                computing actions, but misses additional target- or critic networks.</span>
+<span class="sd">                Also, if `True`, the module does NOT contain those (sub) RLModules that have</span>
+<span class="sd">                their `learner_only` flag set to True.</span>
+<span class="sd">            num_cpus_per_offline_eval_runner: Number of CPUs to allocate per</span>
+<span class="sd">                OfflineEvaluationRunner.</span>
+<span class="sd">            num_gpus_per_offline_eval_runner: Number of GPUs to allocate per</span>
+<span class="sd">                OfflineEvaluationRunner. This can be fractional. This is usually needed only if</span>
+<span class="sd">                your (custom) loss function itself requires a GPU (i.e., it contains GPU-</span>
+<span class="sd">                intensive computations), or model inference is unusually expensive.</span>
+<span class="sd">            custom_resources_per_eval_runner: Any custom Ray resources to allocate per</span>
+<span class="sd">                OfflineEvaluationRunner.</span>
+<span class="sd">            offline_evaluation_timeout_s: The timeout in seconds for calling `run()` on remote</span>
+<span class="sd">                OfflineEvaluationRunner workers. Results (episode list) from workers that take</span>
+<span class="sd">                longer than this time are discarded.</span>
+<span class="sd">            max_requests_in_flight_per_offline_eval_runner: Max number of in-flight requests</span>
+<span class="sd">                to each OfflineEvaluationRunner (actor)). See the</span>
+<span class="sd">                `ray.rllib.utils.actor_manager.FaultTolerantActorManager` class for more</span>
+<span class="sd">                details.</span>
+<span class="sd">                Tuning these values is important when running experiments with</span>
+<span class="sd">                large evaluation batches, where there is the risk that the object store may</span>
+<span class="sd">                fill up, causing spilling of objects to disk. This can cause any</span>
+<span class="sd">                asynchronous requests to become very slow, making your experiment run</span>
+<span class="sd">                slowly as well. You can inspect the object store during your experiment</span>
+<span class="sd">                through a call to `ray memory` on your head node, and by using the Ray</span>
+<span class="sd">                dashboard. If you&#39;re seeing that the object store is filling up,</span>
+<span class="sd">                turn down the number of remote requests in flight or enable compression</span>
+<span class="sd">                or increase the object store memory through, for example:</span>
+<span class="sd">                `ray.init(object_store_memory=10 * 1024 * 1024 * 1024)  # =10 GB`.</span>
+<span class="sd">            broadcast_offline_eval_runner_states: True, if merged OfflineEvaluationRunner</span>
+<span class="sd">                states (from the central connector pipelines) should be broadcast back to</span>
+<span class="sd">                all remote OfflineEvaluationRunner actors.</span>
+<span class="sd">            validate_offline_eval_runners_after_construction: Whether to validate that each</span>
+<span class="sd">                created remote OfflineEvaluationRunner is healthy after its construction process.</span>
+<span class="sd">            restart_failed_offline_eval_runners: Whether - upon an OfflineEvaluationRunner</span>
+<span class="sd">                failure - RLlib tries to restart the lost OfflineEvaluationRunner(s) as an</span>
+<span class="sd">                identical copy of the failed one(s). You should set this to True when training</span>
+<span class="sd">                on SPOT instances that may preempt any time and/or if you need to evaluate always a</span>
+<span class="sd">                complete dataset b/c OfflineEvaluationRunner(s) evaluate through streaming split</span>
+<span class="sd">                iterators on disjoint batches. The new, recreated OfflineEvaluationRunner(s) only</span>
+<span class="sd">                differ from the failed one in their `self.recreated_worker=True` property value</span>
+<span class="sd">                and have the same `worker_index` as the original(s). If this setting is True, the</span>
+<span class="sd">                value of the `ignore_offline_eval_runner_failures` setting is ignored.</span>
+<span class="sd">            ignore_offline_eval_runner_failures: Whether to ignore any OfflineEvalautionRunner</span>
+<span class="sd">                failures and continue running with the remaining OfflineEvaluationRunners. This</span>
+<span class="sd">                setting is ignored, if `restart_failed_offline_eval_runners=True`.</span>
+<span class="sd">            max_num_offline_eval_runner_restarts: The maximum number of times any</span>
+<span class="sd">                OfflineEvaluationRunner is allowed to be restarted (if</span>
+<span class="sd">                `restart_failed_offline_eval_runners` is True).</span>
+<span class="sd">            offline_eval_runner_health_probe_timeout_s: Max amount of time in seconds, we should</span>
+<span class="sd">                spend waiting for OfflineEvaluationRunner health probe calls</span>
+<span class="sd">                (`OfflineEvaluationRunner.ping.remote()`) to respond. Health pings are very cheap,</span>
+<span class="sd">                however, we perform the health check via a blocking `ray.get()`, so the</span>
+<span class="sd">                default value should not be too large.</span>
+<span class="sd">            offline_eval_runner_restore_timeout_s: Max amount of time we should wait to restore</span>
+<span class="sd">                states on recovered OfflineEvaluationRunner actors. Default is 30 mins.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            This updated AlgorithmConfig object.</span>
@@ -4152,6 +4393,14 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_duration</span> <span class="o">=</span> <span class="n">evaluation_duration</span>
         <span class="k">if</span> <span class="n">evaluation_duration_unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_duration_unit</span> <span class="o">=</span> <span class="n">evaluation_duration_unit</span>
+        <span class="k">if</span> <span class="n">evaluation_auto_duration_min_env_steps_per_sample</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_auto_duration_min_env_steps_per_sample</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">evaluation_auto_duration_min_env_steps_per_sample</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">evaluation_auto_duration_max_env_steps_per_sample</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_auto_duration_max_env_steps_per_sample</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">evaluation_auto_duration_max_env_steps_per_sample</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">evaluation_sample_timeout_s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_sample_timeout_s</span> <span class="o">=</span> <span class="n">evaluation_sample_timeout_s</span>
         <span class="k">if</span> <span class="n">evaluation_parallel_to_training</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
@@ -4185,6 +4434,65 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">custom_evaluation_function</span> <span class="o">=</span> <span class="n">custom_evaluation_function</span>
         <span class="k">if</span> <span class="n">ope_split_batch_by_episode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ope_split_batch_by_episode</span> <span class="o">=</span> <span class="n">ope_split_batch_by_episode</span>
+        <span class="c1"># Offline evaluation.</span>
+        <span class="k">if</span> <span class="n">offline_evaluation_interval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">offline_evaluation_interval</span> <span class="o">=</span> <span class="n">offline_evaluation_interval</span>
+        <span class="k">if</span> <span class="n">num_offline_eval_runners</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_offline_eval_runners</span> <span class="o">=</span> <span class="n">num_offline_eval_runners</span>
+        <span class="k">if</span> <span class="n">offline_loss_for_module_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">offline_loss_for_module_fn</span> <span class="o">=</span> <span class="n">offline_loss_for_module_fn</span>
+        <span class="k">if</span> <span class="n">offline_eval_batch_size_per_runner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_batch_size_per_runner</span> <span class="o">=</span> <span class="n">offline_eval_batch_size_per_runner</span>
+        <span class="k">if</span> <span class="n">dataset_num_iters_per_offline_eval_runner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset_num_iters_per_eval_runner</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">dataset_num_iters_per_offline_eval_runner</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">offline_eval_rl_module_inference_only</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_rl_module_inference_only</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">offline_eval_rl_module_inference_only</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">num_cpus_per_offline_eval_runner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_cpus_per_offline_eval_runner</span> <span class="o">=</span> <span class="n">num_cpus_per_offline_eval_runner</span>
+        <span class="k">if</span> <span class="n">num_gpus_per_offline_eval_runner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_gpus_per_offline_eval_runner</span> <span class="o">=</span> <span class="n">num_gpus_per_offline_eval_runner</span>
+        <span class="k">if</span> <span class="n">custom_resources_per_offline_eval_runner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">custom_resources_per_offline_eval_runner</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">custom_resources_per_offline_eval_runner</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">offline_evaluation_timeout_s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">offline_evaluation_timeout_s</span> <span class="o">=</span> <span class="n">offline_evaluation_timeout_s</span>
+        <span class="k">if</span> <span class="n">max_requests_in_flight_per_offline_eval_runner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_requests_in_flight_per_offline_eval_runner</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">max_requests_in_flight_per_offline_eval_runner</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">broadcast_offline_eval_runner_states</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">broadcast_offline_eval_runner_states</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">broadcast_offline_eval_runner_states</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">validate_offline_eval_runners_after_construction</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validate_offline_eval_runners_after_construction</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">validate_offline_eval_runners_after_construction</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">restart_failed_offline_eval_runners</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">restart_failed_offline_eval_runners</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">restart_failed_offline_eval_runners</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">ignore_offline_eval_runner_failures</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ignore_offline_eval_runner_failures</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">ignore_offline_eval_runner_failures</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_num_offline_eval_runner_restarts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_num_offline_eval_runner_restarts</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">max_num_offline_eval_runner_restarts</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">offline_eval_runner_health_probe_timeout_s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_health_probe_timeout_s</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">offline_eval_runner_health_probe_timeout_s</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">offline_eval_runner_restore_timeout_s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_restore_timeout_s</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">offline_eval_runner_restore_timeout_s</span>
+            <span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span></div>
 
@@ -4209,6 +4517,7 @@ document.write(`
         <span class="n">materialize_mapped_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">map_batches_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">iter_batches_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="n">ignore_final_observation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">prelearner_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">prelearner_buffer_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
         <span class="n">prelearner_buffer_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
@@ -4354,6 +4663,11 @@ document.write(`
 <span class="sd">                `{&#39;prefetch_batches&#39;: 2}` is used. Use these keyword args</span>
 <span class="sd">                together with `input_read_method_kwargs` and `map_batches_kwargs` to</span>
 <span class="sd">                tune the performance of the data pipeline.</span>
+<span class="sd">            ignore_final_observation: If the final observation in an episode chunk should</span>
+<span class="sd">                be ignored. This concerns mainly column-based data and instead of using a</span>
+<span class="sd">                user-provided `NEXT_OBS` sets final observations to zero. This should be</span>
+<span class="sd">                used with BC only, as in true Offline RL algorithms the final observation</span>
+<span class="sd">                is important.</span>
 <span class="sd">            prelearner_class: An optional `OfflinePreLearner` class that is used to</span>
 <span class="sd">                transform data batches in `ray.data.map_batches` used in the</span>
 <span class="sd">                `OfflineData` class to transform data from columns to batches that can</span>
@@ -4369,7 +4683,7 @@ document.write(`
 <span class="sd">                purposes: (a) to store intermediate data in memory, and (b) to ensure</span>
 <span class="sd">                that RLlib samples exactly `train_batch_size_per_learner` experiences</span>
 <span class="sd">                per batch. The default is RLlib&#39;s `EpisodeReplayBuffer`.</span>
-<span class="sd">            prelearner_buffer_kwargs: Optional keyword arguments for intializing the</span>
+<span class="sd">            prelearner_buffer_kwargs: Optional keyword arguments for initializing the</span>
 <span class="sd">                `EpisodeReplayBuffer`. In most cases this value is simply the `capacity`</span>
 <span class="sd">                for the default buffer that RLlib uses (`EpisodeReplayBuffer`), but it</span>
 <span class="sd">                may differ if the `prelearner_buffer_class` uses a custom buffer.</span>
@@ -4482,6 +4796,8 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">map_batches_kwargs</span> <span class="o">=</span> <span class="n">map_batches_kwargs</span>
         <span class="k">if</span> <span class="n">iter_batches_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">iter_batches_kwargs</span> <span class="o">=</span> <span class="n">iter_batches_kwargs</span>
+        <span class="k">if</span> <span class="n">ignore_final_observation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ignore_final_observation</span> <span class="o">=</span> <span class="n">ignore_final_observation</span>
         <span class="k">if</span> <span class="n">prelearner_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">prelearner_class</span> <span class="o">=</span> <span class="n">prelearner_class</span>
         <span class="k">if</span> <span class="n">prelearner_buffer_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
@@ -5298,17 +5614,6 @@ document.write(`
             <span class="k">return</span> <span class="n">default_rl_module_spec</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">train_batch_size_per_learner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># If not set explicitly, try to infer the value.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_batch_size_per_learner</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_batch_size</span> <span class="o">//</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_learners</span> <span class="ow">or</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_batch_size_per_learner</span>
-
-    <span class="nd">@train_batch_size_per_learner</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">train_batch_size_per_learner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_train_batch_size_per_learner</span> <span class="o">=</span> <span class="n">value</span>
-
-    <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">train_batch_size_per_learner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="c1"># If not set explicitly, try to infer the value.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_batch_size_per_learner</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -5630,7 +5935,7 @@ document.write(`
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EnvType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">PolicyID</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Space</span><span class="p">,</span> <span class="n">Space</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">PolicyID</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">,</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">inference_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="c1"># @HybridAPIStack</span>
         <span class="n">policy_dict</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PolicySpec</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -5717,7 +6022,7 @@ document.write(`
 
                 <span class="c1"># The individual (single-agent) module specs have not been configured</span>
                 <span class="c1"># via this AlgorithmConfig object -&gt; Use provided single-agent spec or</span>
-                <span class="c1"># the the default spec (which is also a RLModuleSpec in this</span>
+                <span class="c1"># the default spec (which is also a RLModuleSpec in this</span>
                 <span class="c1"># case).</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">single_agent_spec</span> <span class="o">=</span> <span class="p">(</span>
@@ -6032,6 +6337,7 @@ document.write(`
                 <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_episode_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                 <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_checkpoint_loaded</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                 <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_env_runners_recreated</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">callbacks_on_offline_eval_runners_recreated</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_value_error</span><span class="p">(</span>
                     <span class="s2">&quot;Config settings `config.callbacks(on_....=lambda ..)` aren&#39;t &quot;</span>
@@ -6135,6 +6441,7 @@ document.write(`
         <span class="c1"># evaluation, and set `evaluation_parallel_to_training` to False.</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_num_env_runners</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_offline_eval_runners</span> <span class="o">==</span> <span class="mi">0</span>
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_parallel_to_training</span>
         <span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_value_error</span><span class="p">(</span>
@@ -6424,13 +6731,25 @@ document.write(`
         <span class="c1"># action and observation spaces. Note, we require here the spaces,</span>
         <span class="c1"># i.e. a user cannot provide an environment instead because we do</span>
         <span class="c1"># not want to create the environment to receive spaces.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_offline</span> <span class="ow">and</span> <span class="p">(</span>
-            <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_num_env_runners</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_interval</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">action_space</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_offline</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_online</span>
+            <span class="ow">and</span> <span class="p">(</span>
+                <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_num_env_runners</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_interval</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">action_space</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_value_error</span><span class="p">(</span>
                 <span class="s2">&quot;If no evaluation should be run, `action_space` and &quot;</span>
                 <span class="s2">&quot;`observation_space` must be provided.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_final_observation</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo_class</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s2">&quot;BC&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;`ignore_final_observation=True` (zeros-out truncation observations), &quot;</span>
+                <span class="s2">&quot;but the algorithm isn&#39;t `BC`. It is recommended to use this &quot;</span>
+                <span class="s2">&quot;setting only with `BC`, b/c other RL algorithms rely on truncation-&quot;</span>
+                <span class="s2">&quot;observations due to value function estimates.&quot;</span>
             <span class="p">)</span>
 
         <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.offline.offline_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">OfflineData</span>
@@ -6486,6 +6805,14 @@ document.write(`
                 <span class="s2">&quot;recorded (i.e. `batch_mode==&#39;complete_episodes&#39;`). Otherwise &quot;</span>
                 <span class="s2">&quot;recorded episodes cannot be read in for training.&quot;</span>
             <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_online</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Defines if this config is for online RL.</span>
+
+<span class="sd">        Note, a config can be for on- and offline training at the same time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_online</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_offline</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -6687,7 +7014,7 @@ document.write(`
         <span class="o">*</span><span class="p">,</span>
         <span class="n">policies</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MultiAgentPolicyConfigDict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EnvType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">PolicyID</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Space</span><span class="p">,</span> <span class="n">Space</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">PolicyID</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">,</span> <span class="n">gym</span><span class="o">.</span><span class="n">Space</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">default_policy_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">Policy</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">MultiAgentPolicyConfigDict</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PolicyID</span><span class="p">,</span> <span class="n">SampleBatchType</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compiles complete multi-agent config (dict) from the information in `self`.</span>
@@ -7254,6 +7581,144 @@ document.write(`
         <span class="p">)</span>
         <span class="k">pass</span></div>
 
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">DifferentiableAlgorithmConfig</span><span class="p">(</span><span class="n">AlgorithmConfig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An RLlib DifferentiableAlgorithmConfig builds a Meta algorithm from a given</span>
+<span class="sd">    configuration</span>
+
+<span class="sd">    .. testcode::</span>
+
+<span class="sd">        from ray.rllib.algorithm.algorithm_config import DifferentiableAlgorithmConfig</span>
+<span class="sd">        # Construct a generic config for an algorithm that needs differentiable Learners.</span>
+<span class="sd">        config = (</span>
+<span class="sd">            DifferentiableAlgorithmConfig()</span>
+<span class="sd">            .training(lr=3e-4)</span>
+<span class="sd">            .environment(env=&quot;CartPole-v1&quot;)</span>
+<span class="sd">            .learners(</span>
+<span class="sd">                differentiable_learner_configs=[</span>
+<span class="sd">                    DifferentiableLearnerConfig(</span>
+<span class="sd">                        DifferentiableTorchLearner,</span>
+<span class="sd">                        lr=1e-4,</span>
+<span class="sd">                    )</span>
+<span class="sd">                ]</span>
+<span class="sd">            )</span>
+<span class="sd">        )</span>
+<span class="sd">        # Similar to `AlgorithmConfig` the config using differentiable Learners can be</span>
+<span class="sd">        # used to build a respective `Algorithm`.</span>
+<span class="sd">        algo = config.build()</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># A list of `DifferentiableLearnerConfig` instances that define differentiable</span>
+    <span class="c1"># `Learner`&#39;s. Note, each of them needs to implement the `DifferentiableLearner`</span>
+    <span class="c1"># API.</span>
+    <span class="n">differentiable_learner_configs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DifferentiableLearnerConfig</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algo_class</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the DifferentiableLearnerConfig instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            algo_class: An optional Algorithm class that this config class belongs to.</span>
+<span class="sd">                Used (if provided) to build a respective Algorithm instance from this</span>
+<span class="sd">                config.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialize the `AlgorithmConfig` first.</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">algo_class</span><span class="o">=</span><span class="n">algo_class</span><span class="p">)</span>
+
+        <span class="c1"># Initialize the list of differentiable learner configs to an empty list, which</span>
+        <span class="c1"># defines the default, i.e. the `MetaLearner` will have no nested updates.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">differentiable_learner_configs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DifferentiableLearnerConfig</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">learners</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">differentiable_learner_configs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DifferentiableLearnerConfig</span><span class="p">]</span> <span class="o">=</span> <span class="n">NotProvided</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DifferentiableAlgorithmConfig&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the configurations for differentiable learners.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            differentiable_learner_configs: A list of `DifferentiableLearnerConfig` instances</span>
+<span class="sd">                defining the `DifferentiableLearner` classes used for the nested updates in</span>
+<span class="sd">                `Algorithm`&#39;s learner.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">learners</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">differentiable_learner_configs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">NotProvided</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">differentiable_learner_configs</span> <span class="o">=</span> <span class="n">differentiable_learner_configs</span>
+
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates all values in this config.&quot;&quot;&quot;</span>
+
+        <span class="c1"># First, call the `validate` method of super.</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+
+        <span class="c1"># TODO (simon): Maybe moving this to a private method?</span>
+        <span class="c1"># Ensure that the default learner class is derived from `TorchMetaLearner`.</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.learner.torch.torch_meta_learner</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchMetaLearner</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_default_learner_class</span><span class="p">(),</span> <span class="n">TorchMetaLearner</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_value_error</span><span class="p">(</span>
+                <span class="s2">&quot;`get_default_learner_class` must return a `MetaLearner` class &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;or sublass but got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_default_learner_class</span><span class="p">()</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># Make sure that the differentiable learner configs are contained in a list.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">differentiable_learner_configs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_value_error</span><span class="p">(</span>
+                <span class="s2">&quot;`differentiable_learner_configs` must be a list of &quot;</span>
+                <span class="s2">&quot;`DifferentiableLearnerConfig` instances, but is &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">differentiable_learner_configs</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># In addition, check, if all configurations are wrapped in a</span>
+        <span class="c1"># `DifferentiableLearnerConfig`.</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">learner_cfg</span><span class="p">,</span> <span class="n">DifferentiableLearnerConfig</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">learner_cfg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">differentiable_learner_configs</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_value_error</span><span class="p">(</span>
+                <span class="s2">&quot;`differentiable_learner_configs` must be a list of &quot;</span>
+                <span class="s2">&quot;`DifferentiableLearnerConfig` instances, but at least &quot;</span>
+                <span class="s2">&quot;one instance is not a `DifferentiableLearnerConfig`.&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_learner_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="s2">&quot;TorchMetaLearner&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the `MetaLearner` class to use for this algorithm.</span>
+
+<span class="sd">        Override this method in the sub-class to return the `MetaLearner`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The `MetaLearner` class to use for this algorithm either as a class</span>
+<span class="sd">            type or as a string. (e.g. &quot;ray.rllib.core.learner.torch.torch_meta_learner.TorchMetaLearner&quot;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_differentiable_learner_classes</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="s2">&quot;DifferentiableLearner&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the `DifferentiableLearner` classes to use for this algorithm.</span>
+
+<span class="sd">        Override this method in the sub-class to return the `DifferentiableLearner`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The `DifferentiableLearner` class to use for this algorithm either as a class</span>
+<span class="sd">            type or as a string. (e.g.</span>
+<span class="sd">            &quot;ray.rllib.core.learner.torch.torch_meta_learner.TorchDifferentiableLearner&quot;).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_differentiable_learner_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">DifferentiableLearnerConfig</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the `DifferentiableLearnerConfigs` for all `DifferentiableLearner`s.</span>
+
+<span class="sd">        Override this method in the sub-class to return the `DifferentiableLearnerConfig`s.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The `DifferentiableLearnerConfig` instances to use for this algorithm.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">differentiable_learner_configs</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">TorchCompileWhatToCompile</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>

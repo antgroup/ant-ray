@@ -37,7 +37,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/css/csat.css?v=c8f39c76" />
     <link rel="stylesheet" type="text/css" href="../_static/css/assistant.css?v=d345c55e" />
     <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=633d7681" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=4676c12b" />
     <link rel="stylesheet" type="text/css" href="../_static/docsearch.css?v=45fb5152" />
     <link rel="stylesheet" type="text/css" href="../_static/pydata-docsearch-custom.css?v=7fb92720" />
   
@@ -69,7 +69,7 @@
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="next" title="Saving Data" href="saving-data.html" />
-    <link rel="prev" title="Iterating over Data" href="iterating-over-data.html" /><!-- Extra header to include at the top of each template.
+    <link rel="prev" title="Joining datasets" href="joining-data.html" /><!-- Extra header to include at the top of each template.
 Kept separately so that it can easily be included in any templates
 that need to be overridden for individual pages; e.g. included
 both in the usual template (layout.html) as well as (index.html). -->
@@ -187,6 +187,12 @@ both in the usual template (layout.html) as well as (index.html). -->
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+
+  <div class="bd-header-announcement container-fluid bd-header-announcement">
+    <div class="bd-header-announcement__content">Try Ray with $100 credit — <a target="_blank" href="https://console.anyscale.com/register/ha?render_flow=ray&utm_source=ray_docs&utm_medium=docs&utm_campaign=banner">Start now</a>.</div>
+  </div>
+
   
     <nav class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
@@ -349,15 +355,6 @@ document.write(`
 `);
 </script></div>
       
-        <div class="navbar-item"><a
-  id="try-anyscale-href"
-  href="https://www.anyscale.com/ray-on-anyscale/?utm_source=ray_docs&utm_medium=docs&utm_campaign=navbar"
->
-  <div id="try-anyscale-text">
-    <span>Try Ray on Anyscale</span>
-  </div>
-</a></div>
-      
     </div>
     
   </div>
@@ -518,15 +515,6 @@ document.write(`
 `);
 </script></div>
         
-          <div class="navbar-item"><a
-  id="try-anyscale-href"
-  href="https://www.anyscale.com/ray-on-anyscale/?utm_source=ray_docs&utm_medium=docs&utm_campaign=navbar"
->
-  <div id="try-anyscale-text">
-    <span>Try Ray on Anyscale</span>
-  </div>
-</a></div>
-        
       </div>
     
   </div>
@@ -542,17 +530,32 @@ document.write(`
 
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../ray-overview/examples.html">Example Gallery</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ray-overview/ray-libraries.html">Ecosystem</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-core/walkthrough.html">Ray Core</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../ray-core/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-core/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/tasks.html">Tasks</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../ray-core/tasks/nested-tasks.html">Nested Remote Functions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../ray-core/tasks/generators.html">Dynamic generators</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-overview/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ray-overview/examples/entity-recognition-with-llms/README.html">Entity Recognition with LLMs</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-overview/examples/e2e-audio/index.html">End-to-end audio</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../ray-overview/examples/e2e-audio/README.html">Audio data curation with Ray</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ray-overview/examples/e2e-audio/e2e_audio/curation.html">Audio curation with offline batch inference</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/actors.html">Actors</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-overview/examples/e2e-xgboost/index.html">End-to-end distributed XGBoost</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../ray-overview/examples/e2e-xgboost/README.html">Overview</a></li>
+
+<li class="toctree-l3"><a class="reference internal" href="../ray-overview/examples/e2e-xgboost/notebooks/01-Distributed_Training.html">Distributed training of an XGBoost model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ray-overview/examples/e2e-xgboost/notebooks/02-Validation.html">Model validation using offline batch inference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ray-overview/examples/e2e-xgboost/notebooks/03-Serving.html">Scalable online XGBoost inference with Ray Serve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ray-overview/ray-libraries.html">Ecosystem</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-core/walkthrough.html">Ray Core</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ray-core/key-concepts.html">Key Concepts</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-core/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/tasks.html">Tasks</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ray-core/tasks/nested-tasks.html">Nested Remote Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/actors.html">Actors</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/actors/named-actors.html">Named Actors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/actors/terminating-actors.html">Terminating Actors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/actors/async_api.html">AsyncIO / Concurrency for Actors</a></li>
@@ -562,13 +565,13 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/actors/task-orders.html">Actor Task Execution Order</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/objects.html">Objects</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/objects.html">Objects</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/objects/serialization.html">Serialization</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/objects/object-spilling.html">Object Spilling</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../ray-core/handling-dependencies.html">Environment Dependencies</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/scheduling/index.html">Scheduling</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/scheduling/index.html">Scheduling</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/scheduling/resources.html">Resources</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/scheduling/accelerators.html">Accelerator Support</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/scheduling/placement-group.html">Placement Groups</a></li>
@@ -576,7 +579,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/scheduling/ray-oom-prevention.html">Out-Of-Memory Prevention</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/fault-tolerance.html">Fault Tolerance</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/fault-tolerance.html">Fault tolerance</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/fault_tolerance/tasks.html">Task Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/fault_tolerance/actors.html">Actor Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/fault_tolerance/objects.html">Object Fault Tolerance</a></li>
@@ -585,7 +588,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/fault_tolerance/head-ha.html">Head High-Availability Feature</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/patterns/nested-tasks.html">Pattern: Using nested tasks to achieve nested parallelism</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/patterns/generators.html">Pattern: Using generators to reduce heap memory usage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/patterns/limit-pending-tasks.html">Pattern: Using ray.wait to limit the number of pending tasks</a></li>
@@ -608,7 +611,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/patterns/fork-new-processes.html">Anti-pattern: Forking new processes in application code</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/compiled-graph/profiling.html">Profiling</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/compiled-graph/overlap.html">Experimental: Overlapping communication and computation</a></li>
@@ -616,12 +619,12 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/compiled-graph/compiled-graph-api.html">Compiled Graph API</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/advanced-topics.html">Advanced Topics</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-core/advanced-topics.html">Advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/tips-for-first-time.html">Tips for first-time users</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/starting-ray.html">Starting Ray</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/ray-generator.html">Ray Generators</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/namespaces.html">Using Namespaces</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../ray-core/cross-language.html">Cross-Language Programming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ray-core/cross-language.html">Cross-language programming</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/using-ray-with-jupyter.html">Working with Jupyter Notebooks &amp; JupyterLab</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/ray-dag.html">Lazy Computation Graphs with the Ray DAG API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-core/miscellaneous.html">Miscellaneous Topics</a></li>
@@ -631,7 +634,7 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-core/examples/overview.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-core/examples/overview.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../ray-core/examples/automl_for_time_series.html">Simple AutoML for time series with Ray Core</a></li>
 
 <li class="toctree-l3"><a class="reference internal" href="../ray-core/examples/batch_prediction.html">Batch Prediction with Ray Core</a></li>
@@ -645,7 +648,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../ray-core/examples/web-crawler.html">Speed up your web crawler by parallelizing it with Ray</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-core/api/index.html">Ray Core API</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-core/api/index.html">Ray Core API</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../ray-core/api/core.html">Core API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ray-core/api/scheduling.html">Scheduling API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ray-core/api/runtime-env.html">Runtime Env API</a></li>
@@ -658,14 +661,15 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="data.html">Ray Data</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="data.html">Ray Data</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html">Ray Data Quickstart</a></li>
 <li class="toctree-l2"><a class="reference internal" href="key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="user-guide.html">User Guides</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="user-guide.html">User Guides</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="loading-data.html">Loading Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="inspecting-data.html">Inspecting Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="transforming-data.html">Transforming Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="iterating-over-data.html">Iterating over Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="joining-data.html">Joining datasets</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">Shuffling Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="saving-data.html">Saving Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="working-with-images.html">Working with Images</a></li>
@@ -681,7 +685,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="api/api.html">Ray Data API</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/api.html">Ray Data API</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/input_output.html">Input/Output</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/dataset.html">Dataset API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/data_iterator.html">DataIterator API</a></li>
@@ -698,12 +702,13 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="data-internals.html">Ray Data Internals</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../train/train.html">Ray Train</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../train/train.html">Ray Train</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../train/overview.html">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../train/getting-started-pytorch.html">PyTorch Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../train/getting-started-pytorch-lightning.html">PyTorch Lightning Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../train/getting-started-transformers.html">Hugging Face Transformers Guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../train/more-frameworks.html">More Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../train/getting-started-xgboost.html">XGBoost Guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../train/more-frameworks.html">More Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-21"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../train/huggingface-accelerate.html">Hugging Face Accelerate Guide</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/deepspeed.html">DeepSpeed Guide</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/distributed-tensorflow-keras.html">TensorFlow and Keras Guide</a></li>
@@ -711,7 +716,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../train/horovod.html">Horovod Guide</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../train/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../train/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-22"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/data-loading-preprocessing.html">Data Loading and Preprocessing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/using-gpus.html">Configuring Scale and GPUs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/persistent-storage.html">Configuring Persistent Storage</a></li>
@@ -729,23 +734,22 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../train/api/api.html">Ray Train API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../tune/index.html">Ray Tune</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tune/index.html">Ray Tune</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../tune/getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tune/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/tutorials/overview.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-21"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/tutorials/overview.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-run.html">Running Basic Experiments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-output.html">Logging and Outputs in Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-resources.html">Setting Trial Resources</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-search-spaces.html">Using Search Spaces</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-stopping.html">How to Define Stopping Criteria for a Ray Tune Experiment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-trial-checkpoints.html">How to Save and Load Trial Checkpoints</a></li>
-
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-storage.html">How to Configure Persistent Storage in Ray Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-fault-tolerance.html">How to Enable Fault Tolerance in Ray Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-metrics.html">Using Callbacks and Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune_get_data_in_and_out.html">Getting Data in and out of Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune_analyze_results.html">Analyzing Tune Experiment Results</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../tune/examples/pbt_guide.html">A Guide to Population Based Training with Tune</a><input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-22"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../tune/examples/pbt_guide.html">A Guide to Population Based Training with Tune</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../tune/examples/pbt_visualization/pbt_visualization.html">Visualizing and Understanding PBT</a></li>
 </ul>
 </li>
@@ -754,36 +758,25 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-scalability.html">Scalability Benchmarks</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../tune/examples/ml-frameworks.html">Examples using Ray Tune with ML Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/tune-xgboost.html">XGBoost Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/lightgbm_example.html">LightGBM Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/pbt_transformers.html">Hugging Face Transformers Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/horovod_simple.html">Horovod Example</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../tune/examples/experiment-tracking.html">Tune Experiment Tracking Examples</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/tune-wandb.html">Weights &amp; Biases Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/tune-mlflow.html">MLflow Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/tune-aim.html">Aim Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/tune-comet.html">Comet Example</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../tune/examples/hpo-frameworks.html">Tune Hyperparameter Optimization Framework Examples</a><input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-26"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/ax_example.html">Ax Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/hyperopt_example.html">HyperOpt Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/bayesopt_example.html">Bayesopt Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/bohb_example.html">BOHB Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/nevergrad_example.html">Nevergrad Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../tune/examples/optuna_example.html">Optuna Example</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../tune/examples/other-examples.html">Other Examples</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tune/examples/exercises.html">Exercises</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-26"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune-xgboost.html">XGBoost Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/lightgbm_example.html">LightGBM Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/pbt_transformers.html">Hugging Face Transformers Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/horovod_simple.html">Horovod Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune-wandb.html">Weights &amp; Biases Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune-mlflow.html">MLflow Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune-aim.html">Aim Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune-comet.html">Comet Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/ax_example.html">Ax Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/hyperopt_example.html">HyperOpt Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/bayesopt_example.html">Bayesopt Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/bohb_example.html">BOHB Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/nevergrad_example.html">Nevergrad Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tune/examples/optuna_example.html">Optuna Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../tune/faq.html">Ray Tune FAQ</a></li>
@@ -1053,7 +1046,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.html">ray.rllib.utils.schedules.scheduler.Scheduler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.validate.html">ray.rllib.utils.schedules.scheduler.Scheduler.validate</a></li>
@@ -1114,6 +1107,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../ray-more-libs/raydp.html">Using Spark on Ray (RayDP)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ray-more-libs/mars-on-ray.html">Using Mars on Ray</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ray-more-libs/modin/index.html">Using Pandas on Ray (Modin)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ray-more-libs/data_juicer_distributed_data_processing.html">Distributed Data Processing in Data-Juicer</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../workflows/index.html">Ray Workflows (Deprecated)</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../workflows/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../workflows/basics.html">Getting Started</a></li>
@@ -1135,6 +1129,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../cluster/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/getting-started/kuberay-operator-installation.html">KubeRay Operator Installation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/getting-started/raycluster-quick-start.html">RayCluster Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/getting-started/rayjob-quick-start.html">RayJob Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/getting-started/rayservice-quick-start.html">RayService Quickstart</a></li>
@@ -1142,10 +1137,12 @@ document.write(`
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/rayservice.html">Deploy Ray Serve Apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/rayservice-no-ray-serve-replica.html">RayService worker Pods aren’t ready</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/rayservice-high-availability.html">RayService high availability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/observability.html">KubeRay Observability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/upgrade-guide.html">KubeRay upgrade guide</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/k8s-cluster-setup.html">Managed Kubernetes services</a></li>
+
 
 
 
@@ -1290,7 +1287,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../ray-observability/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/general-debugging.html">General Debugging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/general-debugging.html">Common Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/debug-hangs.html">Debugging Hangs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/debug-failures.html">Debugging Failures</a></li>
@@ -1406,16 +1403,16 @@ This guide shows several different methods of shuffling data with Ray Data and t
 <section id="types-of-shuffling">
 <h2>Types of shuffling<a class="headerlink" href="#types-of-shuffling" title="Link to this heading">#</a></h2>
 <p>Ray Data provides several different options for shuffling data, trading off the granularity of shuffle
-control with memory consumption and runtime. The options below are listed in increasing order of
-resource consumption and runtime; choose the most appropriate method for your use case.</p>
+control with memory consumption and runtime. The list below presents options in increasing order of
+resource consumption and runtime. Choose the most appropriate method for your use case.</p>
 <section id="shuffle-the-ordering-of-files">
 <span id="shuffling-file-order"></span><h3>Shuffle the ordering of files<a class="headerlink" href="#shuffle-the-ordering-of-files" title="Link to this heading">#</a></h3>
 <p>To randomly shuffle the ordering of input files before reading, call a <a class="reference internal" href="api/input_output.html#input-output"><span class="std std-ref">read function</span></a> function that supports shuffling, such as
 <a class="reference internal" href="api/doc/ray.data.read_images.html#ray.data.read_images" title="ray.data.read_images"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_images()</span></code></a>, and use the <code class="docutils literal notranslate"><span class="pre">shuffle=&quot;files&quot;</span></code> parameter. This randomly assigns
 input files to workers for reading.</p>
-<p>This is the fastest option for shuffle, and is a purely metadata operation. This
-option doesn’t shuffle the actual rows inside files, so the randomness might be
-poor if each file has many rows.</p>
+<p>This is the fastest “shuffle” option: it’s purely a metadata operation—the system random-shuffles the list of files constituting the dataset before
+fetching them with reading tasks. This option, however, doesn’t shuffle the rows inside files, so the randomness might not be
+sufficient for your needs in case of files with the large number of rows.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_images</span><span class="p">(</span>
@@ -1425,16 +1422,16 @@ poor if each file has many rows.</p>
 </pre></div>
 </div>
 </section>
-<section id="local-shuffle-when-iterating-over-batches">
-<span id="local-shuffle-buffer"></span><h3>Local shuffle when iterating over batches<a class="headerlink" href="#local-shuffle-when-iterating-over-batches" title="Link to this heading">#</a></h3>
+<section id="local-buffer-shuffle">
+<span id="local-shuffle-buffer"></span><h3>Local buffer shuffle<a class="headerlink" href="#local-buffer-shuffle" title="Link to this heading">#</a></h3>
 <p>To locally shuffle a subset of rows using iteration methods, such as <a class="reference internal" href="api/doc/ray.data.Dataset.iter_batches.html#ray.data.Dataset.iter_batches" title="ray.data.Dataset.iter_batches"><code class="xref py py-meth docutils literal notranslate"><span class="pre">iter_batches()</span></code></a>,
 <a class="reference internal" href="api/doc/ray.data.Dataset.iter_torch_batches.html#ray.data.Dataset.iter_torch_batches" title="ray.data.Dataset.iter_torch_batches"><code class="xref py py-meth docutils literal notranslate"><span class="pre">iter_torch_batches()</span></code></a>, and <a class="reference internal" href="api/doc/ray.data.Dataset.iter_tf_batches.html#ray.data.Dataset.iter_tf_batches" title="ray.data.Dataset.iter_tf_batches"><code class="xref py py-meth docutils literal notranslate"><span class="pre">iter_tf_batches()</span></code></a>,
-specify <code class="code docutils literal notranslate"><span class="pre">local_shuffle_buffer_size</span></code>. This shuffles the rows up to a provided buffer
-size during iteration. See more details in
+specify <code class="code docutils literal notranslate"><span class="pre">local_shuffle_buffer_size</span></code>.</p>
+<p>This shuffles up to a <code class="code docutils literal notranslate"><span class="pre">local_shuffle_buffer_size</span></code> number of rows buffered during iteration. See more details in
 <a class="reference internal" href="iterating-over-data.html#iterating-over-batches-with-shuffling"><span class="std std-ref">Iterating over batches with shuffling</span></a>.</p>
-<p>This is slower than shuffling ordering of files, and shuffles rows locally without
-network transfer. This local shuffle buffer can be used together with shuffling
-ordering of files; see <a class="reference internal" href="#shuffling-file-order"><span class="std std-ref">Shuffle the ordering of files</span></a>.</p>
+<p>This is slower than files shuffling, and shuffles rows locally without
+network transfer. You can use this local shuffle buffer together with shuffling
+ordering of files. See <a class="reference internal" href="#shuffling-file-order"><span class="std std-ref">Shuffle the ordering of files</span></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_images</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/image-datasets/simple&quot;</span><span class="p">)</span>
@@ -1457,9 +1454,19 @@ time spent in other steps, decrease <code class="docutils literal notranslate"><
 shuffle buffer altogether and only <a class="reference internal" href="#shuffling-file-order"><span class="std std-ref">shuffle the ordering of files</span></a>.</p>
 </div>
 </section>
-<section id="shuffling-block-order">
-<h3>Shuffling block order<a class="headerlink" href="#shuffling-block-order" title="Link to this heading">#</a></h3>
-<p>This option randomizes the order of blocks in a dataset. Blocks are the basic unit of data chunk that Ray Data stores in the object store. Applying this operation alone doesn’t involve heavy computation and communication. However, it requires Ray Data to materialize all blocks in memory before applying the operation. Only use this option when your dataset is small enough to fit into the object store memory.</p>
+<section id="randomizing-block-order">
+<h3>Randomizing block order<a class="headerlink" href="#randomizing-block-order" title="Link to this heading">#</a></h3>
+<p>This option randomizes the order of <a class="reference internal" href="key-concepts.html#data-key-concepts"><span class="std std-ref">blocks</span></a> in a dataset. While applying this operation alone doesn’t involve heavy computation
+and communication, it requires Ray Data to materialize all blocks in memory before actually randomizing their ordering in the queue for subsequent operation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ray Data doesn’t guarantee any particular ordering of the blocks when reading blocks from different files in parallel by default, unless you set <code class="code docutils literal notranslate"><span class="pre">DataContext.execution_options.preserve_order</span></code> to true. Henceforth, this particular option
+is primarily relevant in cases when the system yields blocks from relatively small set of very large files.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only use this option when your dataset is small enough to fit into the object store memory.</p>
+</div>
 <p>To perform block order shuffling, use <a class="reference internal" href="api/doc/ray.data.Dataset.randomize_block_order.html#ray.data.Dataset.randomize_block_order" title="ray.data.Dataset.randomize_block_order"><code class="xref py py-meth docutils literal notranslate"><span class="pre">randomize_block_order</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span>
     <span class="s2">&quot;s3://anonymous@ray-example-data/sms_spam_collection_subset.txt&quot;</span>
@@ -1470,17 +1477,36 @@ shuffle buffer altogether and only <a class="reference internal" href="#shufflin
 </pre></div>
 </div>
 </section>
-<section id="shuffle-all-rows">
-<h3>Shuffle all rows<a class="headerlink" href="#shuffle-all-rows" title="Link to this heading">#</a></h3>
-<p>To randomly shuffle all rows globally, call <a class="reference internal" href="api/doc/ray.data.Dataset.random_shuffle.html#ray.data.Dataset.random_shuffle" title="ray.data.Dataset.random_shuffle"><code class="xref py py-meth docutils literal notranslate"><span class="pre">random_shuffle()</span></code></a>.
-This is the slowest option for shuffle, and requires transferring data across
-network between workers. This option achieves the best randomness among all options.</p>
+<section id="global-shuffle">
+<h3>Global shuffle<a class="headerlink" href="#global-shuffle" title="Link to this heading">#</a></h3>
+<p>To shuffle all rows globally, across the whole dataset, multiple options are available</p>
+<blockquote>
+<div><p>1. <em>Random shuffling</em>: invoking <a class="reference internal" href="api/doc/ray.data.Dataset.random_shuffle.html#ray.data.Dataset.random_shuffle" title="ray.data.Dataset.random_shuffle"><code class="xref py py-meth docutils literal notranslate"><span class="pre">random_shuffle()</span></code></a> essentially permutes and shuffles individual rows
+from existing blocks into the new ones using an optionally provided seed.</p>
+<p>2. (<strong>New in 2.46</strong>) <em>Key-based repartitioning</em>: invoking <a class="reference internal" href="api/doc/ray.data.Dataset.repartition.html#ray.data.Dataset.repartition" title="ray.data.Dataset.repartition"><code class="xref py py-meth docutils literal notranslate"><span class="pre">repartition()</span></code></a> with <code class="code docutils literal notranslate"><span class="pre">keys</span></code> parameter triggers
+<a class="reference internal" href="data-internals.html#hash-shuffle"><span class="std std-ref">hash-shuffle</span></a> operation, shuffling the rows based on the hash of the values in the provided key columns, providing
+deterministic way of co-locating rows based on the hash of the column values.</p>
+</div></blockquote>
+<p>Note that shuffle is an expensive operation requiring materializing of the whole dataset in memory as well as serving as a synchronization
+barrier—subsequent operators won’t be able to start executing until shuffle completion.</p>
+<p>Example of random shuffling with seed:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
 
-<span class="n">ds</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_images</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/image-datasets/simple&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">random_shuffle</span><span class="p">()</span>
-<span class="p">)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_images</span><span class="p">(</span><span class="s2">&quot;s3://anonymous@ray-example-data/image-datasets/simple&quot;</span><span class="p">)</span>
+
+<span class="c1"># Random shuffle with seed</span>
+<span class="n">random_shuffled_ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">random_shuffle</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Example of hash shuffling based on column <code class="code docutils literal notranslate"><span class="pre">id</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.data.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataContext</span><span class="p">,</span> <span class="n">ShuffleStrategy</span>
+
+<span class="c1"># First enable hash-shuffle as shuffling strategy</span>
+<span class="n">DataContext</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span><span class="o">.</span><span class="n">shuffle_strategy</span> <span class="o">=</span> <span class="n">ShuffleStrategy</span><span class="o">.</span><span class="n">HASH_SHUFFLE</span>
+
+<span class="c1"># Hash-shuffle</span>
+<span class="n">hash_shuffled_ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">repartition</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">num_blocks</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -1497,36 +1523,29 @@ network between workers. This option achieves the best randomness among all opti
 <p>Use global per-epoch shuffling only if your model is sensitive to the
 randomness of the training data. Based on a
 <a class="reference external" href="https://arxiv.org/abs/1709.10432">theoretical foundation</a>, all
-gradient-descent-based model trainers benefit from improved (global) shuffle quality.
-In practice, the benefit is particularly pronounced for tabular data/models.
+gradient-descent-based model trainers benefit from improved global shuffle quality.
+In practice, the benefit’s particularly pronounced for tabular data/models.
 However, the more global the shuffle is, the more expensive the shuffling operation.
 The increase compounds with distributed data-parallel training on a multi-node cluster due
 to data transfer costs. This cost can be prohibitive when using very large datasets.</p>
 <p>The best route for determining the best tradeoff between preprocessing time and cost and
 per-epoch shuffle quality is to measure the precision gain per training step for your
-particular model under different shuffling policies:</p>
-<ul class="simple">
-<li><p>no shuffling,</p></li>
-<li><p>local (per-shard) limited-memory shuffle buffer,</p></li>
-<li><p>local (per-shard) shuffling,</p></li>
-<li><p>windowed (pseudo-global) shuffling, and</p></li>
-<li><p>fully global shuffling.</p></li>
-</ul>
+particular model under different shuffling policies such as no shuffling, local shuffling, or global shuffling.</p>
 <p>As long as your data loading and shuffling throughput is higher than your training throughput, your GPU should
-be saturated. If you have shuffle-sensitive models, push the
-shuffle quality higher until this threshold is hit.</p>
+saturate. If you have shuffle-sensitive models, push the
+shuffle quality higher until you reach this threshold.</p>
 </section>
 <section id="enabling-push-based-shuffle">
 <span id="shuffle-performance-tips"></span><h3>Enabling push-based shuffle<a class="headerlink" href="#enabling-push-based-shuffle" title="Link to this heading">#</a></h3>
-<p>Some Dataset operations require a <em>shuffle</em> operation, meaning that data is shuffled from all of the input partitions to all of the output partitions.
+<p>Some Dataset operations require a <em>shuffle</em> operation, meaning that the system shuffles data from all of the input partitions to all of the output partitions.
 These operations include <a class="reference internal" href="api/doc/ray.data.Dataset.random_shuffle.html#ray.data.Dataset.random_shuffle" title="ray.data.Dataset.random_shuffle"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.random_shuffle</span></code></a>,
 <a class="reference internal" href="api/doc/ray.data.Dataset.sort.html#ray.data.Dataset.sort" title="ray.data.Dataset.sort"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.sort</span></code></a> and <a class="reference internal" href="api/doc/ray.data.Dataset.groupby.html#ray.data.Dataset.groupby" title="ray.data.Dataset.groupby"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.groupby</span></code></a>.
-For example, during a sort operation, data is reordered between blocks and therefore requires shuffling across partitions.
+For example, during a sort operation, the system reorders data between blocks and therefore requires shuffling across partitions.
 Shuffling can be challenging to scale to large data sizes and clusters, especially when the total dataset size can’t fit into memory.</p>
 <p>Ray Data provides an alternative shuffle implementation known as push-based shuffle for improving large-scale performance.
 Try this out if your dataset has more than 1000 blocks or is larger than 1 TB in size.</p>
 <p>To try this out locally or on a cluster, you can start with the <a class="reference external" href="https://github.com/ray-project/ray/blob/master/release/nightly_tests/dataset/sort_benchmark.py">nightly release test</a> that Ray runs for <a class="reference internal" href="api/doc/ray.data.Dataset.random_shuffle.html#ray.data.Dataset.random_shuffle" title="ray.data.Dataset.random_shuffle"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.random_shuffle</span></code></a> and <a class="reference internal" href="api/doc/ray.data.Dataset.sort.html#ray.data.Dataset.sort" title="ray.data.Dataset.sort"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.sort</span></code></a>.
-To get an idea of the performance you can expect, here are some run time results for <a class="reference internal" href="api/doc/ray.data.Dataset.random_shuffle.html#ray.data.Dataset.random_shuffle" title="ray.data.Dataset.random_shuffle"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.random_shuffle</span></code></a> on 1-10 TB of data on 20 machines (m5.4xlarge instances on AWS EC2, each with 16 vCPUs, 64 GB RAM).</p>
+To get an idea of the performance you can expect, here are some run time results for <a class="reference internal" href="api/doc/ray.data.Dataset.random_shuffle.html#ray.data.Dataset.random_shuffle" title="ray.data.Dataset.random_shuffle"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.random_shuffle</span></code></a> on 1-10 TB of data on 20 machines - m5.4xlarge instances on AWS EC2, each with 16 vCPUs, 64 GB RAM.</p>
 <img alt="https://docs.google.com/spreadsheets/d/e/2PACX-1vQvBWpdxHsW0-loasJsBpdarAixb7rjoo-lTgikghfCeKPQtjQDDo2fY51Yc1B6k_S4bnYEoChmFrH2/pubchart?oid=598567373&amp;format=image" class="align-center" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQvBWpdxHsW0-loasJsBpdarAixb7rjoo-lTgikghfCeKPQtjQDDo2fY51Yc1B6k_S4bnYEoChmFrH2/pubchart?oid=598567373&amp;format=image" />
 <p>To try out push-based shuffle, set the environment variable <code class="docutils literal notranslate"><span class="pre">RAY_DATA_PUSH_BASED_SHUFFLE=1</span></code> when running your application:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>wget<span class="w"> </span>https://raw.githubusercontent.com/ray-project/ray/master/release/nightly_tests/dataset/sort.py
@@ -1591,12 +1610,12 @@ Here is an example that shows how to limit a random shuffle operation to two out
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="iterating-over-data.html"
+       href="joining-data.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Iterating over Data</p>
+        <p class="prev-next-title">Joining datasets</p>
       </div>
     </a>
     <a class="right-next"
@@ -1625,9 +1644,9 @@ Here is an example that shows how to limit a random shuffle operation to two out
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types-of-shuffling">Types of shuffling</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#shuffle-the-ordering-of-files">Shuffle the ordering of files</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#local-shuffle-when-iterating-over-batches">Local shuffle when iterating over batches</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#shuffling-block-order">Shuffling block order</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#shuffle-all-rows">Shuffle all rows</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#local-buffer-shuffle">Local buffer shuffle</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#randomizing-block-order">Randomizing block order</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#global-shuffle">Global shuffle</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-optimizing-shuffles">Advanced: Optimizing shuffles</a><ul class="nav section-nav flex-column">

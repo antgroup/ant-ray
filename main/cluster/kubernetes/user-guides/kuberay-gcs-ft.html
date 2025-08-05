@@ -37,7 +37,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/css/csat.css?v=c8f39c76" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/assistant.css?v=d345c55e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=633d7681" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=4676c12b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/docsearch.css?v=45fb5152" />
     <link rel="stylesheet" type="text/css" href="../../../_static/pydata-docsearch-custom.css?v=7fb92720" />
   
@@ -187,6 +187,12 @@ both in the usual template (layout.html) as well as (index.html). -->
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+
+  <div class="bd-header-announcement container-fluid bd-header-announcement">
+    <div class="bd-header-announcement__content">Try Ray with $100 credit — <a target="_blank" href="https://console.anyscale.com/register/ha?render_flow=ray&utm_source=ray_docs&utm_medium=docs&utm_campaign=banner">Start now</a>.</div>
+  </div>
+
   
     <nav class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
@@ -349,15 +355,6 @@ document.write(`
 `);
 </script></div>
       
-        <div class="navbar-item"><a
-  id="try-anyscale-href"
-  href="https://www.anyscale.com/ray-on-anyscale/?utm_source=ray_docs&utm_medium=docs&utm_campaign=navbar"
->
-  <div id="try-anyscale-text">
-    <span>Try Ray on Anyscale</span>
-  </div>
-</a></div>
-      
     </div>
     
   </div>
@@ -518,15 +515,6 @@ document.write(`
 `);
 </script></div>
         
-          <div class="navbar-item"><a
-  id="try-anyscale-href"
-  href="https://www.anyscale.com/ray-on-anyscale/?utm_source=ray_docs&utm_medium=docs&utm_campaign=navbar"
->
-  <div id="try-anyscale-text">
-    <span>Try Ray on Anyscale</span>
-  </div>
-</a></div>
-        
       </div>
     
   </div>
@@ -542,17 +530,32 @@ document.write(`
 
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ray-overview/examples.html">Example Gallery</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ray-overview/ray-libraries.html">Ecosystem</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-core/walkthrough.html">Ray Core</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../ray-core/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-core/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/tasks.html">Tasks</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/tasks/nested-tasks.html">Nested Remote Functions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/tasks/generators.html">Dynamic generators</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-overview/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../ray-overview/examples/entity-recognition-with-llms/README.html">Entity Recognition with LLMs</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-overview/examples/e2e-audio/index.html">End-to-end audio</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-overview/examples/e2e-audio/README.html">Audio data curation with Ray</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-overview/examples/e2e-audio/e2e_audio/curation.html">Audio curation with offline batch inference</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/actors.html">Actors</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-overview/examples/e2e-xgboost/index.html">End-to-end distributed XGBoost</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-overview/examples/e2e-xgboost/README.html">Overview</a></li>
+
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-overview/examples/e2e-xgboost/notebooks/01-Distributed_Training.html">Distributed training of an XGBoost model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-overview/examples/e2e-xgboost/notebooks/02-Validation.html">Model validation using offline batch inference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ray-overview/examples/e2e-xgboost/notebooks/03-Serving.html">Scalable online XGBoost inference with Ray Serve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ray-overview/ray-libraries.html">Ecosystem</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../ray-core/walkthrough.html">Ray Core</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../ray-core/key-concepts.html">Key Concepts</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-core/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/tasks.html">Tasks</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/tasks/nested-tasks.html">Nested Remote Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/actors.html">Actors</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/actors/named-actors.html">Named Actors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/actors/terminating-actors.html">Terminating Actors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/actors/async_api.html">AsyncIO / Concurrency for Actors</a></li>
@@ -562,13 +565,13 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/actors/task-orders.html">Actor Task Execution Order</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/objects.html">Objects</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/objects.html">Objects</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/objects/serialization.html">Serialization</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/objects/object-spilling.html">Object Spilling</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-core/handling-dependencies.html">Environment Dependencies</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/scheduling/index.html">Scheduling</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/scheduling/index.html">Scheduling</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/scheduling/resources.html">Resources</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/scheduling/accelerators.html">Accelerator Support</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/scheduling/placement-group.html">Placement Groups</a></li>
@@ -576,7 +579,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/scheduling/ray-oom-prevention.html">Out-Of-Memory Prevention</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/fault-tolerance.html">Fault Tolerance</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/fault-tolerance.html">Fault tolerance</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/tasks.html">Task Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/actors.html">Actor Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/objects.html">Object Fault Tolerance</a></li>
@@ -585,7 +588,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/fault_tolerance/head-ha.html">Head High-Availability Feature</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/nested-tasks.html">Pattern: Using nested tasks to achieve nested parallelism</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/generators.html">Pattern: Using generators to reduce heap memory usage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/limit-pending-tasks.html">Pattern: Using ray.wait to limit the number of pending tasks</a></li>
@@ -608,7 +611,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/patterns/fork-new-processes.html">Anti-pattern: Forking new processes in application code</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/overlap.html">Experimental: Overlapping communication and computation</a></li>
@@ -616,12 +619,12 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/compiled-graph/compiled-graph-api.html">Compiled Graph API</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/advanced-topics.html">Advanced Topics</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-core/advanced-topics.html">Advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/tips-for-first-time.html">Tips for first-time users</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/starting-ray.html">Starting Ray</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/ray-generator.html">Ray Generators</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/namespaces.html">Using Namespaces</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/cross-language.html">Cross-Language Programming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-core/cross-language.html">Cross-language programming</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/using-ray-with-jupyter.html">Working with Jupyter Notebooks &amp; JupyterLab</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/ray-dag.html">Lazy Computation Graphs with the Ray DAG API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-core/miscellaneous.html">Miscellaneous Topics</a></li>
@@ -631,7 +634,7 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-core/examples/overview.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-core/examples/overview.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-core/examples/automl_for_time_series.html">Simple AutoML for time series with Ray Core</a></li>
 
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-core/examples/batch_prediction.html">Batch Prediction with Ray Core</a></li>
@@ -645,7 +648,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-core/examples/web-crawler.html">Speed up your web crawler by parallelizing it with Ray</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-core/api/index.html">Ray Core API</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-core/api/index.html">Ray Core API</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-core/api/core.html">Core API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-core/api/scheduling.html">Scheduling API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../ray-core/api/runtime-env.html">Runtime Env API</a></li>
@@ -658,14 +661,15 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../data/data.html">Ray Data</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../data/data.html">Ray Data</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../data/quickstart.html">Ray Data Quickstart</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../data/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../data/loading-data.html">Loading Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../data/inspecting-data.html">Inspecting Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../data/transforming-data.html">Transforming Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../data/iterating-over-data.html">Iterating over Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../data/joining-data.html">Joining datasets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../data/shuffling-data.html">Shuffling Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../data/saving-data.html">Saving Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../data/working-with-images.html">Working with Images</a></li>
@@ -681,7 +685,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../data/examples.html">Examples</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data/api/api.html">Ray Data API</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../data/api/api.html">Ray Data API</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../data/api/input_output.html">Input/Output</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../data/api/dataset.html">Dataset API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../data/api/data_iterator.html">DataIterator API</a></li>
@@ -698,12 +702,13 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../data/data-internals.html">Ray Data Internals</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../train/train.html">Ray Train</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../train/train.html">Ray Train</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../train/overview.html">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../train/getting-started-pytorch.html">PyTorch Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../train/getting-started-pytorch-lightning.html">PyTorch Lightning Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../train/getting-started-transformers.html">Hugging Face Transformers Guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../train/more-frameworks.html">More Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../train/getting-started-xgboost.html">XGBoost Guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../train/more-frameworks.html">More Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-21"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../train/huggingface-accelerate.html">Hugging Face Accelerate Guide</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../train/deepspeed.html">DeepSpeed Guide</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../train/distributed-tensorflow-keras.html">TensorFlow and Keras Guide</a></li>
@@ -711,7 +716,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../train/horovod.html">Horovod Guide</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../train/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../train/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-22"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../train/user-guides/data-loading-preprocessing.html">Data Loading and Preprocessing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../train/user-guides/using-gpus.html">Configuring Scale and GPUs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../train/user-guides/persistent-storage.html">Configuring Persistent Storage</a></li>
@@ -729,23 +734,22 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../train/api/api.html">Ray Train API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../tune/index.html">Ray Tune</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../tune/index.html">Ray Tune</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../tune/getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tune/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tune/tutorials/overview.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-21"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tune/tutorials/overview.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../tune/tutorials/tune-run.html">Running Basic Experiments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tune/tutorials/tune-output.html">Logging and Outputs in Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tune/tutorials/tune-resources.html">Setting Trial Resources</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tune/tutorials/tune-search-spaces.html">Using Search Spaces</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tune/tutorials/tune-stopping.html">How to Define Stopping Criteria for a Ray Tune Experiment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tune/tutorials/tune-trial-checkpoints.html">How to Save and Load Trial Checkpoints</a></li>
-
 <li class="toctree-l3"><a class="reference internal" href="../../../tune/tutorials/tune-storage.html">How to Configure Persistent Storage in Ray Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tune/tutorials/tune-fault-tolerance.html">How to Enable Fault Tolerance in Ray Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tune/tutorials/tune-metrics.html">Using Callbacks and Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tune/tutorials/tune_get_data_in_and_out.html">Getting Data in and out of Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/tune_analyze_results.html">Analyzing Tune Experiment Results</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../tune/examples/pbt_guide.html">A Guide to Population Based Training with Tune</a><input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-22"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../tune/examples/pbt_guide.html">A Guide to Population Based Training with Tune</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/pbt_visualization/pbt_visualization.html">Visualizing and Understanding PBT</a></li>
 </ul>
 </li>
@@ -754,36 +758,25 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../tune/tutorials/tune-scalability.html">Scalability Benchmarks</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../tune/examples/ml-frameworks.html">Examples using Ray Tune with ML Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune-xgboost.html">XGBoost Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/lightgbm_example.html">LightGBM Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/pbt_transformers.html">Hugging Face Transformers Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/horovod_simple.html">Horovod Example</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../tune/examples/experiment-tracking.html">Tune Experiment Tracking Examples</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune-wandb.html">Weights &amp; Biases Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune-mlflow.html">MLflow Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune-aim.html">Aim Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/tune-comet.html">Comet Example</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../tune/examples/hpo-frameworks.html">Tune Hyperparameter Optimization Framework Examples</a><input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-26"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/ax_example.html">Ax Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/hyperopt_example.html">HyperOpt Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/bayesopt_example.html">Bayesopt Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/bohb_example.html">BOHB Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/nevergrad_example.html">Nevergrad Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../tune/examples/optuna_example.html">Optuna Example</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/other-examples.html">Other Examples</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/exercises.html">Exercises</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-26"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/tune-xgboost.html">XGBoost Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/lightgbm_example.html">LightGBM Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/pbt_transformers.html">Hugging Face Transformers Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/horovod_simple.html">Horovod Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/tune-wandb.html">Weights &amp; Biases Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/tune-mlflow.html">MLflow Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/tune-aim.html">Aim Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/tune-comet.html">Comet Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/ax_example.html">Ax Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/hyperopt_example.html">HyperOpt Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/bayesopt_example.html">Bayesopt Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/bohb_example.html">BOHB Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/nevergrad_example.html">Nevergrad Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tune/examples/optuna_example.html">Optuna Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tune/faq.html">Ray Tune FAQ</a></li>
@@ -1053,7 +1046,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.html">ray.rllib.utils.schedules.scheduler.Scheduler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.validate.html">ray.rllib.utils.schedules.scheduler.Scheduler.validate</a></li>
@@ -1114,6 +1107,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/raydp.html">Using Spark on Ray (RayDP)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/mars-on-ray.html">Using Mars on Ray</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/modin/index.html">Using Pandas on Ray (Modin)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../ray-more-libs/data_juicer_distributed_data_processing.html">Distributed Data Processing in Data-Juicer</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../workflows/index.html">Ray Workflows (Deprecated)</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../workflows/basics.html">Getting Started</a></li>
@@ -1135,6 +1129,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html">Deploying on Kubernetes</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l3 has-children"><a class="reference internal" href="../getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../getting-started/kuberay-operator-installation.html">KubeRay Operator Installation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../getting-started/raycluster-quick-start.html">RayCluster Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../getting-started/rayjob-quick-start.html">RayJob Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../getting-started/rayservice-quick-start.html">RayService Quickstart</a></li>
@@ -1142,10 +1137,12 @@ document.write(`
 </li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="../user-guides.html">User Guides</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="rayservice.html">Deploy Ray Serve Apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rayservice-no-ray-serve-replica.html">RayService worker Pods aren’t ready</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rayservice-high-availability.html">RayService high availability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="observability.html">KubeRay Observability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="upgrade-guide.html">KubeRay upgrade guide</a></li>
 <li class="toctree-l4"><a class="reference internal" href="k8s-cluster-setup.html">Managed Kubernetes services</a></li>
+
 
 
 
@@ -1290,7 +1287,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../ray-observability/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/general-debugging.html">General Debugging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/general-debugging.html">Common Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/debug-hangs.html">Debugging Hangs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../ray-observability/user-guides/debug-apps/debug-failures.html">Debugging Failures</a></li>
@@ -1411,23 +1408,17 @@ To make the GCS fault tolerant, you must have a high-availability Redis.
 This way, in the event of a GCS restart, it retrieves all the data from the Redis instance and resumes its regular functions.</p>
 <div class="admonition-fate-sharing-without-gcs-fault-tolerance admonition">
 <p class="admonition-title">Fate-sharing without GCS fault tolerance</p>
-<p>Without GCS fault tolerance, the Ray cluster, the GCS process, and the Ray head Pod are fate-sharing.
-If the GCS process dies, the Ray head Pod dies as well after <code class="docutils literal notranslate"><span class="pre">RAY_gcs_rpc_server_reconnect_timeout_s</span></code> seconds.
-If the Ray head Pod is restarted according to the Pod’s <code class="docutils literal notranslate"><span class="pre">restartPolicy</span></code>, worker Pods attempt to reconnect to the new head Pod.
-The worker Pods are terminated by the new head Pod; without GCS fault tolerance enabled, the cluster state is lost, and the worker Pods are perceived as “unknown workers” by the new head Pod.
-This is adequate for most Ray applications; however, it is not ideal for Ray Serve, especially if high availability is crucial for your use cases.
-Hence, we recommend enabling GCS fault tolerance on the RayService custom resource to ensure high availability.
-See <a class="reference internal" href="../../../serve/production-guide/fault-tolerance.html#serve-e2e-ft-guide-gcs"><span class="std std-ref">Ray Serve end-to-end fault tolerance documentation</span></a> for more information.</p>
+<p>Without GCS fault tolerance, the Ray cluster, the GCS process, and the Ray head Pod are fate-sharing. If the GCS process dies, the Ray head Pod dies as well after <code class="docutils literal notranslate"><span class="pre">RAY_gcs_rpc_server_reconnect_timeout_s</span></code> seconds. If the Ray head Pod is restarted according to the Pod’s <code class="docutils literal notranslate"><span class="pre">restartPolicy</span></code>, worker Pods attempt to reconnect to the new head Pod. The worker Pods are terminated by the new head Pod; without GCS fault tolerance enabled, the cluster state is lost, and the worker Pods are perceived as “unknown workers” by the new head Pod. This is adequate for most Ray applications; however, it is not ideal for Ray Serve, especially if high availability is crucial for your use cases. Hence, we recommend enabling GCS fault tolerance on the RayService custom resource to ensure high availability. See <a class="reference external" href="https://docs.ray.io/en/latest/serve/production-guide/fault-tolerance.html#serve-e2e-ft-guide-gcs">Ray Serve end-to-end fault tolerance documentation</a> for more information.</p>
 </div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p>If you need fault tolerance for Redis as well, see <a class="reference internal" href="kuberay-gcs-persistent-ft.html#kuberay-gcs-persistent-ft"><span class="std std-ref">Tuning Redis for a Persistent Fault Tolerant GCS</span></a>.</p>
+<p>If you need fault tolerance for Redis as well, see <a class="reference external" href="https://docs.ray.io/en/latest/cluster/kubernetes/user-guides/kuberay-gcs-persistent-ft.html#kuberay-gcs-persistent-ft">Tuning Redis for a Persistent Fault Tolerant GCS</a>.</p>
 </div>
 <section id="use-cases">
 <h2>Use cases<a class="headerlink" href="#use-cases" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p><strong>Ray Serve</strong>: The recommended configuration is enabling GCS fault tolerance on the RayService custom resource to ensure high availability.
-See <a class="reference internal" href="../../../serve/production-guide/fault-tolerance.html#serve-e2e-ft-guide-gcs"><span class="std std-ref">Ray Serve end-to-end fault tolerance documentation</span></a> for more information.</p></li>
+See <a class="reference external" href="https://docs.ray.io/en/latest/serve/production-guide/fault-tolerance.html#serve-e2e-ft-guide-gcs">Ray Serve end-to-end fault tolerance documentation</a> for more information.</p></li>
 <li><p><strong>Other workloads</strong>: GCS fault tolerance isn’t recommended and the compatibility isn’t guaranteed.</p></li>
 </ul>
 </section>
@@ -1443,36 +1434,64 @@ See <a class="reference internal" href="../../../serve/production-guide/fault-to
 <h2>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading">#</a></h2>
 <section id="step-1-create-a-kubernetes-cluster-with-kind">
 <h3>Step 1: Create a Kubernetes cluster with Kind<a class="headerlink" href="#step-1-create-a-kubernetes-cluster-with-kind" title="Link to this heading">#</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--image<span class="o">=</span>kindest/node:v1.26.0
+<div class="cell tag_nbval-ignore-output tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kind<span class="w"> </span>create<span class="w"> </span>cluster<span class="w"> </span>--image<span class="o">=</span>kindest/node:v1.26.0
 </pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="step-2-install-the-kuberay-operator">
 <h3>Step 2: Install the KubeRay operator<a class="headerlink" href="#step-2-install-the-kuberay-operator" title="Link to this heading">#</a></h3>
-<p>Follow <a class="reference internal" href="../getting-started/raycluster-quick-start.html#kuberay-operator-deploy"><span class="std std-ref">this document</span></a> to install the latest stable KubeRay operator via Helm repository.</p>
+<p>Follow <a class="reference external" href="https://docs.ray.io/en/latest/cluster/kubernetes/getting-started/raycluster-quick-start.html#kuberay-operator-deploy">this document</a> to install the latest stable KubeRay operator via Helm repository.</p>
 </section>
 <section id="step-3-install-a-raycluster-with-gcs-ft-enabled">
 <h3>Step 3: Install a RayCluster with GCS FT enabled<a class="headerlink" href="#step-3-install-a-raycluster-with-gcs-ft-enabled" title="Link to this heading">#</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-LO<span class="w"> </span>https://raw.githubusercontent.com/ray-project/kuberay/master/ray-operator/config/samples/ray-cluster.external-redis.yaml
+<div class="cell tag_nbval-ignore-output tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-LO<span class="w"> </span>https://raw.githubusercontent.com/ray-project/kuberay/master/ray-operator/config/samples/ray-cluster.external-redis.yaml
 kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>ray-cluster.external-redis.yaml
 </pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="step-4-verify-the-kubernetes-cluster-status">
 <h3>Step 4: Verify the Kubernetes cluster status<a class="headerlink" href="#step-4-verify-the-kubernetes-cluster-status" title="Link to this heading">#</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 4.1: List all Pods in the `default` namespace.</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 4.1: List all Pods in the `default` namespace.</span>
 <span class="c1"># The expected output should be 4 Pods: 1 head, 1 worker, 1 KubeRay, and 1 Redis.</span>
 kubectl<span class="w"> </span>get<span class="w"> </span>pods
-
-<span class="c1"># Step 4.2: List all ConfigMaps in the `default` namespace.</span>
-kubectl<span class="w"> </span>get<span class="w"> </span>configmaps
-
-<span class="c1"># [Example output]</span>
-<span class="c1"># NAME                  DATA   AGE</span>
-<span class="c1"># ray-example           2      5m45s</span>
-<span class="c1"># redis-config          1      5m45s</span>
-<span class="c1"># ...</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NAME                                                 READY   STATUS    RESTARTS   AGE
+kuberay-operator-6bc45dd644-ktbnh                    1/1     Running   0          3m4s
+raycluster-external-redis-head-xrjff                 1/1     Running   0          2m41s
+raycluster-external-redis-small-group-worker-dwt98   1/1     Running   0          2m41s
+redis-6cf756c755-qljcv                               1/1     Running   0          2m41s
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 4.2: List all ConfigMaps in the `default` namespace.</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>configmaps
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NAME               DATA   AGE
+kube-root-ca.crt   1      3m4s
+ray-example        2      2m41s
+redis-config       1      2m41s
+</pre></div>
+</div>
+</div>
 </div>
 <p>The <a class="reference external" href="https://github.com/ray-project/kuberay/blob/master/ray-operator/config/samples/ray-cluster.external-redis.yaml">ray-cluster.external-redis.yaml</a> file defines Kubernetes resources for RayCluster, Redis, and ConfigMaps.
 There are two ConfigMaps in this example: <code class="docutils literal notranslate"><span class="pre">ray-example</span></code> and <code class="docutils literal notranslate"><span class="pre">redis-config</span></code>.
@@ -1508,94 +1527,340 @@ The <code class="docutils literal notranslate"><span class="pre">ray-example</sp
 </section>
 <section id="step-5-create-a-detached-actor">
 <h3>Step 5: Create a detached actor<a class="headerlink" href="#step-5-create-a-detached-actor" title="Link to this heading">#</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 4.1: Create a detached actor with the name, `counter_actor`.</span>
+<div class="cell tag_nbval-ignore-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 5.1: Create a detached actor with the name, `counter_actor`.</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">HEAD_POD</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>--selector<span class="o">=</span>ray.io/node-type<span class="o">=</span>head<span class="w"> </span>-o<span class="w"> </span>custom-columns<span class="o">=</span>POD:metadata.name<span class="w"> </span>--no-headers<span class="k">)</span>
 kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span><span class="nv">$HEAD_POD</span><span class="w"> </span>--<span class="w"> </span>python3<span class="w"> </span>/home/ray/samples/detached_actor.py
-
-<span class="c1"># Step 4.2: Increment the counter.</span>
+<span class="c1"># Step 5.2: Increment the counter.</span>
 kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span><span class="nv">$HEAD_POD</span><span class="w"> </span>--<span class="w"> </span>python3<span class="w"> </span>/home/ray/samples/increment_counter.py
-
-<span class="c1"># 2023-09-07 16:01:41,925 INFO worker.py:1313 -- Using address 127.0.0.1:6379 set in the environment variable RAY_ADDRESS</span>
-<span class="c1"># 2023-09-07 16:01:41,926 INFO worker.py:1431 -- Connecting to existing Ray cluster at address: 10.244.0.17:6379...</span>
-<span class="c1"># 2023-09-07 16:01:42,000 INFO worker.py:1612 -- Connected to Ray cluster. View the dashboard at http://10.244.0.17:8265</span>
-<span class="c1"># 1</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-04-18 02:51:25,359	INFO worker.py:1514 -- Using address 127.0.0.1:6379 set in the environment variable RAY_ADDRESS
+2025-04-18 02:51:25,361	INFO worker.py:1654 -- Connecting to existing Ray cluster at address: 10.244.0.8:6379...
+2025-04-18 02:51:25,557	INFO worker.py:1832 -- Connected to Ray cluster. View the dashboard at <span class=" -Color -Color-Bold -Color-Bold-Green">10.244.0.8:8265 </span>
+2025-04-18 02:51:29,069	INFO worker.py:1514 -- Using address 127.0.0.1:6379 set in the environment variable RAY_ADDRESS
+2025-04-18 02:51:29,072	INFO worker.py:1654 -- Connecting to existing Ray cluster at address: 10.244.0.8:6379...
+2025-04-18 02:51:29,198	INFO worker.py:1832 -- Connected to Ray cluster. View the dashboard at <span class=" -Color -Color-Bold -Color-Bold-Green">10.244.0.8:8265 </span>
+1
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="step-6-check-the-data-in-redis">
 <span id="kuberay-external-storage-namespace-example"></span><h3>Step 6: Check the data in Redis<a class="headerlink" href="#step-6-check-the-data-in-redis" title="Link to this heading">#</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 6.1: Check the RayCluster&#39;s UID.</span>
+<div class="cell tag_nbval-ignore-output tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 6.1: Check the RayCluster&#39;s UID.</span>
 kubectl<span class="w"> </span>get<span class="w"> </span>rayclusters.ray.io<span class="w"> </span>raycluster-external-redis<span class="w"> </span>-o<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.metadata.uid}&#39;</span>
 <span class="c1"># [Example output]: 864b004c-6305-42e3-ac46-adfa8eb6f752</span>
-
-<span class="c1"># Step 6.2: Check the head Pod&#39;s environment variable `RAY_external_storage_namespace`.</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_nbval-ignore-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 6.2: Check the head Pod&#39;s environment variable `RAY_external_storage_namespace`.</span>
 kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span><span class="nv">$HEAD_POD</span><span class="w"> </span>-o<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.containers[0].env}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq
-<span class="c1"># [Example output]:</span>
-<span class="c1"># [</span>
-<span class="c1">#   {</span>
-<span class="c1">#     &quot;name&quot;: &quot;RAY_external_storage_namespace&quot;,</span>
-<span class="c1">#     &quot;value&quot;: &quot;864b004c-6305-42e3-ac46-adfa8eb6f752&quot;</span>
-<span class="c1">#   },</span>
-<span class="c1">#   ...</span>
-<span class="c1"># ]</span>
-
-<span class="c1"># Step 6.3: Log into the Redis Pod.</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">REDIS_POD</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>--selector<span class="o">=</span><span class="nv">app</span><span class="o">=</span>redis<span class="w"> </span>-o<span class="w"> </span>custom-columns<span class="o">=</span>POD:metadata.name<span class="w"> </span>--no-headers<span class="k">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Bold">[</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_external_storage_namespace&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;66a4e2af-7c89-43db-a79c-71d1d0d9d71d&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_REDIS_ADDRESS&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;redis:6379&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;REDIS_PASSWORD&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;valueFrom&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">      </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;secretKeyRef&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;key&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;password&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;redis-password-secret&quot;</span>
+<span class=" -Color -Color-Bold">      }</span>
+<span class=" -Color -Color-Bold">    }</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_CLUSTER_NAME&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;valueFrom&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">      </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldRef&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;apiVersion&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;v1&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldPath&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;metadata.labels[&#39;ray.io/cluster&#39;]&quot;</span>
+<span class=" -Color -Color-Bold">      }</span>
+<span class=" -Color -Color-Bold">    }</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_CLOUD_INSTANCE_ID&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;valueFrom&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">      </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldRef&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;apiVersion&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;v1&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldPath&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;metadata.name&quot;</span>
+<span class=" -Color -Color-Bold">      }</span>
+<span class=" -Color -Color-Bold">    }</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_NODE_TYPE_NAME&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;valueFrom&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">      </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldRef&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;apiVersion&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;v1&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldPath&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;metadata.labels[&#39;ray.io/group&#39;]&quot;</span>
+<span class=" -Color -Color-Bold">      }</span>
+<span class=" -Color -Color-Bold">    }</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;KUBERAY_GEN_RAY_START_CMD&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;ray start --head  --block  --dashboard-agent-listen-port=52365  --dashboard-host=0.0.0.0  --metrics-export-port=8080  --num-cpus=0  --redis-password=$REDIS_PASSWORD &quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_PORT&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;6379&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_ADDRESS&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;127.0.0.1:6379&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_USAGE_STATS_KUBERAY_IN_USE&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;1&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_USAGE_STATS_EXTRA_TAGS&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;kuberay_version=v1.3.0;kuberay_crd=RayCluster&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_DASHBOARD_ENABLE_K8S_DISK_USAGE&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;1&quot;</span>
+<span class=" -Color -Color-Bold">  }</span>
+<span class=" -Color -Color-Bold">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_nbval-ignore-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 6.3: Log into the Redis Pod.</span>
 <span class="c1"># The password `5241590000000000` is defined in the `redis-config` ConfigMap.</span>
-kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span><span class="nv">$REDIS_POD</span><span class="w"> </span>--<span class="w"> </span>redis-cli<span class="w"> </span>-a<span class="w"> </span><span class="s2">&quot;5241590000000000&quot;</span>
-
 <span class="c1"># Step 6.4: Check the keys in Redis.</span>
 <span class="c1"># Note: the schema changed in Ray 2.38.0. Previously we use a single HASH table,</span>
 <span class="c1"># now we use multiple HASH tables with a common prefix.</span>
-
-KEYS<span class="w"> </span>*
-<span class="c1"># [Example output]:</span>
-<span class="c1"># 1) &quot;RAY864b004c-6305-42e3-ac46-adfa8eb6f752@INTERNAL_CONFIG&quot;</span>
-<span class="c1"># 2) &quot;RAY864b004c-6305-42e3-ac46-adfa8eb6f752@KV&quot;</span>
-<span class="c1"># 3) &quot;RAY864b004c-6305-42e3-ac46-adfa8eb6f752@NODE&quot;</span>
-<span class="c1"># [Example output Before Ray 2.38.0]:</span>
-<span class="c1"># 2) &quot;864b004c-6305-42e3-ac46-adfa8eb6f752&quot;</span>
-<span class="c1">#</span>
-
-<span class="c1"># Step 6.5: Check the value of the key.</span>
-HGETALL<span class="w"> </span>RAY864b004c-6305-42e3-ac46-adfa8eb6f752@NODE
+<span class="nb">export</span><span class="w"> </span><span class="nv">REDIS_POD</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>--selector<span class="o">=</span><span class="nv">app</span><span class="o">=</span>redis<span class="w"> </span>-o<span class="w"> </span>custom-columns<span class="o">=</span>POD:metadata.name<span class="w"> </span>--no-headers<span class="k">)</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-i<span class="w"> </span><span class="nv">$REDIS_POD</span><span class="w"> </span>--<span class="w"> </span>env<span class="w"> </span><span class="nv">REDISCLI_AUTH</span><span class="o">=</span><span class="s2">&quot;5241590000000000&quot;</span><span class="w"> </span>redis-cli<span class="w"> </span>KEYS<span class="w"> </span><span class="s1">&#39;*&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>RAY66a4e2af-7c89-43db-a79c-71d1d0d9d71d@ACTOR
+RAY66a4e2af-7c89-43db-a79c-71d1d0d9d71d@JOB
+RAY66a4e2af-7c89-43db-a79c-71d1d0d9d71d@ACTOR_TASK_SPEC
+RAY66a4e2af-7c89-43db-a79c-71d1d0d9d71d@WORKERS
+RAY66a4e2af-7c89-43db-a79c-71d1d0d9d71d@JobCounter
+RAY66a4e2af-7c89-43db-a79c-71d1d0d9d71d@KV
+RAY66a4e2af-7c89-43db-a79c-71d1d0d9d71d@NODE
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_nbval-ignore-output tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 6.5: Check the value of the key.</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-i<span class="w"> </span><span class="nv">$REDIS_POD</span><span class="w"> </span>--<span class="w"> </span>env<span class="w"> </span><span class="nv">REDISCLI_AUTH</span><span class="o">=</span><span class="s2">&quot;5241590000000000&quot;</span><span class="w"> </span>redis-cli<span class="w"> </span>HGETALL<span class="w"> </span>RAY864b004c-6305-42e3-ac46-adfa8eb6f752@NODE
 <span class="c1"># Before Ray 2.38.0:</span>
 <span class="c1"># HGETALL 864b004c-6305-42e3-ac46-adfa8eb6f752</span>
 </pre></div>
 </div>
+</div>
+</div>
 <p>In <a class="reference external" href="https://github.com/ray-project/kuberay/blob/master/ray-operator/config/samples/ray-cluster.external-redis.yaml">ray-cluster.external-redis.yaml</a>, the <code class="docutils literal notranslate"><span class="pre">gcsFaultToleranceOptions.externalStorageNamespace</span></code> option isn’t set for the RayCluster.
 Therefore, KubeRay automatically injects the environment variable <code class="docutils literal notranslate"><span class="pre">RAY_external_storage_namespace</span></code> to all Ray Pods managed by the RayCluster with the RayCluster’s UID as the external storage namespace by default.
-See <a class="reference internal" href="#kuberay-external-storage-namespace"><span class="std std-ref">this section</span></a> to learn more about the option.</p>
+See <a class="reference external" href="https://docs.ray.io/en/latest/cluster/kubernetes/user-guides/kuberay-gcs-ft.html#kuberay-external-storage-namespace">this section</a> to learn more about the option.</p>
 </section>
 <section id="step-7-kill-the-gcs-process-in-the-head-pod">
 <h3>Step 7: Kill the GCS process in the head Pod<a class="headerlink" href="#step-7-kill-the-gcs-process-in-the-head-pod" title="Link to this heading">#</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 7.1: Check the `RAY_gcs_rpc_server_reconnect_timeout_s` environment variable in both the head Pod and worker Pod.</span>
+<div class="cell tag_nbval-ignore-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 7.1: Check the `RAY_gcs_rpc_server_reconnect_timeout_s` environment variable in both the head Pod and worker Pod.</span>
 kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span><span class="nv">$HEAD_POD</span><span class="w"> </span>-o<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.containers[0].env}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq
-<span class="c1"># [Expected result]:</span>
-<span class="c1"># No `RAY_gcs_rpc_server_reconnect_timeout_s` environment variable is set. Hence, the Ray head uses its default value of `60`.</span>
-kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span><span class="nv">$YOUR_WORKER_POD</span><span class="w"> </span>-o<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.containers[0].env}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq
-<span class="c1"># [Expected result]:</span>
-<span class="c1"># KubeRay injects the `RAY_gcs_rpc_server_reconnect_timeout_s` environment variable with the value `600` to the worker Pod.</span>
-<span class="c1"># [</span>
-<span class="c1">#   {</span>
-<span class="c1">#     &quot;name&quot;: &quot;RAY_gcs_rpc_server_reconnect_timeout_s&quot;,</span>
-<span class="c1">#     &quot;value&quot;: &quot;600&quot;</span>
-<span class="c1">#   },</span>
-<span class="c1">#   ...</span>
-<span class="c1"># ]</span>
-
-<span class="c1"># Step 7.2: Kill the GCS process in the head Pod.</span>
-kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span><span class="nv">$HEAD_POD</span><span class="w"> </span>--<span class="w"> </span>pkill<span class="w"> </span>gcs_server
-
-<span class="c1"># Step 7.3: The head Pod fails and restarts after `RAY_gcs_rpc_server_reconnect_timeout_s` (60) seconds.</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Bold">[</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_external_storage_namespace&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;66a4e2af-7c89-43db-a79c-71d1d0d9d71d&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_REDIS_ADDRESS&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;redis:6379&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;REDIS_PASSWORD&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;valueFrom&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">      </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;secretKeyRef&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;key&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;password&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;redis-password-secret&quot;</span>
+<span class=" -Color -Color-Bold">      }</span>
+<span class=" -Color -Color-Bold">    }</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_CLUSTER_NAME&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;valueFrom&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">      </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldRef&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;apiVersion&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;v1&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldPath&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;metadata.labels[&#39;ray.io/cluster&#39;]&quot;</span>
+<span class=" -Color -Color-Bold">      }</span>
+<span class=" -Color -Color-Bold">    }</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_CLOUD_INSTANCE_ID&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;valueFrom&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">      </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldRef&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;apiVersion&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;v1&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldPath&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;metadata.name&quot;</span>
+<span class=" -Color -Color-Bold">      }</span>
+<span class=" -Color -Color-Bold">    }</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_NODE_TYPE_NAME&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;valueFrom&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">      </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldRef&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;apiVersion&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;v1&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldPath&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;metadata.labels[&#39;ray.io/group&#39;]&quot;</span>
+<span class=" -Color -Color-Bold">      }</span>
+<span class=" -Color -Color-Bold">    }</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;KUBERAY_GEN_RAY_START_CMD&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;ray start --head  --block  --dashboard-agent-listen-port=52365  --dashboard-host=0.0.0.0  --metrics-export-port=8080  --num-cpus=0  --redis-password=$REDIS_PASSWORD &quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_PORT&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;6379&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_ADDRESS&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;127.0.0.1:6379&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_USAGE_STATS_KUBERAY_IN_USE&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;1&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_USAGE_STATS_EXTRA_TAGS&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;kuberay_version=v1.3.0;kuberay_crd=RayCluster&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_DASHBOARD_ENABLE_K8S_DISK_USAGE&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;1&quot;</span>
+<span class=" -Color -Color-Bold">  }</span>
+<span class=" -Color -Color-Bold">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span><span class="nv">$YOUR_WORKER_POD</span><span class="w"> </span>-o<span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.spec.containers[0].env}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Bold">[</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_gcs_rpc_server_reconnect_timeout_s&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;600&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;FQ_RAY_IP&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;raycluster-external-redis-head-svc.default.svc.cluster.local&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_IP&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;raycluster-external-redis-head-svc&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_CLUSTER_NAME&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;valueFrom&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">      </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldRef&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;apiVersion&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;v1&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldPath&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;metadata.labels[&#39;ray.io/cluster&#39;]&quot;</span>
+<span class=" -Color -Color-Bold">      }</span>
+<span class=" -Color -Color-Bold">    }</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_CLOUD_INSTANCE_ID&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;valueFrom&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">      </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldRef&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;apiVersion&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;v1&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldPath&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;metadata.name&quot;</span>
+<span class=" -Color -Color-Bold">      }</span>
+<span class=" -Color -Color-Bold">    }</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_NODE_TYPE_NAME&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;valueFrom&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">      </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldRef&quot;</span><span class=" -Color -Color-Bold">: {</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;apiVersion&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;v1&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">        </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;fieldPath&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;metadata.labels[&#39;ray.io/group&#39;]&quot;</span>
+<span class=" -Color -Color-Bold">      }</span>
+<span class=" -Color -Color-Bold">    }</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;KUBERAY_GEN_RAY_START_CMD&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;ray start  --address=raycluster-external-redis-head-svc.default.svc.cluster.local:6379  --block  --dashboard-agent-listen-port=52365  --metrics-export-port=8080  --num-cpus=1 &quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_PORT&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;6379&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_ADDRESS&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;raycluster-external-redis-head-svc.default.svc.cluster.local:6379&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_USAGE_STATS_KUBERAY_IN_USE&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;1&quot;</span>
+<span class=" -Color -Color-Bold">  },</span>
+<span class=" -Color -Color-Bold">  {</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;name&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;RAY_DASHBOARD_ENABLE_K8S_DISK_USAGE&quot;</span><span class=" -Color -Color-Bold">,</span>
+<span class=" -Color -Color-Bold">    </span><span class=" -Color -Color-Bold -Color-Bold-Blue">&quot;value&quot;</span><span class=" -Color -Color-Bold">: </span><span class=" -Color -Color-Green">&quot;1&quot;</span>
+<span class=" -Color -Color-Bold">  }</span>
+<span class=" -Color -Color-Bold">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_nbval-ignore-output tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 7.2: Kill the GCS process in the head Pod.</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-i<span class="w"> </span><span class="nv">$HEAD_POD</span><span class="w"> </span>--<span class="w"> </span>pkill<span class="w"> </span>gcs_server
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 7.3: The head Pod fails and restarts after `RAY_gcs_rpc_server_reconnect_timeout_s` (60) seconds.</span>
 <span class="c1"># In addition, the worker Pod isn&#39;t terminated by the new head after reconnecting because GCS fault</span>
 <span class="c1"># tolerance is enabled.</span>
 kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-l<span class="o">=</span>ray.io/is-ray-node<span class="o">=</span>yes
-<span class="c1"># [Example output]:</span>
-<span class="c1"># NAME                                                 READY   STATUS    RESTARTS      AGE</span>
-<span class="c1"># raycluster-external-redis-head-xxxxx                 1/1     Running   1 (64s ago)   xxm</span>
-<span class="c1"># raycluster-external-redis-worker-small-group-yyyyy   1/1     Running   0             xxm</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>NAME                                                 READY   STATUS    RESTARTS      AGE
+raycluster-external-redis-head-xrjff                 1/1     Running   1 (48s ago)   4m41s
+raycluster-external-redis-small-group-worker-dwt98   1/1     Running   0             4m41s
+</pre></div>
+</div>
+</div>
 </div>
 <p>In <a class="reference external" href="https://github.com/ray-project/kuberay/blob/master/ray-operator/config/samples/ray-cluster.external-redis.yaml">ray-cluster.external-redis.yaml</a>, the <code class="docutils literal notranslate"><span class="pre">RAY_gcs_rpc_server_reconnect_timeout_s</span></code> environment variable isn’t set in the specifications for either the head Pod or the worker Pod within the RayCluster.
 Therefore, KubeRay automatically injects the <code class="docutils literal notranslate"><span class="pre">RAY_gcs_rpc_server_reconnect_timeout_s</span></code> environment variable with the value <strong>600</strong> to the worker Pod and uses the default value <strong>60</strong> for the head Pod.
@@ -1603,17 +1868,25 @@ The timeout value for worker Pods must be longer than the timeout value for the 
 </section>
 <section id="step-8-access-the-detached-actor-again">
 <h3>Step 8: Access the detached actor again<a class="headerlink" href="#step-8-access-the-detached-actor-again" title="Link to this heading">#</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span><span class="nv">$HEAD_POD</span><span class="w"> </span>--<span class="w"> </span>python3<span class="w"> </span>/home/ray/samples/increment_counter.py
-<span class="c1"># 2023-09-07 17:31:17,793 INFO worker.py:1313 -- Using address 127.0.0.1:6379 set in the environment variable RAY_ADDRESS</span>
-<span class="c1"># 2023-09-07 17:31:17,793 INFO worker.py:1431 -- Connecting to existing Ray cluster at address: 10.244.0.21:6379...</span>
-<span class="c1"># 2023-09-07 17:31:17,875 INFO worker.py:1612 -- Connected to Ray cluster. View the dashboard at http://10.244.0.21:8265</span>
-<span class="c1"># 2</span>
+<div class="cell tag_nbval-ignore-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span><span class="nv">$HEAD_POD</span><span class="w"> </span>--<span class="w"> </span>python3<span class="w"> </span>/home/ray/samples/increment_counter.py
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2025-04-18 02:53:25,356	INFO worker.py:1514 -- Using address 127.0.0.1:6379 set in the environment variable RAY_ADDRESS
+2025-04-18 02:53:25,359	INFO worker.py:1654 -- Connecting to existing Ray cluster at address: 10.244.0.8:6379...
+2025-04-18 02:53:25,488	INFO worker.py:1832 -- Connected to Ray cluster. View the dashboard at <span class=" -Color -Color-Bold -Color-Bold-Green">10.244.0.8:8265 </span>
+2
+
+</pre></div>
+</div>
+</div>
 </div>
 <div class="admonition-the-detached-actor-is-always-on-the-worker-pod-in-this-example admonition">
 <p class="admonition-title">The detached actor is always on the worker Pod in this example.</p>
-<p>The head Pod’s <code class="docutils literal notranslate"><span class="pre">rayStartParams</span></code> is set to <code class="docutils literal notranslate"><span class="pre">num-cpus:</span> <span class="pre">&quot;0&quot;</span></code>.
-Hence, no tasks or actors will be scheduled on the head Pod.</p>
+<p>The head Pod’s <code class="docutils literal notranslate"><span class="pre">rayStartParams</span></code> is set to <code class="docutils literal notranslate"><span class="pre">num-cpus:</span> <span class="pre">&quot;0&quot;</span></code>.Hence, no tasks or actors will be scheduled on the head Pod.</p>
 </div>
 <p>With GCS fault tolerance enabled, you can still access the detached actor after the GCS process is dead and restarted.
 Note that the fault tolerance doesn’t persist the actor’s state.
@@ -1622,22 +1895,37 @@ On the other hand, if the head Pod hosts the detached actor, the <code class="do
 </section>
 <section id="step-9-remove-the-key-stored-in-redis-when-deleting-raycluster">
 <h3>Step 9: Remove the key stored in Redis when deleting RayCluster<a class="headerlink" href="#step-9-remove-the-key-stored-in-redis-when-deleting-raycluster" title="Link to this heading">#</a></h3>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 9.1: Delete the RayCluster custom resource.</span>
+<div class="cell tag_nbval-ignore-output tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 9.1: Delete the RayCluster custom resource.</span>
 kubectl<span class="w"> </span>delete<span class="w"> </span>raycluster<span class="w"> </span>raycluster-external-redis
-
-<span class="c1"># Step 9.2: KubeRay operator deletes all Pods in the RayCluster.</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_nbval-ignore-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 9.2: KubeRay operator deletes all Pods in the RayCluster.</span>
 <span class="c1"># Step 9.3: KubeRay operator creates a Kubernetes Job to delete the Redis key after the head Pod is terminated.</span>
-
 <span class="c1"># Step 9.4: Check whether the RayCluster has been deleted.</span>
 kubectl<span class="w"> </span>get<span class="w"> </span>raycluster
-<span class="c1"># [Expected output]: No resources found in default namespace.</span>
-
-<span class="c1"># Step 9.5: Check Redis keys after the Kubernetes Job finishes.</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">REDIS_POD</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>--selector<span class="o">=</span><span class="nv">app</span><span class="o">=</span>redis<span class="w"> </span>-o<span class="w"> </span>custom-columns<span class="o">=</span>POD:metadata.name<span class="w"> </span>--no-headers<span class="k">)</span>
-kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span><span class="nv">$REDIS_POD</span><span class="w"> </span>--<span class="w"> </span>redis-cli<span class="w"> </span>-a<span class="w"> </span><span class="s2">&quot;5241590000000000&quot;</span>
-KEYS<span class="w"> </span>*
-<span class="c1"># [Expected output]: (empty list or set)</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>No resources found in default namespace.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_nbval-ignore-output tag_remove-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 9.5: Check Redis keys after the Kubernetes Job finishes.</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">REDIS_POD</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>--selector<span class="o">=</span><span class="nv">app</span><span class="o">=</span>redis<span class="w"> </span>-o<span class="w"> </span>custom-columns<span class="o">=</span>POD:metadata.name<span class="w"> </span>--no-headers<span class="k">)</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-i<span class="w"> </span><span class="nv">$REDIS_POD</span><span class="w"> </span>--<span class="w"> </span>env<span class="w"> </span><span class="nv">REDISCLI_AUTH</span><span class="o">=</span><span class="s2">&quot;5241590000000000&quot;</span><span class="w"> </span>redis-cli<span class="w"> </span>KEYS<span class="w"> </span><span class="s2">&quot;*&quot;</span>
+</pre></div>
+</div>
+</div>
 </div>
 <p>In KubeRay v1.0.0, the KubeRay operator adds a Kubernetes finalizer to the RayCluster with GCS fault tolerance enabled to ensure Redis cleanup.
 KubeRay only removes this finalizer after the Kubernetes Job successfully cleans up Redis.</p>
@@ -1651,12 +1939,16 @@ KubeRay only removes this finalizer after the Kubernetes Job successfully cleans
 <p>Starting with KubeRay v1.1.0, KubeRay changes the Redis cleanup behavior from a mandatory to a best-effort basis.
 KubeRay still removes the Kubernetes finalizer from the RayCluster if the Kubernetes Job fails, thereby unblocking the deletion of the RayCluster.</p>
 <p>Users can turn off this by setting the feature gate value <code class="docutils literal notranslate"><span class="pre">ENABLE_GCS_FT_REDIS_CLEANUP</span></code>.
-Refer to the <a class="reference internal" href="#kuberay-redis-cleanup-gate"><span class="std std-ref">KubeRay GCS fault tolerance configurations</span></a> section for more details.</p>
+Refer to the <a class="reference external" href="https://docs.ray.io/en/latest/cluster/kubernetes/user-guides/kuberay-gcs-ft.html#kuberay-redis-cleanup-gate">KubeRay GCS fault tolerance configurations</a> section for more details.</p>
 </section>
 <section id="step-10-delete-the-kubernetes-cluster">
 <h3>Step 10: Delete the Kubernetes cluster<a class="headerlink" href="#step-10-delete-the-kubernetes-cluster" title="Link to this heading">#</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>kind<span class="w"> </span>delete<span class="w"> </span>cluster
+<div class="cell tag_remove-output tag_nbval-ignore-output docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kind<span class="w"> </span>delete<span class="w"> </span>cluster
 </pre></div>
+</div>
+</div>
 </div>
 </section>
 </section>
@@ -1666,17 +1958,16 @@ Refer to the <a class="reference internal" href="#kuberay-redis-cleanup-gate"><s
 <em><strong>Read this section in conjunction with the YAML file.</strong></em></p>
 <div class="admonition-these-configurations-require-kuberay-1-3-0 admonition">
 <p class="admonition-title">These configurations require KubeRay 1.3.0+</p>
-<p>The following section uses the new <code class="docutils literal notranslate"><span class="pre">gcsFaultToleranceOptions</span></code> field introduced in KubeRay 1.3.0.
-For the old GCS fault tolerance configurations, including the <code class="docutils literal notranslate"><span class="pre">ray.io/ft-enabled</span></code> annotation, please refer to <a class="reference external" href="https://docs.ray.io/en/releases-2.42.1/cluster/kubernetes/user-guides/kuberay-gcs-ft.html">the old document</a>.</p>
+<p>The following section uses the new <code class="docutils literal notranslate"><span class="pre">gcsFaultToleranceOptions</span></code> field introduced in KubeRay 1.3.0. For the old GCS fault tolerance configurations, including the <code class="docutils literal notranslate"><span class="pre">ray.io/ft-enabled</span></code> annotation, please refer to <a class="reference external" href="https://docs.ray.io/en/releases-2.42.1/cluster/kubernetes/user-guides/kuberay-gcs-ft.html">the old document</a>.</p>
 </div>
 <section id="enable-gcs-fault-tolerance">
 <h3>1. Enable GCS fault tolerance<a class="headerlink" href="#enable-gcs-fault-tolerance" title="Link to this heading">#</a></h3>
 <ul>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">gcsFaultToleranceOptions</span></code></strong>: Add <code class="docutils literal notranslate"><span class="pre">gcsFaultToleranceOptions</span></code> field to the RayCluster custom resource to enable GCS fault tolerance.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RayCluster</span>
-<span class="nt">metadata</span><span class="p">:</span>
-<span class="nt">spec</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">gcsFaultToleranceOptions</span><span class="p">:</span><span class="w"> </span><span class="c1"># &lt;- Add this field to enable GCS fault tolerance.</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RayCluster</span>
+<span class="w">  </span><span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">spec</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">gcsFaultToleranceOptions</span><span class="p">:</span><span class="w"> </span><span class="c1"># &lt;- Add this field to enable GCS fault tolerance.</span>
 </pre></div>
 </div>
 </li>
@@ -1720,8 +2011,8 @@ In the <a class="reference external" href="https://github.com/ray-project/kubera
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">externalStorageNamespace</span></code></strong> (<strong>optional</strong>): Add <code class="docutils literal notranslate"><span class="pre">externalStorageNamespace</span></code> to the <code class="docutils literal notranslate"><span class="pre">gcsFaultToleranceOptions</span></code> field.
 KubeRay uses the value of this option to set the environment variable <code class="docutils literal notranslate"><span class="pre">RAY_external_storage_namespace</span></code> to all Ray Pods managed by the RayCluster.
 In most cases, <em><strong>you don’t need to set <code class="docutils literal notranslate"><span class="pre">externalStorageNamespace</span></code></strong></em> because KubeRay automatically sets it to the UID of RayCluster.
-Only modify this option if you fully understand the behaviors of the GCS fault tolerance and RayService to avoid <a class="reference internal" href="../troubleshooting/rayservice-troubleshooting.html#kuberay-raysvc-issue10"><span class="std std-ref">this issue</span></a>.
-Refer to <a class="reference internal" href="#kuberay-external-storage-namespace-example"><span class="std std-ref">this section</span></a> in the earlier quickstart example for more details.</p>
+Only modify this option if you fully understand the behaviors of the GCS fault tolerance and RayService to avoid <a class="reference external" href="https://docs.ray.io/en/latest/cluster/kubernetes/troubleshooting/rayservice-troubleshooting.html#kuberay-raysvc-issue10">this issue</a>.
+Refer to <a class="reference external" href="https://docs.ray.io/en/latest/cluster/kubernetes/user-guides/kuberay-gcs-ft.html#kuberay-external-storage-namespace-example">this section</a> in the earlier quickstart example for more details.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RayCluster</span>
 <span class="nt">metadata</span><span class="p">:</span>
 <span class="nt">spec</span><span class="p">:</span>
@@ -1747,16 +2038,15 @@ set these two options in your <code class="docutils literal notranslate"><span c
 </ul>
 <p>These two options instruct Redis to delete the least recently used keys when it reaches the <code class="docutils literal notranslate"><span class="pre">maxmemory</span></code> limit.
 See <a class="reference external" href="https://redis.io/docs/reference/eviction/">Key eviction</a> from Redis for more information.</p>
-<p>Note that Redis does this eviction and it doesn’t guarantee that
-Ray won’t use the deleted keys.</p>
+<p>Note that Redis does this eviction and it doesn’t guarantee that Ray won’t use the deleted keys.</p>
 </div>
 </section>
 </section>
 <section id="next-steps">
 <h2>Next steps<a class="headerlink" href="#next-steps" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p>See <a class="reference internal" href="../../../serve/production-guide/fault-tolerance.html#serve-e2e-ft-guide-gcs"><span class="std std-ref">Ray Serve end-to-end fault tolerance documentation</span></a> for more information.</p></li>
-<li><p>See <a class="reference internal" href="../../../ray-core/fault_tolerance/gcs.html#fault-tolerance-gcs"><span class="std std-ref">Ray Core GCS fault tolerance documentation</span></a> for more information.</p></li>
+<li><p>See <a class="reference external" href="https://docs.ray.io/en/latest/serve/production-guide/fault-tolerance.html#serve-e2e-ft-guide-gcs">Ray Serve end-to-end fault tolerance documentation</a> for more information.</p></li>
+<li><p>See <a class="reference external" href="https://docs.ray.io/en/latest/ray-core/fault_tolerance/gcs.html#fault-tolerance-gcs">Ray Core GCS fault tolerance documentation</a> for more information.</p></li>
 </ul>
 </section>
 </section>
@@ -1832,7 +2122,7 @@ Ray won’t use the deleted keys.</p>
 
   <div class="sidebar-secondary-item">  
 <div class="tocsection editthispage">
-  <a href="https://github.com/ray-project/ray/edit/master/doc/source/cluster/kubernetes/user-guides/kuberay-gcs-ft.md">
+  <a href="https://github.com/ray-project/ray/edit/master/doc/source/cluster/kubernetes/user-guides/kuberay-gcs-ft.ipynb">
     <i class="fa-solid fa-pencil"></i>
        Edit
     on GitHub  

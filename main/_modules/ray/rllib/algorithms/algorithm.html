@@ -36,7 +36,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/csat.css?v=c8f39c76" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/assistant.css?v=d345c55e" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css?v=633d7681" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css?v=4676c12b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/docsearch.css?v=45fb5152" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/pydata-docsearch-custom.css?v=7fb92720" />
   
@@ -184,6 +184,12 @@ both in the usual template (layout.html) as well as (index.html). -->
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+
+  <div class="bd-header-announcement container-fluid bd-header-announcement">
+    <div class="bd-header-announcement__content">Try Ray with $100 credit — <a target="_blank" href="https://console.anyscale.com/register/ha?render_flow=ray&utm_source=ray_docs&utm_medium=docs&utm_campaign=banner">Start now</a>.</div>
+  </div>
+
   
     <nav class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
@@ -346,15 +352,6 @@ document.write(`
 `);
 </script></div>
       
-        <div class="navbar-item"><a
-  id="try-anyscale-href"
-  href="https://www.anyscale.com/ray-on-anyscale/?utm_source=ray_docs&utm_medium=docs&utm_campaign=navbar"
->
-  <div id="try-anyscale-text">
-    <span>Try Ray on Anyscale</span>
-  </div>
-</a></div>
-      
     </div>
     
   </div>
@@ -511,15 +508,6 @@ document.write(`
 `);
 </script></div>
         
-          <div class="navbar-item"><a
-  id="try-anyscale-href"
-  href="https://www.anyscale.com/ray-on-anyscale/?utm_source=ray_docs&utm_medium=docs&utm_campaign=navbar"
->
-  <div id="try-anyscale-text">
-    <span>Try Ray on Anyscale</span>
-  </div>
-</a></div>
-        
       </div>
     
   </div>
@@ -535,17 +523,32 @@ document.write(`
 
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ray-overview/examples.html">Example Gallery</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../ray-overview/ray-libraries.html">Ecosystem</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../ray-core/walkthrough.html">Ray Core</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../../ray-core/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-core/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/tasks.html">Tasks</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/tasks/nested-tasks.html">Nested Remote Functions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/tasks/generators.html">Dynamic generators</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../ray-overview/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../ray-overview/examples/entity-recognition-with-llms/README.html">Entity Recognition with LLMs</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-overview/examples/e2e-audio/index.html">End-to-end audio</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../ray-overview/examples/e2e-audio/README.html">Audio data curation with Ray</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../ray-overview/examples/e2e-audio/e2e_audio/curation.html">Audio curation with offline batch inference</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/actors.html">Actors</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-overview/examples/e2e-xgboost/index.html">End-to-end distributed XGBoost</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../ray-overview/examples/e2e-xgboost/README.html">Overview</a></li>
+
+<li class="toctree-l3"><a class="reference internal" href="../../../../ray-overview/examples/e2e-xgboost/notebooks/01-Distributed_Training.html">Distributed training of an XGBoost model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../ray-overview/examples/e2e-xgboost/notebooks/02-Validation.html">Model validation using offline batch inference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../ray-overview/examples/e2e-xgboost/notebooks/03-Serving.html">Scalable online XGBoost inference with Ray Serve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ray-overview/ray-libraries.html">Ecosystem</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../ray-core/walkthrough.html">Ray Core</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../ray-core/key-concepts.html">Key Concepts</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-core/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/tasks.html">Tasks</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/tasks/nested-tasks.html">Nested Remote Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/actors.html">Actors</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/actors/named-actors.html">Named Actors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/actors/terminating-actors.html">Terminating Actors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/actors/async_api.html">AsyncIO / Concurrency for Actors</a></li>
@@ -555,13 +558,13 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/actors/task-orders.html">Actor Task Execution Order</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/objects.html">Objects</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/objects.html">Objects</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/objects/serialization.html">Serialization</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/objects/object-spilling.html">Object Spilling</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../ray-core/handling-dependencies.html">Environment Dependencies</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/scheduling/index.html">Scheduling</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/scheduling/index.html">Scheduling</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/scheduling/resources.html">Resources</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/scheduling/accelerators.html">Accelerator Support</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/scheduling/placement-group.html">Placement Groups</a></li>
@@ -569,7 +572,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/scheduling/ray-oom-prevention.html">Out-Of-Memory Prevention</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/fault-tolerance.html">Fault Tolerance</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/fault-tolerance.html">Fault tolerance</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/fault_tolerance/tasks.html">Task Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/fault_tolerance/actors.html">Actor Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/fault_tolerance/objects.html">Object Fault Tolerance</a></li>
@@ -578,7 +581,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/fault_tolerance/head-ha.html">Head High-Availability Feature</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/patterns/nested-tasks.html">Pattern: Using nested tasks to achieve nested parallelism</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/patterns/generators.html">Pattern: Using generators to reduce heap memory usage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/patterns/limit-pending-tasks.html">Pattern: Using ray.wait to limit the number of pending tasks</a></li>
@@ -601,7 +604,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/patterns/fork-new-processes.html">Anti-pattern: Forking new processes in application code</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/profiling.html">Profiling</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/overlap.html">Experimental: Overlapping communication and computation</a></li>
@@ -609,12 +612,12 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/compiled-graph/compiled-graph-api.html">Compiled Graph API</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/advanced-topics.html">Advanced Topics</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-core/advanced-topics.html">Advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/tips-for-first-time.html">Tips for first-time users</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/starting-ray.html">Starting Ray</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/ray-generator.html">Ray Generators</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/namespaces.html">Using Namespaces</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/cross-language.html">Cross-Language Programming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/cross-language.html">Cross-language programming</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/using-ray-with-jupyter.html">Working with Jupyter Notebooks &amp; JupyterLab</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/ray-dag.html">Lazy Computation Graphs with the Ray DAG API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-core/miscellaneous.html">Miscellaneous Topics</a></li>
@@ -624,7 +627,7 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-core/examples/overview.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-core/examples/overview.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../ray-core/examples/automl_for_time_series.html">Simple AutoML for time series with Ray Core</a></li>
 
 <li class="toctree-l3"><a class="reference internal" href="../../../../ray-core/examples/batch_prediction.html">Batch Prediction with Ray Core</a></li>
@@ -638,7 +641,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../../ray-core/examples/web-crawler.html">Speed up your web crawler by parallelizing it with Ray</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-core/api/index.html">Ray Core API</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-core/api/index.html">Ray Core API</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../ray-core/api/core.html">Core API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../ray-core/api/scheduling.html">Scheduling API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../ray-core/api/runtime-env.html">Runtime Env API</a></li>
@@ -651,14 +654,15 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../data/data.html">Ray Data</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../data/data.html">Ray Data</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../data/quickstart.html">Ray Data Quickstart</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../data/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../data/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../data/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/loading-data.html">Loading Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/inspecting-data.html">Inspecting Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/transforming-data.html">Transforming Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/iterating-over-data.html">Iterating over Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../data/joining-data.html">Joining datasets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/shuffling-data.html">Shuffling Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/saving-data.html">Saving Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/working-with-images.html">Working with Images</a></li>
@@ -674,7 +678,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../data/examples.html">Examples</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../data/api/api.html">Ray Data API</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../data/api/api.html">Ray Data API</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/api/input_output.html">Input/Output</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/api/dataset.html">Dataset API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../data/api/data_iterator.html">DataIterator API</a></li>
@@ -691,12 +695,13 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../data/data-internals.html">Ray Data Internals</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../train/train.html">Ray Train</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../train/train.html">Ray Train</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../train/overview.html">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../train/getting-started-pytorch.html">PyTorch Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../train/getting-started-pytorch-lightning.html">PyTorch Lightning Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../train/getting-started-transformers.html">Hugging Face Transformers Guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../train/more-frameworks.html">More Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../train/getting-started-xgboost.html">XGBoost Guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../train/more-frameworks.html">More Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-21"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../train/huggingface-accelerate.html">Hugging Face Accelerate Guide</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../train/deepspeed.html">DeepSpeed Guide</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../train/distributed-tensorflow-keras.html">TensorFlow and Keras Guide</a></li>
@@ -704,7 +709,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../../train/horovod.html">Horovod Guide</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../train/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../train/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-22"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../train/user-guides/data-loading-preprocessing.html">Data Loading and Preprocessing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../train/user-guides/using-gpus.html">Configuring Scale and GPUs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../train/user-guides/persistent-storage.html">Configuring Persistent Storage</a></li>
@@ -722,23 +727,22 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../train/api/api.html">Ray Train API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../tune/index.html">Ray Tune</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../tune/index.html">Ray Tune</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../tune/getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../tune/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../tune/tutorials/overview.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-21"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../tune/tutorials/overview.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-run.html">Running Basic Experiments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-output.html">Logging and Outputs in Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-resources.html">Setting Trial Resources</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-search-spaces.html">Using Search Spaces</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-stopping.html">How to Define Stopping Criteria for a Ray Tune Experiment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-trial-checkpoints.html">How to Save and Load Trial Checkpoints</a></li>
-
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-storage.html">How to Configure Persistent Storage in Ray Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-fault-tolerance.html">How to Enable Fault Tolerance in Ray Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-metrics.html">Using Callbacks and Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune_get_data_in_and_out.html">Getting Data in and out of Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune_analyze_results.html">Analyzing Tune Experiment Results</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../tune/examples/pbt_guide.html">A Guide to Population Based Training with Tune</a><input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-22"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../tune/examples/pbt_guide.html">A Guide to Population Based Training with Tune</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/pbt_visualization/pbt_visualization.html">Visualizing and Understanding PBT</a></li>
 </ul>
 </li>
@@ -747,36 +751,25 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../../../../tune/tutorials/tune-scalability.html">Scalability Benchmarks</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../tune/examples/ml-frameworks.html">Examples using Ray Tune with ML Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune-xgboost.html">XGBoost Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/lightgbm_example.html">LightGBM Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/pbt_transformers.html">Hugging Face Transformers Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/horovod_simple.html">Horovod Example</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../tune/examples/experiment-tracking.html">Tune Experiment Tracking Examples</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune-wandb.html">Weights &amp; Biases Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune-mlflow.html">MLflow Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune-aim.html">Aim Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/tune-comet.html">Comet Example</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../../../tune/examples/hpo-frameworks.html">Tune Hyperparameter Optimization Framework Examples</a><input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-26"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/ax_example.html">Ax Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/hyperopt_example.html">HyperOpt Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/bayesopt_example.html">Bayesopt Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/bohb_example.html">BOHB Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/nevergrad_example.html">Nevergrad Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../tune/examples/optuna_example.html">Optuna Example</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/other-examples.html">Other Examples</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/exercises.html">Exercises</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-26"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune-xgboost.html">XGBoost Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/lightgbm_example.html">LightGBM Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/pbt_transformers.html">Hugging Face Transformers Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune_mnist_keras.html">Keras Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/horovod_simple.html">Horovod Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune-wandb.html">Weights &amp; Biases Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune-mlflow.html">MLflow Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune-aim.html">Aim Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/tune-comet.html">Comet Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/ax_example.html">Ax Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/hyperopt_example.html">HyperOpt Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/bayesopt_example.html">Bayesopt Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/bohb_example.html">BOHB Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/nevergrad_example.html">Nevergrad Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tune/examples/optuna_example.html">Optuna Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../tune/faq.html">Ray Tune FAQ</a></li>
@@ -1046,7 +1039,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.html">ray.rllib.utils.schedules.scheduler.Scheduler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.validate.html">ray.rllib.utils.schedules.scheduler.Scheduler.validate</a></li>
@@ -1107,6 +1100,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../ray-more-libs/raydp.html">Using Spark on Ray (RayDP)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../ray-more-libs/mars-on-ray.html">Using Mars on Ray</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../ray-more-libs/modin/index.html">Using Pandas on Ray (Modin)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../ray-more-libs/data_juicer_distributed_data_processing.html">Distributed Data Processing in Data-Juicer</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../workflows/index.html">Ray Workflows (Deprecated)</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../workflows/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../workflows/basics.html">Getting Started</a></li>
@@ -1128,6 +1122,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../cluster/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/getting-started/kuberay-operator-installation.html">KubeRay Operator Installation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/getting-started/raycluster-quick-start.html">RayCluster Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/getting-started/rayjob-quick-start.html">RayJob Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/getting-started/rayservice-quick-start.html">RayService Quickstart</a></li>
@@ -1135,10 +1130,12 @@ document.write(`
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/user-guides/rayservice.html">Deploy Ray Serve Apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/user-guides/rayservice-no-ray-serve-replica.html">RayService worker Pods aren’t ready</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/user-guides/rayservice-high-availability.html">RayService high availability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/user-guides/observability.html">KubeRay Observability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/user-guides/upgrade-guide.html">KubeRay upgrade guide</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../cluster/kubernetes/user-guides/k8s-cluster-setup.html">Managed Kubernetes services</a></li>
+
 
 
 
@@ -1283,7 +1280,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../../../../ray-observability/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../../ray-observability/user-guides/debug-apps/general-debugging.html">General Debugging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../ray-observability/user-guides/debug-apps/general-debugging.html">Common Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-observability/user-guides/debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-observability/user-guides/debug-apps/debug-hangs.html">Debugging Hangs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../ray-observability/user-guides/debug-apps/debug-failures.html">Debugging Failures</a></li>
@@ -1435,17 +1432,21 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.algorithms.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AggregatorActor</span><span class="p">,</span>
     <span class="n">_get_env_runner_bundles</span><span class="p">,</span>
+    <span class="n">_get_offline_eval_runner_bundles</span><span class="p">,</span>
     <span class="n">_get_learner_bundles</span><span class="p">,</span>
     <span class="n">_get_main_process_bundle</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.callbacks.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_callback</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.agent.obs_preproc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObsPreprocessorConnector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.connectors.connector_pipeline_v2</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConnectorPipelineV2</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">COMPONENT_ENV_RUNNER</span><span class="p">,</span>
+    <span class="n">COMPONENT_ENV_TO_MODULE_CONNECTOR</span><span class="p">,</span>
     <span class="n">COMPONENT_EVAL_ENV_RUNNER</span><span class="p">,</span>
     <span class="n">COMPONENT_LEARNER</span><span class="p">,</span>
     <span class="n">COMPONENT_LEARNER_GROUP</span><span class="p">,</span>
     <span class="n">COMPONENT_METRICS_LOGGER</span><span class="p">,</span>
+    <span class="n">COMPONENT_MODULE_TO_ENV_CONNECTOR</span><span class="p">,</span>
     <span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span>
     <span class="n">DEFAULT_MODULE_ID</span><span class="p">,</span>
 <span class="p">)</span>
@@ -1456,6 +1457,7 @@ document.write(`
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_module_id</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.core.rl_module.rl_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLModule</span><span class="p">,</span> <span class="n">RLModuleSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env</span><span class="w"> </span><span class="kn">import</span> <span class="n">INPUT_ENV_SPACES</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.env_context</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvContext</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.env_runner</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvRunner</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env.env_runner_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnvRunnerGroup</span>
@@ -1506,6 +1508,7 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AGGREGATOR_ACTOR_RESULTS</span><span class="p">,</span>
     <span class="n">ALL_MODULES</span><span class="p">,</span>
+    <span class="n">DATASET_NUM_ITERS_EVALUATED</span><span class="p">,</span>
     <span class="n">ENV_RUNNER_RESULTS</span><span class="p">,</span>
     <span class="n">ENV_RUNNER_SAMPLING_TIMER</span><span class="p">,</span>
     <span class="n">EPISODE_LEN_MEAN</span><span class="p">,</span>
@@ -1522,7 +1525,6 @@ document.write(`
     <span class="n">NUM_AGENT_STEPS_TRAINED_LIFETIME</span><span class="p">,</span>
     <span class="n">NUM_ENV_STEPS_SAMPLED</span><span class="p">,</span>
     <span class="n">NUM_ENV_STEPS_SAMPLED_LIFETIME</span><span class="p">,</span>
-    <span class="n">NUM_ENV_STEPS_SAMPLED_PER_SECOND</span><span class="p">,</span>
     <span class="n">NUM_ENV_STEPS_SAMPLED_THIS_ITER</span><span class="p">,</span>
     <span class="n">NUM_ENV_STEPS_SAMPLED_FOR_EVALUATION_THIS_ITER</span><span class="p">,</span>
     <span class="n">NUM_ENV_STEPS_TRAINED</span><span class="p">,</span>
@@ -1530,8 +1532,11 @@ document.write(`
     <span class="n">NUM_EPISODES</span><span class="p">,</span>
     <span class="n">NUM_EPISODES_LIFETIME</span><span class="p">,</span>
     <span class="n">NUM_TRAINING_STEP_CALLS_PER_ITERATION</span><span class="p">,</span>
+    <span class="n">OFFLINE_EVAL_RUNNER_RESULTS</span><span class="p">,</span>
+    <span class="n">OFFLINE_EVALUATION_ITERATION_TIMER</span><span class="p">,</span>
     <span class="n">RESTORE_ENV_RUNNERS_TIMER</span><span class="p">,</span>
     <span class="n">RESTORE_EVAL_ENV_RUNNERS_TIMER</span><span class="p">,</span>
+    <span class="n">RESTORE_OFFLINE_EVAL_RUNNERS_TIMER</span><span class="p">,</span>
     <span class="n">SYNCH_ENV_CONNECTOR_STATES_TIMER</span><span class="p">,</span>
     <span class="n">SYNCH_EVAL_ENV_CONNECTOR_STATES_TIMER</span><span class="p">,</span>
     <span class="n">SYNCH_WORKER_WEIGHTS_TIMER</span><span class="p">,</span>
@@ -1542,8 +1547,8 @@ document.write(`
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.learner_info</span><span class="w"> </span><span class="kn">import</span> <span class="n">LEARNER_INFO</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.metrics_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsLogger</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stats</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.replay_buffers</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiAgentReplayBuffer</span><span class="p">,</span> <span class="n">ReplayBuffer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.runners.runner_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunnerGroup</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.serialization</span><span class="w"> </span><span class="kn">import</span> <span class="n">deserialize_type</span><span class="p">,</span> <span class="n">NOT_SERIALIZABLE</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.spaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">space_utils</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -1873,7 +1878,7 @@ document.write(`
         <span class="c1"># The Algorithm&#39;s `MetricsLogger` object to collect stats from all its</span>
         <span class="c1"># components (including timers, counters and other stats in its own</span>
         <span class="c1"># `training_step()` and other methods) as well as custom callbacks.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">MetricsLogger</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">MetricsLogger</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># Create a default logger creator if no logger_creator is specified</span>
         <span class="k">if</span> <span class="n">logger_creator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2002,6 +2007,11 @@ document.write(`
         <span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EnvRunnerGroup</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># In case there is no local EnvRunner anymore, we need to handle connector</span>
+        <span class="c1"># pipelines directly here.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env_to_module_connector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConnectorPipelineV2</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module_to_env_connector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConnectorPipelineV2</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Offline RL settings.</span>
         <span class="n">input_evaluation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;input_evaluation&quot;</span><span class="p">)</span>
@@ -2030,14 +2040,20 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">offline_data</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">offline_data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">is_online</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_env_runner_and_connector_v2</span><span class="p">:</span>
             <span class="c1"># Create a set of env runner actors via a EnvRunnerGroup.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span> <span class="o">=</span> <span class="n">EnvRunnerGroup</span><span class="p">(</span>
                 <span class="n">env_creator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env_creator</span><span class="p">,</span>
                 <span class="n">validate_env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">validate_env</span><span class="p">,</span>
                 <span class="n">default_policy_class</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_default_policy_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">),</span>
                 <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
-                <span class="n">local_env_runner</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="c1"># New API stack: User decides whether to create local env runner.</span>
+                <span class="c1"># Old API stack: Always create local EnvRunner.</span>
+                <span class="n">local_env_runner</span><span class="o">=</span><span class="p">(</span>
+                    <span class="kc">True</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_env_runner_and_connector_v2</span>
+                    <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">create_local_env_runner</span>
+                <span class="p">),</span>
                 <span class="n">logdir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logdir</span><span class="p">,</span>
                 <span class="n">tune_trial_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_id</span><span class="p">,</span>
             <span class="p">)</span>
@@ -2066,7 +2082,27 @@ document.write(`
                 <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span><span class="p">,</span>
                 <span class="n">logdir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logdir</span><span class="p">,</span>
                 <span class="n">tune_trial_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trial_id</span><span class="p">,</span>
+                <span class="c1"># New API stack: User decides whether to create local env runner.</span>
+                <span class="c1"># Old API stack: Always create local EnvRunner.</span>
+                <span class="n">local_env_runner</span><span class="o">=</span><span class="p">(</span>
+                    <span class="kc">True</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span><span class="o">.</span><span class="n">enable_env_runner_and_connector_v2</span>
+                    <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span><span class="o">.</span><span class="n">create_local_env_runner</span>
+                <span class="p">),</span>
                 <span class="n">pg_offset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">num_env_runners</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">get_spaces</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="o">.</span><span class="n">get_spaces</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env_to_module_connector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">build_env_to_module_connector</span><span class="p">(</span>
+                <span class="n">spaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spaces</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">module_to_env_connector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">build_module_to_env_connector</span><span class="p">(</span>
+                <span class="n">spaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spaces</span>
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_dataset</span> <span class="o">=</span> <span class="kc">None</span>
@@ -2123,8 +2159,6 @@ document.write(`
             <span class="n">method_config</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">method_type</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_rl_module_and_learner</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.env</span><span class="w"> </span><span class="kn">import</span> <span class="n">INPUT_ENV_SPACES</span>
-
             <span class="n">spaces</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="n">INPUT_ENV_SPACES</span><span class="p">:</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">observation_space</span><span class="p">,</span>
@@ -2132,7 +2166,7 @@ document.write(`
                 <span class="p">)</span>
             <span class="p">}</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="p">:</span>
-                <span class="n">spaces</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">get_spaces</span><span class="p">())</span>
+                <span class="n">spaces</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="p">:</span>
                 <span class="n">spaces</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="o">.</span><span class="n">get_spaces</span><span class="p">())</span>
             <span class="k">else</span><span class="p">:</span>
@@ -2173,22 +2207,24 @@ document.write(`
                 <span class="n">inference_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)[</span><span class="n">COMPONENT_LEARNER</span><span class="p">]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">rl_module_state</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">sync_env_runner_states</span><span class="p">(</span>
                     <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
                     <span class="n">env_steps_sampled</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span>
                         <span class="p">(</span><span class="n">ENV_RUNNER_RESULTS</span><span class="p">,</span> <span class="n">NUM_ENV_STEPS_SAMPLED_LIFETIME</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span>
                     <span class="p">),</span>
                     <span class="n">rl_module_state</span><span class="o">=</span><span class="n">rl_module_state</span><span class="p">,</span>
+                    <span class="n">env_to_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env_to_module_connector</span><span class="p">,</span>
+                    <span class="n">module_to_env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_to_env_connector</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">rl_module_state</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="o">.</span><span class="n">sync_env_runner_states</span><span class="p">(</span>
-                    <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+                    <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span><span class="p">,</span>
                     <span class="n">env_steps_sampled</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span>
                         <span class="p">(</span><span class="n">ENV_RUNNER_RESULTS</span><span class="p">,</span> <span class="n">NUM_ENV_STEPS_SAMPLED_LIFETIME</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span>
                     <span class="p">),</span>
                     <span class="n">rl_module_state</span><span class="o">=</span><span class="n">rl_module_state</span><span class="p">,</span>
+                    <span class="n">env_to_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env_to_module_connector</span><span class="p">,</span>
+                    <span class="n">module_to_env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_to_env_connector</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="c1"># TODO (simon): Update modules in DataWorkers.</span>
 
@@ -2221,19 +2257,42 @@ document.write(`
                 <span class="c1"># need it for reading recorded experiences.</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">offline_data</span><span class="o">.</span><span class="n">spaces</span> <span class="o">=</span> <span class="n">spaces</span>
 
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_create_offline_evaluation_runners</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span><span class="p">):</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.offline.offline_evaluation_runner_group</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+                    <span class="n">OfflineEvaluationRunnerGroup</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="c1"># If no inference-only `RLModule` should be used in offline evaluation,</span>
+                <span class="c1"># get the complete learner module.</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span><span class="o">.</span><span class="n">offline_eval_rl_module_inference_only</span><span class="p">:</span>
+                    <span class="n">rl_module_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learner_group</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span>
+                        <span class="n">components</span><span class="o">=</span><span class="n">COMPONENT_LEARNER</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span>
+                        <span class="n">inference_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="p">)[</span><span class="n">COMPONENT_LEARNER</span><span class="p">]</span>
+                <span class="c1"># Create the offline evaluation runner group.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_group</span><span class="p">:</span> <span class="n">OfflineEvaluationRunnerGroup</span> <span class="o">=</span> <span class="n">OfflineEvaluationRunnerGroup</span><span class="p">(</span>
+                    <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span><span class="p">,</span>
+                    <span class="c1"># Do not create a local runner such that the dataset can be split.</span>
+                    <span class="n">local_runner</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="c1"># Provide the `RLModule`&#39;s state for the `OfflinePreLearner`s.</span>
+                    <span class="n">module_state</span><span class="o">=</span><span class="n">rl_module_state</span><span class="p">[</span><span class="n">COMPONENT_RL_MODULE</span><span class="p">],</span>
+                    <span class="n">module_spec</span><span class="o">=</span><span class="n">module_spec</span><span class="p">,</span>
+                    <span class="c1"># Note, even if no environment is run, the `MultiRLModule` needs</span>
+                    <span class="c1"># spaces to construct the policy network.</span>
+                    <span class="n">spaces</span><span class="o">=</span><span class="n">spaces</span><span class="p">,</span>
+                <span class="p">)</span>
+
         <span class="c1"># Create an Aggregator actor set, if necessary.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_aggregator_actor_manager</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_rl_module_and_learner</span> <span class="ow">and</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">num_aggregator_actors_per_learner</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="p">):</span>
             <span class="n">rl_module_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_multi_rl_module_spec</span><span class="p">(</span>
-                <span class="n">spaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">get_spaces</span><span class="p">(),</span>
+                <span class="n">spaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">,</span>
                 <span class="n">inference_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">agg_cls</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span>
                 <span class="n">num_cpus</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                <span class="c1"># TODO (sven): Activate this when Ray has figured out GPU pre-loading.</span>
-                <span class="c1"># num_gpus=0.01 if self.config.num_gpus_per_learner &gt; 0 else 0,</span>
                 <span class="n">max_restarts</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
             <span class="p">)(</span><span class="n">AggregatorActor</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_aggregator_actor_manager</span> <span class="o">=</span> <span class="n">FaultTolerantActorManager</span><span class="p">(</span>
@@ -2355,11 +2414,20 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">evaluation_interval</span>
             <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">evaluation_interval</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="p">)</span>
+
+        <span class="n">evaluate_offline_this_iter</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">offline_evaluation_interval</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iteration</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">offline_evaluation_interval</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="p">)</span>
+
         <span class="c1"># Results dict for training (and if appolicable: evaluation).</span>
         <span class="n">eval_results</span><span class="p">:</span> <span class="n">ResultDict</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="c1"># Parallel eval + training: Kick off evaluation-loop and parallel train() call.</span>
-        <span class="k">if</span> <span class="n">evaluate_this_iter</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">evaluation_parallel_to_training</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">evaluate_this_iter</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">evaluation_parallel_to_training</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">offline_evaluation_parallel_to_training</span>
+        <span class="p">):</span>
             <span class="p">(</span>
                 <span class="n">train_results</span><span class="p">,</span>
                 <span class="n">eval_results</span><span class="p">,</span>
@@ -2382,6 +2450,18 @@ document.write(`
         <span class="k">if</span> <span class="n">evaluate_this_iter</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">evaluation_parallel_to_training</span><span class="p">:</span>
             <span class="n">eval_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_one_evaluation</span><span class="p">(</span><span class="n">parallel_train_future</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">evaluate_offline_this_iter</span><span class="p">:</span>
+            <span class="n">offline_eval_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_one_offline_evaluation</span><span class="p">()</span>
+            <span class="c1"># If we already have online evaluation results merge the offline</span>
+            <span class="c1"># evaluation results.</span>
+            <span class="k">if</span> <span class="n">eval_results</span><span class="p">:</span>
+                <span class="n">eval_results</span><span class="p">[</span><span class="n">EVALUATION_RESULTS</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="n">offline_eval_results</span><span class="p">[</span><span class="n">EVALUATION_RESULTS</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="c1"># Otherwise, just assign.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">eval_results</span> <span class="o">=</span> <span class="n">offline_eval_results</span>
+
         <span class="c1"># Sync EnvRunner workers.</span>
         <span class="c1"># TODO (sven): For the new API stack, the common execution pattern for any algo</span>
         <span class="c1">#  should be: [sample + get_metrics + get_state] -&gt; send all these in one remote</span>
@@ -2397,7 +2477,11 @@ document.write(`
                 <span class="c1"># Synchronize EnvToModule and ModuleToEnv connector states and broadcast</span>
                 <span class="c1"># new states back to all EnvRunners.</span>
                 <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_time</span><span class="p">((</span><span class="n">TIMERS</span><span class="p">,</span> <span class="n">SYNCH_ENV_CONNECTOR_STATES_TIMER</span><span class="p">)):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">sync_env_runner_states</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">sync_env_runner_states</span><span class="p">(</span>
+                        <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+                        <span class="n">env_to_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env_to_module_connector</span><span class="p">,</span>
+                        <span class="n">module_to_env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_to_env_connector</span><span class="p">,</span>
+                    <span class="p">)</span>
             <span class="c1"># Compile final ResultDict from `train_results` and `eval_results`. Note</span>
             <span class="c1"># that, as opposed to the old API stack, EnvRunner stats should already be</span>
             <span class="c1"># in `train_results` and `eval_results`.</span>
@@ -2426,6 +2510,62 @@ document.write(`
         <span class="k">return</span> <span class="n">results</span></div>
 
 
+<div class="viewcode-block" id="Algorithm.evaluate_offline">
+<a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate_offline.html#ray.rllib.algorithms.algorithm.Algorithm.evaluate_offline">[docs]</a>
+    <span class="nd">@PublicAPI</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_offline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluates current policy offline under `evaluation_config` settings.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A ResultDict only containing the offline evaluation results from the current</span>
+<span class="sd">            iteration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># First synchronize weights.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_group</span><span class="o">.</span><span class="n">sync_weights</span><span class="p">(</span>
+            <span class="n">from_worker_or_learner_group</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">learner_group</span><span class="p">,</span>
+            <span class="n">inference_only</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">offline_eval_rl_module_inference_only</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># TODO (simon): Check, how we can sync without a local runner. Also,</span>
+        <span class="c1"># connectors are in the data pipeline not directly in the runner applied.</span>
+        <span class="c1"># if self.config.broadcast_offline_eval_runner_states:</span>
+        <span class="c1">#     # TODO (simon): Create offline equivalent.</span>
+        <span class="c1">#     with self.metrics.log_time(TIMERS, SYNCH_EVAL_ENV_CONNECTOR_STATES_TIMER):</span>
+        <span class="c1">#         self.offline_eval_runner_group.sync_runner_states(</span>
+        <span class="c1">#             from_runner=</span>
+        <span class="c1">#         )</span>
+
+        <span class="n">make_callback</span><span class="p">(</span>
+            <span class="s2">&quot;on_evaluate_offline_start&quot;</span><span class="p">,</span>
+            <span class="n">callbacks_objects</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">,</span>
+            <span class="n">callbacks_functions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">callbacks_on_evaluate_offline_start</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">algorithm</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics_logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Evaluate with fixed duration.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_offline_with_fixed_duration</span><span class="p">()</span>
+        <span class="c1"># Reduce the evaluation results.</span>
+        <span class="n">eval_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span>
+            <span class="p">(</span><span class="s2">&quot;EVALUATION_RESULTS&quot;</span><span class="p">,</span> <span class="s2">&quot;OFFLINE_EVAL_RUNNER_RESULTS&quot;</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="p">{}</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Trigger `on_evaluate_offline_end` callback.</span>
+        <span class="n">make_callback</span><span class="p">(</span>
+            <span class="s2">&quot;on_evaluate_offline_end&quot;</span><span class="p">,</span>
+            <span class="n">callbacks_objects</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">,</span>
+            <span class="n">callbacks_functions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">callbacks_on_evaluate_offline_end</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                <span class="n">algorithm</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">metrics_logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span>
+                <span class="n">evaluation_metrics</span><span class="o">=</span><span class="n">eval_results</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Also return the results here for convenience.</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">EVALUATION_RESULTS</span><span class="p">:</span> <span class="p">{</span><span class="n">OFFLINE_EVAL_RUNNER_RESULTS</span><span class="p">:</span> <span class="n">eval_results</span><span class="p">}}</span></div>
+
+
 <div class="viewcode-block" id="Algorithm.evaluate">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html#ray.rllib.algorithms.algorithm.Algorithm.evaluate">[docs]</a>
     <span class="nd">@PublicAPI</span>
@@ -2450,40 +2590,43 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_before_evaluate</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_offline_evaluation</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_offline_evaluation_old_api_stack</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_env_runner_and_connector_v2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">healthy_env_runner_ids</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="c1"># TODO (sven): Replace this with a new ActorManager API:</span>
+                <span class="c1">#  try_remote_request_till_success(&quot;get_state&quot;) -&gt; tuple(int,</span>
+                <span class="c1">#  remoteresult)</span>
+                <span class="n">weights_src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">_worker_manager</span><span class="o">.</span><span class="n">_actors</span><span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">healthy_env_runner_ids</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">weights_src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learner_group</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">weights_src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span>
 
         <span class="c1"># Sync weights to the evaluation EnvRunners.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_env_runner_and_connector_v2</span><span class="p">:</span>
-                <span class="k">if</span> <span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">healthy_env_runner_ids</span><span class="p">()</span>
-                <span class="p">):</span>
-                    <span class="c1"># TODO (sven): Replace this with a new ActorManager API:</span>
-                    <span class="c1">#  try_remote_request_till_success(&quot;get_state&quot;) -&gt; tuple(int,</span>
-                    <span class="c1">#  remoteresult)</span>
-                    <span class="n">weights_src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">_worker_manager</span><span class="o">.</span><span class="n">_actors</span><span class="p">[</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">healthy_env_runner_ids</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="p">]</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">weights_src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learner_group</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">weights_src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="o">.</span><span class="n">sync_weights</span><span class="p">(</span>
                 <span class="n">from_worker_or_learner_group</span><span class="o">=</span><span class="n">weights_src</span><span class="p">,</span>
                 <span class="n">inference_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
 
+            <span class="c1"># Merge (eval) EnvRunner states and broadcast the merged state back</span>
+            <span class="c1"># to the remote (eval) EnvRunner actors.</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_env_runner_and_connector_v2</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="p">:</span>
-                    <span class="c1"># Synchronize EnvToModule and ModuleToEnv connector states</span>
-                    <span class="c1"># and broadcast new states back to all eval EnvRunners.</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span><span class="o">.</span><span class="n">broadcast_env_runner_states</span><span class="p">:</span>
                     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_time</span><span class="p">(</span>
                         <span class="p">(</span><span class="n">TIMERS</span><span class="p">,</span> <span class="n">SYNCH_EVAL_ENV_CONNECTOR_STATES_TIMER</span><span class="p">)</span>
                     <span class="p">):</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="o">.</span><span class="n">sync_env_runner_states</span><span class="p">(</span>
                             <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span><span class="p">,</span>
-                            <span class="n">from_worker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span><span class="p">,</span>
+                            <span class="n">from_worker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span><span class="p">,</span>
+                            <span class="n">env_to_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env_to_module_connector</span><span class="p">,</span>
+                            <span class="n">module_to_env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_to_env_connector</span><span class="p">,</span>
                         <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_sync_filters_if_needed</span><span class="p">(</span>
@@ -2491,6 +2634,12 @@ document.write(`
                     <span class="n">workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="p">,</span>
                     <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span><span class="p">,</span>
                 <span class="p">)</span>
+        <span class="c1"># Sync weights to the local EnvRunner (if no eval EnvRunnerGroup).</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_env_runner_and_connector_v2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">sync_weights</span><span class="p">(</span>
+                <span class="n">from_worker_or_learner_group</span><span class="o">=</span><span class="n">weights_src</span><span class="p">,</span>
+                <span class="n">inference_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="n">make_callback</span><span class="p">(</span>
             <span class="s2">&quot;on_evaluate_start&quot;</span><span class="p">,</span>
@@ -2513,15 +2662,13 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">eval_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">custom_evaluation_function</span><span class="p">()</span>
         <span class="c1"># There is no eval EnvRunnerGroup -&gt; Run on local EnvRunner.</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span><span class="p">:</span>
             <span class="p">(</span>
                 <span class="n">eval_results</span><span class="p">,</span>
                 <span class="n">env_steps</span><span class="p">,</span>
                 <span class="n">agent_steps</span><span class="p">,</span>
                 <span class="n">batches</span><span class="p">,</span>
-            <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_on_local_env_runner</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span>
-            <span class="p">)</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_on_local_env_runner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span><span class="p">)</span>
         <span class="c1"># There is only a local eval EnvRunner -&gt; Run on that.</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="o">.</span><span class="n">num_healthy_remote_workers</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="p">(</span>
@@ -2554,9 +2701,11 @@ document.write(`
             <span class="n">eval_results</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_env_runner_and_connector_v2</span><span class="p">:</span>
-            <span class="n">eval_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span>
-                <span class="n">key</span><span class="o">=</span><span class="n">EVALUATION_RESULTS</span><span class="p">,</span> <span class="n">return_stats_obj</span><span class="o">=</span><span class="kc">False</span>
-            <span class="p">)</span>
+            <span class="n">eval_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">EVALUATION_RESULTS</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">{})</span>
+            <span class="k">if</span> <span class="n">log_once</span><span class="p">(</span><span class="s2">&quot;no_eval_results&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">eval_results</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;No evaluation results found for this iteration. This can happen if the evaluation worker(s) is/are not healthy.&quot;</span>
+                <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">eval_results</span> <span class="o">=</span> <span class="p">{</span><span class="n">ENV_RUNNER_RESULTS</span><span class="p">:</span> <span class="n">eval_results</span><span class="p">}</span>
             <span class="n">eval_results</span><span class="p">[</span><span class="n">NUM_AGENT_STEPS_SAMPLED_THIS_ITER</span><span class="p">]</span> <span class="o">=</span> <span class="n">agent_steps</span>
@@ -2634,7 +2783,7 @@ document.write(`
                 <span class="s2">&quot;Can&#39;t evaluate on a local worker if this local worker does not have &quot;</span>
                 <span class="s2">&quot;an environment!</span><span class="se">\n</span><span class="s2">Try one of the following:&quot;</span>
                 <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">1) Set `evaluation_interval` &gt; 0 to force creating a separate &quot;</span>
-                <span class="s2">&quot;evaluation EnvRunnerGroup.</span><span class="se">\n</span><span class="s2">2) Set `create_env_on_driver=True` to &quot;</span>
+                <span class="s2">&quot;evaluation EnvRunnerGroup.</span><span class="se">\n</span><span class="s2">2) Set `create_local_env_runner=True` to &quot;</span>
                 <span class="s2">&quot;force the local (non-eval) EnvRunner to have an environment to &quot;</span>
                 <span class="s2">&quot;evaluate on.&quot;</span>
             <span class="p">)</span>
@@ -2684,8 +2833,8 @@ document.write(`
                 <span class="n">keep_custom_metrics</span><span class="o">=</span><span class="n">eval_cfg</span><span class="o">.</span><span class="n">keep_per_episode_custom_metrics</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span>
-                <span class="n">env_runner_results</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">env_runner_results</span><span class="p">],</span>
                 <span class="n">key</span><span class="o">=</span><span class="p">(</span><span class="n">EVALUATION_RESULTS</span><span class="p">,</span> <span class="n">ENV_RUNNER_RESULTS</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="n">env_runner_results</span> <span class="o">=</span> <span class="kc">None</span>
@@ -2745,12 +2894,10 @@ document.write(`
                 <span class="c1"># Compute rough number of timesteps it takes for a single EnvRunner</span>
                 <span class="c1"># to occupy the estimated (parallelly running) train step.</span>
                 <span class="n">_num</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
-                    <span class="c1"># Cap at 20k to not put too much memory strain on EnvRunners.</span>
-                    <span class="mi">20000</span><span class="p">,</span>
+                    <span class="c1"># Clamp number of steps to take between a max and a min.</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">evaluation_auto_duration_max_env_steps_per_sample</span><span class="p">,</span>
                     <span class="nb">max</span><span class="p">(</span>
-                        <span class="c1"># Low-cap at 100 to avoid possibly negative rollouts or very</span>
-                        <span class="c1"># short ones.</span>
-                        <span class="mi">100</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">evaluation_auto_duration_min_env_steps_per_sample</span><span class="p">,</span>
                         <span class="p">(</span>
                             <span class="c1"># How much time do we have left?</span>
                             <span class="p">(</span><span class="n">train_mean_time</span> <span class="o">-</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">))</span>
@@ -2760,8 +2907,9 @@ document.write(`
                                 <span class="p">(</span>
                                     <span class="n">EVALUATION_RESULTS</span><span class="p">,</span>
                                     <span class="n">ENV_RUNNER_RESULTS</span><span class="p">,</span>
-                                    <span class="n">NUM_ENV_STEPS_SAMPLED_PER_SECOND</span><span class="p">,</span>
+                                    <span class="n">NUM_ENV_STEPS_SAMPLED_LIFETIME</span><span class="p">,</span>
                                 <span class="p">),</span>
+                                <span class="n">throughput</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                 <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
                             <span class="p">)</span>
                             <span class="o">/</span> <span class="n">num_healthy_workers</span>
@@ -2831,7 +2979,7 @@ document.write(`
             <span class="p">)</span>
             <span class="n">num_episodes</span> <span class="o">=</span> <span class="n">env_runner_results</span><span class="p">[</span><span class="n">NUM_EPISODES</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">merge_and_log_n_dicts</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span>
                 <span class="n">all_metrics</span><span class="p">,</span>
                 <span class="n">key</span><span class="o">=</span><span class="p">(</span><span class="n">EVALUATION_RESULTS</span><span class="p">,</span> <span class="n">ENV_RUNNER_RESULTS</span><span class="p">),</span>
             <span class="p">)</span>
@@ -2860,6 +3008,88 @@ document.write(`
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">env_runner_results</span><span class="p">,</span> <span class="n">env_steps</span><span class="p">,</span> <span class="n">agent_steps</span><span class="p">,</span> <span class="n">all_batches</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_offline_with_fixed_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># How many batches do we need to run?</span>
+        <span class="n">num_workers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">num_offline_eval_runners</span>
+        <span class="n">time_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">offline_evaluation_timeout_s</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_offline_eval_runner_remote</span><span class="p">(</span><span class="n">runner</span><span class="p">,</span> <span class="nb">iter</span><span class="p">):</span>
+
+            <span class="n">metrics</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="n">metrics</span><span class="p">,</span> <span class="nb">iter</span>
+
+        <span class="n">all_metrics</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">num_units_done</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># How many episodes have we run (across all eval workers)?</span>
+        <span class="n">num_units_done</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">num_healthy_workers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_group</span><span class="o">.</span><span class="n">num_healthy_remote_runners</span>
+
+        <span class="c1"># TODO (simon): Note, agent steps might not be available, but only</span>
+        <span class="c1"># module steps.</span>
+
+        <span class="n">t_last_result</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">_round</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">algo_iteration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span>
+
+        <span class="c1"># In case all the remote evaluation workers die during a round of</span>
+        <span class="c1"># evaluation, we need to stop.</span>
+        <span class="k">while</span> <span class="n">num_healthy_workers</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">units_left_to_do</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">offline_evaluation_duration</span> <span class="o">*</span> <span class="n">num_workers</span> <span class="o">-</span> <span class="n">num_units_done</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">units_left_to_do</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="n">_round</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_group</span><span class="o">.</span><span class="n">foreach_runner_async</span><span class="p">(</span>
+                <span class="n">func</span><span class="o">=</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
+                    <span class="n">_offline_eval_runner_remote</span><span class="p">,</span>
+                    <span class="nb">iter</span><span class="o">=</span><span class="n">algo_iteration</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_group</span><span class="o">.</span><span class="n">fetch_ready_async_reqs</span><span class="p">(</span>
+                <span class="n">return_obj_refs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="o">=</span><span class="mf">0.01</span>
+            <span class="p">)</span>
+            <span class="c1"># Make sure we properly time out if we have not received any results</span>
+            <span class="c1"># for more than `time_out` seconds.</span>
+            <span class="n">time_now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">results</span> <span class="ow">and</span> <span class="n">time_now</span> <span class="o">-</span> <span class="n">t_last_result</span> <span class="o">&gt;</span> <span class="n">time_out</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">elif</span> <span class="n">results</span><span class="p">:</span>
+                <span class="n">t_last_result</span> <span class="o">=</span> <span class="n">time_now</span>
+            <span class="k">for</span> <span class="n">wid</span><span class="p">,</span> <span class="p">(</span><span class="n">met</span><span class="p">,</span> <span class="nb">iter</span><span class="p">)</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">iter</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iteration</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">all_metrics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">met</span><span class="p">)</span>
+                <span class="n">num_units_done</span> <span class="o">+=</span> <span class="p">(</span>
+                    <span class="n">met</span><span class="p">[</span><span class="n">ALL_MODULES</span><span class="p">][</span><span class="n">DATASET_NUM_ITERS_EVALUATED</span><span class="p">]</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">DATASET_NUM_ITERS_EVALUATED</span> <span class="ow">in</span> <span class="n">met</span><span class="p">[</span><span class="n">ALL_MODULES</span><span class="p">]</span>
+                    <span class="k">else</span> <span class="mi">0</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Update correct number of healthy remote workers.</span>
+            <span class="n">num_healthy_workers</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_group</span><span class="o">.</span><span class="n">num_healthy_remote_runners</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">num_healthy_workers</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Calling `run()` on your remote offline evaluation runner(s) &quot;</span>
+                <span class="s2">&quot;resulted in all runners crashing! Make sure a) your dataset is not&quot;</span>
+                <span class="s2">&quot; corrupted, b) you have enough offline evaluation runners &quot;</span>
+                <span class="s2">&quot;(`config.evaluation(num_offline_eval_runners=...)`) to cover for &quot;</span>
+                <span class="s2">&quot;occasional losses, and c) you use the `config.fault_tolerance(&quot;</span>
+                <span class="s2">&quot;restart_failed_offline_eval_runners=True)` setting.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span>
+            <span class="n">all_metrics</span><span class="p">,</span>
+            <span class="n">key</span><span class="o">=</span><span class="p">(</span><span class="n">EVALUATION_RESULTS</span><span class="p">,</span> <span class="n">OFFLINE_EVAL_RUNNER_RESULTS</span><span class="p">),</span>
+        <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_with_fixed_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># How many episodes/timesteps do we need to run?</span>
@@ -3025,7 +3255,7 @@ document.write(`
             <span class="p">)</span>
             <span class="n">num_episodes</span> <span class="o">=</span> <span class="n">env_runner_results</span><span class="p">[</span><span class="n">NUM_EPISODES</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">merge_and_log_n_dicts</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span>
                 <span class="n">all_metrics</span><span class="p">,</span>
                 <span class="n">key</span><span class="o">=</span><span class="p">(</span><span class="n">EVALUATION_RESULTS</span><span class="p">,</span> <span class="n">ENV_RUNNER_RESULTS</span><span class="p">),</span>
             <span class="p">)</span>
@@ -3058,7 +3288,7 @@ document.write(`
 <div class="viewcode-block" id="Algorithm.restore_env_runners">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.restore_env_runners.html#ray.rllib.algorithms.algorithm.Algorithm.restore_env_runners">[docs]</a>
     <span class="nd">@OverrideToImplementCustomLogic</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">restore_env_runners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_runner_group</span><span class="p">:</span> <span class="n">EnvRunnerGroup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore_env_runners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_runner_group</span><span class="p">:</span> <span class="n">EnvRunnerGroup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Try bringing back unhealthy EnvRunners and - if successful - sync with local.</span>
 
 <span class="sd">        Algorithms that use custom EnvRunners may override this method to</span>
@@ -3069,6 +3299,10 @@ document.write(`
 <span class="sd">        Args:</span>
 <span class="sd">            env_runner_group: The EnvRunnerGroup to restore. This may be the training or</span>
 <span class="sd">                the evaluation EnvRunnerGroup.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A list of EnvRunner indices that have been restored during the call of</span>
+<span class="sd">            this method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If `env_runner_group` is None, or</span>
         <span class="c1"># 1. `env_runner_group` (EnvRunnerGroup) does not have a local worker, and</span>
@@ -3078,7 +3312,7 @@ document.write(`
         <span class="k">if</span> <span class="ow">not</span> <span class="n">env_runner_group</span> <span class="ow">or</span> <span class="p">(</span>
             <span class="ow">not</span> <span class="n">env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span>
         <span class="p">):</span>
-            <span class="k">return</span>
+            <span class="k">return</span> <span class="p">[]</span>
 
         <span class="c1"># This is really cheap, since probe_unhealthy_env_runners() is a no-op</span>
         <span class="c1"># if there are no unhealthy workers.</span>
@@ -3133,34 +3367,55 @@ document.write(`
                 <span class="n">timeout_seconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">env_runner_restore_timeout_s</span><span class="p">,</span>
             <span class="p">)</span>
 
-            <span class="c1"># Fire the callback for re-created workers.</span>
-            <span class="n">make_callback</span><span class="p">(</span>
-                <span class="s2">&quot;on_env_runners_recreated&quot;</span><span class="p">,</span>
-                <span class="n">callbacks_objects</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">,</span>
-                <span class="n">callbacks_functions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">callbacks_on_env_runners_recreated</span><span class="p">,</span>
-                <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                    <span class="n">algorithm</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
-                    <span class="n">env_runner_group</span><span class="o">=</span><span class="n">env_runner_group</span><span class="p">,</span>
-                    <span class="n">env_runner_indices</span><span class="o">=</span><span class="n">restored</span><span class="p">,</span>
-                    <span class="n">is_evaluation</span><span class="o">=</span><span class="p">(</span>
-                        <span class="n">env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">in_evaluation</span>
-                    <span class="p">),</span>
-                <span class="p">),</span>
-            <span class="p">)</span>
-            <span class="c1"># TODO (sven): Deprecate this call.</span>
-            <span class="n">make_callback</span><span class="p">(</span>
-                <span class="s2">&quot;on_workers_recreated&quot;</span><span class="p">,</span>
-                <span class="n">callbacks_objects</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">,</span>
-                <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                    <span class="n">algorithm</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
-                    <span class="n">worker_set</span><span class="o">=</span><span class="n">env_runner_group</span><span class="p">,</span>
-                    <span class="n">worker_ids</span><span class="o">=</span><span class="n">restored</span><span class="p">,</span>
-                    <span class="n">is_evaluation</span><span class="o">=</span><span class="p">(</span>
-                        <span class="n">env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">in_evaluation</span>
-                    <span class="p">),</span>
-                <span class="p">),</span>
-            <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">restored</span></div>
 
+
+    <span class="nd">@OverrideToImplementCustomLogic</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restore_offline_eval_runners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner_group</span><span class="p">:</span> <span class="n">RunnerGroup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">runner_group</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">runner_group</span><span class="o">.</span><span class="n">local_runner</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">restored</span> <span class="o">=</span> <span class="n">runner_group</span><span class="o">.</span><span class="n">probe_unhealthy_runners</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">restored</span><span class="p">:</span>
+            <span class="c1"># Count the restored workers.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_counters</span><span class="p">[</span><span class="s2">&quot;total_num_restored_workers&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">restored</span><span class="p">)</span>
+
+            <span class="c1"># Get the state of the correct (reference) worker.</span>
+            <span class="n">from_runner</span> <span class="o">=</span> <span class="n">runner_group</span><span class="o">.</span><span class="n">healthy_runner_ids</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">runner_group</span><span class="o">.</span><span class="n">foreach_runner</span><span class="p">(</span>
+                <span class="s2">&quot;get_state&quot;</span><span class="p">,</span>
+                <span class="n">local_runner</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">remote_worker_ids</span><span class="o">=</span><span class="n">from_runner</span><span class="p">,</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">state_ref</span> <span class="o">=</span> <span class="n">ray</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+            <span class="k">def</span><span class="w"> </span><span class="nf">_sync_runner</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">state_ref</span><span class="p">))</span>
+
+            <span class="c1"># By default, entire `Runner`` state is synced after restoration</span>
+            <span class="c1"># to bring the previously failed `Runner` up to date.</span>
+            <span class="n">runner_group</span><span class="o">.</span><span class="n">foreach_runner</span><span class="p">(</span>
+                <span class="n">func</span><span class="o">=</span><span class="n">_sync_runner</span><span class="p">,</span>
+                <span class="n">remote_worker_ids</span><span class="o">=</span><span class="n">restored</span><span class="p">,</span>
+                <span class="c1"># Don&#39;t update the local `Runner`.</span>
+                <span class="n">local_runner</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">timeout_seconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span><span class="o">.</span><span class="n">offline_eval_runner_restore_timeout_s</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="c1"># Restore the correct data iterator split stream.</span>
+            <span class="c1"># TODO (simon): Define a `restore` method in the `RunnerGroup`</span>
+            <span class="c1"># such that we do not have to check here for the group.</span>
+            <span class="c1"># Also get a different streaming split if a runner fails and is not</span>
+            <span class="c1"># recreated.</span>
+            <span class="n">runner_group</span><span class="o">.</span><span class="n">foreach_runner</span><span class="p">(</span>
+                <span class="n">func</span><span class="o">=</span><span class="s2">&quot;set_dataset_iterator&quot;</span><span class="p">,</span>
+                <span class="n">remote_worker_ids</span><span class="o">=</span><span class="n">restored</span><span class="p">,</span>
+                <span class="n">local_runner</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">timeout_seconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span><span class="o">.</span><span class="n">offline_eval_runner_restore_timeout_s</span><span class="p">,</span>
+                <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;iterator&quot;</span><span class="p">:</span> <span class="n">runner_group</span><span class="o">.</span><span class="n">_offline_data_iterators</span><span class="p">[</span><span class="n">restored</span><span class="p">]},</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">restored</span>
 
 <div class="viewcode-block" id="Algorithm.training_step">
 <a class="viewcode-back" href="../../../../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.training_step.html#ray.rllib.algorithms.algorithm.Algorithm.training_step">[docs]</a>
@@ -3216,7 +3471,7 @@ document.write(`
                     <span class="n">_return_metrics</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="p">)</span>
         <span class="c1"># Reduce EnvRunner metrics over the n EnvRunners.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">merge_and_log_n_dicts</span><span class="p">(</span><span class="n">env_runner_results</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">ENV_RUNNER_RESULTS</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">env_runner_results</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">ENV_RUNNER_RESULTS</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_time</span><span class="p">((</span><span class="n">TIMERS</span><span class="p">,</span> <span class="n">LEARNER_UPDATE_TIMER</span><span class="p">)):</span>
             <span class="n">learner_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learner_group</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
@@ -3253,7 +3508,15 @@ document.write(`
 <span class="sd">            The RLModule found under the ModuleID key inside the local EnvRunner&#39;s</span>
 <span class="sd">            MultiRLModule. None if `module_id` doesn&#39;t exist.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span><span class="o">.</span><span class="n">module</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span><span class="o">.</span><span class="n">module</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">foreach_env_runner</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">er</span><span class="p">:</span> <span class="n">er</span><span class="o">.</span><span class="n">module</span><span class="p">,</span>
+                <span class="n">remote_worker_ids</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">local_env_runner</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">MultiRLModule</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">module</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">module_id</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -3983,24 +4246,34 @@ document.write(`
         <span class="n">state</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="c1"># Get (local) EnvRunner state (w/o RLModule).</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_component</span><span class="p">(</span>
-            <span class="n">COMPONENT_ENV_RUNNER</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">not_components</span>
-        <span class="p">):</span>
-            <span class="n">state</span><span class="p">[</span>
-                <span class="n">COMPONENT_ENV_RUNNER</span>
-            <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span>
-                <span class="n">components</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_subcomponents</span><span class="p">(</span><span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span> <span class="n">components</span><span class="p">),</span>
-                <span class="n">not_components</span><span class="o">=</span><span class="n">force_list</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_subcomponents</span><span class="p">(</span><span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span> <span class="n">not_components</span><span class="p">)</span>
-                <span class="p">)</span>
-                <span class="c1"># We don&#39;t want the RLModule state from the EnvRunners (it&#39;s</span>
-                <span class="c1"># `inference_only` anyway and already provided in full by the Learners).</span>
-                <span class="o">+</span> <span class="p">[</span><span class="n">COMPONENT_RL_MODULE</span><span class="p">],</span>
-                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">is_online</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_component</span><span class="p">(</span><span class="n">COMPONENT_ENV_RUNNER</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">not_components</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span><span class="p">:</span>
+                    <span class="n">state</span><span class="p">[</span><span class="n">COMPONENT_ENV_RUNNER</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span>
+                        <span class="n">components</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_subcomponents</span><span class="p">(</span>
+                            <span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span> <span class="n">components</span>
+                        <span class="p">),</span>
+                        <span class="n">not_components</span><span class="o">=</span><span class="n">force_list</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_get_subcomponents</span><span class="p">(</span><span class="n">COMPONENT_RL_MODULE</span><span class="p">,</span> <span class="n">not_components</span><span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="c1"># We don&#39;t want the RLModule state from the EnvRunners (it&#39;s</span>
+                        <span class="c1"># `inference_only` anyway and already provided in full by the</span>
+                        <span class="c1"># Learners).</span>
+                        <span class="o">+</span> <span class="p">[</span><span class="n">COMPONENT_RL_MODULE</span><span class="p">],</span>
+                        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">state</span><span class="p">[</span><span class="n">COMPONENT_ENV_RUNNER</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="n">COMPONENT_ENV_TO_MODULE_CONNECTOR</span><span class="p">:</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">env_to_module_connector</span><span class="o">.</span><span class="n">get_state</span><span class="p">()</span>
+                        <span class="p">),</span>
+                        <span class="n">COMPONENT_MODULE_TO_ENV_CONNECTOR</span><span class="p">:</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">module_to_env_connector</span><span class="o">.</span><span class="n">get_state</span><span class="p">()</span>
+                        <span class="p">),</span>
+                    <span class="p">}</span>
 
-        <span class="c1"># Get (local) evaluation EnvRunner state (w/o RLModule).</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_component</span><span class="p">(</span>
+                <span class="c1"># Get (local) evaluation EnvRunner state (w/o RLModule).</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_component</span><span class="p">(</span>
             <span class="n">COMPONENT_EVAL_ENV_RUNNER</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">not_components</span>
         <span class="p">):</span>
             <span class="n">state</span><span class="p">[</span><span class="n">COMPONENT_EVAL_ENV_RUNNER</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span>
@@ -4040,16 +4313,31 @@ document.write(`
     <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">StateDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Set the (training) EnvRunners&#39; states.</span>
         <span class="k">if</span> <span class="n">COMPONENT_ENV_RUNNER</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span>
-                <span class="n">state</span><span class="p">[</span><span class="n">COMPONENT_ENV_RUNNER</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">COMPONENT_ENV_RUNNER</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">env_to_module_connector</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span>
+                    <span class="n">state</span><span class="p">[</span><span class="n">COMPONENT_ENV_RUNNER</span><span class="p">][</span><span class="n">COMPONENT_ENV_TO_MODULE_CONNECTOR</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">module_to_env_connector</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span>
+                    <span class="n">state</span><span class="p">[</span><span class="n">COMPONENT_ENV_RUNNER</span><span class="p">][</span><span class="n">COMPONENT_MODULE_TO_ENV_CONNECTOR</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">sync_env_runner_states</span><span class="p">(</span>
+                <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+                <span class="n">from_worker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span><span class="p">,</span>
+                <span class="n">env_to_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env_to_module_connector</span><span class="p">,</span>
+                <span class="n">module_to_env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_to_env_connector</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">sync_env_runner_states</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
 
         <span class="c1"># Set the (eval) EnvRunners&#39; states.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span> <span class="ow">and</span> <span class="n">COMPONENT_EVAL_ENV_RUNNER</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">COMPONENT_ENV_RUNNER</span><span class="p">])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">COMPONENT_ENV_RUNNER</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="o">.</span><span class="n">sync_env_runner_states</span><span class="p">(</span>
-                <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span>
+                <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span><span class="p">,</span>
+                <span class="n">from_worker</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span><span class="p">,</span>
+                <span class="n">env_to_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env_to_module_connector</span><span class="p">,</span>
+                <span class="n">module_to_env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_to_env_connector</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="c1"># Set the LearnerGroup&#39;s state.</span>
@@ -4079,11 +4367,11 @@ document.write(`
         <span class="n">components</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span><span class="n">COMPONENT_LEARNER_GROUP</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">learner_group</span><span class="p">),</span>
         <span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">is_offline</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">is_online</span><span class="p">:</span>
             <span class="n">components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="p">(</span><span class="n">COMPONENT_ENV_RUNNER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">COMPONENT_ENV_RUNNER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner</span><span class="p">),</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner</span><span class="p">:</span>
             <span class="n">components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="p">(</span>
                     <span class="n">COMPONENT_EVAL_ENV_RUNNER</span><span class="p">,</span>
@@ -4197,6 +4485,11 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="n">eval_env_runner_bundles</span> <span class="o">=</span> <span class="p">[]</span>
 
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_should_create_offline_evaluation_runners</span><span class="p">(</span><span class="n">eval_config</span><span class="p">):</span>
+            <span class="n">offline_eval_runner_bundles</span> <span class="o">=</span> <span class="n">_get_offline_eval_runner_bundles</span><span class="p">(</span><span class="n">eval_config</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">offline_eval_runner_bundles</span> <span class="o">=</span> <span class="p">[]</span>
+
         <span class="n">learner_bundles</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">enable_rl_module_and_learner</span><span class="p">:</span>
             <span class="n">learner_bundles</span> <span class="o">=</span> <span class="n">_get_learner_bundles</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
@@ -4205,6 +4498,7 @@ document.write(`
             <span class="p">[</span><span class="n">main_process</span><span class="p">]</span>
             <span class="o">+</span> <span class="n">env_runner_bundles</span>
             <span class="o">+</span> <span class="n">eval_env_runner_bundles</span>
+            <span class="o">+</span> <span class="n">offline_eval_runner_bundles</span>
             <span class="o">+</span> <span class="n">learner_bundles</span>
         <span class="p">)</span>
 
@@ -4472,7 +4766,14 @@ document.write(`
                 <span class="k">while</span> <span class="ow">not</span> <span class="n">train_iter_ctx</span><span class="o">.</span><span class="n">should_stop</span><span class="p">(</span><span class="n">has_run_once</span><span class="p">):</span>
                     <span class="c1"># Before training step, try to bring failed workers back.</span>
                     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_time</span><span class="p">((</span><span class="n">TIMERS</span><span class="p">,</span> <span class="n">RESTORE_ENV_RUNNERS_TIMER</span><span class="p">)):</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">restore_env_runners</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="p">)</span>
+                        <span class="n">restored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">restore_env_runners</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="p">)</span>
+                        <span class="c1"># Fire the callback for re-created EnvRunners.</span>
+                        <span class="k">if</span> <span class="n">restored</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_make_on_env_runners_recreated_callbacks</span><span class="p">(</span>
+                                <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+                                <span class="n">env_runner_group</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="p">,</span>
+                                <span class="n">restored_env_runner_indices</span><span class="o">=</span><span class="n">restored</span><span class="p">,</span>
+                            <span class="p">)</span>
 
                     <span class="c1"># Try to train one step.</span>
                     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_time</span><span class="p">((</span><span class="n">TIMERS</span><span class="p">,</span> <span class="n">TRAINING_STEP_TIMER</span><span class="p">)):</span>
@@ -4520,14 +4821,62 @@ document.write(`
                 <span class="n">remote_aggregator_metrics</span><span class="p">,</span>
                 <span class="n">ignore_ray_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">merge_and_log_n_dicts</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span>
                 <span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">remote_aggregator_metrics</span><span class="o">.</span><span class="n">result_or_errors</span><span class="p">],</span>
                 <span class="n">key</span><span class="o">=</span><span class="n">AGGREGATOR_ACTOR_RESULTS</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="c1"># Only here (at the end of the iteration), reduce the results into a single</span>
-        <span class="c1"># result dict.</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">reduce</span><span class="p">(),</span> <span class="n">train_iter_ctx</span>
+        <span class="c1"># Only here (at the end of the iteration), compile the results into a single result dict.</span>
+        <span class="c1"># Calling compile here reduces the metrics into single values and adds throughputs to the results where applicable.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">compile</span><span class="p">(),</span> <span class="n">train_iter_ctx</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_one_offline_evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs offline evaluation step via `self.offline_evaluate()` and handling runner</span>
+<span class="sd">        failures.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The results dict from the offline evaluation call.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Restore crashed offline evaluation runners.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_time</span><span class="p">((</span><span class="n">TIMERS</span><span class="p">,</span> <span class="n">RESTORE_OFFLINE_EVAL_RUNNERS_TIMER</span><span class="p">)):</span>
+                <span class="n">restored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">restore_offline_eval_runners</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_group</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">restored</span><span class="p">:</span>
+                    <span class="c1"># Fire the callback for re-created workers.</span>
+                    <span class="n">make_callback</span><span class="p">(</span>
+                        <span class="s2">&quot;on_offline_eval_runners_recreated&quot;</span><span class="p">,</span>
+                        <span class="n">callbacks_objects</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">,</span>
+                        <span class="n">callbacks_functions</span><span class="o">=</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">callbacks_on_offline_eval_runners_recreated</span>
+                        <span class="p">),</span>
+                        <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                            <span class="n">algorithm</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                            <span class="n">env_runner_group</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_group</span><span class="p">,</span>
+                            <span class="n">env_runner_indices</span><span class="o">=</span><span class="n">restored</span><span class="p">,</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
+
+        <span class="c1"># Run one offline evaluation and time it.</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_time</span><span class="p">((</span><span class="n">TIMERS</span><span class="p">,</span> <span class="n">OFFLINE_EVALUATION_ITERATION_TIMER</span><span class="p">)):</span>
+            <span class="n">eval_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_offline</span><span class="p">()</span>
+
+        <span class="c1"># After evaluation, do a round of health check on remote eval runners to see if</span>
+        <span class="c1"># any of the failed runners are back.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Add number of healthy evaluation runners after this iteration.</span>
+            <span class="n">eval_results</span><span class="p">[</span>
+                <span class="s2">&quot;num_healthy_offline_eval_runners&quot;</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_group</span><span class="o">.</span><span class="n">num_healthy_remote_runners</span>
+            <span class="n">eval_results</span><span class="p">[</span>
+                <span class="s2">&quot;offline_runners_actor_manager_num_outstanding_async_reqs&quot;</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_group</span><span class="o">.</span><span class="n">num_in_flight_async_reqs</span>
+            <span class="n">eval_results</span><span class="p">[</span>
+                <span class="s2">&quot;num_remote_offline_eval_runners_restarts&quot;</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offline_eval_runner_group</span><span class="o">.</span><span class="n">num_remote_runner_restarts</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="n">EVALUATION_RESULTS</span><span class="p">:</span> <span class="n">eval_results</span><span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_run_one_evaluation</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -4548,10 +4897,17 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_env_runner_and_connector_v2</span><span class="p">:</span>
                 <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_time</span><span class="p">((</span><span class="n">TIMERS</span><span class="p">,</span> <span class="n">RESTORE_EVAL_ENV_RUNNERS_TIMER</span><span class="p">)):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">restore_env_runners</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="p">)</span>
+                    <span class="n">restored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">restore_env_runners</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timers</span><span class="p">[</span><span class="s2">&quot;restore_eval_workers&quot;</span><span class="p">]:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">restore_env_runners</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="p">)</span>
+                    <span class="n">restored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">restore_env_runners</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="p">)</span>
+            <span class="c1"># Fire the callback for re-created EnvRunners.</span>
+            <span class="k">if</span> <span class="n">restored</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_make_on_env_runners_recreated_callbacks</span><span class="p">(</span>
+                    <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_config</span><span class="p">,</span>
+                    <span class="n">env_runner_group</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="p">,</span>
+                    <span class="n">restored_env_runner_indices</span><span class="o">=</span><span class="n">restored</span><span class="p">,</span>
+                <span class="p">)</span>
 
         <span class="c1"># Run `self.evaluate()` only once per training iteration.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_env_runner_and_connector_v2</span><span class="p">:</span>
@@ -4559,22 +4915,6 @@ document.write(`
                 <span class="n">eval_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
                     <span class="n">parallel_train_future</span><span class="o">=</span><span class="n">parallel_train_future</span>
                 <span class="p">)</span>
-            <span class="c1"># TODO (sven): Properly support throughput/sec measurements within</span>
-            <span class="c1">#  `self.metrics.log_time()` call.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span>
-                <span class="n">key</span><span class="o">=</span><span class="p">(</span>
-                    <span class="n">EVALUATION_RESULTS</span><span class="p">,</span>
-                    <span class="n">ENV_RUNNER_RESULTS</span><span class="p">,</span>
-                    <span class="n">NUM_ENV_STEPS_SAMPLED_PER_SECOND</span><span class="p">,</span>
-                <span class="p">),</span>
-                <span class="n">value</span><span class="o">=</span><span class="p">(</span>
-                    <span class="n">eval_results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ENV_RUNNER_RESULTS</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                        <span class="n">NUM_ENV_STEPS_SAMPLED</span><span class="p">,</span> <span class="mi">0</span>
-                    <span class="p">)</span>
-                    <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">peek</span><span class="p">((</span><span class="n">TIMERS</span><span class="p">,</span> <span class="n">EVALUATION_ITERATION_TIMER</span><span class="p">))</span>
-                <span class="p">),</span>
-            <span class="p">)</span>
-
         <span class="k">else</span><span class="p">:</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timers</span><span class="p">[</span><span class="n">EVALUATION_ITERATION_TIMER</span><span class="p">]:</span>
                 <span class="n">eval_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
@@ -4636,7 +4976,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">train_results</span><span class="p">,</span> <span class="n">evaluation_results</span><span class="p">,</span> <span class="n">train_iter_ctx</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_run_offline_evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_offline_evaluation_old_api_stack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs offline evaluation via `OfflineEvaluator.estimate_on_dataset()` API.</span>
 
 <span class="sd">        This method will be used when `evaluation_dataset` is provided.</span>
@@ -4675,6 +5015,18 @@ document.write(`
         <span class="k">return</span> <span class="ow">not</span> <span class="n">run_offline_evaluation</span> <span class="ow">and</span> <span class="p">(</span>
             <span class="n">eval_config</span><span class="o">.</span><span class="n">evaluation_num_env_runners</span> <span class="o">&gt;</span> <span class="mi">0</span>
             <span class="ow">or</span> <span class="n">eval_config</span><span class="o">.</span><span class="n">evaluation_interval</span>
+        <span class="p">)</span>
+
+    <span class="c1"># TODO (simon, sven): Flexibilize the different env/offline components and move</span>
+    <span class="c1"># away from the currently hard-coded: (1) eval `EnvRunnerGroup`, (2) OfflineData</span>
+    <span class="c1"># and (3) `OfflineEvaluationRunnerGroup`.</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_should_create_offline_evaluation_runners</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">eval_config</span><span class="p">:</span> <span class="s2">&quot;AlgorithmConfig&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determines whether we need to create offline evaluation workers.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">eval_config</span><span class="o">.</span><span class="n">offline_evaluation_interval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">or</span> <span class="n">eval_config</span><span class="o">.</span><span class="n">num_offline_eval_runners</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_compile_iteration_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">train_results</span><span class="p">,</span> <span class="n">eval_results</span><span class="p">):</span>
@@ -4721,26 +5073,37 @@ document.write(`
                 <span class="p">),</span>
             <span class="p">}</span>
 
-        <span class="c1"># Compile all throughput stats.</span>
-        <span class="n">throughputs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="n">results</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">_reduce</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">Stats</span><span class="p">):</span>
-                <span class="n">ret</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span>
-                <span class="n">_throughput</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="n">throughput</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">_throughput</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">_curr</span> <span class="o">=</span> <span class="n">throughputs</span>
-                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">p</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-                        <span class="n">_curr</span> <span class="o">=</span> <span class="n">_curr</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">{})</span>
-                    <span class="n">_curr</span><span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_throughput&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_throughput</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">ret</span> <span class="o">=</span> <span class="n">s</span>
-            <span class="k">return</span> <span class="n">ret</span>
-
-        <span class="c1"># Resolve all `Stats` leafs by peeking (get their reduced values).</span>
-        <span class="n">all_results</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">map_structure_with_path</span><span class="p">(</span><span class="n">_reduce</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
-        <span class="n">deep_update</span><span class="p">(</span><span class="n">all_results</span><span class="p">,</span> <span class="n">throughputs</span><span class="p">,</span> <span class="n">new_keys_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">all_results</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_on_env_runners_recreated_callbacks</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">,</span>
+        <span class="n">env_runner_group</span><span class="p">,</span>
+        <span class="n">restored_env_runner_indices</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">make_callback</span><span class="p">(</span>
+            <span class="s2">&quot;on_env_runners_recreated&quot;</span><span class="p">,</span>
+            <span class="n">callbacks_objects</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">,</span>
+            <span class="n">callbacks_functions</span><span class="o">=</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">callbacks_on_env_runners_recreated</span><span class="p">),</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                <span class="n">algorithm</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">env_runner_group</span><span class="o">=</span><span class="n">env_runner_group</span><span class="p">,</span>
+                <span class="n">env_runner_indices</span><span class="o">=</span><span class="n">restored_env_runner_indices</span><span class="p">,</span>
+                <span class="n">is_evaluation</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">in_evaluation</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="c1"># TODO (sven): Deprecate this call.</span>
+        <span class="n">make_callback</span><span class="p">(</span>
+            <span class="s2">&quot;on_workers_recreated&quot;</span><span class="p">,</span>
+            <span class="n">callbacks_objects</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                <span class="n">algorithm</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">worker_set</span><span class="o">=</span><span class="n">env_runner_group</span><span class="p">,</span>
+                <span class="n">worker_ids</span><span class="o">=</span><span class="n">restored_env_runner_indices</span><span class="p">,</span>
+                <span class="n">is_evaluation</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">in_evaluation</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_rl_module_and_learner</span><span class="p">:</span>
@@ -4757,12 +5120,16 @@ document.write(`
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">env_runner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The local EnvRunner instance within the algo&#39;s EnvRunnerGroup.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span>
+        <span class="k">return</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">eval_env_runner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The local EnvRunner instance within the algo&#39;s evaluation EnvRunnerGroup.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_env_runner_group</span><span class="o">.</span><span class="n">local_env_runner</span>
+        <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_record_usage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Record the framework and algorithm used.</span>
@@ -5102,7 +5469,14 @@ document.write(`
             <span class="k">with</span> <span class="n">TrainIterCtx</span><span class="p">(</span><span class="n">algo</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span> <span class="k">as</span> <span class="n">train_iter_ctx</span><span class="p">:</span>
                 <span class="k">while</span> <span class="ow">not</span> <span class="n">train_iter_ctx</span><span class="o">.</span><span class="n">should_stop</span><span class="p">(</span><span class="n">training_step_results</span><span class="p">):</span>
                     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timers</span><span class="p">[</span><span class="s2">&quot;restore_workers&quot;</span><span class="p">]:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">restore_env_runners</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="p">)</span>
+                        <span class="n">restored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">restore_env_runners</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="p">)</span>
+                        <span class="c1"># Fire the callback for re-created EnvRunners.</span>
+                        <span class="k">if</span> <span class="n">restored</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_make_on_env_runners_recreated_callbacks</span><span class="p">(</span>
+                                <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+                                <span class="n">env_runner_group</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env_runner_group</span><span class="p">,</span>
+                                <span class="n">restored_env_runner_indices</span><span class="o">=</span><span class="n">restored</span><span class="p">,</span>
+                            <span class="p">)</span>
 
                     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timers</span><span class="p">[</span><span class="n">TRAINING_STEP_TIMER</span><span class="p">]:</span>
                         <span class="n">training_step_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">training_step</span><span class="p">()</span>
@@ -5433,13 +5807,13 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">actions</span>
 
-    <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Algorithm.restore_env_runners&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">new</span><span class="o">=</span><span class="s2">&quot;Algorithm.restore_env_runners&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">restore_workers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">restore_env_runners</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">pass</span>
 
     <span class="nd">@Deprecated</span><span class="p">(</span>
         <span class="n">new</span><span class="o">=</span><span class="s2">&quot;Algorithm.env_runner_group&quot;</span><span class="p">,</span>
-        <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">workers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -5447,7 +5821,7 @@ document.write(`
 
     <span class="nd">@Deprecated</span><span class="p">(</span>
         <span class="n">new</span><span class="o">=</span><span class="s2">&quot;Algorithm.eval_env_runner_group&quot;</span><span class="p">,</span>
-        <span class="n">error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">evaluation_workers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -5578,6 +5952,7 @@ document.write(`
         <span class="n">min_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">min_time_s_per_iteration</span>
         <span class="n">min_sample_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">min_sample_timesteps_per_iteration</span>
         <span class="n">min_train_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algo</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">min_train_timesteps_per_iteration</span>
+
         <span class="c1"># Repeat if not enough time has passed or if not enough</span>
         <span class="c1"># env|train timesteps have been processed (or these min</span>
         <span class="c1"># values are not provided by the user).</span>

@@ -36,7 +36,7 @@
     <link rel="stylesheet" type="text/css" href="_static/css/csat.css?v=c8f39c76" />
     <link rel="stylesheet" type="text/css" href="_static/css/assistant.css?v=d345c55e" />
     <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
-    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=633d7681" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=4676c12b" />
     <link rel="stylesheet" type="text/css" href="_static/docsearch.css?v=45fb5152" />
     <link rel="stylesheet" type="text/css" href="_static/pydata-docsearch-custom.css?v=7fb92720" />
   
@@ -184,6 +184,12 @@ both in the usual template (layout.html) as well as (index.html). -->
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+
+  <div class="bd-header-announcement container-fluid bd-header-announcement">
+    <div class="bd-header-announcement__content">Try Ray with $100 credit — <a target="_blank" href="https://console.anyscale.com/register/ha?render_flow=ray&utm_source=ray_docs&utm_medium=docs&utm_campaign=banner">Start now</a>.</div>
+  </div>
+
   
     <nav class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
@@ -346,15 +352,6 @@ document.write(`
 `);
 </script></div>
       
-        <div class="navbar-item"><a
-  id="try-anyscale-href"
-  href="https://www.anyscale.com/ray-on-anyscale/?utm_source=ray_docs&utm_medium=docs&utm_campaign=navbar"
->
-  <div id="try-anyscale-text">
-    <span>Try Ray on Anyscale</span>
-  </div>
-</a></div>
-      
     </div>
     
   </div>
@@ -511,15 +508,6 @@ document.write(`
 `);
 </script></div>
         
-          <div class="navbar-item"><a
-  id="try-anyscale-href"
-  href="https://www.anyscale.com/ray-on-anyscale/?utm_source=ray_docs&utm_medium=docs&utm_campaign=navbar"
->
-  <div id="try-anyscale-text">
-    <span>Try Ray on Anyscale</span>
-  </div>
-</a></div>
-        
       </div>
     
   </div>
@@ -535,17 +523,32 @@ document.write(`
 
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="ray-overview/examples.html">Example Gallery</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ray-overview/ray-libraries.html">Ecosystem</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="ray-core/walkthrough.html">Ray Core</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="ray-core/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="ray-core/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/tasks.html">Tasks</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="ray-core/tasks/nested-tasks.html">Nested Remote Functions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="ray-core/tasks/generators.html">Dynamic generators</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="ray-overview/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="ray-overview/examples/entity-recognition-with-llms/README.html">Entity Recognition with LLMs</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="ray-overview/examples/e2e-audio/index.html">End-to-end audio</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="ray-overview/examples/e2e-audio/README.html">Audio data curation with Ray</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ray-overview/examples/e2e-audio/e2e_audio/curation.html">Audio curation with offline batch inference</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/actors.html">Actors</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="ray-overview/examples/e2e-xgboost/index.html">End-to-end distributed XGBoost</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="ray-overview/examples/e2e-xgboost/README.html">Overview</a></li>
+
+<li class="toctree-l3"><a class="reference internal" href="ray-overview/examples/e2e-xgboost/notebooks/01-Distributed_Training.html">Distributed training of an XGBoost model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ray-overview/examples/e2e-xgboost/notebooks/02-Validation.html">Model validation using offline batch inference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ray-overview/examples/e2e-xgboost/notebooks/03-Serving.html">Scalable online XGBoost inference with Ray Serve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ray-overview/ray-libraries.html">Ecosystem</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="ray-core/walkthrough.html">Ray Core</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="ray-core/key-concepts.html">Key Concepts</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="ray-core/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/tasks.html">Tasks</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="ray-core/tasks/nested-tasks.html">Nested Remote Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/actors.html">Actors</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/actors/named-actors.html">Named Actors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/actors/terminating-actors.html">Terminating Actors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/actors/async_api.html">AsyncIO / Concurrency for Actors</a></li>
@@ -555,13 +558,13 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="ray-core/actors/task-orders.html">Actor Task Execution Order</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/objects.html">Objects</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/objects.html">Objects</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/objects/serialization.html">Serialization</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/objects/object-spilling.html">Object Spilling</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ray-core/handling-dependencies.html">Environment Dependencies</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/scheduling/index.html">Scheduling</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/scheduling/index.html">Scheduling</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/scheduling/resources.html">Resources</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/scheduling/accelerators.html">Accelerator Support</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/scheduling/placement-group.html">Placement Groups</a></li>
@@ -569,7 +572,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="ray-core/scheduling/ray-oom-prevention.html">Out-Of-Memory Prevention</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/fault-tolerance.html">Fault Tolerance</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/fault-tolerance.html">Fault tolerance</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/fault_tolerance/tasks.html">Task Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/fault_tolerance/actors.html">Actor Fault Tolerance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/fault_tolerance/objects.html">Object Fault Tolerance</a></li>
@@ -578,7 +581,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="ray-core/fault_tolerance/head-ha.html">Head High-Availability Feature</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/patterns/index.html">Design Patterns &amp; Anti-patterns</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/patterns/nested-tasks.html">Pattern: Using nested tasks to achieve nested parallelism</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/patterns/generators.html">Pattern: Using generators to reduce heap memory usage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/patterns/limit-pending-tasks.html">Pattern: Using ray.wait to limit the number of pending tasks</a></li>
@@ -601,7 +604,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="ray-core/patterns/fork-new-processes.html">Anti-pattern: Forking new processes in application code</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/compiled-graph/ray-compiled-graph.html">Ray Compiled Graph (beta)</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/compiled-graph/quickstart.html">Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/compiled-graph/profiling.html">Profiling</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/compiled-graph/overlap.html">Experimental: Overlapping communication and computation</a></li>
@@ -609,12 +612,12 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="ray-core/compiled-graph/compiled-graph-api.html">Compiled Graph API</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/advanced-topics.html">Advanced Topics</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ray-core/advanced-topics.html">Advanced topics</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/tips-for-first-time.html">Tips for first-time users</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/starting-ray.html">Starting Ray</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/ray-generator.html">Ray Generators</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/namespaces.html">Using Namespaces</a></li>
-<li class="toctree-l4"><a class="reference internal" href="ray-core/cross-language.html">Cross-Language Programming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ray-core/cross-language.html">Cross-language programming</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/using-ray-with-jupyter.html">Working with Jupyter Notebooks &amp; JupyterLab</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/ray-dag.html">Lazy Computation Graphs with the Ray DAG API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-core/miscellaneous.html">Miscellaneous Topics</a></li>
@@ -624,7 +627,7 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="ray-core/examples/overview.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="ray-core/examples/overview.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="ray-core/examples/automl_for_time_series.html">Simple AutoML for time series with Ray Core</a></li>
 
 <li class="toctree-l3"><a class="reference internal" href="ray-core/examples/batch_prediction.html">Batch Prediction with Ray Core</a></li>
@@ -638,7 +641,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="ray-core/examples/web-crawler.html">Speed up your web crawler by parallelizing it with Ray</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="ray-core/api/index.html">Ray Core API</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="ray-core/api/index.html">Ray Core API</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="ray-core/api/core.html">Core API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ray-core/api/scheduling.html">Scheduling API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ray-core/api/runtime-env.html">Runtime Env API</a></li>
@@ -651,14 +654,15 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="data/data.html">Ray Data</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="data/data.html">Ray Data</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="data/quickstart.html">Ray Data Quickstart</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="data/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="data/user-guide.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="data/loading-data.html">Loading Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data/inspecting-data.html">Inspecting Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data/transforming-data.html">Transforming Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data/iterating-over-data.html">Iterating over Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data/joining-data.html">Joining datasets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data/shuffling-data.html">Shuffling Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data/saving-data.html">Saving Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data/working-with-images.html">Working with Images</a></li>
@@ -674,7 +678,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data/examples.html">Examples</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="data/api/api.html">Ray Data API</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="data/api/api.html">Ray Data API</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="data/api/input_output.html">Input/Output</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data/api/dataset.html">Dataset API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data/api/data_iterator.html">DataIterator API</a></li>
@@ -691,12 +695,13 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="data/data-internals.html">Ray Data Internals</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="train/train.html">Ray Train</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="train/train.html">Ray Train</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="train/overview.html">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="train/getting-started-pytorch.html">PyTorch Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="train/getting-started-pytorch-lightning.html">PyTorch Lightning Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="train/getting-started-transformers.html">Hugging Face Transformers Guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="train/more-frameworks.html">More Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="train/getting-started-xgboost.html">XGBoost Guide</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="train/more-frameworks.html">More Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-21"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="train/huggingface-accelerate.html">Hugging Face Accelerate Guide</a></li>
 <li class="toctree-l3"><a class="reference internal" href="train/deepspeed.html">DeepSpeed Guide</a></li>
 <li class="toctree-l3"><a class="reference internal" href="train/distributed-tensorflow-keras.html">TensorFlow and Keras Guide</a></li>
@@ -704,7 +709,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="train/horovod.html">Horovod Guide</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="train/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="train/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-22"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="train/user-guides/data-loading-preprocessing.html">Data Loading and Preprocessing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="train/user-guides/using-gpus.html">Configuring Scale and GPUs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="train/user-guides/persistent-storage.html">Configuring Persistent Storage</a></li>
@@ -722,23 +727,22 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="train/api/api.html">Ray Train API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="tune/index.html">Ray Tune</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tune/index.html">Ray Tune</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="tune/getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tune/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="tune/tutorials/overview.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-21"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="tune/tutorials/overview.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="tune/tutorials/tune-run.html">Running Basic Experiments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tune/tutorials/tune-output.html">Logging and Outputs in Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tune/tutorials/tune-resources.html">Setting Trial Resources</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tune/tutorials/tune-search-spaces.html">Using Search Spaces</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tune/tutorials/tune-stopping.html">How to Define Stopping Criteria for a Ray Tune Experiment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tune/tutorials/tune-trial-checkpoints.html">How to Save and Load Trial Checkpoints</a></li>
-
 <li class="toctree-l3"><a class="reference internal" href="tune/tutorials/tune-storage.html">How to Configure Persistent Storage in Ray Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tune/tutorials/tune-fault-tolerance.html">How to Enable Fault Tolerance in Ray Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tune/tutorials/tune-metrics.html">Using Callbacks and Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tune/tutorials/tune_get_data_in_and_out.html">Getting Data in and out of Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tune/examples/tune_analyze_results.html">Analyzing Tune Experiment Results</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="tune/examples/pbt_guide.html">A Guide to Population Based Training with Tune</a><input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-22"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="tune/examples/pbt_guide.html">A Guide to Population Based Training with Tune</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="tune/examples/pbt_visualization/pbt_visualization.html">Visualizing and Understanding PBT</a></li>
 </ul>
 </li>
@@ -747,36 +751,25 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="tune/tutorials/tune-scalability.html">Scalability Benchmarks</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="tune/examples/ml-frameworks.html">Examples using Ray Tune with ML Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/tune-xgboost.html">XGBoost Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/lightgbm_example.html">LightGBM Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/pbt_transformers.html">Hugging Face Transformers Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/tune_mnist_keras.html">Keras Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/horovod_simple.html">Horovod Example</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="tune/examples/experiment-tracking.html">Tune Experiment Tracking Examples</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/tune-wandb.html">Weights &amp; Biases Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/tune-mlflow.html">MLflow Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/tune-aim.html">Aim Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/tune-comet.html">Comet Example</a></li>
-</ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="tune/examples/hpo-frameworks.html">Tune Hyperparameter Optimization Framework Examples</a><input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-26"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/ax_example.html">Ax Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/hyperopt_example.html">HyperOpt Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/bayesopt_example.html">Bayesopt Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/bohb_example.html">BOHB Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/nevergrad_example.html">Nevergrad Example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tune/examples/optuna_example.html">Optuna Example</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="tune/examples/other-examples.html">Other Examples</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tune/examples/exercises.html">Exercises</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-26"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/tune-xgboost.html">XGBoost Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/lightgbm_example.html">LightGBM Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/pbt_transformers.html">Hugging Face Transformers Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/pbt_ppo_example.html">Ray RLlib Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/tune_mnist_keras.html">Keras Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/horovod_simple.html">Horovod Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/tune-wandb.html">Weights &amp; Biases Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/tune-mlflow.html">MLflow Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/tune-aim.html">Aim Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/tune-comet.html">Comet Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/ax_example.html">Ax Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/hyperopt_example.html">HyperOpt Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/bayesopt_example.html">Bayesopt Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/bohb_example.html">BOHB Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/nevergrad_example.html">Nevergrad Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tune/examples/optuna_example.html">Optuna Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tune/faq.html">Ray Tune FAQ</a></li>
@@ -1046,7 +1039,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.html">ray.rllib.utils.schedules.scheduler.Scheduler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rllib/package_ref/doc/ray.rllib.utils.schedules.scheduler.Scheduler.validate.html">ray.rllib.utils.schedules.scheduler.Scheduler.validate</a></li>
@@ -1107,6 +1100,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="ray-more-libs/raydp.html">Using Spark on Ray (RayDP)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ray-more-libs/mars-on-ray.html">Using Mars on Ray</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ray-more-libs/modin/index.html">Using Pandas on Ray (Modin)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ray-more-libs/data_juicer_distributed_data_processing.html">Distributed Data Processing in Data-Juicer</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="workflows/index.html">Ray Workflows (Deprecated)</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="workflows/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="workflows/basics.html">Getting Started</a></li>
@@ -1128,6 +1122,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="cluster/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="cluster/kubernetes/getting-started/kuberay-operator-installation.html">KubeRay Operator Installation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cluster/kubernetes/getting-started/raycluster-quick-start.html">RayCluster Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cluster/kubernetes/getting-started/rayjob-quick-start.html">RayJob Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cluster/kubernetes/getting-started/rayservice-quick-start.html">RayService Quickstart</a></li>
@@ -1135,10 +1130,12 @@ document.write(`
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="cluster/kubernetes/user-guides/rayservice.html">Deploy Ray Serve Apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cluster/kubernetes/user-guides/rayservice-no-ray-serve-replica.html">RayService worker Pods aren’t ready</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cluster/kubernetes/user-guides/rayservice-high-availability.html">RayService high availability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cluster/kubernetes/user-guides/observability.html">KubeRay Observability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cluster/kubernetes/user-guides/upgrade-guide.html">KubeRay upgrade guide</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cluster/kubernetes/user-guides/k8s-cluster-setup.html">Managed Kubernetes services</a></li>
+
 
 
 
@@ -1283,7 +1280,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="ray-observability/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="ray-observability/user-guides/debug-apps/general-debugging.html">General Debugging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ray-observability/user-guides/debug-apps/general-debugging.html">Common Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-observability/user-guides/debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-observability/user-guides/debug-apps/debug-hangs.html">Debugging Hangs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ray-observability/user-guides/debug-apps/debug-failures.html">Debugging Failures</a></li>
@@ -1555,6 +1552,13 @@ document.write(`
         <li><a href="cluster/cli.html#cmdoption-ray-submit-disable-usage-stats">ray-submit command line option</a>
 </li>
         <li><a href="cluster/cli.html#cmdoption-ray-up-disable-usage-stats">ray-up command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --enable-resource-isolation
+
+      <ul>
+        <li><a href="cluster/cli.html#cmdoption-ray-start-enable-resource-isolation">ray-start command line option</a>
 </li>
       </ul></li>
       <li>
@@ -1936,8 +1940,6 @@ document.write(`
         <li><a href="cluster/cli.html#cmdoption-ray-start-node-manager-port">ray-start command line option</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     --non-blocking
 
@@ -1945,6 +1947,8 @@ document.write(`
         <li><a href="serve/api/index.html#cmdoption-serve-run-blocking">serve-run command line option</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     --num-cpus
 
@@ -1971,6 +1975,13 @@ document.write(`
 
       <ul>
         <li><a href="cluster/cli.html#cmdoption-ray-start-object-manager-port">ray-start command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --object-spilling-directory
+
+      <ul>
+        <li><a href="cluster/cli.html#cmdoption-ray-start-object-spilling-directory">ray-start command line option</a>
 </li>
       </ul></li>
       <li>
@@ -2182,6 +2193,20 @@ document.write(`
 
       <ul>
         <li><a href="cluster/running-applications/job-submission/cli.html#cmdoption-ray-job-submit-submission-id">ray-job-submit command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --system-reserved-cpu
+
+      <ul>
+        <li><a href="cluster/cli.html#cmdoption-ray-start-system-reserved-cpu">ray-start command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --system-reserved-memory
+
+      <ul>
+        <li><a href="cluster/cli.html#cmdoption-ray-start-system-reserved-memory">ray-start command line option</a>
 </li>
       </ul></li>
       <li>
@@ -2493,6 +2518,10 @@ document.write(`
       <li><a href="ray-core/api/doc/ray.actor.ActorClass.__init__.html#ray.actor.ActorClass.__init__">__init__() (ray.actor.ActorClass method)</a>
 
       <ul>
+        <li><a href="ray-core/api/doc/ray.actor.ActorHandle.__init__.html#ray.actor.ActorHandle.__init__">(ray.actor.ActorHandle method)</a>
+</li>
+        <li><a href="ray-core/api/doc/ray.actor.ActorMethod.__init__.html#ray.actor.ActorMethod.__init__">(ray.actor.ActorMethod method)</a>
+</li>
         <li><a href="ray-core/compiled-graph/doc/ray.dag.input_node.InputNode.__init__.html#ray.dag.input_node.InputNode.__init__">(ray.dag.input_node.InputNode method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.block.BlockAccessor.__init__.html#ray.data.block.BlockAccessor.__init__">(ray.data.block.BlockAccessor method)</a>
@@ -2599,6 +2628,10 @@ document.write(`
 </li>
         <li><a href="serve/api/doc/ray.serve.schema.ServeInstanceDetails.__init__.html#ray.serve.schema.ServeInstanceDetails.__init__">(ray.serve.schema.ServeInstanceDetails method)</a>
 </li>
+        <li><a href="serve/api/doc/ray.serve.schema.Target.__init__.html#ray.serve.schema.Target.__init__">(ray.serve.schema.Target method)</a>
+</li>
+        <li><a href="serve/api/doc/ray.serve.schema.TargetGroup.__init__.html#ray.serve.schema.TargetGroup.__init__">(ray.serve.schema.TargetGroup method)</a>
+</li>
         <li><a href="train/api/doc/ray.train.Checkpoint.__init__.html#ray.train.Checkpoint.__init__">(ray.train.Checkpoint method)</a>
 </li>
         <li><a href="train/api/doc/ray.train.context.TrainContext.__init__.html#ray.train.context.TrainContext.__init__">(ray.train.context.TrainContext method)</a>
@@ -2702,6 +2735,8 @@ document.write(`
 </li>
       <li><a href="ray-core/api/doc/ray.actor.ActorHandle.html#ray.actor.ActorHandle._ray_method_max_task_retries">_ray_method_max_task_retries (ray.actor.ActorHandle attribute)</a>
 </li>
+      <li><a href="ray-core/api/doc/ray.actor.ActorHandle.html#ray.actor.ActorHandle._ray_method_name_to_tensor_transport">_ray_method_name_to_tensor_transport (ray.actor.ActorHandle attribute)</a>
+</li>
       <li><a href="ray-core/api/doc/ray.actor.ActorHandle.html#ray.actor.ActorHandle._ray_method_num_returns">_ray_method_num_returns (ray.actor.ActorHandle attribute)</a>
 </li>
       <li><a href="ray-core/api/doc/ray.actor.ActorHandle.html#ray.actor.ActorHandle._ray_method_retry_exceptions">_ray_method_retry_exceptions (ray.actor.ActorHandle attribute)</a>
@@ -2730,6 +2765,8 @@ document.write(`
 </li>
       <li><a href="ray-core/api/doc/ray.actor.ActorMethod.html#ray.actor.ActorMethod._signature">_signature (ray.actor.ActorMethod attribute)</a>
 </li>
+      <li><a href="ray-core/api/doc/ray.actor.ActorMethod.html#ray.actor.ActorMethod._tensor_transport">_tensor_transport (ray.actor.ActorMethod attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -2750,6 +2787,8 @@ document.write(`
       </ul></li>
       <li><a href="ray-references/glossary.html#term-Action-space"><strong>Action space</strong></a>
 </li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModule.html#ray.rllib.core.rl_module.rl_module.RLModule.action_dist_cls">action_dist_cls (ray.rllib.core.rl_module.rl_module.RLModule attribute)</a>
+</li>
       <li><a href="rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.action_space.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.action_space">action_space (ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec attribute)</a>
 
       <ul>
@@ -2765,8 +2804,6 @@ document.write(`
       <li><a href="rllib/package_ref/env/env/ray.rllib.env.utils.external_env_protocol.RLlink.ACTION_SPACE.html#ray.rllib.env.utils.external_env_protocol.RLlink.ACTION_SPACE">ACTION_SPACE (ray.rllib.env.utils.external_env_protocol.RLlink attribute)</a>
 </li>
       <li><a href="rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.actions.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.actions">actions (ray.rllib.env.single_agent_episode.SingleAgentEpisode attribute)</a>
-</li>
-      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.activate_tensor_mode.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.activate_tensor_mode">activate_tensor_mode() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
 </li>
       <li><a href="ray-references/glossary.html#term-Actor"><strong>Actor</strong></a>
 </li>
@@ -2921,13 +2958,11 @@ document.write(`
       <ul>
         <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.CompletionRequest.html#ray.serve.llm.openai_api_models.CompletionRequest.add_special_tokens">(ray.serve.llm.openai_api_models.CompletionRequest attribute)</a>
 </li>
-      </ul></li>
-      <li><a href="rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.add_temporary_timestep_data.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.add_temporary_timestep_data">add_temporary_timestep_data() (ray.rllib.env.multi_agent_episode.MultiAgentEpisode method)</a>
-
-      <ul>
-        <li><a href="rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.add_temporary_timestep_data.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.add_temporary_timestep_data">(ray.rllib.env.single_agent_episode.SingleAgentEpisode method)</a>
+        <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.EmbeddingRequest.html#ray.serve.llm.openai_api_models.EmbeddingRequest.add_special_tokens">(ray.serve.llm.openai_api_models.EmbeddingRequest attribute)</a>
 </li>
       </ul></li>
+      <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.EmbeddingRequest.html#ray.serve.llm.openai_api_models.EmbeddingRequest.additional_data">additional_data (ray.serve.llm.openai_api_models.EmbeddingRequest attribute)</a>
+</li>
       <li><a href="ray-core/api/doc/ray.LoggingConfig.additional_log_standard_attrs.html#ray.LoggingConfig.additional_log_standard_attrs">additional_log_standard_attrs (ray.LoggingConfig attribute)</a>
 
       <ul>
@@ -2948,10 +2983,10 @@ document.write(`
       </ul></li>
       <li><a href="rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.after_gradient_based_update.html#ray.rllib.core.learner.learner.Learner.after_gradient_based_update">after_gradient_based_update() (ray.rllib.core.learner.learner.Learner method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="train/api/doc/ray.train.UserCallback.after_report.html#ray.train.UserCallback.after_report">after_report() (ray.train.UserCallback method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ray-references/glossary.html#term-Agent"><strong>Agent</strong></a>
 </li>
       <li><a href="rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.agent_episode_ids.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.agent_episode_ids">agent_episode_ids (ray.rllib.env.multi_agent_episode.MultiAgentEpisode property)</a>
@@ -2976,6 +3011,8 @@ document.write(`
 
       <ul>
         <li><a href="data/api/doc/ray.data.grouped_data.GroupedData.aggregate.html#ray.data.grouped_data.GroupedData.aggregate">(ray.data.grouped_data.GroupedData method)</a>
+</li>
+        <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate">(ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
 </li>
       </ul></li>
       <li><a href="data/api/doc/ray.data.aggregate.AggregateFnV2.aggregate_block.html#ray.data.aggregate.AggregateFnV2.aggregate_block">aggregate_block() (ray.data.aggregate.AggregateFnV2 method)</a>
@@ -3429,6 +3466,8 @@ document.write(`
         <li><a href="serve/api/doc/ray.serve.schema.ProxyStatus.center.html#ray.serve.schema.ProxyStatus.center">(ray.serve.schema.ProxyStatus method)</a>
 </li>
       </ul></li>
+      <li><a href="data/api/doc/ray.data.preprocessors.Chain.html#ray.data.preprocessors.Chain">Chain (class in ray.data.preprocessors)</a>
+</li>
       <li><a href="serve/api/doc/ray.serve.llm.LLMServer.chat.html#ray.serve.llm.LLMServer.chat">chat() (ray.serve.llm.LLMServer method)</a>
 </li>
       <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.ChatCompletionRequest.html#ray.serve.llm.openai_api_models.ChatCompletionRequest.chat_template">chat_template (ray.serve.llm.openai_api_models.ChatCompletionRequest attribute)</a>
@@ -3623,8 +3662,6 @@ document.write(`
         <li><a href="cluster/cli.html#cmdoption-ray-exec-arg-CMD">ray-exec command line option</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.ErrorResponse.html#ray.serve.llm.openai_api_models.ErrorResponse.code">code (ray.serve.llm.openai_api_models.ErrorResponse attribute)</a>
 </li>
       <li><a href="serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.code.html#ray.serve.grpc_util.RayServegRPCContext.code">code() (ray.serve.grpc_util.RayServegRPCContext method)</a>
@@ -3633,11 +3670,15 @@ document.write(`
 </li>
       <li><a href="data/api/doc/ray.data.Dataset.columns.html#ray.data.Dataset.columns">columns() (ray.data.Dataset method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data/api/doc/ray.data.aggregate.AggregateFnV2.combine.html#ray.data.aggregate.AggregateFnV2.combine">combine() (ray.data.aggregate.AggregateFnV2 method)</a>
 </li>
       <li><a href="tune/api/doc/ray.tune.stopper.CombinedStopper.html#ray.tune.stopper.CombinedStopper">CombinedStopper (class in ray.tune.stopper)</a>
 </li>
       <li><a href="tune/api/doc/ray.air.integrations.comet.CometLoggerCallback.html#ray.air.integrations.comet.CometLoggerCallback">CometLoggerCallback (class in ray.air.integrations.comet)</a>
+</li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.compile.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.compile">compile() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
 </li>
       <li><a href="ray-core/compiled-graph/doc/ray.experimental.compiled_dag_ref.CompiledDAGRef.html#ray.experimental.compiled_dag_ref.CompiledDAGRef">CompiledDAGRef (class in ray.experimental.compiled_dag_ref)</a>
 </li>
@@ -3733,6 +3774,10 @@ document.write(`
 </li>
         <li><a href="serve/api/doc/ray.serve.schema.ServeInstanceDetails.construct.html#ray.serve.schema.ServeInstanceDetails.construct">(ray.serve.schema.ServeInstanceDetails class method)</a>
 </li>
+        <li><a href="serve/api/doc/ray.serve.schema.Target.construct.html#ray.serve.schema.Target.construct">(ray.serve.schema.Target class method)</a>
+</li>
+        <li><a href="serve/api/doc/ray.serve.schema.TargetGroup.construct.html#ray.serve.schema.TargetGroup.construct">(ray.serve.schema.TargetGroup class method)</a>
+</li>
       </ul></li>
       <li><a href="tune/api/doc/ray.tune.schedulers.FIFOScheduler.CONTINUE.html#ray.tune.schedulers.FIFOScheduler.CONTINUE">CONTINUE (ray.tune.schedulers.FIFOScheduler attribute)</a>
 
@@ -3815,6 +3860,10 @@ document.write(`
 </li>
         <li><a href="serve/api/doc/ray.serve.schema.ServeInstanceDetails.copy.html#ray.serve.schema.ServeInstanceDetails.copy">(ray.serve.schema.ServeInstanceDetails method)</a>
 </li>
+        <li><a href="serve/api/doc/ray.serve.schema.Target.copy.html#ray.serve.schema.Target.copy">(ray.serve.schema.Target method)</a>
+</li>
+        <li><a href="serve/api/doc/ray.serve.schema.TargetGroup.copy.html#ray.serve.schema.TargetGroup.copy">(ray.serve.schema.TargetGroup method)</a>
+</li>
       </ul></li>
       <li><a href="data/api/doc/ray.data.aggregate.Count.html#ray.data.aggregate.Count">Count (class in ray.data.aggregate)</a>
 </li>
@@ -3846,6 +3895,8 @@ document.write(`
         <li><a href="ray-core/api/doc/ray.util.metrics.Counter.html#ray.util.metrics.Counter">(class in ray.util.metrics)</a>
 </li>
       </ul></li>
+      <li><a href="data/api/doc/ray.data.preprocessors.CountVectorizer.html#ray.data.preprocessors.CountVectorizer">CountVectorizer (class in ray.data.preprocessors)</a>
+</li>
       <li><a href="data/api/doc/ray.data.block.BlockExecStats.html#ray.data.block.BlockExecStats.cpu_time_s">cpu_time_s (ray.data.block.BlockExecStats attribute)</a>
 </li>
       <li><a href="rllib/rllib-algorithms.html#ray.rllib.algorithms.cql.cql.CQLConfig">CQLConfig (class in ray.rllib.algorithms.cql.cql)</a>
@@ -3877,6 +3928,8 @@ document.write(`
 </li>
         <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.CompletionStreamResponse.html#ray.serve.llm.openai_api_models.CompletionStreamResponse.created">(ray.serve.llm.openai_api_models.CompletionStreamResponse attribute)</a>
 </li>
+        <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.EmbeddingResponse.html#ray.serve.llm.openai_api_models.EmbeddingResponse.created">(ray.serve.llm.openai_api_models.EmbeddingResponse attribute)</a>
+</li>
       </ul></li>
       <li><a href="ray-observability/reference/doc/ray.util.state.common.RuntimeEnvState.html#ray.util.state.common.RuntimeEnvState.creation_time_ms">creation_time_ms (ray.util.state.common.RuntimeEnvState attribute)</a>
 
@@ -3894,6 +3947,12 @@ document.write(`
 </li>
       <li><a href="ray-core/api/doc/ray.runtime_context.RuntimeContext.current_placement_group_id.html#ray.runtime_context.RuntimeContext.current_placement_group_id">current_placement_group_id (ray.runtime_context.RuntimeContext property)</a>
 </li>
+      <li><a href="rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.custom_data.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.custom_data">custom_data (ray.rllib.env.multi_agent_episode.MultiAgentEpisode property)</a>
+
+      <ul>
+        <li><a href="rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.custom_data.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.custom_data">(ray.rllib.env.single_agent_episode.SingleAgentEpisode property)</a>
+</li>
+      </ul></li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.custom_resources_per_worker.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.custom_resources_per_worker">custom_resources_per_worker (ray.rllib.algorithms.algorithm_config.AlgorithmConfig property)</a>
 </li>
       <li><a href="data/api/doc/ray.data.preprocessors.CustomKBinsDiscretizer.html#ray.data.preprocessors.CustomKBinsDiscretizer">CustomKBinsDiscretizer (class in ray.data.preprocessors)</a>
@@ -3911,6 +3970,8 @@ document.write(`
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ray-core/compiled-graph/doc/ray.dag.context.DAGContext.html#ray.dag.context.DAGContext">DAGContext (class in ray.dag.context)</a>
+</li>
+      <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.EmbeddingResponse.html#ray.serve.llm.openai_api_models.EmbeddingResponse.data">data (ray.serve.llm.openai_api_models.EmbeddingResponse attribute)</a>
 </li>
       <li><a href="data/api/doc/ray.data.llm.Processor.DATA_COLUMN.html#ray.data.llm.Processor.DATA_COLUMN">DATA_COLUMN (ray.data.llm.Processor attribute)</a>
 </li>
@@ -3937,8 +3998,6 @@ document.write(`
       <li><a href="data/api/doc/ray.data.Datasink.html#ray.data.Datasink">Datasink (class in ray.data)</a>
 </li>
       <li><a href="data/api/doc/ray.data.Datasource.html#ray.data.Datasource">Datasource (class in ray.data)</a>
-</li>
-      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.deactivate_tensor_mode.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.deactivate_tensor_mode">deactivate_tensor_mode() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
 </li>
       <li><a href="ray-observability/reference/doc/ray.util.state.common.ActorState.html#ray.util.state.common.ActorState.death_cause">death_cause (ray.util.state.common.ActorState attribute)</a>
 </li>
@@ -4051,9 +4110,17 @@ document.write(`
       <ul>
         <li><a href="data/api/doc/ray.data.preprocessors.Categorizer.deserialize.html#ray.data.preprocessors.Categorizer.deserialize">(ray.data.preprocessors.Categorizer static method)</a>
 </li>
+        <li><a href="data/api/doc/ray.data.preprocessors.Chain.deserialize.html#ray.data.preprocessors.Chain.deserialize">(ray.data.preprocessors.Chain static method)</a>
+</li>
         <li><a href="data/api/doc/ray.data.preprocessors.Concatenator.deserialize.html#ray.data.preprocessors.Concatenator.deserialize">(ray.data.preprocessors.Concatenator static method)</a>
 </li>
+        <li><a href="data/api/doc/ray.data.preprocessors.CountVectorizer.deserialize.html#ray.data.preprocessors.CountVectorizer.deserialize">(ray.data.preprocessors.CountVectorizer static method)</a>
+</li>
         <li><a href="data/api/doc/ray.data.preprocessors.CustomKBinsDiscretizer.deserialize.html#ray.data.preprocessors.CustomKBinsDiscretizer.deserialize">(ray.data.preprocessors.CustomKBinsDiscretizer static method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.FeatureHasher.deserialize.html#ray.data.preprocessors.FeatureHasher.deserialize">(ray.data.preprocessors.FeatureHasher static method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.HashingVectorizer.deserialize.html#ray.data.preprocessors.HashingVectorizer.deserialize">(ray.data.preprocessors.HashingVectorizer static method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.LabelEncoder.deserialize.html#ray.data.preprocessors.LabelEncoder.deserialize">(ray.data.preprocessors.LabelEncoder static method)</a>
 </li>
@@ -4076,6 +4143,8 @@ document.write(`
         <li><a href="data/api/doc/ray.data.preprocessors.SimpleImputer.deserialize.html#ray.data.preprocessors.SimpleImputer.deserialize">(ray.data.preprocessors.SimpleImputer static method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.StandardScaler.deserialize.html#ray.data.preprocessors.StandardScaler.deserialize">(ray.data.preprocessors.StandardScaler static method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.TorchVisionPreprocessor.deserialize.html#ray.data.preprocessors.TorchVisionPreprocessor.deserialize">(ray.data.preprocessors.TorchVisionPreprocessor static method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.UniformKBinsDiscretizer.deserialize.html#ray.data.preprocessors.UniformKBinsDiscretizer.deserialize">(ray.data.preprocessors.UniformKBinsDiscretizer static method)</a>
 </li>
@@ -4129,7 +4198,13 @@ document.write(`
 </li>
         <li><a href="serve/api/doc/ray.serve.schema.ServeInstanceDetails.dict.html#ray.serve.schema.ServeInstanceDetails.dict">(ray.serve.schema.ServeInstanceDetails method)</a>
 </li>
+        <li><a href="serve/api/doc/ray.serve.schema.Target.dict.html#ray.serve.schema.Target.dict">(ray.serve.schema.Target method)</a>
+</li>
+        <li><a href="serve/api/doc/ray.serve.schema.TargetGroup.dict.html#ray.serve.schema.TargetGroup.dict">(ray.serve.schema.TargetGroup method)</a>
+</li>
       </ul></li>
+      <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.EmbeddingRequest.html#ray.serve.llm.openai_api_models.EmbeddingRequest.dimensions">dimensions (ray.serve.llm.openai_api_models.EmbeddingRequest attribute)</a>
+</li>
       <li><a href="data/api/doc/ray.data.datasource.PartitionStyle.DIRECTORY.html#ray.data.datasource.PartitionStyle.DIRECTORY">DIRECTORY (ray.data.datasource.PartitionStyle attribute)</a>
 </li>
       <li><a href="serve/api/doc/ray.serve.config.ProxyLocation.Disabled.html#ray.serve.config.ProxyLocation.Disabled">Disabled (ray.serve.config.ProxyLocation attribute)</a>
@@ -4214,6 +4289,8 @@ document.write(`
         <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.CompletionRequest.html#ray.serve.llm.openai_api_models.CompletionRequest.echo">(ray.serve.llm.openai_api_models.CompletionRequest attribute)</a>
 </li>
       </ul></li>
+      <li><a href="serve/api/doc/ray.serve.llm.LLMServer.embeddings.html#ray.serve.llm.LLMServer.embeddings">embeddings() (ray.serve.llm.LLMServer method)</a>
+</li>
       <li><a href="ray-core/api/doc/ray.util.queue.Empty.html#ray.util.queue.Empty">Empty</a>
 </li>
       <li><a href="ray-core/api/doc/ray.util.queue.Queue.empty.html#ray.util.queue.Queue.empty">empty() (ray.util.queue.Queue method)</a>
@@ -4246,6 +4323,8 @@ document.write(`
         <li><a href="serve/api/doc/ray.serve.schema.LoggingConfig.encoding.html#ray.serve.schema.LoggingConfig.encoding">(ray.serve.schema.LoggingConfig attribute)</a>
 </li>
       </ul></li>
+      <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.EmbeddingRequest.html#ray.serve.llm.openai_api_models.EmbeddingRequest.encoding_format">encoding_format (ray.serve.llm.openai_api_models.EmbeddingRequest attribute)</a>
+</li>
       <li><a href="serve/api/doc/ray.serve.schema.EncodingType.html#ray.serve.schema.EncodingType">EncodingType (class in ray.serve.schema)</a>
 </li>
       <li><a href="rllib/package_ref/env/env/ray.rllib.env.utils.external_env_protocol.RLlink.END_EPISODE.html#ray.rllib.env.utils.external_env_protocol.RLlink.END_EPISODE">END_EPISODE (ray.rllib.env.utils.external_env_protocol.RLlink attribute)</a>
@@ -4367,6 +4446,8 @@ document.write(`
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate.html#ray.rllib.algorithms.algorithm.Algorithm.evaluate">evaluate() (ray.rllib.algorithms.algorithm.Algorithm method)</a>
 </li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.evaluate_offline.html#ray.rllib.algorithms.algorithm.Algorithm.evaluate_offline">evaluate_offline() (ray.rllib.algorithms.algorithm.Algorithm method)</a>
+</li>
       <li><a href="tune/api/internals.html#ray.tune.experiment.trial.Trial.evaluated_params">evaluated_params (ray.tune.experiment.trial.Trial attribute)</a>
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.evaluation.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.evaluation">evaluation() (ray.rllib.algorithms.algorithm_config.AlgorithmConfig method)</a>
@@ -4441,6 +4522,8 @@ document.write(`
         <li><a href="ray-core/compiled-graph/doc/ray.dag.output_node.MultiOutputNode.experimental_compile.html#ray.dag.output_node.MultiOutputNode.experimental_compile">(ray.dag.output_node.MultiOutputNode method)</a>
 </li>
       </ul></li>
+      <li><a href="serve/api/doc/ray.serve.llm.LLMConfig.html#ray.serve.llm.LLMConfig.experimental_configs">experimental_configs (ray.serve.llm.LLMConfig attribute)</a>
+</li>
       <li><a href="tune/api/doc/ray.tune.ExperimentAnalysis.html#ray.tune.ExperimentAnalysis">ExperimentAnalysis (class in ray.tune)</a>
 </li>
       <li><a href="tune/api/doc/ray.tune.stopper.ExperimentPlateauStopper.html#ray.tune.stopper.ExperimentPlateauStopper">ExperimentPlateauStopper (class in ray.tune.stopper)</a>
@@ -4515,6 +4598,8 @@ document.write(`
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.core.rl_module.default_model_config.DefaultModelConfig.fcnet_kernel_initializer_kwargs.html#ray.rllib.core.rl_module.default_model_config.DefaultModelConfig.fcnet_kernel_initializer_kwargs">fcnet_kernel_initializer_kwargs (ray.rllib.core.rl_module.default_model_config.DefaultModelConfig attribute)</a>
 </li>
+      <li><a href="data/api/doc/ray.data.preprocessors.FeatureHasher.html#ray.data.preprocessors.FeatureHasher">FeatureHasher (class in ray.data.preprocessors)</a>
+</li>
       <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.ChatCompletionRequest.html#ray.serve.llm.openai_api_models.ChatCompletionRequest.field_name">field_name (ray.serve.llm.openai_api_models.ChatCompletionRequest attribute)</a>
 </li>
       <li><a href="data/api/doc/ray.data.datasource.Partitioning.field_names.html#ray.data.datasource.Partitioning.field_names">field_names (ray.data.datasource.Partitioning attribute)</a>
@@ -4549,6 +4634,22 @@ document.write(`
 </li>
       <li><a href="ray-observability/reference/doc/ray.util.state.common.JobState.html#ray.util.state.common.JobState.filterable_columns">filterable_columns() (ray.util.state.common.JobState class method)</a>
 </li>
+      <li><a href="data/api/doc/ray.data.aggregate.AbsMax.finalize.html#ray.data.aggregate.AbsMax.finalize">finalize() (ray.data.aggregate.AbsMax method)</a>
+
+      <ul>
+        <li><a href="data/api/doc/ray.data.aggregate.AggregateFnV2.finalize.html#ray.data.aggregate.AggregateFnV2.finalize">(ray.data.aggregate.AggregateFnV2 method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.aggregate.Count.finalize.html#ray.data.aggregate.Count.finalize">(ray.data.aggregate.Count method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.aggregate.Max.finalize.html#ray.data.aggregate.Max.finalize">(ray.data.aggregate.Max method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.aggregate.Min.finalize.html#ray.data.aggregate.Min.finalize">(ray.data.aggregate.Min method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.aggregate.Sum.finalize.html#ray.data.aggregate.Sum.finalize">(ray.data.aggregate.Sum method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.aggregate.Unique.finalize.html#ray.data.aggregate.Unique.finalize">(ray.data.aggregate.Unique method)</a>
+</li>
+      </ul></li>
       <li><a href="data/api/doc/ray.data.datasource.PartitionStyle.find.html#ray.data.datasource.PartitionStyle.find">find() (ray.data.datasource.PartitionStyle method)</a>
 
       <ul>
@@ -4594,9 +4695,17 @@ document.write(`
       <ul>
         <li><a href="data/api/doc/ray.data.preprocessors.Categorizer.fit.html#ray.data.preprocessors.Categorizer.fit">(ray.data.preprocessors.Categorizer method)</a>
 </li>
+        <li><a href="data/api/doc/ray.data.preprocessors.Chain.fit.html#ray.data.preprocessors.Chain.fit">(ray.data.preprocessors.Chain method)</a>
+</li>
         <li><a href="data/api/doc/ray.data.preprocessors.Concatenator.fit.html#ray.data.preprocessors.Concatenator.fit">(ray.data.preprocessors.Concatenator method)</a>
 </li>
+        <li><a href="data/api/doc/ray.data.preprocessors.CountVectorizer.fit.html#ray.data.preprocessors.CountVectorizer.fit">(ray.data.preprocessors.CountVectorizer method)</a>
+</li>
         <li><a href="data/api/doc/ray.data.preprocessors.CustomKBinsDiscretizer.fit.html#ray.data.preprocessors.CustomKBinsDiscretizer.fit">(ray.data.preprocessors.CustomKBinsDiscretizer method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.FeatureHasher.fit.html#ray.data.preprocessors.FeatureHasher.fit">(ray.data.preprocessors.FeatureHasher method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.HashingVectorizer.fit.html#ray.data.preprocessors.HashingVectorizer.fit">(ray.data.preprocessors.HashingVectorizer method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.LabelEncoder.fit.html#ray.data.preprocessors.LabelEncoder.fit">(ray.data.preprocessors.LabelEncoder method)</a>
 </li>
@@ -4619,6 +4728,8 @@ document.write(`
         <li><a href="data/api/doc/ray.data.preprocessors.SimpleImputer.fit.html#ray.data.preprocessors.SimpleImputer.fit">(ray.data.preprocessors.SimpleImputer method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.StandardScaler.fit.html#ray.data.preprocessors.StandardScaler.fit">(ray.data.preprocessors.StandardScaler method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.TorchVisionPreprocessor.fit.html#ray.data.preprocessors.TorchVisionPreprocessor.fit">(ray.data.preprocessors.TorchVisionPreprocessor method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.UniformKBinsDiscretizer.fit.html#ray.data.preprocessors.UniformKBinsDiscretizer.fit">(ray.data.preprocessors.UniformKBinsDiscretizer method)</a>
 </li>
@@ -4656,7 +4767,13 @@ document.write(`
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.Concatenator.fit_transform.html#ray.data.preprocessors.Concatenator.fit_transform">(ray.data.preprocessors.Concatenator method)</a>
 </li>
+        <li><a href="data/api/doc/ray.data.preprocessors.CountVectorizer.fit_transform.html#ray.data.preprocessors.CountVectorizer.fit_transform">(ray.data.preprocessors.CountVectorizer method)</a>
+</li>
         <li><a href="data/api/doc/ray.data.preprocessors.CustomKBinsDiscretizer.fit_transform.html#ray.data.preprocessors.CustomKBinsDiscretizer.fit_transform">(ray.data.preprocessors.CustomKBinsDiscretizer method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.FeatureHasher.fit_transform.html#ray.data.preprocessors.FeatureHasher.fit_transform">(ray.data.preprocessors.FeatureHasher method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.HashingVectorizer.fit_transform.html#ray.data.preprocessors.HashingVectorizer.fit_transform">(ray.data.preprocessors.HashingVectorizer method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.LabelEncoder.fit_transform.html#ray.data.preprocessors.LabelEncoder.fit_transform">(ray.data.preprocessors.LabelEncoder method)</a>
 </li>
@@ -4679,6 +4796,8 @@ document.write(`
         <li><a href="data/api/doc/ray.data.preprocessors.SimpleImputer.fit_transform.html#ray.data.preprocessors.SimpleImputer.fit_transform">(ray.data.preprocessors.SimpleImputer method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.StandardScaler.fit_transform.html#ray.data.preprocessors.StandardScaler.fit_transform">(ray.data.preprocessors.StandardScaler method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.TorchVisionPreprocessor.fit_transform.html#ray.data.preprocessors.TorchVisionPreprocessor.fit_transform">(ray.data.preprocessors.TorchVisionPreprocessor method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.UniformKBinsDiscretizer.fit_transform.html#ray.data.preprocessors.UniformKBinsDiscretizer.fit_transform">(ray.data.preprocessors.UniformKBinsDiscretizer method)</a>
 </li>
@@ -4797,6 +4916,8 @@ document.write(`
         <li><a href="rllib/package_ref/doc/ray.rllib.utils.checkpoints.Checkpointable.from_checkpoint.html#ray.rllib.utils.checkpoints.Checkpointable.from_checkpoint">(ray.rllib.utils.checkpoints.Checkpointable class method)</a>
 </li>
       </ul></li>
+      <li><a href="data/api/doc/ray.data.from_daft.html#ray.data.from_daft">from_daft() (in module ray.data)</a>
+</li>
       <li><a href="data/api/doc/ray.data.from_dask.html#ray.data.from_dask">from_dask() (in module ray.data)</a>
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.from_dict.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.from_dict">from_dict() (ray.rllib.algorithms.algorithm_config.AlgorithmConfig class method)</a>
@@ -5251,13 +5372,15 @@ document.write(`
       </ul></li>
       <li><a href="ray-core/api/doc/ray.util.ActorPool.get_next.html#ray.util.ActorPool.get_next">get_next() (ray.util.ActorPool method)</a>
 </li>
-      <li><a href="ray-core/api/doc/ray.util.ActorPool.get_next_unordered.html#ray.util.ActorPool.get_next_unordered">get_next_unordered() (ray.util.ActorPool method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ray-core/api/doc/ray.util.ActorPool.get_next_unordered.html#ray.util.ActorPool.get_next_unordered">get_next_unordered() (ray.util.ActorPool method)</a>
+</li>
       <li><a href="ray-observability/reference/doc/ray.util.state.get_node.html#ray.util.state.get_node">get_node() (in module ray.util.state)</a>
 </li>
       <li><a href="ray-core/api/doc/ray.runtime_context.RuntimeContext.get_node_id.html#ray.runtime_context.RuntimeContext.get_node_id">get_node_id() (ray.runtime_context.RuntimeContext method)</a>
+</li>
+      <li><a href="ray-core/api/doc/ray.runtime_context.RuntimeContext.get_node_labels.html#ray.runtime_context.RuntimeContext.get_node_labels">get_node_labels() (ray.runtime_context.RuntimeContext method)</a>
 </li>
       <li><a href="train/api/doc/ray.train.context.TrainContext.get_node_rank.html#ray.train.context.TrainContext.get_node_rank">get_node_rank() (ray.train.context.TrainContext method)</a>
 
@@ -5461,12 +5584,6 @@ document.write(`
 </li>
       <li><a href="ray-core/api/doc/ray.runtime_context.RuntimeContext.get_task_name.html#ray.runtime_context.RuntimeContext.get_task_name">get_task_name() (ray.runtime_context.RuntimeContext method)</a>
 </li>
-      <li><a href="rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_temporary_timestep_data.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_temporary_timestep_data">get_temporary_timestep_data() (ray.rllib.env.multi_agent_episode.MultiAgentEpisode method)</a>
-
-      <ul>
-        <li><a href="rllib/package_ref/env/env/ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_temporary_timestep_data.html#ray.rllib.env.single_agent_episode.SingleAgentEpisode.get_temporary_timestep_data">(ray.rllib.env.single_agent_episode.SingleAgentEpisode method)</a>
-</li>
-      </ul></li>
       <li><a href="rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_terminateds.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.get_terminateds">get_terminateds() (ray.rllib.env.multi_agent_episode.MultiAgentEpisode method)</a>
 </li>
       <li><a href="ray-core/compiled-graph/doc/ray.dag.context.DAGContext.get_timeout.html#ray.dag.context.DAGContext.get_timeout">get_timeout (ray.dag.context.DAGContext attribute)</a>
@@ -5627,6 +5744,8 @@ document.write(`
 </li>
       <li><a href="ray-core/api/doc/ray.util.ActorPool.has_next.html#ray.util.ActorPool.has_next">has_next() (ray.util.ActorPool method)</a>
 </li>
+      <li><a href="data/api/doc/ray.data.preprocessors.HashingVectorizer.html#ray.data.preprocessors.HashingVectorizer">HashingVectorizer (class in ray.data.preprocessors)</a>
+</li>
       <li><a href="ray-references/glossary.html#term-Head-node"><strong>Head node</strong></a>
 </li>
       <li><a href="tune/api/doc/ray.tune.execution.placement_groups.PlacementGroupFactory.head_bundle_is_empty.html#ray.tune.execution.placement_groups.PlacementGroupFactory.head_bundle_is_empty">head_bundle_is_empty (ray.tune.execution.placement_groups.PlacementGroupFactory property)</a>
@@ -5655,14 +5774,14 @@ document.write(`
 </li>
       <li><a href="tune/api/doc/ray.tune.search.hebo.HEBOSearch.html#ray.tune.search.hebo.HEBOSearch">HEBOSearch (class in ray.tune.search.hebo)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="serve/api/doc/ray.serve.metrics.Histogram.html#ray.serve.metrics.Histogram">Histogram (class in ray.serve.metrics)</a>
 
       <ul>
         <li><a href="ray-core/api/doc/ray.util.metrics.Histogram.html#ray.util.metrics.Histogram">(class in ray.util.metrics)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data/api/doc/ray.data.datasource.PartitionStyle.HIVE.html#ray.data.datasource.PartitionStyle.HIVE">HIVE (ray.data.datasource.PartitionStyle attribute)</a>
 </li>
       <li><a href="train/api/doc/ray.train.horovod.HorovodConfig.html#ray.train.horovod.HorovodConfig">HorovodConfig (class in ray.train.horovod)</a>
@@ -5725,6 +5844,8 @@ document.write(`
 </li>
         <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.CompletionStreamResponse.html#ray.serve.llm.openai_api_models.CompletionStreamResponse.id">(ray.serve.llm.openai_api_models.CompletionStreamResponse attribute)</a>
 </li>
+        <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.EmbeddingResponse.html#ray.serve.llm.openai_api_models.EmbeddingResponse.id">(ray.serve.llm.openai_api_models.EmbeddingResponse attribute)</a>
+</li>
       </ul></li>
       <li><a href="rllib/package_ref/env/env/ray.rllib.env.multi_agent_episode.MultiAgentEpisode.id_.html#ray.rllib.env.multi_agent_episode.MultiAgentEpisode.id_">id_ (ray.rllib.env.multi_agent_episode.MultiAgentEpisode attribute)</a>
 
@@ -5781,6 +5902,8 @@ document.write(`
         <li><a href="serve/api/doc/ray.serve.schema.ProxyStatus.index.html#ray.serve.schema.ProxyStatus.index">(ray.serve.schema.ProxyStatus method)</a>
 </li>
       </ul></li>
+      <li><a href="data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources.inf">inf() (ray.data.ExecutionResources class method)</a>
+</li>
       <li><a href="rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.inference_only.html#ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec.inference_only">inference_only (ray.rllib.core.rl_module.multi_rl_module.MultiRLModuleSpec attribute)</a>
 
       <ul>
@@ -5827,6 +5950,8 @@ document.write(`
       </ul></li>
       <li><a href="serve/api/doc/ray.serve.config.AutoscalingConfig.initial_replicas.html#ray.serve.config.AutoscalingConfig.initial_replicas">initial_replicas (ray.serve.config.AutoscalingConfig attribute)</a>
 </li>
+      <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.EmbeddingRequest.html#ray.serve.llm.openai_api_models.EmbeddingRequest.input">input (ray.serve.llm.openai_api_models.EmbeddingRequest attribute)</a>
+</li>
       <li><a href="data/api/doc/ray.data.block.BlockMetadata.input_files.html#ray.data.block.BlockMetadata.input_files">input_files (ray.data.block.BlockMetadata attribute)</a>
 </li>
       <li><a href="data/api/doc/ray.data.Dataset.input_files.html#ray.data.Dataset.input_files">input_files() (ray.data.Dataset method)</a>
@@ -5855,15 +5980,19 @@ document.write(`
 </li>
       <li><a href="ray-core/api/doc/ray.util.inspect_serializability.html#ray.util.inspect_serializability">inspect_serializability() (in module ray.util)</a>
 </li>
+      <li><a href="serve/api/doc/ray.serve.schema.Target.instance_id.html#ray.serve.schema.Target.instance_id">instance_id (ray.serve.schema.Target attribute)</a>
+</li>
       <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.ErrorResponse.html#ray.serve.llm.openai_api_models.ErrorResponse.internal_message">internal_message (ray.serve.llm.openai_api_models.ErrorResponse attribute)</a>
 </li>
       <li><a href="data/api/doc/ray.data.preprocessors.LabelEncoder.inverse_transform.html#ray.data.preprocessors.LabelEncoder.inverse_transform">inverse_transform() (ray.data.preprocessors.LabelEncoder method)</a>
 </li>
       <li><a href="serve/api/doc/ray.serve.grpc_util.RayServegRPCContext.invocation_metadata.html#ray.serve.grpc_util.RayServegRPCContext.invocation_metadata">invocation_metadata() (ray.serve.grpc_util.RayServegRPCContext method)</a>
 </li>
-      <li><a href="ray-observability/reference/doc/ray.util.state.common.ObjectState.html#ray.util.state.common.ObjectState.ip">ip (ray.util.state.common.ObjectState attribute)</a>
+      <li><a href="serve/api/doc/ray.serve.schema.Target.ip.html#ray.serve.schema.Target.ip">ip (ray.serve.schema.Target attribute)</a>
 
       <ul>
+        <li><a href="ray-observability/reference/doc/ray.util.state.common.ObjectState.html#ray.util.state.common.ObjectState.ip">(ray.util.state.common.ObjectState attribute)</a>
+</li>
         <li><a href="ray-observability/reference/doc/ray.util.state.common.WorkerState.html#ray.util.state.common.WorkerState.ip">(ray.util.state.common.WorkerState attribute)</a>
 </li>
       </ul></li>
@@ -5906,6 +6035,8 @@ document.write(`
 </li>
       </ul></li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.is_offline.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.is_offline">is_offline (ray.rllib.algorithms.algorithm_config.AlgorithmConfig property)</a>
+</li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.is_online.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.is_online">is_online (ray.rllib.algorithms.algorithm_config.AlgorithmConfig property)</a>
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.is_remote.html#ray.rllib.core.learner.learner_group.LearnerGroup.is_remote">is_remote (ray.rllib.core.learner.learner_group.LearnerGroup property)</a>
 </li>
@@ -6222,9 +6353,11 @@ document.write(`
 </li>
       <li><a href="cluster/running-applications/job-submission/doc/ray.job_submission.JobType.html#ray.job_submission.JobType">JobType (class in ray.job_submission)</a>
 </li>
-      <li><a href="data/api/doc/ray.data.datasource.PartitionStyle.join.html#ray.data.datasource.PartitionStyle.join">join() (ray.data.datasource.PartitionStyle method)</a>
+      <li><a href="data/api/doc/ray.data.Dataset.join.html#ray.data.Dataset.join">join() (ray.data.Dataset method)</a>
 
       <ul>
+        <li><a href="data/api/doc/ray.data.datasource.PartitionStyle.join.html#ray.data.datasource.PartitionStyle.join">(ray.data.datasource.PartitionStyle method)</a>
+</li>
         <li><a href="cluster/running-applications/job-submission/doc/ray.job_submission.JobStatus.join.html#ray.job_submission.JobStatus.join">(ray.job_submission.JobStatus method)</a>
 </li>
         <li><a href="cluster/running-applications/job-submission/doc/ray.job_submission.JobType.join.html#ray.job_submission.JobType.join">(ray.job_submission.JobType method)</a>
@@ -6272,6 +6405,10 @@ document.write(`
         <li><a href="serve/api/doc/ray.serve.schema.ServeDeploySchema.json.html#ray.serve.schema.ServeDeploySchema.json">(ray.serve.schema.ServeDeploySchema method)</a>
 </li>
         <li><a href="serve/api/doc/ray.serve.schema.ServeInstanceDetails.json.html#ray.serve.schema.ServeInstanceDetails.json">(ray.serve.schema.ServeInstanceDetails method)</a>
+</li>
+        <li><a href="serve/api/doc/ray.serve.schema.Target.json.html#ray.serve.schema.Target.json">(ray.serve.schema.Target method)</a>
+</li>
+        <li><a href="serve/api/doc/ray.serve.schema.TargetGroup.json.html#ray.serve.schema.TargetGroup.json">(ray.serve.schema.TargetGroup method)</a>
 </li>
       </ul></li>
       <li><a href="tune/api/doc/ray.tune.logger.JsonLoggerCallback.html#ray.tune.logger.JsonLoggerCallback">JsonLoggerCallback (class in ray.tune.logger)</a>
@@ -6458,12 +6595,16 @@ document.write(`
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict">log_dict() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
 </li>
+      <li><a href="serve/api/doc/ray.serve.llm.LLMConfig.html#ray.serve.llm.LLMConfig.log_engine_metrics">log_engine_metrics (ray.serve.llm.LLMConfig attribute)</a>
+</li>
       <li><a href="serve/api/doc/ray.serve.schema.ReplicaDetails.log_file_path.html#ray.serve.schema.ReplicaDetails.log_file_path">log_file_path (ray.serve.schema.ReplicaDetails attribute)</a>
 
       <ul>
         <li><a href="serve/api/doc/ray.serve.schema.ServeActorDetails.html#ray.serve.schema.ServeActorDetails.log_file_path">(ray.serve.schema.ServeActorDetails attribute)</a>
 </li>
       </ul></li>
+      <li><a href="data/api/doc/ray.data.llm.Processor.log_input_column_names.html#ray.data.llm.Processor.log_input_column_names">log_input_column_names() (ray.data.llm.Processor method)</a>
+</li>
       <li><a href="ray-core/api/doc/ray.LoggingConfig.log_level.html#ray.LoggingConfig.log_level">log_level (ray.LoggingConfig attribute)</a>
 
       <ul>
@@ -6476,10 +6617,10 @@ document.write(`
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.core.rl_module.default_model_config.DefaultModelConfig.log_std_clip_param.html#ray.rllib.core.rl_module.default_model_config.DefaultModelConfig.log_std_clip_param">log_std_clip_param (ray.rllib.core.rl_module.default_model_config.DefaultModelConfig attribute)</a>
 </li>
-      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time">log_time() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time">log_time() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
+</li>
       <li><a href="train/api/doc/ray.air.config.RunConfig.log_to_file.html#ray.air.config.RunConfig.log_to_file">log_to_file (ray.air.config.RunConfig attribute)</a>
 
       <ul>
@@ -6766,6 +6907,8 @@ document.write(`
         <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.CompletionRequest.html#ray.serve.llm.openai_api_models.CompletionRequest.max_tokens">(ray.serve.llm.openai_api_models.CompletionRequest attribute)</a>
 </li>
       </ul></li>
+      <li><a href="data/api/doc/ray.data.block.BlockExecStats.html#ray.data.block.BlockExecStats.max_uss_bytes">max_uss_bytes (ray.data.block.BlockExecStats attribute)</a>
+</li>
       <li><a href="data/api/doc/ray.data.preprocessors.MaxAbsScaler.html#ray.data.preprocessors.MaxAbsScaler">MaxAbsScaler (class in ray.data.preprocessors)</a>
 </li>
       <li><a href="tune/api/doc/ray.tune.stopper.MaximumIterationStopper.html#ray.tune.stopper.MaximumIterationStopper">MaximumIterationStopper (class in ray.tune.stopper)</a>
@@ -6784,11 +6927,11 @@ document.write(`
 </li>
       <li><a href="serve/api/doc/ray.serve.schema.RayActorOptionsSchema.memory.html#ray.serve.schema.RayActorOptionsSchema.memory">memory (ray.serve.schema.RayActorOptionsSchema attribute)</a>
 </li>
+      <li><a href="data/api/doc/ray.data.ExecutionResources.html#ray.data.ExecutionResources.memory_str">memory_str() (ray.data.ExecutionResources method)</a>
+</li>
       <li><a href="rllib/rllib-dev.html#ray.rllib.callbacks.callbacks.MemoryTrackingCallbacks">MemoryTrackingCallbacks (class in ray.rllib.callbacks.callbacks)</a>
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.merge_algorithm_configs.html#ray.rllib.algorithms.algorithm.Algorithm.merge_algorithm_configs">merge_algorithm_configs() (ray.rllib.algorithms.algorithm.Algorithm class method)</a>
-</li>
-      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.merge_and_log_n_dicts">merge_and_log_n_dicts() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
 </li>
       <li><a href="data/api/doc/ray.data.block.BlockAccessor.merge_sorted_blocks.html#ray.data.block.BlockAccessor.merge_sorted_blocks">merge_sorted_blocks() (ray.data.block.BlockAccessor static method)</a>
 </li>
@@ -6979,6 +7122,10 @@ document.write(`
 </li>
         <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.CompletionStreamResponse.html#ray.serve.llm.openai_api_models.CompletionStreamResponse.model">(ray.serve.llm.openai_api_models.CompletionStreamResponse attribute)</a>
 </li>
+        <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.EmbeddingRequest.html#ray.serve.llm.openai_api_models.EmbeddingRequest.model">(ray.serve.llm.openai_api_models.EmbeddingRequest attribute)</a>
+</li>
+        <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.EmbeddingResponse.html#ray.serve.llm.openai_api_models.EmbeddingResponse.model">(ray.serve.llm.openai_api_models.EmbeddingResponse attribute)</a>
+</li>
       </ul></li>
       <li><a href="serve/api/doc/ray.serve.llm.LLMConfig.html#ray.serve.llm.LLMConfig.model_architecture">model_architecture (ray.serve.llm.LLMConfig property)</a>
 </li>
@@ -7097,6 +7244,8 @@ document.write(`
         <li><a href="ray-observability/reference/doc/ray.util.state.common.TaskState.html#ray.util.state.common.TaskState.name">(ray.util.state.common.TaskState attribute)</a>
 </li>
       </ul></li>
+      <li><a href="data/api/dataset.html#ray.data.Schema.names">names (ray.data.Schema property)</a>
+</li>
       <li><a href="ray-references/glossary.html#term-Namespace"><strong>Namespace</strong></a>
 </li>
       <li><a href="ray-core/api/doc/ray.runtime_context.RuntimeContext.namespace.html#ray.runtime_context.RuntimeContext.namespace">namespace (ray.runtime_context.RuntimeContext property)</a>
@@ -7137,6 +7286,12 @@ document.write(`
       </ul></li>
       <li><a href="ray-observability/reference/doc/ray.util.state.common.StateSummary.html#ray.util.state.common.StateSummary.node_id_to_summary">node_id_to_summary (ray.util.state.common.StateSummary attribute)</a>
 </li>
+      <li><a href="serve/api/doc/ray.serve.schema.ReplicaDetails.node_instance_id.html#ray.serve.schema.ReplicaDetails.node_instance_id">node_instance_id (ray.serve.schema.ReplicaDetails attribute)</a>
+
+      <ul>
+        <li><a href="serve/api/doc/ray.serve.schema.ServeActorDetails.html#ray.serve.schema.ServeActorDetails.node_instance_id">(ray.serve.schema.ServeActorDetails attribute)</a>
+</li>
+      </ul></li>
       <li><a href="serve/api/doc/ray.serve.schema.ReplicaDetails.node_ip.html#ray.serve.schema.ReplicaDetails.node_ip">node_ip (ray.serve.schema.ReplicaDetails attribute)</a>
 
       <ul>
@@ -7157,6 +7312,8 @@ document.write(`
 </li>
       <li><a href="ray-observability/reference/doc/ray.util.state.common.NodeState.html#ray.util.state.common.NodeState">NodeState (class in ray.util.state.common)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tune/api/doc/ray.tune.schedulers.FIFOScheduler.NOOP.html#ray.tune.schedulers.FIFOScheduler.NOOP">NOOP (ray.tune.schedulers.FIFOScheduler attribute)</a>
 
       <ul>
@@ -7177,8 +7334,6 @@ document.write(`
         <li><a href="tune/api/doc/ray.tune.schedulers.TrialScheduler.NOOP.html#ray.tune.schedulers.TrialScheduler.NOOP">(ray.tune.schedulers.TrialScheduler attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tune/api/doc/ray.tune.stopper.noop.NoopStopper.html#ray.tune.stopper.noop.NoopStopper">NoopStopper (class in ray.tune.stopper.noop)</a>
 </li>
       <li><a href="data/api/doc/ray.data.datasource.Partitioning.normalized_base_dir.html#ray.data.datasource.Partitioning.normalized_base_dir">normalized_base_dir (ray.data.datasource.Partitioning property)</a>
@@ -7279,6 +7434,8 @@ document.write(`
         <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.CompletionResponse.html#ray.serve.llm.openai_api_models.CompletionResponse.object">(ray.serve.llm.openai_api_models.CompletionResponse attribute)</a>
 </li>
         <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.CompletionStreamResponse.html#ray.serve.llm.openai_api_models.CompletionStreamResponse.object">(ray.serve.llm.openai_api_models.CompletionStreamResponse attribute)</a>
+</li>
+        <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.EmbeddingResponse.html#ray.serve.llm.openai_api_models.EmbeddingResponse.object">(ray.serve.llm.openai_api_models.EmbeddingResponse attribute)</a>
 </li>
       </ul></li>
       <li><a href="ray-references/glossary.html#term-Object-ownership"><strong>Object ownership</strong></a>
@@ -7403,6 +7560,10 @@ document.write(`
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_evaluate_end.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_evaluate_end">on_evaluate_end() (ray.rllib.callbacks.callbacks.RLlibCallback method)</a>
 </li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_evaluate_offline_end.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_evaluate_offline_end">on_evaluate_offline_end() (ray.rllib.callbacks.callbacks.RLlibCallback method)</a>
+</li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_evaluate_offline_start.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_evaluate_offline_start">on_evaluate_offline_start() (ray.rllib.callbacks.callbacks.RLlibCallback method)</a>
+</li>
       <li><a href="rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_evaluate_start.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_evaluate_start">on_evaluate_start() (ray.rllib.callbacks.callbacks.RLlibCallback method)</a>
 </li>
       <li><a href="tune/api/doc/ray.air.integrations.comet.CometLoggerCallback.on_experiment_end.html#ray.air.integrations.comet.CometLoggerCallback.on_experiment_end">on_experiment_end() (ray.air.integrations.comet.CometLoggerCallback method)</a>
@@ -7426,6 +7587,8 @@ document.write(`
 </li>
       </ul></li>
       <li><a href="rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_learn_on_batch.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_learn_on_batch">on_learn_on_batch() (ray.rllib.callbacks.callbacks.RLlibCallback method)</a>
+</li>
+      <li><a href="rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_offline_eval_runners_recreated.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_offline_eval_runners_recreated">on_offline_eval_runners_recreated() (ray.rllib.callbacks.callbacks.RLlibCallback method)</a>
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_postprocess_trajectory.html#ray.rllib.callbacks.callbacks.RLlibCallback.on_postprocess_trajectory">on_postprocess_trajectory() (ray.rllib.callbacks.callbacks.RLlibCallback method)</a>
 </li>
@@ -7857,12 +8020,12 @@ document.write(`
         <li><a href="ray-core/api/doc/ray.runtime_env.RuntimeEnvConfig.popitem.html#ray.runtime_env.RuntimeEnvConfig.popitem">(ray.runtime_env.RuntimeEnvConfig method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tune/api/doc/ray.tune.schedulers.PopulationBasedTraining.html#ray.tune.schedulers.PopulationBasedTraining">PopulationBasedTraining (class in ray.tune.schedulers)</a>
 </li>
       <li><a href="tune/api/doc/ray.tune.schedulers.PopulationBasedTrainingReplay.html#ray.tune.schedulers.PopulationBasedTrainingReplay">PopulationBasedTrainingReplay (class in ray.tune.schedulers)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="serve/api/doc/ray.serve.config.gRPCOptions.port.html#ray.serve.config.gRPCOptions.port">port (ray.serve.config.gRPCOptions attribute)</a>
 
       <ul>
@@ -7873,6 +8036,8 @@ document.write(`
         <li><a href="serve/api/doc/ray.serve.schema.HTTPOptionsSchema.port.html#ray.serve.schema.HTTPOptionsSchema.port">(ray.serve.schema.HTTPOptionsSchema attribute)</a>
 </li>
         <li><a href="serve/api/doc/ray.serve.schema.ServeApplicationSchema.port.html#ray.serve.schema.ServeApplicationSchema.port">(ray.serve.schema.ServeApplicationSchema attribute)</a>
+</li>
+        <li><a href="serve/api/doc/ray.serve.schema.Target.port.html#ray.serve.schema.Target.port">(ray.serve.schema.Target attribute)</a>
 </li>
       </ul></li>
       <li><a href="rllib/package_ref/doc/ray.rllib.core.learner.learner.Learner.postprocess_gradients.html#ray.rllib.core.learner.learner.Learner.postprocess_gradients">postprocess_gradients() (ray.rllib.core.learner.learner.Learner method)</a>
@@ -7890,9 +8055,17 @@ document.write(`
       <ul>
         <li><a href="data/api/doc/ray.data.preprocessors.Categorizer.preferred_batch_format.html#ray.data.preprocessors.Categorizer.preferred_batch_format">(ray.data.preprocessors.Categorizer class method)</a>
 </li>
+        <li><a href="data/api/doc/ray.data.preprocessors.Chain.preferred_batch_format.html#ray.data.preprocessors.Chain.preferred_batch_format">(ray.data.preprocessors.Chain class method)</a>
+</li>
         <li><a href="data/api/doc/ray.data.preprocessors.Concatenator.preferred_batch_format.html#ray.data.preprocessors.Concatenator.preferred_batch_format">(ray.data.preprocessors.Concatenator class method)</a>
 </li>
+        <li><a href="data/api/doc/ray.data.preprocessors.CountVectorizer.preferred_batch_format.html#ray.data.preprocessors.CountVectorizer.preferred_batch_format">(ray.data.preprocessors.CountVectorizer class method)</a>
+</li>
         <li><a href="data/api/doc/ray.data.preprocessors.CustomKBinsDiscretizer.preferred_batch_format.html#ray.data.preprocessors.CustomKBinsDiscretizer.preferred_batch_format">(ray.data.preprocessors.CustomKBinsDiscretizer class method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.FeatureHasher.preferred_batch_format.html#ray.data.preprocessors.FeatureHasher.preferred_batch_format">(ray.data.preprocessors.FeatureHasher class method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.HashingVectorizer.preferred_batch_format.html#ray.data.preprocessors.HashingVectorizer.preferred_batch_format">(ray.data.preprocessors.HashingVectorizer class method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.LabelEncoder.preferred_batch_format.html#ray.data.preprocessors.LabelEncoder.preferred_batch_format">(ray.data.preprocessors.LabelEncoder class method)</a>
 </li>
@@ -7980,6 +8153,8 @@ document.write(`
       <ul>
         <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.CompletionRequest.html#ray.serve.llm.openai_api_models.CompletionRequest.priority">(ray.serve.llm.openai_api_models.CompletionRequest attribute)</a>
 </li>
+        <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.EmbeddingRequest.html#ray.serve.llm.openai_api_models.EmbeddingRequest.priority">(ray.serve.llm.openai_api_models.EmbeddingRequest attribute)</a>
+</li>
       </ul></li>
       <li><a href="data/api/doc/ray.data.llm.Processor.html#ray.data.llm.Processor">Processor (class in ray.data.llm)</a>
 </li>
@@ -8013,6 +8188,8 @@ document.write(`
         <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.CompletionRequest.html#ray.serve.llm.openai_api_models.CompletionRequest.prompt_logprobs">(ray.serve.llm.openai_api_models.CompletionRequest attribute)</a>
 </li>
       </ul></li>
+      <li><a href="serve/api/doc/ray.serve.schema.TargetGroup.protocol.html#ray.serve.schema.TargetGroup.protocol">protocol (ray.serve.schema.TargetGroup attribute)</a>
+</li>
       <li><a href="serve/api/doc/ray.serve.schema.ServeInstanceDetails.proxies.html#ray.serve.schema.ServeInstanceDetails.proxies">proxies (ray.serve.schema.ServeInstanceDetails attribute)</a>
 
       <ul>
@@ -8490,6 +8667,8 @@ document.write(`
 </li>
         <li><a href="cluster/cli.html#cmdoption-ray-start-disable-usage-stats">--disable-usage-stats</a>
 </li>
+        <li><a href="cluster/cli.html#cmdoption-ray-start-enable-resource-isolation">--enable-resource-isolation</a>
+</li>
         <li><a href="cluster/cli.html#cmdoption-ray-start-gcs-server-port">--gcs-server-port</a>
 </li>
         <li><a href="cluster/cli.html#cmdoption-ray-start-head">--head</a>
@@ -8520,6 +8699,8 @@ document.write(`
 </li>
         <li><a href="cluster/cli.html#cmdoption-ray-start-object-manager-port">--object-manager-port</a>
 </li>
+        <li><a href="cluster/cli.html#cmdoption-ray-start-object-spilling-directory">--object-spilling-directory</a>
+</li>
         <li><a href="cluster/cli.html#cmdoption-ray-start-object-store-memory">--object-store-memory</a>
 </li>
         <li><a href="cluster/cli.html#cmdoption-ray-start-plasma-directory">--plasma-directory</a>
@@ -8539,6 +8720,10 @@ document.write(`
         <li><a href="cluster/cli.html#cmdoption-ray-start-runtime-env-agent-port">--runtime-env-agent-port</a>
 </li>
         <li><a href="cluster/cli.html#cmdoption-ray-start-storage">--storage</a>
+</li>
+        <li><a href="cluster/cli.html#cmdoption-ray-start-system-reserved-cpu">--system-reserved-cpu</a>
+</li>
+        <li><a href="cluster/cli.html#cmdoption-ray-start-system-reserved-memory">--system-reserved-memory</a>
 </li>
         <li><a href="cluster/cli.html#cmdoption-ray-start-temp-dir">--temp-dir</a>
 </li>
@@ -9017,9 +9202,15 @@ document.write(`
 </li>
       <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.ChatCompletionRequest.html#ray.serve.llm.openai_api_models.ChatCompletionRequest.request_id">request_id (ray.serve.llm.openai_api_models.ChatCompletionRequest attribute)</a>
 </li>
-      <li><a href="serve/api/doc/ray.serve.config.HTTPOptions.request_timeout_s.html#ray.serve.config.HTTPOptions.request_timeout_s">request_timeout_s (ray.serve.config.HTTPOptions attribute)</a>
+      <li><a href="serve/api/doc/ray.serve.schema.DeploymentSchema.request_router_class.html#ray.serve.schema.DeploymentSchema.request_router_class">request_router_class (ray.serve.schema.DeploymentSchema attribute)</a>
+</li>
+      <li><a href="serve/api/doc/ray.serve.config.gRPCOptions.request_timeout_s.html#ray.serve.config.gRPCOptions.request_timeout_s">request_timeout_s (ray.serve.config.gRPCOptions attribute)</a>
 
       <ul>
+        <li><a href="serve/api/doc/ray.serve.config.HTTPOptions.request_timeout_s.html#ray.serve.config.HTTPOptions.request_timeout_s">(ray.serve.config.HTTPOptions attribute)</a>
+</li>
+        <li><a href="serve/api/doc/ray.serve.schema.gRPCOptionsSchema.request_timeout_s.html#ray.serve.schema.gRPCOptionsSchema.request_timeout_s">(ray.serve.schema.gRPCOptionsSchema attribute)</a>
+</li>
         <li><a href="serve/api/doc/ray.serve.schema.HTTPOptionsSchema.request_timeout_s.html#ray.serve.schema.HTTPOptionsSchema.request_timeout_s">(ray.serve.schema.HTTPOptionsSchema attribute)</a>
 </li>
       </ul></li>
@@ -9077,6 +9268,8 @@ document.write(`
       <li><a href="serve/api/doc/ray.serve.schema.RayActorOptionsSchema.resources.html#ray.serve.schema.RayActorOptionsSchema.resources">resources (ray.serve.schema.RayActorOptionsSchema attribute)</a>
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.resources.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.resources">resources() (ray.rllib.algorithms.algorithm_config.AlgorithmConfig method)</a>
+</li>
+      <li><a href="serve/api/doc/ray.serve.llm.LLMConfig.html#ray.serve.llm.LLMConfig.resources_per_bundle">resources_per_bundle (ray.serve.llm.LLMConfig attribute)</a>
 </li>
       <li><a href="train/api/doc/ray.air.config.ScalingConfig.resources_per_worker.html#ray.air.config.ScalingConfig.resources_per_worker">resources_per_worker (ray.air.config.ScalingConfig attribute)</a>
 
@@ -9310,6 +9503,8 @@ document.write(`
 
       <ul>
         <li><a href="serve/api/doc/ray.serve.schema.ServeApplicationSchema.route_prefix.html#ray.serve.schema.ServeApplicationSchema.route_prefix">(ray.serve.schema.ServeApplicationSchema attribute)</a>
+</li>
+        <li><a href="serve/api/doc/ray.serve.schema.TargetGroup.route_prefix.html#ray.serve.schema.TargetGroup.route_prefix">(ray.serve.schema.TargetGroup attribute)</a>
 </li>
       </ul></li>
       <li><a href="data/api/doc/ray.data.datasource.RowBasedFileDatasink.html#ray.data.datasource.RowBasedFileDatasink">RowBasedFileDatasink (class in ray.data.datasource)</a>
@@ -9619,9 +9814,17 @@ document.write(`
       <ul>
         <li><a href="data/api/doc/ray.data.preprocessors.Categorizer.serialize.html#ray.data.preprocessors.Categorizer.serialize">(ray.data.preprocessors.Categorizer method)</a>
 </li>
+        <li><a href="data/api/doc/ray.data.preprocessors.Chain.serialize.html#ray.data.preprocessors.Chain.serialize">(ray.data.preprocessors.Chain method)</a>
+</li>
         <li><a href="data/api/doc/ray.data.preprocessors.Concatenator.serialize.html#ray.data.preprocessors.Concatenator.serialize">(ray.data.preprocessors.Concatenator method)</a>
 </li>
+        <li><a href="data/api/doc/ray.data.preprocessors.CountVectorizer.serialize.html#ray.data.preprocessors.CountVectorizer.serialize">(ray.data.preprocessors.CountVectorizer method)</a>
+</li>
         <li><a href="data/api/doc/ray.data.preprocessors.CustomKBinsDiscretizer.serialize.html#ray.data.preprocessors.CustomKBinsDiscretizer.serialize">(ray.data.preprocessors.CustomKBinsDiscretizer method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.FeatureHasher.serialize.html#ray.data.preprocessors.FeatureHasher.serialize">(ray.data.preprocessors.FeatureHasher method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.HashingVectorizer.serialize.html#ray.data.preprocessors.HashingVectorizer.serialize">(ray.data.preprocessors.HashingVectorizer method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.LabelEncoder.serialize.html#ray.data.preprocessors.LabelEncoder.serialize">(ray.data.preprocessors.LabelEncoder method)</a>
 </li>
@@ -9644,6 +9847,8 @@ document.write(`
         <li><a href="data/api/doc/ray.data.preprocessors.SimpleImputer.serialize.html#ray.data.preprocessors.SimpleImputer.serialize">(ray.data.preprocessors.SimpleImputer method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.StandardScaler.serialize.html#ray.data.preprocessors.StandardScaler.serialize">(ray.data.preprocessors.StandardScaler method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.TorchVisionPreprocessor.serialize.html#ray.data.preprocessors.TorchVisionPreprocessor.serialize">(ray.data.preprocessors.TorchVisionPreprocessor method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.UniformKBinsDiscretizer.serialize.html#ray.data.preprocessors.UniformKBinsDiscretizer.serialize">(ray.data.preprocessors.UniformKBinsDiscretizer method)</a>
 </li>
@@ -10587,6 +10792,8 @@ document.write(`
 </li>
       <li><a href="data/api/doc/ray.data.Dataset.take_batch.html#ray.data.Dataset.take_batch">take_batch() (ray.data.Dataset method)</a>
 </li>
+      <li><a href="serve/api/doc/ray.serve.schema.Target.html#ray.serve.schema.Target">Target (class in ray.serve.schema)</a>
+</li>
       <li><a href="serve/api/doc/ray.serve.schema.ServeDeploySchema.target_capacity.html#ray.serve.schema.ServeDeploySchema.target_capacity">target_capacity (ray.serve.schema.ServeDeploySchema attribute)</a>
 
       <ul>
@@ -10595,11 +10802,17 @@ document.write(`
         <li><a href="serve/api/doc/ray.serve.schema.ServeStatus.html#ray.serve.schema.ServeStatus.target_capacity">(ray.serve.schema.ServeStatus attribute)</a>
 </li>
       </ul></li>
+      <li><a href="serve/api/doc/ray.serve.schema.ServeInstanceDetails.target_groups.html#ray.serve.schema.ServeInstanceDetails.target_groups">target_groups (ray.serve.schema.ServeInstanceDetails attribute)</a>
+</li>
       <li><a href="serve/api/doc/ray.serve.schema.DeploymentDetails.target_num_replicas.html#ray.serve.schema.DeploymentDetails.target_num_replicas">target_num_replicas (ray.serve.schema.DeploymentDetails attribute)</a>
 </li>
       <li><a href="serve/api/doc/ray.serve.config.AutoscalingConfig.target_ongoing_requests.html#ray.serve.config.AutoscalingConfig.target_ongoing_requests">target_ongoing_requests (ray.serve.config.AutoscalingConfig attribute)</a>
 </li>
+      <li><a href="serve/api/doc/ray.serve.schema.TargetGroup.html#ray.serve.schema.TargetGroup">TargetGroup (class in ray.serve.schema)</a>
+</li>
       <li><a href="rllib/package_ref/rl_modules.html#ray.rllib.core.rl_module.apis.target_network_api.TargetNetworkAPI">TargetNetworkAPI (class in ray.rllib.core.rl_module.apis.target_network_api)</a>
+</li>
+      <li><a href="serve/api/doc/ray.serve.schema.TargetGroup.targets.html#ray.serve.schema.TargetGroup.targets">targets (ray.serve.schema.TargetGroup attribute)</a>
 </li>
       <li><a href="ray-references/glossary.html#term-Task"><strong>Task</strong></a>
 </li>
@@ -10651,8 +10864,6 @@ document.write(`
         <li><a href="train/api/doc/ray.train.tensorflow.tensorflow_trainer.TensorflowTrainer.html#ray.train.tensorflow.tensorflow_trainer.TensorflowTrainer">(class in ray.train.tensorflow.tensorflow_trainer)</a>
 </li>
       </ul></li>
-      <li><a href="rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.tensors_to_numpy.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.tensors_to_numpy">tensors_to_numpy() (ray.rllib.utils.metrics.metrics_logger.MetricsLogger method)</a>
-</li>
       <li><a href="data/api/doc/ray.data.TFXReadOptions.html#ray.data.TFXReadOptions">TFXReadOptions (class in ray.data)</a>
 </li>
       <li><a href="tune/api/doc/ray.tune.TuneConfig.time_budget_s.html#ray.tune.TuneConfig.time_budget_s">time_budget_s (ray.tune.TuneConfig attribute)</a>
@@ -10694,6 +10905,8 @@ document.write(`
       <li><a href="data/api/doc/ray.data.block.BlockAccessor.to_batch_format.html#ray.data.block.BlockAccessor.to_batch_format">to_batch_format() (ray.data.block.BlockAccessor method)</a>
 </li>
       <li><a href="data/api/doc/ray.data.block.BlockAccessor.to_block.html#ray.data.block.BlockAccessor.to_block">to_block() (ray.data.block.BlockAccessor method)</a>
+</li>
+      <li><a href="data/api/doc/ray.data.Dataset.to_daft.html#ray.data.Dataset.to_daft">to_daft() (ray.data.Dataset method)</a>
 </li>
       <li><a href="data/api/doc/ray.data.Dataset.to_dask.html#ray.data.Dataset.to_dask">to_dask() (ray.data.Dataset method)</a>
 </li>
@@ -10779,6 +10992,8 @@ document.write(`
         <li><a href="train/api/doc/ray.train.torch.torch_trainer.TorchTrainer.html#ray.train.torch.torch_trainer.TorchTrainer">(class in ray.train.torch.torch_trainer)</a>
 </li>
       </ul></li>
+      <li><a href="data/api/doc/ray.data.preprocessors.TorchVisionPreprocessor.html#ray.data.preprocessors.TorchVisionPreprocessor">TorchVisionPreprocessor (class in ray.data.preprocessors)</a>
+</li>
       <li><a href="train/api/doc/ray.train.torch.xla.TorchXLAConfig.html#ray.train.torch.xla.TorchXLAConfig">TorchXLAConfig (class in ray.train.torch.xla)</a>
 </li>
       <li><a href="ray-observability/reference/doc/ray.util.state.common.TaskSummaries.html#ray.util.state.common.TaskSummaries.total_actor_scheduled">total_actor_scheduled (ray.util.state.common.TaskSummaries attribute)</a>
@@ -10841,8 +11056,6 @@ document.write(`
         <li><a href="train/api/doc/ray.train.torch.xla.TorchXLAConfig.train_func_context.html#ray.train.torch.xla.TorchXLAConfig.train_func_context">(ray.train.torch.xla.TorchXLAConfig property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data/api/doc/ray.data.Dataset.train_test_split.html#ray.data.Dataset.train_test_split">train_test_split() (ray.data.Dataset method)</a>
 </li>
       <li><a href="ray-references/glossary.html#term-Trainable"><strong>Trainable</strong></a>
@@ -10853,6 +11066,8 @@ document.write(`
       </ul></li>
       <li><a href="tune/api/internals.html#ray.tune.experiment.trial.Trial.trainable_name">trainable_name (ray.tune.experiment.trial.Trial attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="train/api/doc/ray.train.context.TrainContext.html#ray.train.context.TrainContext">TrainContext (class in ray.train.context)</a>
 
       <ul>
@@ -10918,9 +11133,17 @@ document.write(`
       <ul>
         <li><a href="data/api/doc/ray.data.preprocessors.Categorizer.transform.html#ray.data.preprocessors.Categorizer.transform">(ray.data.preprocessors.Categorizer method)</a>
 </li>
+        <li><a href="data/api/doc/ray.data.preprocessors.Chain.transform.html#ray.data.preprocessors.Chain.transform">(ray.data.preprocessors.Chain method)</a>
+</li>
         <li><a href="data/api/doc/ray.data.preprocessors.Concatenator.transform.html#ray.data.preprocessors.Concatenator.transform">(ray.data.preprocessors.Concatenator method)</a>
 </li>
+        <li><a href="data/api/doc/ray.data.preprocessors.CountVectorizer.transform.html#ray.data.preprocessors.CountVectorizer.transform">(ray.data.preprocessors.CountVectorizer method)</a>
+</li>
         <li><a href="data/api/doc/ray.data.preprocessors.CustomKBinsDiscretizer.transform.html#ray.data.preprocessors.CustomKBinsDiscretizer.transform">(ray.data.preprocessors.CustomKBinsDiscretizer method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.FeatureHasher.transform.html#ray.data.preprocessors.FeatureHasher.transform">(ray.data.preprocessors.FeatureHasher method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.HashingVectorizer.transform.html#ray.data.preprocessors.HashingVectorizer.transform">(ray.data.preprocessors.HashingVectorizer method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.LabelEncoder.transform.html#ray.data.preprocessors.LabelEncoder.transform">(ray.data.preprocessors.LabelEncoder method)</a>
 </li>
@@ -10944,6 +11167,8 @@ document.write(`
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.StandardScaler.transform.html#ray.data.preprocessors.StandardScaler.transform">(ray.data.preprocessors.StandardScaler method)</a>
 </li>
+        <li><a href="data/api/doc/ray.data.preprocessors.TorchVisionPreprocessor.transform.html#ray.data.preprocessors.TorchVisionPreprocessor.transform">(ray.data.preprocessors.TorchVisionPreprocessor method)</a>
+</li>
         <li><a href="data/api/doc/ray.data.preprocessors.UniformKBinsDiscretizer.transform.html#ray.data.preprocessors.UniformKBinsDiscretizer.transform">(ray.data.preprocessors.UniformKBinsDiscretizer method)</a>
 </li>
       </ul></li>
@@ -10952,9 +11177,17 @@ document.write(`
       <ul>
         <li><a href="data/api/doc/ray.data.preprocessors.Categorizer.transform_batch.html#ray.data.preprocessors.Categorizer.transform_batch">(ray.data.preprocessors.Categorizer method)</a>
 </li>
+        <li><a href="data/api/doc/ray.data.preprocessors.Chain.transform_batch.html#ray.data.preprocessors.Chain.transform_batch">(ray.data.preprocessors.Chain method)</a>
+</li>
         <li><a href="data/api/doc/ray.data.preprocessors.Concatenator.transform_batch.html#ray.data.preprocessors.Concatenator.transform_batch">(ray.data.preprocessors.Concatenator method)</a>
 </li>
+        <li><a href="data/api/doc/ray.data.preprocessors.CountVectorizer.transform_batch.html#ray.data.preprocessors.CountVectorizer.transform_batch">(ray.data.preprocessors.CountVectorizer method)</a>
+</li>
         <li><a href="data/api/doc/ray.data.preprocessors.CustomKBinsDiscretizer.transform_batch.html#ray.data.preprocessors.CustomKBinsDiscretizer.transform_batch">(ray.data.preprocessors.CustomKBinsDiscretizer method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.FeatureHasher.transform_batch.html#ray.data.preprocessors.FeatureHasher.transform_batch">(ray.data.preprocessors.FeatureHasher method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.HashingVectorizer.transform_batch.html#ray.data.preprocessors.HashingVectorizer.transform_batch">(ray.data.preprocessors.HashingVectorizer method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.LabelEncoder.transform_batch.html#ray.data.preprocessors.LabelEncoder.transform_batch">(ray.data.preprocessors.LabelEncoder method)</a>
 </li>
@@ -10977,6 +11210,8 @@ document.write(`
         <li><a href="data/api/doc/ray.data.preprocessors.SimpleImputer.transform_batch.html#ray.data.preprocessors.SimpleImputer.transform_batch">(ray.data.preprocessors.SimpleImputer method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.StandardScaler.transform_batch.html#ray.data.preprocessors.StandardScaler.transform_batch">(ray.data.preprocessors.StandardScaler method)</a>
+</li>
+        <li><a href="data/api/doc/ray.data.preprocessors.TorchVisionPreprocessor.transform_batch.html#ray.data.preprocessors.TorchVisionPreprocessor.transform_batch">(ray.data.preprocessors.TorchVisionPreprocessor method)</a>
 </li>
         <li><a href="data/api/doc/ray.data.preprocessors.UniformKBinsDiscretizer.transform_batch.html#ray.data.preprocessors.UniformKBinsDiscretizer.transform_batch">(ray.data.preprocessors.UniformKBinsDiscretizer method)</a>
 </li>
@@ -11050,6 +11285,8 @@ document.write(`
       <ul>
         <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.CompletionRequest.html#ray.serve.llm.openai_api_models.CompletionRequest.truncate_prompt_tokens">(ray.serve.llm.openai_api_models.CompletionRequest attribute)</a>
 </li>
+        <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.EmbeddingRequest.html#ray.serve.llm.openai_api_models.EmbeddingRequest.truncate_prompt_tokens">(ray.serve.llm.openai_api_models.EmbeddingRequest attribute)</a>
+</li>
       </ul></li>
       <li><a href="rllib/package_ref/doc/ray.rllib.utils.checkpoints.try_import_msgpack.html#ray.rllib.utils.checkpoints.try_import_msgpack">try_import_msgpack() (in module ray.rllib.utils.checkpoints)</a>
 </li>
@@ -11111,6 +11348,8 @@ document.write(`
         <li><a href="ray-core/compiled-graph/doc/ray.dag.output_node.MultiOutputNode.type_hint.html#ray.dag.output_node.MultiOutputNode.type_hint">(ray.dag.output_node.MultiOutputNode property)</a>
 </li>
       </ul></li>
+      <li><a href="data/api/dataset.html#ray.data.Schema.types">types (ray.data.Schema property)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -11192,6 +11431,10 @@ document.write(`
 </li>
         <li><a href="serve/api/doc/ray.serve.schema.ServeInstanceDetails.update_forward_refs.html#ray.serve.schema.ServeInstanceDetails.update_forward_refs">(ray.serve.schema.ServeInstanceDetails class method)</a>
 </li>
+        <li><a href="serve/api/doc/ray.serve.schema.Target.update_forward_refs.html#ray.serve.schema.Target.update_forward_refs">(ray.serve.schema.Target class method)</a>
+</li>
+        <li><a href="serve/api/doc/ray.serve.schema.TargetGroup.update_forward_refs.html#ray.serve.schema.TargetGroup.update_forward_refs">(ray.serve.schema.TargetGroup class method)</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -11246,6 +11489,8 @@ document.write(`
 </li>
         <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.CompletionStreamResponse.html#ray.serve.llm.openai_api_models.CompletionStreamResponse.usage">(ray.serve.llm.openai_api_models.CompletionStreamResponse attribute)</a>
 </li>
+        <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.EmbeddingResponse.html#ray.serve.llm.openai_api_models.EmbeddingResponse.usage">(ray.serve.llm.openai_api_models.EmbeddingResponse attribute)</a>
+</li>
       </ul></li>
       <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.ChatCompletionRequest.html#ray.serve.llm.openai_api_models.ChatCompletionRequest.use_beam_search">use_beam_search (ray.serve.llm.openai_api_models.ChatCompletionRequest attribute)</a>
 
@@ -11265,6 +11510,8 @@ document.write(`
 
       <ul>
         <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.CompletionRequest.html#ray.serve.llm.openai_api_models.CompletionRequest.user">(ray.serve.llm.openai_api_models.CompletionRequest attribute)</a>
+</li>
+        <li><a href="serve/api/doc/ray.serve.llm.openai_api_models.EmbeddingRequest.html#ray.serve.llm.openai_api_models.EmbeddingRequest.user">(ray.serve.llm.openai_api_models.EmbeddingRequest attribute)</a>
 </li>
       </ul></li>
       <li><a href="serve/api/doc/ray.serve.Deployment.html#ray.serve.Deployment.user_config">user_config (ray.serve.Deployment property)</a>
@@ -11423,6 +11670,8 @@ document.write(`
 </li>
       <li><a href="rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.worker_restore_timeout_s.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.worker_restore_timeout_s">worker_restore_timeout_s (ray.rllib.algorithms.algorithm_config.AlgorithmConfig property)</a>
 </li>
+      <li><a href="train/api/doc/ray.train.RunConfig.worker_runtime_env.html#ray.train.RunConfig.worker_runtime_env">worker_runtime_env (ray.train.RunConfig attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ray-observability/reference/doc/ray.util.state.common.WorkerState.html#ray.util.state.common.WorkerState.worker_type">worker_type (ray.util.state.common.WorkerState attribute)</a>
@@ -11440,6 +11689,8 @@ document.write(`
       <li><a href="data/api/doc/ray.data.Dataset.write_bigquery.html#ray.data.Dataset.write_bigquery">write_bigquery() (ray.data.Dataset method)</a>
 </li>
       <li><a href="data/api/doc/ray.data.datasource.BlockBasedFileDatasink.write_block_to_file.html#ray.data.datasource.BlockBasedFileDatasink.write_block_to_file">write_block_to_file() (ray.data.datasource.BlockBasedFileDatasink method)</a>
+</li>
+      <li><a href="data/api/doc/ray.data.Dataset.write_clickhouse.html#ray.data.Dataset.write_clickhouse">write_clickhouse() (ray.data.Dataset method)</a>
 </li>
       <li><a href="data/api/doc/ray.data.Dataset.write_csv.html#ray.data.Dataset.write_csv">write_csv() (ray.data.Dataset method)</a>
 </li>

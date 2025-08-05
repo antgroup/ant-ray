@@ -68,6 +68,7 @@ RAY_JOB_START_TIMEOUT_SECONDS_ENV_VAR = "RAY_JOB_START_TIMEOUT_SECONDS"
 DASHBOARD_METRIC_PORT = env_integer("DASHBOARD_METRIC_PORT", 44227)
 
 NODE_TAG_KEYS = ["ip", "Version", "SessionName", "StorageNamespace", "IsHeadNode"]
+RAYLET_TAG_KEYS = NODE_TAG_KEYS + ["pid"]
 GPU_TAG_KEYS = NODE_TAG_KEYS + ["GpuDeviceName", "GpuIndex"]
 CLUSTER_TAG_KEYS = ["node_type", "Version", "SessionName", "StorageNamespace"]
 COMPONENT_METRICS_TAG_KEYS = [

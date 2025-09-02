@@ -319,10 +319,6 @@ class RemoteFunction:
         if client_mode_should_convert():
             return client_mode_convert_function(self, args, kwargs, **task_options)
 
-        from ray.util.insight import record_control_flow
-
-        record_control_flow(None, self._function_name.split(".")[-1])
-
         worker = ray._private.worker.global_worker
         worker.check_connected()
 
@@ -389,6 +385,12 @@ class RemoteFunction:
 
         # TODO(suquark): cleanup these fields
         name = task_options["name"]
+
+        from ray.util.insight import record_control_flow
+        if name is None or name == "":
+            name = self._function_name.split(".")[-1]
+        record_control_flow(None, name)
+
         placement_group = task_options["placement_group"]
         placement_group_bundle_index = task_options["placement_group_bundle_index"]
         placement_group_capture_child_tasks = task_options[

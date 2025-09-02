@@ -387,9 +387,10 @@ class RemoteFunction:
         name = task_options["name"]
 
         from ray.util.insight import record_control_flow
-        if name is None or name == "":
-            name = self._function_name.split(".")[-1]
-        record_control_flow(None, name)
+        record_name = name
+        if record_name is None or record_name == "":
+            record_name = self._function_name.split(".")[-1]
+        record_control_flow(None, record_name)
 
         placement_group = task_options["placement_group"]
         placement_group_bundle_index = task_options["placement_group_bundle_index"]

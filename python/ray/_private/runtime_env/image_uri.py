@@ -140,7 +140,7 @@ def _modify_container_context_impl(
     # we need 'sudo' and 'admin', mount logs
     if container_option.get("sudo"):
         container_command = ["sudo", "-E"] + container_command
-        
+
     container_command.append("-u")
     # we set the user in the container, default is 'admin'
     user = container_option.get("user")

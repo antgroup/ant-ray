@@ -52,10 +52,10 @@ jobs:
       - name: Fetch source branch and checkout
         run: |
           # Fetch only the source branch
-          git fetch --no-tags origin "$SOURCE_BRANCH"
-
+          git fetch --no-tags origin "$SOURCE_BRANCH:$SOURCE_BRANCH"
           git reset --hard  "$SOURCE_BRANCH"
           git status --porcelain --branch || true
+          
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:

@@ -1460,7 +1460,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="TrainingFailedError">
-<a class="viewcode-back" href="../../../train/api/doc/ray.train.base_trainer.TrainingFailedError.html#ray.train.tensorflow.tensorflow_trainer.TrainingFailedError">[docs]</a>
+<a class="viewcode-back" href="../../../train/api/doc/ray.train.base_trainer.TrainingFailedError.html#ray.train.base_trainer.TrainingFailedError">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TrainingFailedError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An error indicating that training has failed.&quot;&quot;&quot;</span>
@@ -1518,7 +1518,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="BaseTrainer">
-<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.html#ray.train.tensorflow.tensorflow_trainer.BaseTrainer">[docs]</a>
+<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.html#ray.train.base_trainer.BaseTrainer">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">BaseTrainer</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines interface for distributed training on Ray.</span>
@@ -1665,7 +1665,7 @@ document.write(`
         <span class="n">air_usage</span><span class="o">.</span><span class="n">tag_air_trainer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BaseTrainer.restore">
-<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.restore.html#ray.train.tensorflow.tensorflow_trainer.BaseTrainer.restore">[docs]</a>
+<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.restore.html#ray.train.base_trainer.BaseTrainer.restore">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="nd">@Deprecated</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">_TRAINER_RESTORE_DEPRECATION_WARNING</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span>
@@ -1827,7 +1827,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="BaseTrainer.can_restore">
-<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.can_restore.html#ray.train.tensorflow.tensorflow_trainer.BaseTrainer.can_restore">[docs]</a>
+<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.can_restore.html#ray.train.base_trainer.BaseTrainer.can_restore">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="nd">@Deprecated</span><span class="p">(</span>
         <span class="n">message</span><span class="o">=</span><span class="n">_TRAINER_RESTORE_DEPRECATION_WARNING</span><span class="p">,</span>
@@ -2001,7 +2001,7 @@ document.write(`
         <span class="k">return</span> <span class="n">scaling_config</span>
 
 <div class="viewcode-block" id="BaseTrainer.setup">
-<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.setup.html#ray.train.tensorflow.tensorflow_trainer.BaseTrainer.setup">[docs]</a>
+<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.setup.html#ray.train.base_trainer.BaseTrainer.setup">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Called during fit() to perform initial setup on the Trainer.</span>
 
@@ -2017,7 +2017,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="BaseTrainer.preprocess_datasets">
-<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.preprocess_datasets.html#ray.train.tensorflow.tensorflow_trainer.BaseTrainer.preprocess_datasets">[docs]</a>
+<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.preprocess_datasets.html#ray.train.base_trainer.BaseTrainer.preprocess_datasets">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">preprocess_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Deprecated.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">DeprecationWarning</span><span class="p">(</span>
@@ -2027,7 +2027,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="BaseTrainer.training_loop">
-<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.training_loop.html#ray.train.tensorflow.tensorflow_trainer.BaseTrainer.training_loop">[docs]</a>
+<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.training_loop.html#ray.train.base_trainer.BaseTrainer.training_loop">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">training_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Loop called by fit() to run training and report results to Tune.</span>
@@ -2059,7 +2059,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="BaseTrainer.fit">
-<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.fit.html#ray.train.tensorflow.tensorflow_trainer.BaseTrainer.fit">[docs]</a>
+<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.fit.html#ray.train.base_trainer.BaseTrainer.fit">[docs]</a>
     <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs training.</span>
@@ -2315,7 +2315,7 @@ document.write(`
         <span class="k">return</span> <span class="n">TrainTrainable</span>
 
 <div class="viewcode-block" id="BaseTrainer.as_trainable">
-<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.as_trainable.html#ray.train.tensorflow.tensorflow_trainer.BaseTrainer.as_trainable">[docs]</a>
+<a class="viewcode-back" href="../../../train/api/doc/ray.train.trainer.BaseTrainer.as_trainable.html#ray.train.base_trainer.BaseTrainer.as_trainable">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">as_trainable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;Trainable&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts self to a ``tune.Trainable`` class.&quot;&quot;&quot;</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>

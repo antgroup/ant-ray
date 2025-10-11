@@ -55,14 +55,14 @@ jobs:
           git fetch --no-tags origin "$SOURCE_BRANCH:$SOURCE_BRANCH"
           git reset --hard  "$SOURCE_BRANCH"
           git status --porcelain --branch || true
-          
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GH_TOKEN }}
           # create the branch from the current HEAD (we checked out 'promote')
           # branch: auto-merge/${{ env.SOURCE_BRANCH }}-to-${{ env.TARGET_BRANCH }}
-          branch-suffix: ${{ env.DATE }}
+          # branch-suffix: ${{ env.DATE }}
           base: ${{ env.TARGET_BRANCH }}
           title: |
             🔄 daily merge: ${{ env.SOURCE_BRANCH }} → ${{ env.TARGET_BRANCH }} ${{ env.DATE }}

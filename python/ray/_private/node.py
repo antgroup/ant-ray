@@ -976,11 +976,15 @@ class Node:
         s.bind(("", 0))
         port = s.getsockname()[1]
 
+        low_end = int(os.getenv("RAY_PORT_RANGE_LOW", 10000))
+        high_end = int(os.getenv("RAY_PORT_RANGE_HIGH", 11499))
+
+
         # Try to generate a port that is far above the 'next available' one.
         # This solves issue #8254 where GRPC fails because the port assigned
         # from this method has been used by a different process.
         for _ in range(ray_constants.NUM_PORT_RETRIES):
-            new_port = random.randint(port, 65535)
+            new_port = random.randint(low_end, high_end)
             if new_port in allocated_ports:
                 # This port is allocated for other usage already,
                 # so we shouldn't use it even if it's not in use right now.

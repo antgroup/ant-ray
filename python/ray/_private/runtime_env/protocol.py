@@ -52,38 +52,8 @@ class ProtocolsProvider:
         Raises:
             ImportError: If required dependencies for the protocol are not installed.
         """
-        assert protocol in cls.get_remote_protocols()
 
-        tp = None
-
-        if protocol == "file":
-            source_uri = source_uri[len("file://") :]
-
-            def open_file(uri, mode, *, transport_params=None):
-                return open(uri, mode)
-
-        elif protocol == "s3":
-            try:
-                import boto3
-                from smart_open import open as open_file
-            except ImportError:
-                raise ImportError(
-                    "You must `pip install smart_open[s3]` "
-                    "to fetch URIs in s3 bucket. " + cls._MISSING_DEPENDENCIES_WARNING
-                )
-            tp = {"client": boto3.client("s3")}
-        elif protocol == "gs":
-            try:
-                from google.cloud import storage  # noqa: F401
-                from smart_open import open as open_file
-            except ImportError:
-                raise ImportError(
-                    "You must `pip install smart_open[gcs]` "
-                    "to fetch URIs in Google Cloud Storage bucket."
-                    + cls._MISSING_DEPENDENCIES_WARNING
-                )
-
-        elif protocol == "dfs":
+        def _download_dfs_file(cls, source_uri, dest_file):
             try:
                 try:
                     import zdfs
@@ -147,6 +117,42 @@ class ProtocolsProvider:
                 else:
                     raise Exception("Hadoop client not found.")
                 return
+
+        assert protocol in cls.get_remote_protocols()
+
+        tp = None
+
+        if protocol == "file":
+            source_uri = source_uri[len("file://") :]
+
+            def open_file(uri, mode, *, transport_params=None):
+                return open(uri, mode)
+
+        elif protocol == "s3":
+            try:
+                import boto3
+                from smart_open import open as open_file
+            except ImportError:
+                raise ImportError(
+                    "You must `pip install smart_open[s3]` "
+                    "to fetch URIs in s3 bucket. " + cls._MISSING_DEPENDENCIES_WARNING
+                )
+            tp = {"client": boto3.client("s3")}
+
+        elif protocol == "gs":
+            try:
+                from google.cloud import storage  # noqa: F401
+                from smart_open import open as open_file
+            except ImportError:
+                raise ImportError(
+                    "You must `pip install smart_open[gcs]` "
+                    "to fetch URIs in Google Cloud Storage bucket."
+                    + cls._MISSING_DEPENDENCIES_WARNING
+                )
+
+        elif protocol == "dfs":
+            _download_dfs_file(cls, source_uri, dest_file)
+            return
 
         elif protocol == "hdfs":
             try:

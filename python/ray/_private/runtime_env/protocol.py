@@ -140,7 +140,9 @@ class ProtocolsProvider:
                     )
                     if result.returncode != 0:
                         raise Exception(
-                            f"Hadoop client failed to download file, return code:{result.returncode}"
+                            f"Hadoop client failed to download file, "
+                            f"return code: {result.returncode}, "
+                            f"stderr: {result.stderr}"
                         )
                 else:
                     raise Exception("Hadoop client not found.")

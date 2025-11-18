@@ -155,6 +155,9 @@ def _modify_context_impl(
             "NCCL_SOCKET_IFNAME",
             "REAL_CUDA_VISIBLE_DEVICES",
         ]
+        extra_env_keys = os.getenv("PODMAN_ENV_KEYS", "")
+        extra_env_keys = extra_env_keys.split(",")
+        nydus_env_keys.extend(extra_env_keys)
 
         # Inherit from os.environ if they exist
         for key in nydus_env_keys:

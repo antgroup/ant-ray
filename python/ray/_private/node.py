@@ -995,9 +995,9 @@ class Node:
                 f"Invalid port range: RAY_PORT_RANGE_LOW ({low_end}) must be less than or equal to RAY_PORT_RANGE_HIGH ({high_end})."
             )
 
-        # Try to generate a port that is far above the 'next available' one 
-        # or from a given range(if low_end and high_end is defined). This 
-        # solves issue #8254 where GRPC fails because the port assigned from 
+        # Try to generate a port that is far above the 'next available' one
+        # or from a given range(if low_end and high_end is defined). This
+        # solves issue #8254 where GRPC fails because the port assigned from
         # this method has been used by a different process.
         for _ in range(ray_constants.NUM_PORT_RETRIES):
             new_port = random.randint(low_end, high_end)

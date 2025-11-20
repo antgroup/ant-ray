@@ -988,8 +988,8 @@ class Node:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind(("", 0))
         port = s.getsockname()[1]
-        low_end = int(os.getenv("RAY_PORT_RANGE_LOW", port))
-        high_end = int(os.getenv("RAY_PORT_RANGE_HIGH", 65535))
+        low_end = ray_constants.env_integer("RAY_PORT_RANGE_LOW", port)
+        high_end = ray_constants.env_integer("RAY_PORT_RANGE_HIGH", 65535)
         if low_end > high_end:
             raise ValueError(
                 f"Invalid port range: RAY_PORT_RANGE_LOW ({low_end}) must be less than or equal to RAY_PORT_RANGE_HIGH ({high_end})."

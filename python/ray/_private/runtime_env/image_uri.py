@@ -1,6 +1,7 @@
 import logging
 import os
 import json
+import shlex
 from typing import List, Optional
 import ray
 import ray._private.runtime_env.constants as runtime_env_constants
@@ -26,20 +27,34 @@ default_logger = logging.getLogger(__name__)
 async def _create_impl(image_uri: str, logger: logging.Logger):
     # Pull image if it doesn't exist
     # Also get path to `default_worker.py` inside the image.
-    pull_image_cmd = [
-        "podman",
-        "run",
-        "--rm",
-        image_uri,
-        "python",
-        "-c",
-        (
-            "import ray._private.workers.default_worker as default_worker; "
-            "print(default_worker.__file__)"
-        ),
-    ]
-    logger.info("Pulling image %s", image_uri)
-    worker_path = await check_output_cmd(pull_image_cmd, logger=logger)
+    custom_pull_cmd = os.getenv("RAY_PODMAN_PULL_CMD", "")
+    if custom_pull_cmd:
+        logger.info("Using custom pull command: %s", custom_pull_cmd)
+        shell_cmd = ["sh", "-c", custom_pull_cmd]
+        worker_path = await check_output_cmd(shell_cmd, logger=logger)
+    else:
+        pull_image_cmd = [
+            "podman",
+            "run",
+            "--rm",
+            image_uri,
+            "python",
+            "-c",
+            (
+                "import ray._private.workers.default_worker as default_worker; "
+                "print(default_worker.__file__)"
+            ),
+        ]
+        logger.info("Pulling image %s", image_uri)
+        worker_path = await check_output_cmd(pull_image_cmd, logger=logger)
+
+    output_filter = os.getenv("RAY_PODMAN_OUTPUT_FILTER", "")
+    if output_filter:
+        safe_worker_path = shlex.quote(worker_path)
+        filter_cmd = ["sh", "-c", f"printf '%s' '{safe_worker_path}' | {output_filter}"]
+        filtered_path = await check_output_cmd(filter_cmd, logger=logger)
+        worker_path = filtered_path
+
     return worker_path.strip()
 
 
@@ -253,6 +268,16 @@ def _modify_context_impl(
     ray_tmp_dir: str,
 ):
     context.override_worker_entrypoint = worker_path
+    custom_container_cmd = os.getenv("RAY_PODMAN_CONTAINER_CMD", "")
+    if custom_container_cmd:
+        custom_container_cmd_str = custom_container_cmd.format(
+            ray_tmp_dir=ray_tmp_dir, image_uri=image_uri
+        )
+        logger.info(
+            f"Starting worker in container with prefix {custom_container_cmd_str}"
+        )
+        context.py_executable = custom_container_cmd_str
+        return
 
     container_driver = "podman"
     container_command = [
@@ -284,6 +309,12 @@ def _modify_context_impl(
     for env_var_name, env_var_value in os.environ.items():
         if env_var_name.startswith("RAY_"):
             env_vars[env_var_name] = env_var_value
+
+    extra_env_keys = os.getenv("RAY_PODMAN_EXTRA_ENV_KEYS", "")
+    if extra_env_keys:
+        for key in extra_env_keys.split(","):
+            if key in os.environ:
+                env_vars[key] = os.environ[key]
 
     # Support for runtime_env['env_vars']
     env_vars.update(context.env_vars)

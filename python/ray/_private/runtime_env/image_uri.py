@@ -312,8 +312,8 @@ def _modify_context_impl(
 
     extra_env_keys = os.getenv("RAY_PODMAN_EXTRA_ENV_KEYS", "")
     if extra_env_keys:
-        for key in extra_env_keys.split(","):
-            if key in os.environ:
+        for key in (k.strip() for k in extra_env_keys.split(",")):
+            if key and key in os.environ:
                 env_vars[key] = os.environ[key]
 
     # Support for runtime_env['env_vars']

@@ -51,7 +51,8 @@ async def _create_impl(image_uri: str, logger: logging.Logger):
     output_filter = os.getenv("RAY_PODMAN_OUTPUT_FILTER", "")
     if output_filter:
         safe_worker_path = shlex.quote(worker_path)
-        filter_cmd = ["sh", "-c", f"printf '%s' '{safe_worker_path}' | {output_filter}"]
+        safe_output_filter = shlex.quote(output_filter)
+        filter_cmd = ["sh", "-c", f"printf '%s' {safe_worker_path} | {output_filter}"]
         filtered_path = await check_output_cmd(filter_cmd, logger=logger)
         worker_path = filtered_path
 

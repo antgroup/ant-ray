@@ -13,8 +13,8 @@ import pytest
 from freezegun import freeze_time
 
 import ray
-from ray._common.test_utils import wait_for_condition
 from ray._private.ray_constants import ID_SIZE
+from ray._private.test_utils import wait_for_condition
 from ray.actor import ActorHandle
 from ray.data._internal.actor_autoscaler import ActorPoolScalingRequest
 from ray.data._internal.execution.bundle_queue import FIFOBundleQueue
@@ -975,7 +975,395 @@ def test_actor_init_failure_retry(
             ).take_all()
 
 
+
+# def test_actor_pool_map_operator_init(ray_start_regular_shared, data_context_override):
+#     """Tests that ActorPoolMapOperator runs init_fn on start."""
+#
+#     from ray.exceptions import RayActorError
+#
+#     # Override to block on actor pool provisioning at least min actors
+#     data_context_override.wait_for_min_actors_s = 60
+#
+#     def _sleep(block_iter: Iterable[Block]) -> Iterable[Block]:
+#         time.sleep(999)
+#
+#     def _fail():
+#         raise ValueError("init_failed")
+#
+#     input_op = InputDataBuffer(
+#         DataContext.get_current(), make_ref_bundles([[i] for i in range(10)])
+#     )
+#     compute_strategy = ActorPoolStrategy(min_size=1)
+#
+#     op = MapOperator.create(
+#         create_map_transformer_from_block_fn(_sleep, init_fn=_fail),
+#         input_op=input_op,
+#         data_context=DataContext.get_current(),
+#         name="TestMapper",
+#         compute_strategy=compute_strategy,
+#     )
+#
+#     with pytest.raises(RayActorError, match=r"init_failed"):
+#         op.start(ExecutionOptions())
+#
+#
+# @pytest.mark.parametrize(
+#     "max_tasks_in_flight_strategy, max_tasks_in_flight_ctx, max_concurrency, expected_max_tasks_in_flight",
+#     [
+#         # Compute strategy takes precedence
+#         (3, 5, 4, 3),
+#         # DataContext.max_tasks_in_flight_per_actor takes precedence
+#         (None, 5, 4, 5),
+#         # Max tasks in-flight is derived as max_concurrency x 4
+#         (
+#             None,
+#             None,
+#             4,
+#             4 * DEFAULT_ACTOR_MAX_TASKS_IN_FLIGHT_TO_MAX_CONCURRENCY_FACTOR,
+#         ),
+#     ],
+# )
+# def test_actor_pool_map_operator_should_add_input(
+#     ray_start_regular_shared,
+#     max_tasks_in_flight_strategy,
+#     max_tasks_in_flight_ctx,
+#     max_concurrency,
+#     expected_max_tasks_in_flight,
+#     restore_data_context,
+# ):
+#     """Tests that ActorPoolMapOperator refuses input when actors are pending."""
+#
+#     ctx = DataContext.get_current()
+#     ctx.max_tasks_in_flight_per_actor = max_tasks_in_flight_ctx
+#
+#     input_op = InputDataBuffer(ctx, make_ref_bundles([[i] for i in range(20)]))
+#
+#     compute_strategy = ActorPoolStrategy(
+#         size=1,
+#         max_tasks_in_flight_per_actor=max_tasks_in_flight_strategy,
+#     )
+#
+#     def _failing_transform(
+#         block_iter: Iterable[Block], task_context: TaskContext
+#     ) -> Iterable[Block]:
+#         raise ValueError("expected failure")
+#
+#     op = MapOperator.create(
+#         create_map_transformer_from_block_fn(_failing_transform),
+#         input_op=input_op,
+#         data_context=ctx,
+#         name="TestMapper",
+#         compute_strategy=compute_strategy,
+#         ray_remote_args={"max_concurrency": max_concurrency},
+#     )
+#
+#     op.start(ExecutionOptions())
+#
+#     # Cannot add input until actor has started.
+#     assert not op.should_add_input()
+#     run_op_tasks_sync(op)
+#     assert op.should_add_input()
+#
+#     # Assert that single actor can accept up to N tasks
+#     for _ in range(expected_max_tasks_in_flight):
+#         assert op.should_add_input()
+#         op.add_input(input_op.get_next(), 0)
+#     assert not op.should_add_input()
+#
+#
+# def test_actor_pool_map_operator_num_active_tasks_and_completed(shutdown_only):
+#     """Tests ActorPoolMapOperator's num_active_tasks and completed methods."""
+#     num_actors = 2
+#     ray.shutdown()
+#     ray.init(num_cpus=num_actors)
+#
+#     signal_actor = create_remote_signal_actor(ray).options(num_cpus=0).remote()
+#
+#     def _map_transfom_fn(block_iter: Iterable[Block], _) -> Iterable[Block]:
+#         ray.get(signal_actor.wait.remote())
+#         yield from block_iter
+#
+#     input_op = InputDataBuffer(
+#         DataContext.get_current(), make_ref_bundles([[i] for i in range(num_actors)])
+#     )
+#     compute_strategy = ActorPoolStrategy(min_size=num_actors, max_size=2 * num_actors)
+#
+#     # Create an operator with [num_actors, 2 * num_actors] actors.
+#     # Resources are limited to num_actors, so the second half will be pending.
+#     op = MapOperator.create(
+#         create_map_transformer_from_block_fn(_map_transfom_fn),
+#         input_op=input_op,
+#         data_context=DataContext.get_current(),
+#         name="TestMapper",
+#         compute_strategy=compute_strategy,
+#     )
+#     actor_pool = op._actor_pool
+#
+#     # Wait for the op to scale up to the min size.
+#     op.start(ExecutionOptions())
+#     run_op_tasks_sync(op)
+#     assert actor_pool.num_running_actors() == num_actors
+#     assert op.num_active_tasks() == 0
+#
+#     # Scale up to the max size, the second half of the actors will be pending.
+#     actor_pool.scale(ActorPoolScalingRequest(delta=num_actors))
+#     assert actor_pool.num_pending_actors() == num_actors
+#     # `num_active_tasks` should exclude the metadata tasks for the pending actors.
+#     assert op.num_active_tasks() == 0
+#
+#     # Add inputs.
+#     for _ in range(num_actors):
+#         assert op.should_add_input()
+#         op.add_input(input_op.get_next(), 0)
+#     # Still `num_active_tasks` should only include data tasks.
+#     assert op.num_active_tasks() == num_actors
+#     assert actor_pool.num_pending_actors() == num_actors
+#
+#     # Let the data tasks complete.
+#     signal_actor.send.remote()
+#     while len(op._data_tasks) > 0:
+#         run_one_op_task(op)
+#     assert op.num_active_tasks() == 0
+#     assert actor_pool.num_pending_actors() == num_actors
+#
+#     # Mark the inputs done and take all outputs.
+#     # The operator should be completed, even if there are pending actors.
+#     op.all_inputs_done()
+#     while op.has_next():
+#         op.get_next()
+#     assert actor_pool.num_pending_actors() == num_actors
+#     assert op.has_completed()
+#
+#
+# def test_actor_pool_with_default_removal_strategy(ray_start_regular_shared):
+#     """Test that _ActorPool uses the default actor removal strategy."""
+#     from ray.data._internal.execution.operators.actor_removal_strategy import (
+#         DefaultActorRemovalStrategy,
+#     )
+#
+#     test_case = TestActorPool()
+#
+#     # Create an actor pool with the default removal strategy.
+#     pool = test_case._create_actor_pool(
+#         min_size=1,
+#         max_size=4,
+#         initial_size=2,
+#     )
+#
+#     # Verify that the default strategy is being used.
+#     assert isinstance(pool._actor_removal_strategy, DefaultActorRemovalStrategy)
+#
+#     # Add multiple actors
+#     test_case._add_ready_actor(pool, node_id="node1")
+#     test_case._add_ready_actor(pool, node_id="node2")
+#
+#     # Verify that shrink works normally
+#     killed = pool._remove_inactive_actor()
+#     assert killed
+#     assert pool.current_size() == 1
+#
+#
+# def test_actor_pool_with_node_aware_removal_strategy(ray_start_regular_shared):
+#     """Test that _ActorPool uses the node-aware actor removal strategy."""
+#     from ray.data._internal.execution.operators.actor_removal_strategy import (
+#         NodeAwareActorRemovalStrategy,
+#     )
+#
+#     test_case = TestActorPool()
+#
+#     # Create an actor pool with the node-aware removal strategy.
+#     strategy = NodeAwareActorRemovalStrategy()
+#     pool = _ActorPool(
+#         min_size=1,
+#         max_size=6,
+#         initial_size=1,
+#         max_actor_concurrency=1,
+#         max_tasks_in_flight_per_actor=4,
+#         create_actor_fn=test_case._create_actor_fn,
+#         per_actor_resource_usage=ExecutionResources(cpu=1),
+#         actor_removal_strategy=strategy,
+#     )
+#
+#     # Verify that NodeAwareActorRemovalStrategy is being used.
+#     assert isinstance(
+#         pool._actor_removal_strategy,
+#         NodeAwareActorRemovalStrategy,
+#     )
+#
+#     # Add 3 actors on node1
+#     actors_node1 = []
+#     for _ in range(3):
+#         actor = test_case._add_ready_actor(pool, node_id="node1")
+#         actors_node1.append(actor)
+#
+#     # Add 1 actor on node2
+#     test_case._add_ready_actor(pool, node_id="node2")
+#
+#     # Verify all actors are added
+#     assert pool.current_size() == 4
+#     assert pool.num_running_actors() == 4
+#
+#     # Shrink one actor - should remove from node1 (it has more idle actors)
+#     killed = pool._remove_inactive_actor()
+#     assert killed
+#     assert pool.current_size() == 3
+#
+#     # Verify that the actor on node2 still exists
+#     test_case._pick_actor(pool)
+#
+#
+# def test_node_aware_strategy_prioritizes_node_with_most_idle_actors(
+#     ray_start_regular_shared,
+# ):
+#     """Test that the node-aware strategy prioritizes the node with the most idle actors."""
+#     from ray.data._internal.execution.operators.actor_removal_strategy import (
+#         NodeAwareActorRemovalStrategy,
+#     )
+#
+#     test_case = TestActorPool()
+#
+#     strategy = NodeAwareActorRemovalStrategy()
+#     pool = _ActorPool(
+#         min_size=1,
+#         max_size=10,
+#         initial_size=1,
+#         max_actor_concurrency=1,
+#         max_tasks_in_flight_per_actor=4,
+#         create_actor_fn=test_case._create_actor_fn,
+#         per_actor_resource_usage=ExecutionResources(cpu=1),
+#         actor_removal_strategy=strategy,
+#     )
+#
+#     # Add 4 actors on node1
+#     for _ in range(4):
+#         test_case._add_ready_actor(pool, node_id="node1")
+#
+#     # Add 2 actors on node2
+#     for _ in range(2):
+#         test_case._add_ready_actor(pool, node_id="node2")
+#
+#     assert pool.current_size() == 6
+#
+#     # Record the number of actors on node1 and node2
+#     node1_actors = sum(
+#         1 for state in pool._running_actors.values() if state.actor_location == "node1"
+#     )
+#     node2_actors = sum(
+#         1 for state in pool._running_actors.values() if state.actor_location == "node2"
+#     )
+#
+#     assert node1_actors == 4
+#     assert node2_actors == 2
+#
+#     # Shrink 3 times - should prioritize removing from node1
+#     for _ in range(3):
+#         killed = pool._remove_inactive_actor()
+#         assert killed
+#
+#     assert pool.current_size() == 3
+#
+#     # Verify that the actors on node1 were removed first
+#     remaining_node1_actors = sum(
+#         1 for state in pool._running_actors.values() if state.actor_location == "node1"
+#     )
+#     remaining_node2_actors = sum(
+#         1 for state in pool._running_actors.values() if state.actor_location == "node2"
+#     )
+#
+#     # node1 should have 1 actor remaining, node2 should have 2 actors
+#     assert remaining_node1_actors == 1
+#     assert remaining_node2_actors == 2
+#
+#
+# def test_node_aware_strategy_with_active_actors(ray_start_regular_shared):
+#     """Test that the node-aware strategy does not remove active actors."""
+#     from ray.data._internal.execution.operators.actor_removal_strategy import (
+#         NodeAwareActorRemovalStrategy,
+#     )
+#
+#     test_case = TestActorPool()
+#
+#     strategy = NodeAwareActorRemovalStrategy()
+#     pool = _ActorPool(
+#         min_size=1,
+#         max_size=6,
+#         initial_size=1,
+#         max_actor_concurrency=1,
+#         max_tasks_in_flight_per_actor=4,
+#         create_actor_fn=test_case._create_actor_fn,
+#         per_actor_resource_usage=ExecutionResources(cpu=1),
+#         actor_removal_strategy=strategy,
+#     )
+#
+#     # Add 3 actors on node1
+#     actors_node1 = []
+#     for _ in range(3):
+#         actor = test_case._add_ready_actor(pool, node_id="node1")
+#         actors_node1.append(actor)
+#
+#     # Add 1 actor on node2
+#     test_case._add_ready_actor(pool, node_id="node2")
+#
+#     # Make all actors on node1 active
+#     for actor in actors_node1:
+#         test_case._pick_actor(pool)
+#
+#     # Verify node1's actors are active
+#     assert pool.num_active_actors() == 3
+#     assert pool.num_idle_actors() == 1  # Only node2's actor is idle
+#
+#     # Try to shrink - should remove the idle actor from node2
+#     killed = pool._remove_inactive_actor()
+#     assert killed
+#     assert pool.current_size() == 3
+#
+#     # Verify that the actors on node1 still exist
+#     remaining_node1_actors = sum(
+#         1 for state in pool._running_actors.values() if state.actor_location == "node1"
+#     )
+#     assert remaining_node1_actors == 3
+#
+#
+# def test_actor_pool_removal_strategy_integration_with_scaling(ray_start_regular_shared):
+#     """Test actor removal strategy integration with scaling."""
+#     from ray.data._internal.execution.operators.actor_removal_strategy import (
+#         NodeAwareActorRemovalStrategy,
+#     )
+#
+#     # Create test instance directly, without calling setup_class()
+#     test_case = TestActorPool()
+#
+#     strategy = NodeAwareActorRemovalStrategy()
+#     pool = _ActorPool(
+#         min_size=2,
+#         max_size=8,
+#         initial_size=2,
+#         max_actor_concurrency=1,
+#         max_tasks_in_flight_per_actor=4,
+#         create_actor_fn=test_case._create_actor_fn,
+#         per_actor_resource_usage=ExecutionResources(cpu=1),
+#         actor_removal_strategy=strategy,
+#     )
+#
+#     # Expand to 6 actors
+#     pool.scale(ActorPoolScalingRequest(delta=4, reason="scale up"))
+#
+#     # Wait for actors to be ready
+#     for ready_ref in pool.get_pending_actor_refs():
+#         test_case._wait_for_actor_ready(pool, ready_ref)
+#
+#     assert pool.current_size() == 4
+#
+#     # Shrink 3 actors
+#     pool.scale(ActorPoolScalingRequest(delta=-3, reason="scale down", force=True))
+#
+#     # Verify shrink success
+#     assert pool.current_size() == 1
+
+
 if __name__ == "__main__":
     import sys
+
+    import pytest
 
     sys.exit(pytest.main(["-v", __file__]))

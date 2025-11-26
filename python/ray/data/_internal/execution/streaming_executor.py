@@ -47,7 +47,7 @@ from ray.data._internal.metadata_exporter import Topology as TopologyMetadata
 from ray.data._internal.progress_bar import ProgressBar
 from ray.data._internal.stats import DatasetStats, Timer, _StatsManager
 from ray.data.context import OK_PREFIX, WARN_PREFIX, DataContext
-from ray.util.debug import log_once
+from ray.util import log_once
 from ray.util.metrics import Gauge
 
 logger = logging.getLogger(__name__)
@@ -217,11 +217,24 @@ class StreamingExecutor(Executor, threading.Thread):
             self._data_context,
             execution_id=self._dataset_id,
         )
-        self._actor_autoscaler = create_actor_autoscaler(
-            self._topology,
-            self._resource_manager,
-            config=self._data_context.autoscaling_config,
-        )
+
+        data_context = DataContext.get_current()
+        if data_context.enable_resource_based_autoscaling:
+            from ray.data._internal.actor_autoscaler.resource_based_actor_autoscaler import (
+                ResourceBasedActorAutoscaler,
+            )
+
+            self._actor_autoscaler = ResourceBasedActorAutoscaler(
+                topology=self._topology,
+                resource_manager=self._resource_manager,
+                config=data_context.autoscaling_config,
+            )
+        else:
+            self._actor_autoscaler = create_actor_autoscaler(
+                self._topology,
+                self._resource_manager,
+                config=data_context.autoscaling_config,
+            )
 
         self._has_op_completed = dict.fromkeys(self._topology, False)
 

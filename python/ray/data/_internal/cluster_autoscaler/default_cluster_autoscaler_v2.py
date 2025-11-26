@@ -190,7 +190,7 @@ class DefaultClusterAutoscalerV2(ClusterAutoscaler):
             and util.gpu < self._cluster_scaling_up_util_threshold
             and util.object_store_memory < self._cluster_scaling_up_util_threshold
         ):
-            logger.debug(
+            logger.info(
                 "Cluster utilization is below threshold: "
                 f"CPU={util.cpu:.2f}, GPU={util.gpu:.2f}, memory={util.object_store_memory:.2f}."
             )
@@ -227,7 +227,7 @@ class DefaultClusterAutoscalerV2(ClusterAutoscaler):
             if logger.isEnabledFor(logging.DEBUG):
                 num_to_request = count + delta_count
                 debug_msg += f" [{bundle}: {count} -> {num_to_request}]"
-        logger.debug(debug_msg)
+        logger.info(debug_msg)
 
         # Cap the resource request to respect user-configured limits.
         # Active bundles (existing nodes) are always included; pending bundles

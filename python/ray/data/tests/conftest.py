@@ -12,7 +12,6 @@ import pytest
 import requests
 
 import ray
-from ray._common.test_utils import wait_for_condition
 from ray._private.arrow_utils import get_pyarrow_version
 from ray._private.internal_api import get_memory_info_reply, get_state_from_address
 from ray._private.ray_constants import DEFAULT_DASHBOARD_AGENT_LISTEN_PORT

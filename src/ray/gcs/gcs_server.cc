@@ -264,6 +264,7 @@ void GcsServer::GetOrGenerateClusterId(
 
 void GcsServer::DoStart(const GcsInitData &gcs_init_data) {
   InitClusterResourceScheduler();
+  InitGcsVirtualClusterManager(gcs_init_data);
   InitGcsNodeManager(gcs_init_data);
   InitClusterLeaseManager();
   InitGcsResourceManager(gcs_init_data);

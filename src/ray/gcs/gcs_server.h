@@ -170,6 +170,9 @@ class GcsServer {
                            ray::observability::MetricInterface &actor_by_state_gauge,
                            ray::observability::MetricInterface &gcs_actor_by_state_gauge);
 
+  /// Initialize gcs virtual cluster manager.
+  void InitGcsVirtualClusterManager(const GcsInitData &gcs_init_data);
+
   /// Initialize gcs placement group manager.
   void InitGcsPlacementGroupManager(
       const GcsInitData &gcs_init_data,

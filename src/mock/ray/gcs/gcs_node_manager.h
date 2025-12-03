@@ -17,6 +17,11 @@
 #include <gmock/gmock.h>
 
 #include "ray/gcs/gcs_node_manager.h"
+#include "ray/gcs/gcs_server/gcs_virtual_cluster_manager.h"
+#include "ray/gcs/gcs_server/gcs_table_storage.h"
+#include "ray/raylet/scheduling/cluster_resource_manager.h"
+#include "ray/common/asio/instrumented_io_context.h"
+#include "mock/ray/pubsub/publisher.h"
 #include "ray/observability/fake_ray_event_recorder.h"
 
 namespace ray {
@@ -25,13 +30,15 @@ namespace gcs {
 class MockGcsNodeManager : public GcsNodeManager {
  public:
   MockGcsNodeManager()
-      : GcsNodeManager(/*gcs_publisher=*/nullptr,
-                       /*gcs_table_storage=*/nullptr,
-                       /*io_context=*/mocked_io_context_not_used_,
-                       /*raylet_client_pool=*/nullptr,
-                       /*cluster_id=*/ClusterID::Nil(),
-                       /*ray_event_recorder=*/fake_ray_event_recorder_,
-                       /*session_name=*/"") {}
+      : GcsNodeManager(
+            GetMockGcsPublisher(),
+            GetMockGcsTableStorage(),
+            *GetMockIoContext(),
+            nullptr,
+            ClusterID::Nil(),
+            *GetMockVirtualClusterManager(),
+            fake_ray_event_recorder_,
+            "") {}
   MOCK_METHOD(void,
               HandleRegisterNode,
               (rpc::RegisterNodeRequest request,
@@ -52,6 +59,35 @@ class MockGcsNodeManager : public GcsNodeManager {
               (override));
   MOCK_METHOD(void, DrainNode, (const NodeID &node_id), (override));
 
+  private:
+  static instrumented_io_context* GetMockIoContext() {
+    static instrumented_io_context* io_context = new instrumented_io_context();
+    return io_context;
+  }
+  static gcs::InMemoryGcsTableStorage* GetMockGcsTableStorage() {
+    static gcs::InMemoryGcsTableStorage* gcs_table_storage = new gcs::InMemoryGcsTableStorage();
+    return gcs_table_storage;
+  }
+  static gcs::GcsPublisher* GetMockGcsPublisher() {
+    static std::unique_ptr<ray::pubsub::Publisher> publisher(new ray::pubsub::MockPublisher());
+    static gcs::GcsPublisher* gcs_publisher = new gcs::GcsPublisher(std::move(publisher));
+    return gcs_publisher;
+  }
+  static ray::ClusterResourceManager* GetMockClusterResourceManager() {
+    static ray::ClusterResourceManager* cluster_resource_manager = new ray::ClusterResourceManager(*GetMockIoContext());
+    return cluster_resource_manager;
+  }
+  static gcs::GcsVirtualClusterManager* GetMockVirtualClusterManager() {
+    static std::shared_ptr<ray::PeriodicalRunner> periodical_runner = nullptr;
+    static gcs::GcsVirtualClusterManager* manager =
+        new gcs::GcsVirtualClusterManager(*GetMockIoContext(),
+                                          *GetMockGcsTableStorage(),
+                                          *GetMockGcsPublisher(),
+                                          *GetMockClusterResourceManager(),
+                                          periodical_runner);
+    return manager;
+  }
+  
   instrumented_io_context mocked_io_context_not_used_;
   observability::FakeRayEventRecorder fake_ray_event_recorder_;
 };

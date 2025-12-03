@@ -12,28 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "ray/gcs/pubsub/gcs_pub_sub.h"
+#include "ray/pubsub/gcs_subscriber.h"
 
 namespace ray {
-namespace gcs {
-
-Status GcsPublisher::PublishVirtualCluster(const VirtualClusterID &id,
-                                           const rpc::VirtualClusterTableData &message,
-                                           const StatusCallback &done) {
-  rpc::PubMessage msg;
-  msg.set_channel_type(rpc::ChannelType::RAY_VIRTUAL_CLUSTER_CHANNEL);
-  msg.set_key_id(id.Binary());
-  *msg.mutable_virtual_cluster_message() = message;
-  publisher_->Publish(msg);
-  if (done != nullptr) {
-    done(Status::OK());
-  }
-  return Status::OK();
-}
+namespace pubsub {
 
 Status GcsSubscriber::SubscribeAllVirtualClusters(
-    const SubscribeCallback<VirtualClusterID, rpc::VirtualClusterTableData> &subscribe,
-    const StatusCallback &done) {
+    const gcs::SubscribeCallback<VirtualClusterID, rpc::VirtualClusterTableData> &subscribe,
+    const gcs::StatusCallback &done) {
   // GCS subscriber.
   auto subscribe_item_callback = [subscribe](rpc::PubMessage &&msg) {
     RAY_CHECK(msg.channel_type() == rpc::ChannelType::RAY_VIRTUAL_CLUSTER_CHANNEL);
@@ -59,5 +45,5 @@ Status GcsSubscriber::SubscribeAllVirtualClusters(
   return Status::OK();
 }
 
-}  // namespace gcs
+}  // namespace pubsub
 }  // namespace ray

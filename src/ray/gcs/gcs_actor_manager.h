@@ -42,6 +42,8 @@
 #include "ray/util/thread_checker.h"
 #include "src/ray/protobuf/gcs_service.pb.h"
 
+#include "ray/gcs/gcs_server/gcs_virtual_cluster_manager.h"
+
 namespace ray {
 namespace gcs {
 
@@ -104,6 +106,7 @@ class GcsActorManager : public rpc::ActorInfoGcsServiceHandler {
       pubsub::GcsPublisher *gcs_publisher,
       RuntimeEnvManager &runtime_env_manager,
       GCSFunctionManager &function_manager,
+      GcsVirtualClusterManager &gcs_virtual_cluster_manager,
       std::function<void(const ActorID &)> destroy_owned_placement_group_if_needed,
       rpc::CoreWorkerClientPool &worker_client_pool,
       observability::RayEventRecorderInterface &ray_event_recorder,
@@ -283,6 +286,21 @@ class GcsActorManager : public rpc::ActorInfoGcsServiceHandler {
     usage_stats_client_ = usage_stats_client;
   }
 
+    /// Add actor registration event listener.
+  void AddActorRegistrationListener(ActorRegistrationListenerCallback listener) {
+    RAY_CHECK(listener);
+    actor_registration_listeners_.emplace_back(std::move(listener));
+  }
+
+  /// Add actor destroy event listener.
+  void AddActorDestroyListener(ActorDestroyListenerCallback listener) {
+    RAY_CHECK(listener);
+    actor_destroy_listeners_.emplace_back(std::move(listener));
+  }
+
+  /// Evict all actors which ttl is expired.
+  void EvictExpiredActors();
+
  private:
   const ray::rpc::ActorDeathCause GenNodeDiedCause(
       const ray::gcs::GcsActor *actor, std::shared_ptr<const rpc::GcsNodeInfo> node);
@@ -367,6 +385,10 @@ class GcsActorManager : public rpc::ActorInfoGcsServiceHandler {
   ///
   /// \param actor The actor to be killed.
   void AddDestroyedActorToCache(const std::shared_ptr<GcsActor> &actor);
+
+  /// Evict one destoyed actor from sorted_destroyed_actor_list_ as well as
+  /// destroyed_actors_.
+  void EvictOneDestroyedActor();
 
   rpc::ActorTableData GenActorDataOnlyWithStates(const rpc::ActorTableData &actor) {
     rpc::ActorTableData actor_delta;
@@ -492,6 +514,8 @@ class GcsActorManager : public rpc::ActorInfoGcsServiceHandler {
   RuntimeEnvManager &runtime_env_manager_;
   /// Function manager for GC purpose
   GCSFunctionManager &function_manager_;
+  /// Virtual cluster manager for scheduling purpose
+  GcsVirtualClusterManager &gcs_virtual_cluster_manager_;
 
   UsageStatsClient *usage_stats_client_;
   /// Run a function on a delay. This is useful for guaranteeing data will be
@@ -511,6 +535,11 @@ class GcsActorManager : public rpc::ActorInfoGcsServiceHandler {
   // Make sure our unprotected maps are accessed from the same thread.
   // Currently protects actor_to_register_callbacks_.
   ThreadChecker thread_checker_;
+  /// Listeners which monitors the registration of actor.
+  std::vector<ActorRegistrationListenerCallback> actor_registration_listeners_;
+
+  /// Listeners which monitors the destruction of actor.
+  std::vector<ActorDestroyListenerCallback> actor_destroy_listeners_;
 
   // Debug info.
   enum CountType {

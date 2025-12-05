@@ -17,7 +17,7 @@
 #include "ray/gcs/gcs_actor_manager.h"
 #include "ray/gcs/gcs_node_manager.h"
 #include "ray/gcs/gcs_placement_group_manager.h"
-#include "ray/gcs/pb_util.h"
+#include "ray/common/protobuf_utils.h"
 
 namespace ray {
 namespace gcs {

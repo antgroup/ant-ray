@@ -136,5 +136,44 @@ class GcsInitData {
   absl::flat_hash_map<WorkerID, rpc::WorkerTableData> worker_table_data_;
 };
 
+// Returns true if an actor should be loaded to registered_actors_.
+// `false` Cases:
+// 0. state is DEAD, and is not restartable
+// 1. root owner is job, and job is dead
+// 2. root owner is another detached actor, and that actor is dead
+bool OnInitializeActorShouldLoad(const ray::gcs::GcsInitData &gcs_init_data,
+                                 ray::ActorID actor_id) {
+  const auto &jobs = gcs_init_data.Jobs();
+  const auto &actors = gcs_init_data.Actors();
+  const auto &actor_task_specs = gcs_init_data.ActorTaskSpecs();
+
+  const auto &actor_table_data = actors.find(actor_id);
+  if (actor_table_data == actors.end()) {
+    return false;
+  }
+  if (actor_table_data->second.state() == ray::rpc::ActorTableData::DEAD &&
+      !ray::gcs::IsActorRestartable(actor_table_data->second)) {
+    return false;
+  }
+
+  const auto &actor_task_spec = ray::map_find_or_die(actor_task_specs, actor_id);
+  ray::ActorID root_detached_actor_id =
+      ray::TaskSpecification(actor_task_spec).RootDetachedActorId();
+  if (root_detached_actor_id.IsNil()) {
+    // owner is job, NOT detached actor, should die with job
+    auto job_iter = jobs.find(actor_id.JobId());
+    return job_iter != jobs.end() && !job_iter->second.is_dead();
+  } else if (actor_id == root_detached_actor_id) {
+    // owner is itself, just live on
+    return true;
+  } else {
+    // owner is another detached actor, should die with the owner actor
+    // Root detached actor can be dead only if state() == DEAD.
+    auto root_detached_actor_iter = actors.find(root_detached_actor_id);
+    return root_detached_actor_iter != actors.end() &&
+           root_detached_actor_iter->second.state() != ray::rpc::ActorTableData::DEAD;
+  }
+};
+
 }  // namespace gcs
 }  // namespace ray

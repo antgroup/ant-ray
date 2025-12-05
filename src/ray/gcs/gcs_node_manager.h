@@ -25,7 +25,7 @@
 #include "ray/common/id.h"
 #include "ray/gcs/gcs_init_data.h"
 #include "ray/gcs/gcs_table_storage.h"
-#include "ray/gcs/gcs_server/gcs_virtual_cluster_manager.h"
+#include "ray/gcs/gcs_virtual_cluster_manager.h"
 #include "ray/gcs/grpc_service_interfaces.h"
 #include "ray/observability/ray_event_recorder_interface.h"
 #include "ray/pubsub/gcs_publisher.h"

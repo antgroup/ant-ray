@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "ray/gcs/gcs_server/gcs_virtual_cluster.h"
+#include "ray/gcs/gcs_virtual_cluster.h"
 
 namespace ray {
 namespace gcs {

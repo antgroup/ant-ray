@@ -25,7 +25,7 @@
 #include "ray/common/ray_syncer/ray_syncer.h"
 #include "ray/gcs/gcs_init_data.h"
 #include "ray/gcs/gcs_node_manager.h"
-#include "ray/gcs/gcs_server/gcs_virtual_cluster_manager.h"
+#include "ray/gcs/gcs_virtual_cluster_manager.h"
 #include "ray/gcs/grpc_service_interfaces.h"
 #include "ray/raylet/scheduling/cluster_lease_manager.h"
 #include "ray/raylet/scheduling/cluster_resource_manager.h"

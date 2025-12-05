@@ -17,7 +17,7 @@
 #include <vector>
 #include <list>
 
-#include "ray/gcs/gcs_server/gcs_init_data.h"
+#include "ray/gcs/gcs_init_data.h"
 #include "ray/gcs/gcs_kv_manager.h"
 #include "ray/gcs/gcs_table_storage.h"
 #include "ray/gcs/grpc_service_interfaces.h"

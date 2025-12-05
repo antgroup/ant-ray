@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "ray/gcs/gcs_server/gcs_virtual_cluster_manager.h"
+#include "ray/gcs/gcs_virtual_cluster_manager.h"
 
 // clang-format off
 #include "gtest/gtest.h"
-#include "ray/gcs/gcs_server/test/gcs_server_test_util.h"
+#include "ray/gcs/test/gcs_server_test_util.h"
 #include "ray/gcs/test/gcs_test_util.h"
 #include "mock/ray/pubsub/publisher.h"
 #include "mock/ray/pubsub/subscriber.h"

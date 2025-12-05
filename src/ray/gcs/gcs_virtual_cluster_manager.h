@@ -14,11 +14,11 @@
 
 #pragma once
 
-#include "ray/gcs/gcs_server/gcs_init_data.h"
-#include "ray/gcs/gcs_server/gcs_table_storage.h"
-#include "ray/gcs/gcs_server/gcs_virtual_cluster.h"
-#include "ray/gcs/pubsub/gcs_pub_sub.h"
-#include "ray/rpc/gcs_server/gcs_rpc_server.h"
+#include "ray/gcs/gcs_init_data.h"
+#include "ray/gcs/gcs_table_storage.h"
+#include "ray/gcs/gcs_virtual_cluster.h"
+#include "ray/pubsub/gcs_publisher.h"
+#include "ray/rpc/grpc_server.h"
 
 namespace ray {
 

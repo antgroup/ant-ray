@@ -14,7 +14,7 @@
 
 #include "ray/gcs/gcs_server.h"
 
-#include "ray/gcs/gcs_server/gcs_virtual_cluster_manager.h"
+#include "ray/gcs/gcs_virtual_cluster_manager.h"
 
 namespace ray {
 namespace gcs {

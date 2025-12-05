@@ -258,7 +258,7 @@ void GcsNodeManager::HandleGetAllNodeInfo(rpc::GetAllNodeInfoRequest request,
       only_node_id_filters = false;
       break;
     case rpc::GetAllNodeInfoRequest_NodeSelector::kVirtualClusterId:
-      virtual_cluster_ids.insert(selector.virtual_cluster_id());
+      virtual_cluster_ids.insert(std::move(*selector.mutable_virtual_cluster_id()));
       only_node_id_filters = false;
       break;
     case rpc::GetAllNodeInfoRequest_NodeSelector::NODE_SELECTOR_NOT_SET:
@@ -299,13 +299,27 @@ void GcsNodeManager::HandleGetAllNodeInfo(rpc::GetAllNodeInfoRequest request,
   auto add_to_response =
       [&](const absl::flat_hash_map<NodeID, std::shared_ptr<const rpc::GcsNodeInfo>>
               &nodes) {
+        auto filter_fn = [&] (const NodeID& node_id, std::shared_ptr<const rpc::GcsNodeInfo>> node_info) {
+          if (!has_node_selectors || node_ids.contains(node_id) ||
+              node_names.contains(node_info_ptr->node_name()) ||
+              node_ip_addresses.contains(node_info_ptr->node_manager_address())) {
+            return true;
+          }
+          for (const auto &vc_id : virtual_cluster_ids) {
+            auto virtual_cluster = gcs_virtual_cluster_manager_.GetVirtualCluster(vc_id);
+            if (virtual_cluster != nullptr &&
+                virtual_cluster->ContainsNodeInstance(node_id.Hex())) {
+              return true;
+            }
+          }
+          return false;
+        };
+
         for (const auto &[node_id, node_info_ptr] : nodes) {
           if (num_added >= limit) {
             break;
           }
-          if (!has_node_selectors || node_ids.contains(node_id) ||
-              node_names.contains(node_info_ptr->node_name()) ||
-              node_ip_addresses.contains(node_info_ptr->node_manager_address())) {
+          if (filter_fn(node_id, node_info_ptr)) {
             *reply->add_node_info_list() = *node_info_ptr;
             num_added += 1;
           }

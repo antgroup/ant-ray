@@ -17,8 +17,8 @@
 #include <gmock/gmock.h>
 
 #include "ray/gcs/gcs_node_manager.h"
-#include "ray/gcs/gcs_server/gcs_virtual_cluster_manager.h"
-#include "ray/gcs/gcs_server/gcs_table_storage.h"
+#include "ray/gcs/gcs_virtual_cluster_manager.h"
+#include "ray/gcs/gcs_table_storage.h"
 #include "ray/raylet/scheduling/cluster_resource_manager.h"
 #include "ray/common/asio/instrumented_io_context.h"
 #include "mock/ray/pubsub/publisher.h"

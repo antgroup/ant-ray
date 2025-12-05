@@ -20,8 +20,8 @@
 #include "ray/gcs/gcs_resource_manager.h"
 #include "mock/ray/gcs/gcs_server/gcs_node_manager.h"
 #include "mock/ray/pubsub/publisher.h"
-#include "ray/gcs/gcs_server/gcs_virtual_cluster_manager.h"
-#include "ray/gcs/gcs_server/gcs_table_storage.h"
+#include "ray/gcs/gcs_virtual_cluster_manager.h"
+#include "ray/gcs/gcs_table_storage.h"
 #include "ray/raylet/scheduling/cluster_resource_manager.h"
 #include "ray/observability/fake_ray_event_recorder.h"
 

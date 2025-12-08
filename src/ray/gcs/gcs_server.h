@@ -276,6 +276,8 @@ class GcsServer {
   std::unique_ptr<GcsNodeManager> gcs_node_manager_;
   /// The health check manager.
   std::shared_ptr<GcsHealthCheckManager> gcs_healthcheck_manager_;
+  /// The gcs virtual cluster handler and service.
+  std::shared_ptr<GcsVirtualClusterManager> gcs_virtual_cluster_manager_;
   /// The gcs placement group manager.
   std::unique_ptr<GcsPlacementGroupManager> gcs_placement_group_manager_;
   /// The gcs actor manager.

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "ray/gcs/gcs_virtual_cluster.h"
+#include "ray/util/time.h"
 
 namespace ray {
 namespace gcs {
@@ -715,8 +716,8 @@ void PrimaryCluster::Initialize(const GcsInitData &gcs_init_data) {
        gcs_init_data.VirtualClusters()) {
     // Convert the node instances to replica instances and mark the dead node instances.
     auto replica_instances = toReplicaInstances(virtual_cluster_data.node_instances());
-    for (auto &[_, job_node_instances] : replica_instances) {
-      for (auto &[_, node_instances] : job_node_instances) {
+    for (auto &[replica_instance_id, job_node_instances] : replica_instances) {
+      for (auto &[job_node_instance_id, node_instances] : job_node_instances) {
         for (auto &[node_instance_id, node_instance] : node_instances) {
           auto node_id = NodeID::FromHex(node_instance_id);
           auto it = nodes.find(node_id);
@@ -1097,13 +1098,13 @@ std::shared_ptr<VirtualCluster> PrimaryCluster::GetVirtualCluster(
   }
 
   // Check if it is a logical cluster
-  auto logical_cluster = GetLogicalCluster(virtual_cluster_id);
-  if (logical_cluster != nullptr) {
-    return logical_cluster;
+  auto logical_cluster_ptr = GetLogicalCluster(virtual_cluster_id);
+  if (logical_cluster_ptr != nullptr) {
+    return logical_cluster_ptr;
   }
   // Check if it is a job cluster
-  auto job_cluster = GetJobCluster(virtual_cluster_id);
-  if (job_cluster != nullptr) {
+  auto job_cluster_ptr = GetJobCluster(virtual_cluster_id);
+  if (job_cluster_ptr != nullptr) {
     return job_cluster;
   }
   // Check if it is a job cluster of any logical cluster

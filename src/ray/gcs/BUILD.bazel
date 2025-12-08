@@ -33,7 +33,9 @@ ray_cc_library(
         ":gcs_table_storage",
         "//src/ray/common:asio",
         "//src/ray/common:id",
+        "//src/ray/common:protobuf_utils",
         "//src/ray/protobuf:gcs_cc_proto",
+        "//src/ray/util:container_util",
         "@com_google_absl//absl/container:flat_hash_map",
     ],
 )
@@ -73,6 +75,7 @@ ray_cc_library(
         "//src/ray/protobuf:gcs_cc_proto",
         "//src/ray/protobuf:gcs_service_cc_proto",
         "//src/ray/raylet/scheduling:cluster_resource_manager",
+        "//src/ray/util:time",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
     ],
@@ -86,8 +89,9 @@ ray_cc_library(
         ":gcs_init_data",
         ":gcs_table_storage",
         ":gcs_virtual_cluster",
+        "//src/ray/common:id",
+        "//src/ray/gcs:grpc_service_interfaces",
         "//src/ray/pubsub:gcs_publisher",
-        "//src/ray/rpc:grpc_server",
     ],
 )
 
@@ -219,6 +223,7 @@ ray_cc_library(
         ":grpc_service_interfaces",
         "//src/ray/pubsub:gcs_publisher",
         "//src/ray/stats:stats_metric",
+        "//src/ray/util:time", # ant-ray internal
     ],
 )
 
@@ -374,7 +379,7 @@ ray_cc_library(
     hdrs = [
         "grpc_service_interfaces.h",
     ],
-    visibility = ["//visibility:private"],
+    visibility = ["//visibility:public"],
     deps = [
         "//src/ray/common:status",
         "//src/ray/protobuf:autoscaler_cc_grpc",
@@ -566,7 +571,7 @@ ray_cc_library(
         "//src/ray/core_worker_rpc_client:core_worker_client",
         "//src/ray/core_worker_rpc_client:core_worker_client_pool",
         "//src/ray/common:runtime_env", # ant-ray internal
-        "//src/ray/gcs:gcs_pb_util", # ant-ray internal
+        "//src/ray/common:protobuf_utils", # ant-ray internal
         "//src/ray/gcs/store_client",
         "//src/ray/gcs/store_client:in_memory_store_client",
         "//src/ray/gcs/store_client:observable_store_client",

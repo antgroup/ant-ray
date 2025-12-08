@@ -133,7 +133,7 @@ void GcsVirtualClusterManager::OnJobFinished(const rpc::JobTableData &job_data) 
   DivisibleCluster *divisible_cluster =
       dynamic_cast<DivisibleCluster *>(virtual_cluster.get());
 
-  auto status = divisible_cluster->RemoveJobCluster(
+  auto rm_status = divisible_cluster->RemoveJobCluster(
       virtual_cluster_id,
       [job_cluster_id](const Status &status,
                        std::shared_ptr<rpc::VirtualClusterTableData> data,
@@ -147,9 +147,9 @@ void GcsVirtualClusterManager::OnJobFinished(const rpc::JobTableData &job_data) 
                         << " after handling job finished event.";
         }
       });
-  if (!status.ok()) {
+  if (!rm_status.ok()) {
     RAY_LOG(WARNING) << "Failed to remove job cluster " << job_cluster_id.Binary()
-                     << " when handling job finished event. status: " << status.message();
+                     << " when handling job finished event. status: " << rm_status.message();
   }
 }
 
@@ -605,21 +605,22 @@ Status GcsVirtualClusterManager::FlushAndPublish(
       return;
     }
 
-    RAY_CHECK_OK(gcs_publisher_.PublishVirtualCluster(
-        VirtualClusterID::FromBinary(data->id()), *data, nullptr));
+    gcs_publisher_.PublishVirtualCluster(VirtualClusterID::FromBinary(data->id()), *data);
     if (callback) {
       callback(status, std::move(data), nullptr);
     }
   };
 
   if (data->is_removed()) {
-    return gcs_table_storage_.VirtualClusterTable().Delete(
+    gcs_table_storage_.VirtualClusterTable().Delete(
         VirtualClusterID::FromBinary(data->id()), {on_done, io_context_});
+    return Status::OK();
   }
 
   // Write the virtual cluster data to the storage.
-  return gcs_table_storage_.VirtualClusterTable().Put(
+  gcs_table_storage_.VirtualClusterTable().Put(
       VirtualClusterID::FromBinary(data->id()), *data, {on_done, io_context_});
+  return Status::OK();
 }
 
 void GcsVirtualClusterManager::OnDetachedActorRegistration(

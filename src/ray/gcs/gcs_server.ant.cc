@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include "ray/gcs/gcs_server.h"
-
 #include "ray/gcs/gcs_virtual_cluster_manager.h"
+#include "ray/gcs/grpc_services.h"
 
 namespace ray {
 namespace gcs {
@@ -29,7 +29,8 @@ void GcsServer::InitGcsVirtualClusterManager(const GcsInitData &gcs_init_data) {
   // Initialize by gcs tables data.
   gcs_virtual_cluster_manager_->Initialize(gcs_init_data);
   rpc_server_.RegisterService(std::make_unique<rpc::VirtualClusterInfoGrpcService>(
-      io_context_provider_.GetDefaultIOContext(), *gcs_virtual_cluster_manager_));
+      io_context_provider_.GetDefaultIOContext(), *gcs_virtual_cluster_manager_, 
+      RayConfig::instance().gcs_max_active_rpcs_per_handler()));
 }
 }  // namespace gcs
 }  // namespace ray

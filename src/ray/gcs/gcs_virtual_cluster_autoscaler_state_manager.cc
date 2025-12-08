@@ -27,10 +27,10 @@ GcsVirtualClusterAutoscalerStateManager::GcsVirtualClusterAutoscalerStateManager
     GcsNodeManager &gcs_node_manager,
     GcsActorManager &gcs_actor_manager,
     const GcsPlacementGroupManager &gcs_placement_group_manager,
-    rpc::NodeManagerClientPool &raylet_client_pool,
+    rpc::RayletClientPool &raylet_client_pool,
     InternalKVInterface &kv,
     instrumented_io_context &io_context,
-    GcsPublisher *gcs_publisher,
+    pubsub::GcsPublisher *gcs_publisher,
     std::shared_ptr<GcsVirtualClusterManager> gcs_virtual_cluster_manager)
     : GcsAutoscalerStateManager(session_name,
                                 gcs_node_manager,
@@ -140,8 +140,7 @@ void GcsVirtualClusterAutoscalerStateManager::MakeVirtualClusterResourceStatesIn
 
 void GcsVirtualClusterAutoscalerStateManager::GetVirtualClusterPendingResourceRequests(
     rpc::autoscaler::VirtualClusterState *state) {
-  absl::flat_hash_map<google::protobuf::Map<std::string, double>, rpc::ResourceDemand>
-      aggregate_load;
+  absl::flat_hash_map<ResourceDemandKey, rpc::ResourceDemand> aggregate_load;
   for (const auto &node : state->nodes()) {
     const auto node_id = NodeID::FromHex(node);
     auto const node_resource_iter = node_resource_info_.find(node_id);
@@ -151,14 +150,14 @@ void GcsVirtualClusterAutoscalerStateManager::GetVirtualClusterPendingResourceRe
     }
   }
 
-  for (const auto &[shape, demand] : aggregate_load) {
+  for (const auto &[demand_key, demand] : aggregate_load) {
     auto num_pending = demand.num_infeasible_requests_queued() + demand.backlog_size() +
                        demand.num_ready_requests_queued();
     if (num_pending > 0) {
       auto pending_req = state->add_pending_resource_requests();
       pending_req->set_count(num_pending);
       auto req = pending_req->mutable_request();
-      req->mutable_resources_bundle()->insert(shape.begin(), shape.end());
+      req->mutable_resources_bundle()->insert(demand_key.shape.begin(), demand_key.shape.end());
     }
   }
 }

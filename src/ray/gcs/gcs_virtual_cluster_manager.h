@@ -17,8 +17,8 @@
 #include "ray/gcs/gcs_init_data.h"
 #include "ray/gcs/gcs_table_storage.h"
 #include "ray/gcs/gcs_virtual_cluster.h"
+#include "ray/gcs/grpc_service_interfaces.h"
 #include "ray/pubsub/gcs_publisher.h"
-#include "ray/rpc/grpc_server.h"
 
 namespace ray {
 
@@ -26,13 +26,13 @@ class PeriodicalRunner;
 
 namespace gcs {
 
-/// This implementation class of `VirtualClusterInfoHandler`.
-class GcsVirtualClusterManager : public rpc::VirtualClusterInfoHandler {
+/// This implementation class of `VirtualClusterInfoGcsServiceHandler`.
+class GcsVirtualClusterManager : public rpc::VirtualClusterInfoGcsServiceHandler {
  public:
   explicit GcsVirtualClusterManager(
       instrumented_io_context &io_context,
-      GcsTableStorage &gcs_table_storage,
-      GcsPublisher &gcs_publisher,
+      gcs::GcsTableStorage &gcs_table_storage,
+      pubsub::GcsPublisher &gcs_publisher,
       const ClusterResourceManager &cluster_resource_manager,
       std::shared_ptr<PeriodicalRunner> periodical_runner = nullptr)
       : io_context_(io_context),
@@ -143,9 +143,9 @@ class GcsVirtualClusterManager : public rpc::VirtualClusterInfoHandler {
   /// funciton needs to post job to this io_context.
   instrumented_io_context &io_context_;
   /// The storage of the GCS tables.
-  GcsTableStorage &gcs_table_storage_;
+  gcs::GcsTableStorage &gcs_table_storage_;
   /// The publisher of the GCS tables.
-  GcsPublisher &gcs_publisher_;
+  pubsub::GcsPublisher &gcs_publisher_;
 
   /// The periodical runner to run `ReplenishAllClusterNodeInstances` task.
   std::shared_ptr<PeriodicalRunner> periodical_runner_;

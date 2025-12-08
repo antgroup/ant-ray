@@ -299,10 +299,10 @@ void GcsNodeManager::HandleGetAllNodeInfo(rpc::GetAllNodeInfoRequest request,
   auto add_to_response =
       [&](const absl::flat_hash_map<NodeID, std::shared_ptr<const rpc::GcsNodeInfo>>
               &nodes) {
-        auto filter_fn = [&] (const NodeID& node_id, std::shared_ptr<const rpc::GcsNodeInfo>> node_info) {
+        auto filter_fn = [&] (const NodeID& node_id, std::shared_ptr<const rpc::GcsNodeInfo> node_info) {
           if (!has_node_selectors || node_ids.contains(node_id) ||
-              node_names.contains(node_info_ptr->node_name()) ||
-              node_ip_addresses.contains(node_info_ptr->node_manager_address())) {
+              node_names.contains(node_info->node_name()) ||
+              node_ip_addresses.contains(node_info->node_manager_address())) {
             return true;
           }
           for (const auto &vc_id : virtual_cluster_ids) {

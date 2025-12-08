@@ -20,6 +20,7 @@
 #include <utility>
 
 #include "ray/stats/metric_defs.h"
+#include "ray/util/time.h"
 
 namespace ray {
 namespace gcs {
@@ -363,8 +364,7 @@ void GcsWorkerManager::EvictOneDeadWorker() {
   if (!sorted_dead_worker_list_.empty()) {
     auto iter = sorted_dead_worker_list_.begin();
     const auto &worker_id = iter->first;
-    RAY_CHECK_OK(
-        gcs_table_storage_.WorkerTable().Delete(worker_id, {[](auto) {}, io_context_}));
+    gcs_table_storage_.WorkerTable().Delete(worker_id, {[](auto) {}, io_context_});
     dead_workers_.erase(worker_id);
     sorted_dead_worker_list_.erase(iter);
   }
@@ -404,15 +404,13 @@ void GcsWorkerManager::EvictExpiredWorkers() {
     ++evicted_worker_number;
 
     if (batch_ids.size() == batch_size) {
-      RAY_CHECK_OK(gcs_table_storage_.WorkerTable().BatchDelete(
-          batch_ids, {[](auto) {}, io_context_}));
+      gcs_table_storage_.WorkerTable().BatchDelete(batch_ids, {[](auto) {}, io_context_});
       batch_ids.clear();
     }
   }
 
   if (!batch_ids.empty()) {
-    RAY_CHECK_OK(gcs_table_storage_.WorkerTable().BatchDelete(
-        batch_ids, {[](auto) {}, io_context_}));
+    gcs_table_storage_.WorkerTable().BatchDelete(batch_ids, {[](auto) {}, io_context_});
   }
 
   RAY_LOG(INFO) << evicted_worker_number << " workers are evicted, there are still "

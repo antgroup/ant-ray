@@ -527,8 +527,6 @@ void RedisStoreClient::AsyncGetNextJobID(Postable<void(int)> callback) {
                       auto job_id = static_cast<int>(reply->ReadAsInteger());
                       std::move(callback).Post("GcsStore.GetNextJobID", job_id);
                     });
-
-  return Status::OK();
 }
 
 void RedisStoreClient::AsyncGetKeys(const std::string &table_name,
@@ -649,7 +647,10 @@ bool RedisDelKeyPrefixSync(const std::string &host,
   size_t num_deleted = 0;
   size_t num_failed = 0;
   for (const auto &key : keys) {
-    if (delete_one_sync(key)) {
+    if ((!key.has_value()) || key->empty()) {
+      continue;
+    }
+    if (delete_one_sync(*key)) {
       num_deleted++;
     } else {
       num_failed++;
@@ -659,13 +660,6 @@ bool RedisDelKeyPrefixSync(const std::string &host,
                 << external_storage_namespace << ". Deleted table count: " << num_deleted
                 << ", Failed table count: " << num_failed;
   return num_failed == 0;
-}
-
-void Scanner::ScanKeys(std::string match_pattern,
-                       std::function<void(std::vector<std::string> result)> callback) {
-  auto on_done = [this, callback = std::move(callback)]() { callback(std::move(keys_)); };
-  match_pattern_ = std::move(match_pattern);
-  Scan(std::move(on_done));
 }
 
 }  // namespace gcs

@@ -265,6 +265,7 @@ class PlacementGroupInfoGrpcService : public GrpcService {
   PlacementGroupInfoGcsServiceHandler &service_handler_;
   int64_t max_active_rpcs_per_handler_;
 };
+
 class VirtualClusterInfoGrpcService : public GrpcService {
  public:
   explicit VirtualClusterInfoGrpcService(instrumented_io_context &io_service,

@@ -707,7 +707,9 @@ void GcsServer::InitKVManager() {
   case (StorageType::REDIS_PERSIST):
     if (RayConfig::instance().enable_redis_operations_observing()) {
       store_client = std::make_unique<ObservableStoreClient>(
-          std::make_unique<RedisStoreClient>(io_context, GetRedisClientOptions()));
+          std::make_unique<RedisStoreClient>(io_context, GetRedisClientOptions()),
+          metrics_.storage_operation_latency_in_ms_histogram,
+          metrics_.storage_operation_count_counter);
     } else {
       store_client = std::make_unique<RedisStoreClient>(io_context, GetRedisClientOptions());
     }
@@ -856,21 +858,21 @@ void GcsServer::InitGcsAutoscalerStateManager(const GcsInitData &gcs_init_data) 
             *gcs_node_manager_,
             *gcs_actor_manager_,
             *gcs_placement_group_manager_,
-            *raylet_client_pool_,
+            raylet_client_pool_,
             kv_manager_->GetInstance(),
             io_context_provider_.GetDefaultIOContext(),
             gcs_publisher_.get(),
             gcs_virtual_cluster_manager_);
   } else {
-  gcs_autoscaler_state_manager_ = std::make_unique<GcsAutoscalerStateManager>(
-      config_.session_name,
-      *gcs_node_manager_,
-      *gcs_actor_manager_,
-      *gcs_placement_group_manager_,
-      raylet_client_pool_,
-      kv_manager_->GetInstance(),
-      io_context_provider_.GetDefaultIOContext(),
-      gcs_publisher_.get());
+    gcs_autoscaler_state_manager_ = std::make_unique<GcsAutoscalerStateManager>(
+        config_.session_name,
+        *gcs_node_manager_,
+        *gcs_actor_manager_,
+        *gcs_placement_group_manager_,
+        raylet_client_pool_,
+        kv_manager_->GetInstance(),
+        io_context_provider_.GetDefaultIOContext(),
+        gcs_publisher_.get());
   }
 
   gcs_autoscaler_state_manager_->Initialize(gcs_init_data);

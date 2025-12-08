@@ -30,17 +30,18 @@ Status GcsSubscriber::SubscribeAllVirtualClusters(
     RAY_LOG(WARNING) << "Subscription to virtual cluster channel failed: "
                      << status.ToString();
   };
-  RAY_UNUSED(subscriber_->SubscribeChannel(
+  subscriber_->Subscribe(
       std::make_unique<rpc::SubMessage>(),
       rpc::ChannelType::RAY_VIRTUAL_CLUSTER_CHANNEL,
       gcs_address_,
+      /*key_id=*/std::nullopt,
       [done](const Status &status) {
         if (done != nullptr) {
           done(status);
         }
       },
       std::move(subscribe_item_callback),
-      std::move(subscription_failure_callback)));
+      std::move(subscription_failure_callback));
 
   return Status::OK();
 }

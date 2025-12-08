@@ -25,12 +25,13 @@
 namespace ray {
 namespace gcs {
 
-GcsResourceManager::GcsResourceManager(instrumented_io_context &io_context,
-                                       ClusterResourceManager &cluster_resource_manager,
-                                       GcsNodeManager &gcs_node_manager,
-                                       NodeID local_node_id,
-                                       GcsVirtualClusterManager &gcs_virtual_cluster_manager,
-                                       raylet::ClusterLeaseManager *cluster_lease_manager)
+GcsResourceManager::GcsResourceManager(
+    instrumented_io_context &io_context,
+    ClusterResourceManager &cluster_resource_manager,
+    GcsNodeManager &gcs_node_manager,
+    NodeID local_node_id,
+    GcsVirtualClusterManager &gcs_virtual_cluster_manager,
+    raylet::ClusterLeaseManager *cluster_lease_manager)
     : io_context_(io_context),
       cluster_resource_manager_(cluster_resource_manager),
       gcs_node_manager_(gcs_node_manager),

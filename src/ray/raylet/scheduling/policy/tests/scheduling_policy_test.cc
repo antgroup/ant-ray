@@ -86,7 +86,7 @@ TEST_F(SchedulingPolicyTest, NodeAffinityPolicyTest) {
 
   auto cluster_resource_manager = MockClusterResourceManager(nodes);
   raylet_scheduling_policy::CompositeSchedulingPolicy scheduling_policy(
-scheduling::NodeID("local"),
+      scheduling::NodeID("local"),
       *cluster_resource_manager,
       [](auto) { return true; },
       [](scheduling::NodeID, const SchedulingContext *) { return true; });
@@ -535,10 +535,10 @@ TEST_F(SchedulingPolicyTest, NonGpuNodePreferredSchedulingTest) {
           [](auto) { return true; },
           [](scheduling::NodeID, const SchedulingContext *) { return true; })
           .Schedule(req,
-                                   HybridOptions(0.51,
-                                                 false,
-                                                 true,
-                                                 /*gpu_avoid_scheduling*/ true));
+                    HybridOptions(0.51,
+                                  false,
+                                  true,
+                                  /*gpu_avoid_scheduling*/ true));
   ASSERT_EQ(to_schedule, remote_node);
 
   req = ResourceMapToResourceRequest({{"CPU", 3}}, false);

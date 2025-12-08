@@ -1819,7 +1819,7 @@ TEST_F(ClusterResourceSchedulerTest, AffinityWithBundleScheduleTest) {
       is_node_available_fn_,
       true,
       [](scheduling::NodeID, const SchedulingContext *) { return true; });
-   ResourceRequest bundle_resource_request_2 =
+  ResourceRequest bundle_resource_request_2 =
       CreateResourceRequest(AddPlacementGroupConstraint(
           {{"CPU", 1}, {"memory", 100}}, bundle_2.first, bundle_2.second));
   NodeResources node_resources_2 =

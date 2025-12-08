@@ -34,6 +34,7 @@
 #include "ray/gcs/gcs_function_manager.h"
 #include "ray/gcs/gcs_init_data.h"
 #include "ray/gcs/gcs_table_storage.h"
+#include "ray/gcs/gcs_virtual_cluster_manager.h"
 #include "ray/gcs/grpc_service_interfaces.h"
 #include "ray/gcs/usage_stats_client.h"
 #include "ray/observability/ray_event_recorder_interface.h"
@@ -41,8 +42,6 @@
 #include "ray/util/counter_map.h"
 #include "ray/util/thread_checker.h"
 #include "src/ray/protobuf/gcs_service.pb.h"
-
-#include "ray/gcs/gcs_virtual_cluster_manager.h"
 
 namespace ray {
 namespace gcs {
@@ -287,13 +286,15 @@ class GcsActorManager : public rpc::ActorInfoGcsServiceHandler {
   }
 
   /// Add actor registration event listener.
-  void AddActorRegistrationListener(std::function<void(const std::shared_ptr<GcsActor> &)> listener) {
+  void AddActorRegistrationListener(
+      std::function<void(const std::shared_ptr<GcsActor> &)> listener) {
     RAY_CHECK(listener);
     actor_registration_listeners_.emplace_back(std::move(listener));
   }
 
   /// Add actor destroy event listener.
-  void AddActorDestroyListener(std::function<void(const std::shared_ptr<GcsActor> &)> listener) {
+  void AddActorDestroyListener(
+      std::function<void(const std::shared_ptr<GcsActor> &)> listener) {
     RAY_CHECK(listener);
     actor_destroy_listeners_.emplace_back(std::move(listener));
   }
@@ -536,10 +537,12 @@ class GcsActorManager : public rpc::ActorInfoGcsServiceHandler {
   // Currently protects actor_to_register_callbacks_.
   ThreadChecker thread_checker_;
   /// Listeners which monitors the registration of actor.
-  std::vector<std::function<void(const std::shared_ptr<GcsActor> &)>> actor_registration_listeners_;
+  std::vector<std::function<void(const std::shared_ptr<GcsActor> &)>>
+      actor_registration_listeners_;
 
   /// Listeners which monitors the destruction of actor.
-  std::vector<std::function<void(const std::shared_ptr<GcsActor> &)>> actor_destroy_listeners_;
+  std::vector<std::function<void(const std::shared_ptr<GcsActor> &)>>
+      actor_destroy_listeners_;
 
   // Debug info.
   enum CountType {

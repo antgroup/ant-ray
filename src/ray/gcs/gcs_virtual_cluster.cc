@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "ray/gcs/gcs_virtual_cluster.h"
+
 #include "ray/util/time.h"
 
 namespace ray {

@@ -94,7 +94,11 @@ TEST_F(HybridSchedulingPolicyTest, GetBestNode) {
         .WillOnce(Return(1))
         .WillOnce(Return(2))
         .WillOnce(Return(0));
-    HybridSchedulingPolicy policy{local_node, {}, [](auto) { return true; }, [](scheduling::NodeID, const SchedulingContext *) { return true; }};
+    HybridSchedulingPolicy policy{
+        local_node,
+        {},
+        [](auto) { return true; },
+        [](scheduling::NodeID, const SchedulingContext *) { return true; }};
     policy.bitgenref_ = absl::BitGenRef{mock};
     EXPECT_EQ(n2,
               policy.GetBestNode(node_scores,
@@ -123,7 +127,11 @@ TEST_F(HybridSchedulingPolicyTest, GetBestNodePrioritizePreferredNode) {
         {n2, 0},
     };
 
-    HybridSchedulingPolicy policy{local_node, {}, [](auto) { return true; }, [](scheduling::NodeID, const SchedulingContext *) { return true; }};
+    HybridSchedulingPolicy policy{
+        local_node,
+        {},
+        [](auto) { return true; },
+        [](scheduling::NodeID, const SchedulingContext *) { return true; }};
     // local node score is greater than the smallest one
     EXPECT_EQ(n1,
               policy.GetBestNode(node_scores,

@@ -54,7 +54,8 @@ void VirtualClusterInfoAccessor::AsyncGetAll(
   request.set_include_job_clusters(true);
   request.set_only_include_indivisible_clusters(true);
   client_impl_->GetGcsRpcClient().GetVirtualClusters(
-      std::move(request), [callback](const Status &status, rpc::GetVirtualClustersReply &&reply) {
+      std::move(request),
+      [callback](const Status &status, rpc::GetVirtualClustersReply &&reply) {
         callback(
             status,
             VectorFromProtobuf(std::move(*reply.mutable_virtual_cluster_data_list())));

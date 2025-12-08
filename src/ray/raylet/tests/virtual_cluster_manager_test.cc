@@ -16,7 +16,7 @@
 
 #include "absl/container/flat_hash_set.h"
 #include "gtest/gtest.h"
-#include "ray/common/id.h" 
+#include "ray/common/id.h"
 
 namespace ray {
 

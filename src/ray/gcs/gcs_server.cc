@@ -711,7 +711,8 @@ void GcsServer::InitKVManager() {
           metrics_.storage_operation_latency_in_ms_histogram,
           metrics_.storage_operation_count_counter);
     } else {
-      store_client = std::make_unique<RedisStoreClient>(io_context, GetRedisClientOptions());
+      store_client =
+          std::make_unique<RedisStoreClient>(io_context, GetRedisClientOptions());
     }
     break;
   case (StorageType::IN_MEMORY):

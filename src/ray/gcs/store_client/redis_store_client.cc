@@ -26,8 +26,8 @@
 #include "absl/cleanup/cleanup.h"
 #include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
-#include "ray/stats/metric_defs.h"
 #include "ray/common/ray_config.h"
+#include "ray/stats/metric_defs.h"
 #include "ray/util/container_util.h"
 #include "ray/util/logging.h"
 
@@ -521,12 +521,13 @@ void RedisStoreClient::AsyncGetNextJobID(Postable<void(int)> callback) {
         1, {{"Operation", "INCRBY"}, {"TableName", "JobCounter"}});
   });
 
-  primary_context_->RunArgvAsync(command.ToRedisArgs(),
-                    [callback = std::move(callback)](
-                        const std::shared_ptr<CallbackReply> &reply) mutable {
-                      auto job_id = static_cast<int>(reply->ReadAsInteger());
-                      std::move(callback).Post("GcsStore.GetNextJobID", job_id);
-                    });
+  primary_context_->RunArgvAsync(
+      command.ToRedisArgs(),
+      [callback =
+           std::move(callback)](const std::shared_ptr<CallbackReply> &reply) mutable {
+        auto job_id = static_cast<int>(reply->ReadAsInteger());
+        std::move(callback).Post("GcsStore.GetNextJobID", job_id);
+      });
 }
 
 void RedisStoreClient::AsyncGetKeys(const std::string &table_name,

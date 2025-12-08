@@ -1355,8 +1355,8 @@ void NodeManager::ProcessAnnounceWorkerPortMessageImpl(
     job_data_ptr->set_virtual_cluster_id(message->virtual_cluster_id()->str());
 
     gcs_client_.Jobs().AsyncAdd(job_data_ptr, [this, client](Status status) {
-          SendPortAnnouncementResponse(client, std::move(status));
-        });
+      SendPortAnnouncementResponse(client, std::move(status));
+    });
   }
 }
 

@@ -1954,15 +1954,13 @@ void GcsActorManager::EvictExpiredActors() {
     ++evicted_actor_number;
 
     if (batch_ids.size() == batch_size) {
-      gcs_table_storage_->ActorTable().BatchDelete(
-          batch_ids, {[](auto) {}, io_context_});
+      gcs_table_storage_->ActorTable().BatchDelete(batch_ids, {[](auto) {}, io_context_});
       batch_ids.clear();
     }
   }
 
   if (!batch_ids.empty()) {
-    gcs_table_storage_->ActorTable().BatchDelete(
-        batch_ids, {[](auto) {}, io_context_});
+    gcs_table_storage_->ActorTable().BatchDelete(batch_ids, {[](auto) {}, io_context_});
   }
   RAY_LOG(INFO) << evicted_actor_number << " actors are evicted, there are still "
                 << sorted_destroyed_actor_list_.size()

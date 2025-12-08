@@ -485,12 +485,11 @@ SchedulingOptions GcsPlacementGroupScheduler::CreateSchedulingOptions(
     return SchedulingOptions::BundleStrictPack(
         soft_target_node_id.IsNil() ? scheduling::NodeID::Nil()
                                     : scheduling::NodeID(soft_target_node_id.Binary()),
-                                      virtual_cluster_id);
+        virtual_cluster_id);
 
   case rpc::PlacementStrategy::STRICT_SPREAD:
     return SchedulingOptions::BundleStrictSpread(
-        CreateSchedulingContext(placement_group_id),
-        virtual_cluster_id);
+        CreateSchedulingContext(placement_group_id), virtual_cluster_id);
   default:
     RAY_LOG(FATAL) << "Unsupported scheduling type: "
                    << rpc::PlacementStrategy_Name(strategy);

@@ -19,9 +19,9 @@
 #include "ray/common/status.h"
 #include "ray/common/virtual_cluster_id.h"
 #include "ray/gcs/gcs_init_data.h"
+#include "ray/raylet/scheduling/cluster_resource_manager.h"
 #include "src/ray/protobuf/gcs.pb.h"
 #include "src/ray/protobuf/gcs_service.pb.h"
-#include "ray/raylet/scheduling/cluster_resource_manager.h"
 
 namespace ray {
 namespace gcs {

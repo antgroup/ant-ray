@@ -14,10 +14,10 @@
 
 #include "ray/gcs/gcs_virtual_cluster_autoscaler_state_manager.h"
 
+#include "ray/common/protobuf_utils.h"
 #include "ray/gcs/gcs_actor_manager.h"
 #include "ray/gcs/gcs_node_manager.h"
 #include "ray/gcs/gcs_placement_group_manager.h"
-#include "ray/common/protobuf_utils.h"
 
 namespace ray {
 namespace gcs {
@@ -157,7 +157,8 @@ void GcsVirtualClusterAutoscalerStateManager::GetVirtualClusterPendingResourceRe
       auto pending_req = state->add_pending_resource_requests();
       pending_req->set_count(num_pending);
       auto req = pending_req->mutable_request();
-      req->mutable_resources_bundle()->insert(demand_key.shape.begin(), demand_key.shape.end());
+      req->mutable_resources_bundle()->insert(demand_key.shape.begin(),
+                                              demand_key.shape.end());
     }
   }
 }

@@ -67,7 +67,7 @@ class GcsInitData {
     return placement_group_table_data_;
   }
 
-    /// Get virtual cluster metadata.
+  /// Get virtual cluster metadata.
   const absl::flat_hash_map<VirtualClusterID, rpc::VirtualClusterTableData>
       &VirtualClusters() const {
     return virtual_cluster_table_data_;
@@ -101,7 +101,7 @@ class GcsInitData {
 
   void AsyncLoadActorTaskSpecTableData(Postable<void()> on_done);
 
-    /// Load virtual cluster metadata from the store into memory asynchronously.
+  /// Load virtual cluster metadata from the store into memory asynchronously.
   ///
   /// \param on_done The callback when virtual cluster metadata is loaded successfully.
   void AsyncLoadVirtualClusterTableData(Postable<void()> on_done);

@@ -26,24 +26,25 @@ void NodeManager::CancelMismatchedLocalTasks(
     if (skip_actor && work->lease_.GetLeaseSpecification().IsActorCreationTask()) {
       return false;
     }
-    if (work->lease_.GetLeaseSpecification().GetSchedulingStrategy().virtual_cluster_id() !=
-        local_virtual_cluster_id) {
+    if (work->lease_.GetLeaseSpecification()
+            .GetSchedulingStrategy()
+            .virtual_cluster_id() != local_virtual_cluster_id) {
       return true;
     }
     return false;
   };
   auto tasks_canceled =
       cluster_lease_manager_.CancelLeases(predicate,
-                                         rpc::RequestWorkerLeaseReply::SCHEDULING_FAILED,
-                                         "The node is removed from a virtual cluster.");
+                                          rpc::RequestWorkerLeaseReply::SCHEDULING_FAILED,
+                                          "The node is removed from a virtual cluster.");
   if (tasks_canceled) {
     RAY_LOG(INFO) << "Tasks are cleaned up from cluster_task_manager because the "
                      "node is removed from virtual cluster.";
   }
   tasks_canceled =
       local_lease_manager_.CancelLeases(predicate,
-                                       rpc::RequestWorkerLeaseReply::SCHEDULING_FAILED,
-                                       "The node is removed from a virtual cluster.");
+                                        rpc::RequestWorkerLeaseReply::SCHEDULING_FAILED,
+                                        "The node is removed from a virtual cluster.");
   if (tasks_canceled) {
     RAY_LOG(INFO) << "Tasks are cleaned up from local_task_manager because the "
                      "node is removed from virtual cluster.";

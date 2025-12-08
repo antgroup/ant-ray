@@ -149,7 +149,8 @@ void GcsVirtualClusterManager::OnJobFinished(const rpc::JobTableData &job_data) 
       });
   if (!rm_status.ok()) {
     RAY_LOG(WARNING) << "Failed to remove job cluster " << job_cluster_id.Binary()
-                     << " when handling job finished event. status: " << rm_status.message();
+                     << " when handling job finished event. status: "
+                     << rm_status.message();
   }
 }
 

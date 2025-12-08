@@ -21,10 +21,9 @@
 
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
+#include "ray/common/virtual_cluster_id.h"
 #include "ray/gcs/store_client/store_client.h"
 #include "src/ray/protobuf/gcs.pb.h"
-
-#include "ray/common/virtual_cluster_id.h"
 
 namespace ray {
 namespace gcs {

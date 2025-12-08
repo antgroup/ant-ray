@@ -96,7 +96,7 @@ JobID GlobalStateAccessor::GetNextJobID() {
 }
 
 std::vector<std::string> GlobalStateAccessor::GetAllNodeInfo(
-  const std::optional<std::string> &virtual_cluster_id) {
+    const std::optional<std::string> &virtual_cluster_id) {
   // This method assumes GCS is HA and does not return any error. On GCS down, it
   // retries indefinitely.
   std::vector<std::string> node_table_data;
@@ -114,7 +114,7 @@ std::vector<std::string> GlobalStateAccessor::GetAllNodeInfo(
     gcs_client_->Nodes().AsyncGetAll(
         TransformForMultiItemCallback<rpc::GcsNodeInfo>(node_table_data, promise),
         /*timeout_ms=*/-1);
-    }
+  }
   promise.get_future().get();
   return node_table_data;
 }

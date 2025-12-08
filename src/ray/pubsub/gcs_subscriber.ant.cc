@@ -18,7 +18,8 @@ namespace ray {
 namespace pubsub {
 
 Status GcsSubscriber::SubscribeAllVirtualClusters(
-    const gcs::SubscribeCallback<VirtualClusterID, rpc::VirtualClusterTableData> &subscribe,
+    const gcs::SubscribeCallback<VirtualClusterID, rpc::VirtualClusterTableData>
+        &subscribe,
     const gcs::StatusCallback &done) {
   // GCS subscriber.
   auto subscribe_item_callback = [subscribe](rpc::PubMessage &&msg) {

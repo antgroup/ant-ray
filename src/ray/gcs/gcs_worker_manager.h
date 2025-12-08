@@ -14,8 +14,8 @@
 
 #pragma once
 
-#include <vector>
 #include <list>
+#include <vector>
 
 #include "ray/gcs/gcs_init_data.h"
 #include "ray/gcs/gcs_kv_manager.h"

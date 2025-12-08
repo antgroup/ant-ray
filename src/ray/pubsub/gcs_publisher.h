@@ -18,9 +18,9 @@
 #include <string>
 #include <utility>
 
+#include "ray/common/virtual_cluster_id.h"
 #include "ray/pubsub/publisher_interface.h"
 #include "src/ray/protobuf/gcs.pb.h"
-#include "ray/common/virtual_cluster_id.h"
 
 namespace ray {
 namespace pubsub {

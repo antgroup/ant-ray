@@ -590,8 +590,8 @@ class GcsRpcClient {
                              PinRuntimeEnvURI,
                              runtime_env_grpc_client_,
                              /*method_timeout_ms*/ -1, )
-  
-                             // Create or update a virtual cluster.
+
+  // Create or update a virtual cluster.
   VOID_GCS_RPC_CLIENT_METHOD(VirtualClusterInfoGcsService,
                              CreateOrUpdateVirtualCluster,
                              virtual_cluster_info_grpc_client_,

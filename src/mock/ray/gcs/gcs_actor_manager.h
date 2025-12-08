@@ -21,9 +21,9 @@
 #include "ray/common/asio/instrumented_io_context.h"
 #include "ray/gcs/gcs_actor_manager.h"
 #include "ray/gcs/gcs_virtual_cluster_manager.h"
-#include "ray/raylet/scheduling/cluster_resource_manager.h"
 #include "ray/observability/fake_metric.h"
 #include "ray/observability/fake_ray_event_recorder.h"
+#include "ray/raylet/scheduling/cluster_resource_manager.h"
 
 namespace ray {
 namespace gcs {

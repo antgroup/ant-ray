@@ -1870,6 +1870,7 @@ TEST_F(ClusterResourceSchedulerTest, AffinityWithBundleScheduleTest) {
 TEST_F(ClusterResourceSchedulerTest, LabelSelectorIsSchedulableOnNodeTest) {
   absl::flat_hash_map<std::string, double> resource_total({{"CPU", 10}});
   auto node_1 = scheduling::NodeID(NodeID::FromRandom().Binary());
+  const absl::flat_hash_map<std::string, std::string> local_node_labels = {};
   instrumented_io_context io_context;
   ClusterResourceScheduler resource_scheduler(
       io_context,

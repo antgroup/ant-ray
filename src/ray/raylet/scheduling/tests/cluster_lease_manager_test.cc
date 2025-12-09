@@ -211,8 +211,8 @@ class MockWorkerPool : public WorkerPoolInterface {
     RAY_CHECK(false) << "Not used.";
   }
 
-  void StartNewWorker(
-      const std::shared_ptr<PopWorkerRequest> &pop_worker_request) override {
+  void StartNewWorker(const std::shared_ptr<PopWorkerRequest> &pop_worker_request,
+                      const std::string &serialized_allocated_instances = "{}") override {
     RAY_CHECK(false) << "Not used.";
   }
 

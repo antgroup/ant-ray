@@ -121,7 +121,7 @@ class GcsActorSchedulerMockTest : public Test {
   WorkerID worker_id;
   NodeID local_node_id;
   std::unique_ptr<gcs::GcsTableStorage> gcs_table_storage_;
-  std::unique_ptr<gcs::GcsPublisher> gcs_publisher_;
+  std::unique_ptr<pubsub::GcsPublisher> gcs_publisher_;
   instrumented_io_context io_service_;
   std::unique_ptr<ray::ClusterResourceManager> cluster_resource_manager_;
   std::unique_ptr<ray::gcs::GcsVirtualClusterManager> gcs_virtual_cluster_manager_;

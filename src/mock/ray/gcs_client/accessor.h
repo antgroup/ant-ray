@@ -368,7 +368,7 @@ class MockVirtualClusterInfoAccessor : public VirtualClusterInfoAccessor {
                bool only_include_indivisible_clusters,
                (const MultiItemCallback<rpc::VirtualClusterTableData> &callback)),
               (override));
-  MOCK_METHOD(void,
+  MOCK_METHOD(Status,
               AsyncSubscribeAll,
               ((const SubscribeCallback<VirtualClusterID, rpc::VirtualClusterTableData>
                     &subscribe),

@@ -14,29 +14,26 @@
 
 #include "ray/gcs/gcs_virtual_cluster_manager.h"
 
-// clang-format off
 #include "gtest/gtest.h"
-#include "ray/gcs/test/gcs_server_test_util.h"
-#include "ray/gcs/test/gcs_test_util.h"
 #include "mock/ray/pubsub/publisher.h"
-#include "mock/ray/pubsub/subscriber.h"
-
-// clang-format on
+#include "ray/common/test_utils.h"
+#include "ray/gcs/store_client/in_memory_store_client.h"
 
 namespace ray {
 namespace gcs {
 class GcsVirtualClusterManagerTest : public ::testing::Test {
  public:
   GcsVirtualClusterManagerTest() : cluster_resource_manager_(io_service_) {
-    gcs_publisher_ = std::make_unique<gcs::GcsPublisher>(
+    gcs_publisher_ = std::make_unique<pubsub::GcsPublisher>(
         std::make_unique<ray::pubsub::MockPublisher>());
-    gcs_table_storage_ = std::make_unique<gcs::InMemoryGcsTableStorage>();
+    gcs_table_storage_ =
+        std::make_unique<GcsTableStorage>(std::make_unique<InMemoryStoreClient>());
     gcs_virtual_cluster_manager_ = std::make_unique<gcs::GcsVirtualClusterManager>(
         io_service_, *gcs_table_storage_, *gcs_publisher_, cluster_resource_manager_);
   }
 
   instrumented_io_context io_service_;
-  std::unique_ptr<gcs::GcsPublisher> gcs_publisher_;
+  std::unique_ptr<pubsub::GcsPublisher> gcs_publisher_;
   std::unique_ptr<gcs::GcsTableStorage> gcs_table_storage_;
   std::unique_ptr<gcs::GcsVirtualClusterManager> gcs_virtual_cluster_manager_;
   ClusterResourceManager cluster_resource_manager_;
@@ -1031,7 +1028,8 @@ TEST_F(FailoverTest, FailoverNormal) {
   ASSERT_EQ(virtual_clusters_data_.size(), 4);
 
   // Mock a gcs_init_data.
-  gcs::InMemoryGcsTableStorage gcs_table_storage;
+  std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage =
+      std::make_unique<GcsTableStorage>(std::make_unique<InMemoryStoreClient>());
   MockGcsInitData gcs_init_data(gcs_table_storage);
   gcs_init_data.SetNodes(nodes_);
   gcs_init_data.SetVirtualClusters(virtual_clusters_data_);
@@ -1092,7 +1090,8 @@ TEST_F(FailoverTest, FailoverWithDeadNodes) {
 
   {
     // Mock a gcs_init_data.
-    gcs::InMemoryGcsTableStorage gcs_table_storage;
+    std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage =
+        std::make_unique<GcsTableStorage>(std::make_unique<InMemoryStoreClient>());
     MockGcsInitData gcs_init_data(gcs_table_storage);
     gcs_init_data.SetNodes(nodes_);
     gcs_init_data.SetVirtualClusters(virtual_clusters_data_);
@@ -1138,7 +1137,8 @@ TEST_F(FailoverTest, FailoverWithDeadNodes) {
     ASSERT_TRUE(async_data_flusher_(virtual_cluster_1->ToProto(), nullptr).ok());
 
     // Mock a gcs_init_data.
-    gcs::InMemoryGcsTableStorage gcs_table_storage;
+    std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage =
+        std::make_unique<GcsTableStorage>(std::make_unique<InMemoryStoreClient>());
     MockGcsInitData gcs_init_data(gcs_table_storage);
     gcs_init_data.SetNodes(nodes_);
     gcs_init_data.SetVirtualClusters(virtual_clusters_data_);
@@ -1210,7 +1210,8 @@ TEST_F(FailoverTest, OnlyFlushJobClusters) {
     // async_data_flusher_(virtual_cluster_1->ToProto(), nullptr);
 
     // Mock a gcs_init_data.
-    gcs::InMemoryGcsTableStorage gcs_table_storage;
+    std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage =
+        std::make_unique<GcsTableStorage>(std::make_unique<InMemoryStoreClient>());
     MockGcsInitData gcs_init_data(gcs_table_storage);
     gcs_init_data.SetNodes(nodes_);
     gcs_init_data.SetVirtualClusters(virtual_clusters_data_);

@@ -1106,7 +1106,7 @@ std::shared_ptr<VirtualCluster> PrimaryCluster::GetVirtualCluster(
   // Check if it is a job cluster
   auto job_cluster_ptr = GetJobCluster(virtual_cluster_id);
   if (job_cluster_ptr != nullptr) {
-    return job_cluster;
+    return job_cluster_ptr;
   }
   // Check if it is a job cluster of any logical cluster
   for (auto &[cluster_id, logical_cluster] : logical_clusters_) {

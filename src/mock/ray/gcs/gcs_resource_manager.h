@@ -16,12 +16,13 @@
 
 #include <gmock/gmock.h>
 
-#include "mock/ray/gcs/gcs_server/gcs_node_manager.h"
+#include "mock/ray/gcs/gcs_node_manager.h"
 #include "mock/ray/pubsub/publisher.h"
 #include "ray/common/asio/instrumented_io_context.h"
 #include "ray/gcs/gcs_resource_manager.h"
 #include "ray/gcs/gcs_table_storage.h"
 #include "ray/gcs/gcs_virtual_cluster_manager.h"
+#include "ray/gcs/store_client/in_memory_store_client.h"
 #include "ray/observability/fake_ray_event_recorder.h"
 #include "ray/raylet/scheduling/cluster_resource_manager.h"
 
@@ -75,15 +76,16 @@ class MockGcsResourceManager : public GcsResourceManager {
     static gcs::GcsNodeManager *node_manager = new gcs::MockGcsNodeManager();
     return node_manager;
   }
-  static gcs::InMemoryGcsTableStorage *GetMockGcsTableStorage() {
-    static gcs::InMemoryGcsTableStorage *gcs_table_storage =
-        new gcs::InMemoryGcsTableStorage();
+  static gcs::GcsTableStorage *GetMockGcsTableStorage() {
+    static gcs::GcsTableStorage *gcs_table_storage =
+        new gcs::GcsTableStorage(std::make_unique<InMemoryStoreClient>());
     return gcs_table_storage;
   }
-  static gcs::GcsPublisher *GetMockGcsPublisher() {
+  static pubsub::GcsPublisher *GetMockGcsPublisher() {
     static std::unique_ptr<ray::pubsub::Publisher> publisher(
         new ray::pubsub::MockPublisher());
-    static gcs::GcsPublisher *gcs_publisher = new gcs::GcsPublisher(std::move(publisher));
+    static pubsub::GcsPublisher *gcs_publisher =
+        new pubsub::GcsPublisher(std::move(publisher));
     return gcs_publisher;
   }
   static gcs::GcsVirtualClusterManager *GetMockVirtualClusterManager() {

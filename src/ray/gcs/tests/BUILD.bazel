@@ -470,3 +470,19 @@ ray_cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+ray_cc_test(
+    name = "gcs_virtual_cluster_manager_test",
+    size = "small",
+    srcs = [
+        "gcs_virtual_cluster_manager_test.cc",
+    ],
+    tags = ["team:core"],
+    deps = [
+        "//src/ray/gcs/gcs_server:gcs_server_lib",
+        ":gcs_server_test_util",
+        "//src/ray/gcs/test:gcs_test_util_lib",
+        "//:ray_mock",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

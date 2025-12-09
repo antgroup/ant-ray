@@ -2,6 +2,8 @@
 # shellcheck disable=SC2086
 # This script is for users to build docker images locally. It is most useful for users wishing to edit the
 # base-deps, or ray images. This script is *not* tested.
+# A pre-built image example, constructed following build-docker-ant.sh, is available on Alibaba Cloud Container Registry:
+# crpi-3wcszgxf0r7f5bmh.cn-hangzhou.personal.cr.aliyuncs.com/ant-ray/prebuilt
 
 GPU=""
 BASE_IMAGE="ubuntu:22.04"

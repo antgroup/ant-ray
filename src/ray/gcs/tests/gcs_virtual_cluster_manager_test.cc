@@ -180,7 +180,7 @@ class VirtualClusterTest : public ::testing::Test {
         async_data_flusher_, cluster_resource_manager_);
 
     for (size_t i = 0; i < node_count; ++i) {
-      auto node = Mocker::GenNodeInfo();
+      auto node = GenNodeInfo();
       auto template_id = std::to_string(i % template_count);
       node->set_node_type_name(template_id);
       primary_cluster->OnNodeAdd(*node);
@@ -1030,7 +1030,7 @@ TEST_F(FailoverTest, FailoverNormal) {
   // Mock a gcs_init_data.
   std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage =
       std::make_unique<GcsTableStorage>(std::make_unique<InMemoryStoreClient>());
-  MockGcsInitData gcs_init_data(gcs_table_storage);
+  MockGcsInitData gcs_init_data(*gcs_table_storage);
   gcs_init_data.SetNodes(nodes_);
   gcs_init_data.SetVirtualClusters(virtual_clusters_data_);
 
@@ -1092,7 +1092,7 @@ TEST_F(FailoverTest, FailoverWithDeadNodes) {
     // Mock a gcs_init_data.
     std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage =
         std::make_unique<GcsTableStorage>(std::make_unique<InMemoryStoreClient>());
-    MockGcsInitData gcs_init_data(gcs_table_storage);
+    MockGcsInitData gcs_init_data(*gcs_table_storage);
     gcs_init_data.SetNodes(nodes_);
     gcs_init_data.SetVirtualClusters(virtual_clusters_data_);
 
@@ -1139,7 +1139,7 @@ TEST_F(FailoverTest, FailoverWithDeadNodes) {
     // Mock a gcs_init_data.
     std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage =
         std::make_unique<GcsTableStorage>(std::make_unique<InMemoryStoreClient>());
-    MockGcsInitData gcs_init_data(gcs_table_storage);
+    MockGcsInitData gcs_init_data(*gcs_table_storage);
     gcs_init_data.SetNodes(nodes_);
     gcs_init_data.SetVirtualClusters(virtual_clusters_data_);
 
@@ -1212,7 +1212,7 @@ TEST_F(FailoverTest, OnlyFlushJobClusters) {
     // Mock a gcs_init_data.
     std::shared_ptr<gcs::GcsTableStorage> gcs_table_storage =
         std::make_unique<GcsTableStorage>(std::make_unique<InMemoryStoreClient>());
-    MockGcsInitData gcs_init_data(gcs_table_storage);
+    MockGcsInitData gcs_init_data(*gcs_table_storage);
     gcs_init_data.SetNodes(nodes_);
     gcs_init_data.SetVirtualClusters(virtual_clusters_data_);
 

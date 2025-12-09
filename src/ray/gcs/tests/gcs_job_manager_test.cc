@@ -640,6 +640,7 @@ TEST_F(GcsJobManagerTest, TestMarkJobFinishedIdempotency) {
                                      *gcs_publisher_,
                                      runtime_env_manager_,
                                      *function_manager_,
+                                     *gcs_virtual_cluster_manager_,
                                      *fake_kv_,
                                      io_service_,
                                      *worker_client_pool_,

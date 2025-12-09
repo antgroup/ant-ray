@@ -106,7 +106,8 @@ class MockWorkerPool : public WorkerPoolInterface {
               (override));
   MOCK_METHOD(void,
               StartNewWorker,
-              (const std::shared_ptr<PopWorkerRequest> &pop_worker_request),
+              (const std::shared_ptr<PopWorkerRequest> &pop_worker_request,
+               const std::string &serialized_allocated_instances),
               (override));
   MOCK_METHOD(std::string, DebugString, (), (const, override));
 

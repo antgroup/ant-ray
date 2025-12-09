@@ -79,7 +79,11 @@ TEST_F(HybridSchedulingPolicyTest, GetBestNode) {
 
   // Test return 1 node always return the first node.
   {
-    HybridSchedulingPolicy policy{local_node, {}, [](auto) { return true; }};
+    HybridSchedulingPolicy policy{
+        local_node,
+        {},
+        [](auto) { return true; },
+        [](scheduling::NodeID, const SchedulingContext *) { return true; }};
     EXPECT_EQ(n1,
               policy.GetBestNode(node_scores,
                                  /*num_candidate_nodes*/ 1,

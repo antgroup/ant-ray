@@ -70,7 +70,7 @@ class MockGcsNodeManager : public GcsNodeManager {
     return gcs_table_storage;
   }
   static pubsub::GcsPublisher *GetMockGcsPublisher() {
-    static std::unique_ptr<ray::pubsub::Publisher> publisher(
+    static std::unique_ptr<ray::pubsub::MockPublisher> publisher(
         new ray::pubsub::MockPublisher());
     static pubsub::GcsPublisher *gcs_publisher =
         new pubsub::GcsPublisher(std::move(publisher));

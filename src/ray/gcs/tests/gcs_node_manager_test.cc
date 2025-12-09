@@ -72,6 +72,7 @@ TEST_F(GcsNodeManagerTest, TestRayEventNodeEvents) {
                                    *io_context_,
                                    client_pool_.get(),
                                    ClusterID::Nil(),
+                                   *gcs_virtual_cluster_manager_,
                                    *fake_ray_event_recorder_,
                                    "test_session_name");
   auto node = GenNodeInfo();
@@ -273,6 +274,7 @@ TEST_F(GcsNodeManagerTest, TestAddNodeListenerCallbackDeadlock) {
                                    *io_context_,
                                    client_pool_.get(),
                                    ClusterID::Nil(),
+                                   *gcs_virtual_cluster_manager_,
                                    *fake_ray_event_recorder_,
                                    "test_session_name");
   int node_count = 10;
@@ -304,6 +306,7 @@ TEST_F(GcsNodeManagerTest, TestUpdateAliveNode) {
                                    *io_context_,
                                    client_pool_.get(),
                                    ClusterID::Nil(),
+                                   *gcs_virtual_cluster_manager_,
                                    *fake_ray_event_recorder_,
                                    "test_session_name");
 
@@ -383,6 +386,7 @@ TEST_F(GcsNodeManagerTest, TestGetNodeAddressAndLiveness) {
                                    *io_context_,
                                    client_pool_.get(),
                                    ClusterID::Nil(),
+                                   *gcs_virtual_cluster_manager_,
                                    *fake_ray_event_recorder_,
                                    "test_session_name");
 
@@ -422,6 +426,7 @@ TEST_F(GcsNodeManagerTest, TestHandleGetAllNodeAddressAndLiveness) {
                                    *io_context_,
                                    client_pool_.get(),
                                    ClusterID::Nil(),
+                                   *gcs_virtual_cluster_manager_,
                                    *fake_ray_event_recorder_,
                                    "test_session_name");
 

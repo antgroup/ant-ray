@@ -1774,6 +1774,14 @@ class Node:
                 wait=wait,
             )
 
+        # Stop the leader selector if it exists
+        if hasattr(self, "leader_selector") and self.leader_selector is not None:
+            try:
+                self.leader_selector.stop()
+                self.leader_selector = None
+            except Exception as e:
+                logger.warning(f"Failed to stop leader selector: {e}")
+
     def live_processes(self):
         """Return a list of the live processes.
 

@@ -43,13 +43,9 @@ def test_head_ha_switch(external_redis):
     os.environ["RAY_ENABLE_HEAD_HA"] = "TRUE"
 
     # Set HA configuration to speed up the test
-    # Reduce check interval from 3s to 500ms
     os.environ["RAY_HA_CHECK_INTERVAL_MS"] = "500"
-    # Reduce key expire time from 60s to 5s
     os.environ["RAY_HA_KEY_EXPIRE_TIME_MS"] = "5000"
-    # Reduce wait time after becoming active from 2s to 500ms
     os.environ["RAY_HA_WAIT_TIME_AFTER_BE_ACTIVE_MS"] = "500"
-    # Reduce max wait time for pre-GCS stop from 3 days to 10s
     os.environ["RAY_HA_WAIT_PRE_GCS_STOP_MAX_TIME_MS"] = "10000"
 
     # Track nodes and exceptions from threads

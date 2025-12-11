@@ -511,6 +511,18 @@ class Node:
                 self._session_dir = ray._private.utils.decode(session_dir)
             else:
                 self._session_dir = os.path.join(self._temp_dir, self._session_name)
+
+        # Setup session directories and symlinks
+        self._setup_session_directories()
+
+    def _setup_session_directories(self):
+        """Create session-related directories and symlinks.
+
+        This method sets up all the necessary directories for a Ray session,
+        including session_dir, sockets, logs, and runtime_env directories.
+        It can be called during initialization or when updating session paths
+        in HA mode.
+        """
         session_symlink = os.path.join(self._temp_dir, ray_constants.SESSION_LATEST)
 
         # Send a warning message if the session exists.
@@ -535,6 +547,18 @@ class Node:
         if os.path.isdir(tpu_log_dir):
             tpu_logs_symlink = os.path.join(self._logs_dir, "tpu_logs")
             try_to_symlink(tpu_logs_symlink, tpu_log_dir)
+
+    def _update_session_paths(self):
+        """Update session-related paths after changing session name in HA mode.
+
+        This is called when a standby head takes over and needs to use the
+        persisted session name from the previous leader.
+        """
+        # Update session directory path based on the new session name
+        self._session_dir = os.path.join(self._temp_dir, self._session_name)
+
+        # Recreate all session directories with the updated session_dir
+        self._setup_session_directories()
 
     def _get_node_labels(self):
         def merge_labels(env_override_labels, params_labels):
@@ -1465,6 +1489,25 @@ class Node:
 
         self.start_head_ha_mode()
 
+        # In HA mode, after becoming the active head, we need to check if there's
+        # already a session name persisted in Redis (from the previous leader).
+        # If so, we should use that session name instead of the one we generated.
+        if self._ray_params.enable_head_ha:
+            persisted_session_name = self.check_persisted_session_name()
+            if persisted_session_name is not None:
+                persisted_session_name_str = ray._private.utils.decode(
+                    persisted_session_name
+                )
+                if persisted_session_name_str != self._session_name:
+                    logger.info(
+                        f"Standby head node taking over. "
+                        f"Using persisted session name: {persisted_session_name_str} "
+                        f"(was: {self._session_name})"
+                    )
+                    self._session_name = persisted_session_name_str
+                    # Also need to update session_dir and related paths
+                    self._update_session_paths()
+
         self.start_gcs_server()
         assert self.get_gcs_client() is not None
         self._write_cluster_info_to_kv()
@@ -1773,6 +1816,14 @@ class Node:
                 allow_graceful=allow_graceful,
                 wait=wait,
             )
+
+        # Stop the leader selector if it exists
+        if hasattr(self, "leader_selector") and self.leader_selector is not None:
+            try:
+                self.leader_selector.stop()
+                self.leader_selector = None
+            except Exception as e:
+                logger.warning(f"Failed to stop leader selector: {e}")
 
     def live_processes(self):
         """Return a list of the live processes.

@@ -251,6 +251,9 @@ def start_redis_instance(
 
     if listen_to_localhost_only:
         command += ["--bind", "127.0.0.1"]
+    # Disable protected mode for testing to allow connections without password
+    # This is safe in test environments and avoids connection issues
+    command += ["--protected-mode", "no"]
     pidfile = os.path.join(session_dir_path, "redis-" + uuid.uuid4().hex + ".pid")
     command += ["--pidfile", pidfile]
     if enable_tls:

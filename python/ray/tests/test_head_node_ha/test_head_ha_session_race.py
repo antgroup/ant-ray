@@ -123,6 +123,12 @@ def test_head_ha_session_race(external_redis):
 
         time.sleep(5)
 
+        # Wait for node threads to finish so we capture any exceptions
+        if thread1 is not None:
+            thread1.join(timeout=10)
+        if thread2 is not None:
+            thread2.join(timeout=10)
+
         print("\n=== Test Results ===")
 
         assert (
@@ -133,9 +139,6 @@ def test_head_ha_session_race(external_redis):
         ), f"Node 2 failed with exception: {node2_exception}"
 
     finally:
-        # wait for threads to finish
-        thread1.join(timeout=5)
-        thread2.join(timeout=5)
         # Restore original methods
         Node._write_cluster_info_to_kv = original_write_cluster_info
         if node1_start_first_tag:

@@ -97,6 +97,7 @@ class Node:
         self.all_processes: dict = {}
         self.removal_lock = threading.Lock()
 
+        self.connect_only = connect_only
         self.ray_init_cluster = ray_init_cluster
         if ray_init_cluster:
             assert head, "ray.init() created cluster only has the head node"
@@ -1492,6 +1493,7 @@ class Node:
         # In HA mode, after becoming the active head, we need to check if there's
         # already a session name persisted in Redis (from the previous leader).
         # If so, we should use that session name instead of the one we generated.
+        _is_head_takeover = False
         if self._ray_params.enable_head_ha:
             persisted_session_name = self.check_persisted_session_name()
             if persisted_session_name is not None:
@@ -1500,17 +1502,25 @@ class Node:
                 )
                 if persisted_session_name_str != self._session_name:
                     logger.info(
-                        f"Standby head node taking over. "
+                        f"HA takeover detected. Standby head node taking over. "
                         f"Using persisted session name: {persisted_session_name_str} "
-                        f"(was: {self._session_name})"
+                        f"(generated session name was: {self._session_name})"
                     )
                     self._session_name = persisted_session_name_str
                     # Also need to update session_dir and related paths
                     self._update_session_paths()
+                    _is_head_takeover = True
+                else:
+                    logger.info(
+                        f"Head node restarting with same session: {self._session_name}"
+                    )
 
         self.start_gcs_server()
         assert self.get_gcs_client() is not None
         self._write_cluster_info_to_kv()
+
+        if _is_head_takeover:
+            self._update_info_after_head_takeover()
 
         if not self._ray_params.no_monitor:
             self.start_monitor()
@@ -1527,6 +1537,29 @@ class Node:
         self.start_api_server(
             include_dashboard=self._ray_params.include_dashboard,
             raise_on_failure=raise_on_api_server_failure,
+        )
+
+    def _update_info_after_head_takeover(self):
+        """Update information in Redis/GCS after head takeover."""
+        logger.info(
+            f"Updating info after head takeover. "
+            f"New head node IP: {self._node_ip_address}, "
+            f"GCS address: {self._gcs_address}"
+        )
+
+        # Update node IP address file Since old file may not present in current session dir
+        if not self.connect_only:
+            ray._private.services.write_node_ip_address(
+                self.get_session_dir_path(), self._node_ip_address
+            )
+
+        # Clear dashboard url of DASHBOARD_ADDRESS key in internal kv
+        # The dashboard start process is asynchronous, so delete the old
+        # dashboard address firstly to avoid clients get the stale address.
+        self.get_gcs_client().internal_kv_del(
+            ray_constants.DASHBOARD_ADDRESS,
+            False,
+            namespace=ray_constants.KV_NAMESPACE_DASHBOARD,
         )
 
     def start_ray_processes(self):

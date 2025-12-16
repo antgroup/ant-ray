@@ -1500,7 +1500,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="PreprocessorNotFittedException">
-<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.PreprocessorNotFittedException.html#ray.data.preprocessor.PreprocessorNotFittedException">[docs]</a>
+<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.PreprocessorNotFittedException.html#ray.data.preprocessors.PreprocessorNotFittedException">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PreprocessorNotFittedException</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Error raised when the preprocessor needs to be fitted first.&quot;&quot;&quot;</span>
@@ -1510,7 +1510,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Preprocessor">
-<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.html#ray.data.preprocessor.Preprocessor">[docs]</a>
+<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.html#ray.data.preprocessors.Preprocessor">[docs]</a>
 <span class="nd">@PublicAPI</span><span class="p">(</span><span class="n">stability</span><span class="o">=</span><span class="s2">&quot;beta&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Preprocessor</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Implements an ML preprocessing operation.</span>
@@ -1579,7 +1579,7 @@ document.write(`
             <span class="k">return</span> <span class="n">Preprocessor</span><span class="o">.</span><span class="n">FitStatus</span><span class="o">.</span><span class="n">NOT_FITTED</span>
 
 <div class="viewcode-block" id="Preprocessor.fit">
-<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.fit.html#ray.data.preprocessor.Preprocessor.fit">[docs]</a>
+<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.fit.html#ray.data.preprocessors.Preprocessor.fit">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Preprocessor&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fit this Preprocessor to the Dataset.</span>
 
@@ -1620,7 +1620,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span>
 
 <div class="viewcode-block" id="Preprocessor.fit_transform">
-<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.fit_transform.html#ray.data.preprocessor.Preprocessor.fit_transform">[docs]</a>
+<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.fit_transform.html#ray.data.preprocessors.Preprocessor.fit_transform">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">fit_transform</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">ds</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">,</span>
@@ -1657,7 +1657,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Preprocessor.transform">
-<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.transform.html#ray.data.preprocessor.Preprocessor.transform">[docs]</a>
+<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.transform.html#ray.data.preprocessors.Preprocessor.transform">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">ds</span><span class="p">:</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">,</span>
@@ -1702,7 +1702,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Preprocessor.transform_batch">
-<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.transform_batch.html#ray.data.preprocessor.Preprocessor.transform_batch">[docs]</a>
+<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.transform_batch.html#ray.data.preprocessors.Preprocessor.transform_batch">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">transform_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="s2">&quot;DataBatchType&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataBatchType&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform a single batch of data.</span>
 
@@ -1871,7 +1871,7 @@ document.write(`
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Preprocessor.preferred_batch_format">
-<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.preferred_batch_format.html#ray.data.preprocessor.Preprocessor.preferred_batch_format">[docs]</a>
+<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.preferred_batch_format.html#ray.data.preprocessors.Preprocessor.preferred_batch_format">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="nd">@DeveloperAPI</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">preferred_batch_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BatchFormat</span><span class="p">:</span>
@@ -1899,7 +1899,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">stat_computation_plan</span> <span class="o">=</span> <span class="n">StatComputationPlan</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Preprocessor.serialize">
-<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.serialize.html#ray.data.preprocessor.Preprocessor.serialize">[docs]</a>
+<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.serialize.html#ray.data.preprocessors.Preprocessor.serialize">[docs]</a>
     <span class="nd">@DeveloperAPI</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return this preprocessor serialized as a string.</span>
@@ -1912,7 +1912,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Preprocessor.deserialize">
-<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.deserialize.html#ray.data.preprocessor.Preprocessor.deserialize">[docs]</a>
+<a class="viewcode-back" href="../../../data/api/doc/ray.data.preprocessor.Preprocessor.deserialize.html#ray.data.preprocessors.Preprocessor.deserialize">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="nd">@DeveloperAPI</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">deserialize</span><span class="p">(</span><span class="n">serialized</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Preprocessor&quot;</span><span class="p">:</span>

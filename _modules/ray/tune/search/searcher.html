@@ -1508,7 +1508,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.html#ray.tune.search.Searcher">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.html#ray.tune.search.bayesopt.Searcher">[docs]</a>
 <span class="nd">@DeveloperAPI</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Searcher</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class for wrapping suggesting algorithms.</span>
@@ -1594,7 +1594,7 @@ document.write(`
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Mode most either be a list or string&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Searcher.set_search_properties">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.set_search_properties.html#ray.tune.search.Searcher.set_search_properties">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.set_search_properties.html#ray.tune.search.bayesopt.Searcher.set_search_properties">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_search_properties</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="o">**</span><span class="n">spec</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -1617,7 +1617,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.on_trial_result">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.on_trial_result.html#ray.tune.search.Searcher.on_trial_result">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.on_trial_result.html#ray.tune.search.bayesopt.Searcher.on_trial_result">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Optional notification for result during training.</span>
 
@@ -1638,7 +1638,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.on_trial_complete">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.on_trial_complete.html#ray.tune.search.Searcher.on_trial_complete">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.on_trial_complete.html#ray.tune.search.bayesopt.Searcher.on_trial_complete">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">on_trial_complete</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1662,7 +1662,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.suggest">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.suggest.html#ray.tune.search.Searcher.suggest">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.suggest.html#ray.tune.search.bayesopt.Searcher.suggest">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Queries the algorithm to retrieve the next set of parameters.</span>
 
@@ -1681,7 +1681,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.add_evaluated_point">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.add_evaluated_point.html#ray.tune.search.Searcher.add_evaluated_point">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.add_evaluated_point.html#ray.tune.search.bayesopt.Searcher.add_evaluated_point">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_evaluated_point</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
@@ -1712,7 +1712,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.add_evaluated_trials">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.add_evaluated_trials.html#ray.tune.search.Searcher.add_evaluated_trials">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.add_evaluated_trials.html#ray.tune.search.bayesopt.Searcher.add_evaluated_trials">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_evaluated_trials</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">trials_or_analysis</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Trial&quot;</span><span class="p">],</span> <span class="s2">&quot;ExperimentAnalysis&quot;</span><span class="p">],</span>
@@ -1790,7 +1790,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.save">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.save.html#ray.tune.search.Searcher.save">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.save.html#ray.tune.search.bayesopt.Searcher.save">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Save state to path for this search algorithm.</span>
 
@@ -1827,7 +1827,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.restore">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.restore.html#ray.tune.search.Searcher.restore">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.restore.html#ray.tune.search.bayesopt.Searcher.restore">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Restore state for this search algorithm</span>
 
@@ -1860,7 +1860,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.set_max_concurrency">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.set_max_concurrency.html#ray.tune.search.Searcher.set_max_concurrency">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.set_max_concurrency.html#ray.tune.search.bayesopt.Searcher.set_max_concurrency">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_max_concurrency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_concurrent</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set max concurrent trials this searcher can run.</span>
 
@@ -1885,7 +1885,7 @@ document.write(`
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
 <div class="viewcode-block" id="Searcher.save_to_dir">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.save_to_dir.html#ray.tune.search.Searcher.save_to_dir">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.save_to_dir.html#ray.tune.search.bayesopt.Searcher.save_to_dir">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">save_to_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">session_str</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Automatically saves the given searcher to the checkpoint_dir.</span>
 
@@ -1913,7 +1913,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Searcher.restore_from_dir">
-<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.restore_from_dir.html#ray.tune.search.Searcher.restore_from_dir">[docs]</a>
+<a class="viewcode-back" href="../../../../tune/api/doc/ray.tune.search.Searcher.restore_from_dir.html#ray.tune.search.bayesopt.Searcher.restore_from_dir">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">restore_from_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Restores the state of a searcher from a given checkpoint_dir.</span>
 

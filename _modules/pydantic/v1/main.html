@@ -1508,11 +1508,11 @@ document.write(`
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass_transform</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.class_validators</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidatorGroup</span><span class="p">,</span> <span class="n">extract_root_validators</span><span class="p">,</span> <span class="n">extract_validators</span><span class="p">,</span> <span class="n">inherit_validators</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseConfig</span><span class="p">,</span> <span class="n">Extra</span><span class="p">,</span> <span class="n">inherit_config</span><span class="p">,</span> <span class="n">prepare_config</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.error_wrappers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorWrapper</span><span class="p">,</span> <span class="n">ValidationError</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigError</span><span class="p">,</span> <span class="n">DictError</span><span class="p">,</span> <span class="n">ExtraError</span><span class="p">,</span> <span class="n">MissingError</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.fields</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.class_validators</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidatorGroup</span><span class="p">,</span> <span class="n">extract_root_validators</span><span class="p">,</span> <span class="n">extract_validators</span><span class="p">,</span> <span class="n">inherit_validators</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseConfig</span><span class="p">,</span> <span class="n">Extra</span><span class="p">,</span> <span class="n">inherit_config</span><span class="p">,</span> <span class="n">prepare_config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.error_wrappers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ErrorWrapper</span><span class="p">,</span> <span class="n">ValidationError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigError</span><span class="p">,</span> <span class="n">DictError</span><span class="p">,</span> <span class="n">ExtraError</span><span class="p">,</span> <span class="n">MissingError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.fields</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MAPPING_LIKE_SHAPES</span><span class="p">,</span>
     <span class="n">Field</span><span class="p">,</span>
     <span class="n">ModelField</span><span class="p">,</span>
@@ -1521,11 +1521,11 @@ document.write(`
     <span class="n">Undefined</span><span class="p">,</span>
     <span class="n">is_finalvar_with_default_val</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.json</span><span class="w"> </span><span class="kn">import</span> <span class="n">custom_pydantic_encoder</span><span class="p">,</span> <span class="n">pydantic_encoder</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">load_file</span><span class="p">,</span> <span class="n">load_str_bytes</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_ref_template</span><span class="p">,</span> <span class="n">model_schema</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">PyObject</span><span class="p">,</span> <span class="n">StrBytes</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.json</span><span class="w"> </span><span class="kn">import</span> <span class="n">custom_pydantic_encoder</span><span class="p">,</span> <span class="n">pydantic_encoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">load_file</span><span class="p">,</span> <span class="n">load_str_bytes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_ref_template</span><span class="p">,</span> <span class="n">model_schema</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">PyObject</span><span class="p">,</span> <span class="n">StrBytes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AnyCallable</span><span class="p">,</span>
     <span class="n">get_args</span><span class="p">,</span>
     <span class="n">get_origin</span><span class="p">,</span>
@@ -1535,7 +1535,7 @@ document.write(`
     <span class="n">resolve_annotations</span><span class="p">,</span>
     <span class="n">update_model_forward_refs</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DUNDER_ATTRIBUTES</span><span class="p">,</span>
     <span class="n">ROOT_KEY</span><span class="p">,</span>
     <span class="n">ClassAttribute</span><span class="p">,</span>
@@ -1555,9 +1555,9 @@ document.write(`
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">Signature</span>
 
-    <span class="kn">from</span><span class="w"> </span><span class="nn">.class_validators</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidatorListDict</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelOrDc</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">.typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.class_validators</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidatorListDict</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelOrDc</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">AbstractSetIntStr</span><span class="p">,</span>
         <span class="n">AnyClassMethod</span><span class="p">,</span>
         <span class="n">CallableGenerator</span><span class="p">,</span>
@@ -1764,6 +1764,12 @@ document.write(`
         <span class="bp">cls</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">mcs</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">new_namespace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># set __signature__ attr only for model class, but not for its instances</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">__signature__</span> <span class="o">=</span> <span class="n">ClassAttribute</span><span class="p">(</span><span class="s1">&#39;__signature__&#39;</span><span class="p">,</span> <span class="n">generate_model_signature</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="fm">__init__</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">config</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_base_model_class_defined</span><span class="p">:</span>
+            <span class="c1"># Cython does not understand the `if TYPE_CHECKING:` condition in the</span>
+            <span class="c1"># BaseModel&#39;s body (where annotations are set), so clear them manually:</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;__annotations__&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
         <span class="k">if</span> <span class="n">resolve_forward_refs</span><span class="p">:</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">__try_update_forward_refs__</span><span class="p">()</span>
 
@@ -1783,7 +1789,7 @@ document.write(`
 
 <span class="sd">        See #3829 and python/cpython#92810</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="s1">&#39;__fields__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__instancecheck__</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="s1">&#39;__post_root_validators__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__instancecheck__</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
 
 
 <span class="n">object_setattr</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span>
@@ -2151,7 +2157,7 @@ document.write(`
     <span class="k">def</span><span class="w"> </span><span class="nf">schema_json</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">by_alias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">ref_template</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">default_ref_template</span><span class="p">,</span> <span class="o">**</span><span class="n">dumps_kwargs</span><span class="p">:</span> <span class="n">Any</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">.json</span><span class="w"> </span><span class="kn">import</span> <span class="n">pydantic_encoder</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.v1.json</span><span class="w"> </span><span class="kn">import</span> <span class="n">pydantic_encoder</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__config__</span><span class="o">.</span><span class="n">json_dumps</span><span class="p">(</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="n">by_alias</span><span class="p">,</span> <span class="n">ref_template</span><span class="o">=</span><span class="n">ref_template</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="n">pydantic_encoder</span><span class="p">,</span> <span class="o">**</span><span class="n">dumps_kwargs</span>
@@ -2219,7 +2225,6 @@ document.write(`
         <span class="n">exclude_defaults</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">exclude_none</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">BaseModel</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">to_dict</span><span class="p">:</span>
                 <span class="n">v_dict</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span>
@@ -2312,7 +2317,6 @@ document.write(`
         <span class="n">exclude_defaults</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">exclude_none</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;TupleGenerator&#39;</span><span class="p">:</span>
-
         <span class="c1"># Merge field set excludes with explicit exclude parameter with explicit overriding field set options.</span>
         <span class="c1"># The extra &quot;is not None&quot; guards are not logically necessary but optimizes performance for the simple case.</span>
         <span class="k">if</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">__exclude_fields__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

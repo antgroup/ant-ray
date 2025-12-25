@@ -18,7 +18,7 @@ def install_ray_package(ray_version, whl_dir):
     if whl_dir:
         # generate whl file name
         whl_file_name = (
-            f"ant_ray-*cp{sys.version_info[0]}" f"{sys.version_info[1]}*.whl[default]"
+            f"ant_ray-*cp{sys.version_info.major}{sys.version_info.minor}*.whl[default]"
         )
 
         # whl file path

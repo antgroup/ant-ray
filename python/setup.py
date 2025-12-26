@@ -95,7 +95,7 @@ class SetupSpec:
         elif build_type == BuildType.NIGHTLY:
             version_postfix = datetime.today().strftime("%Y%m%d")
             version = re.sub(r"dev\d*", f"dev{version_postfix}", version)
-            self.version: str = version
+            self.version: str = version + ".a0"
             self.name = f"{self.name}-nightly"
         elif build_type == BuildType.DEPS_ONLY:
             self.version: str = DEPS_ONLY_VERSION

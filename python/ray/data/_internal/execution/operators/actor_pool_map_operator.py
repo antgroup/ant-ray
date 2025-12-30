@@ -37,7 +37,6 @@ from ray.data._internal.execution.operators.actor_removal_strategy import (
     DefaultActorRemovalStrategy,
 )
 from ray.data._internal.execution.operators.map_operator import (
-    BaseRefBundler,
     MapOperator,
     _map_task,
 )
@@ -45,7 +44,10 @@ from ray.data._internal.execution.operators.map_transformer import MapTransforme
 from ray.data._internal.execution.util import locality_string
 from ray.data._internal.remote_fn import _add_system_error_to_retry_exceptions
 from ray.data.block import Block, BlockMetadata
-from ray.data.context import DataContext
+from ray.data.context import (
+    DEFAULT_ACTOR_MAX_TASKS_IN_FLIGHT_TO_MAX_CONCURRENCY_FACTOR,
+    DataContext,
+)
 from ray.types import ObjectRef
 from ray.util.common import INT32_MAX
 

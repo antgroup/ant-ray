@@ -3,14 +3,15 @@ import logging
 import os
 import tempfile
 import shlex
-from typing import List, Optional
+import glob
+from typing import List, Optional, Set
 import ray._private.runtime_env.constants as runtime_env_constants
 from ray._private.runtime_env.context import RuntimeEnvContext
 from ray._private.runtime_env.plugin import RuntimeEnvPlugin
 from ray._private.ray_constants import RAY_NODE_LOGS_DIR
 
 from ray._private.utils import (
-    get_ray_site_packages_path,
+    get_ray_python_path,
     get_pyenv_path,
     try_parse_default_mount_points,
     try_parse_container_run_options,
@@ -208,7 +209,6 @@ def _modify_container_context_impl(
         container_command.append(context.working_dir)
     else:
         container_command.append(os.getcwd())
-    container_command.append("--cap-add=AUDIT_WRITE")
 
     redirected_pyenv_folder = None
     if container_install_ray or container_pip_packages:
@@ -220,7 +220,7 @@ def _modify_container_context_impl(
 
     if not container_install_ray:
         # mount ray package site path
-        host_site_packages_path = get_ray_site_packages_path()
+        host_site_packages_path = get_ray_python_path()
 
         # If the user specifies a `py_executable` in the container
         # and it starts with the ${PYENV_ROOT} environment variable (indicating a PYENV-managed executable),
@@ -238,7 +238,8 @@ def _modify_container_context_impl(
                 ".pyenv", redirected_pyenv_folder
             )
             context.container[redirected_pyenv_folder] = redirected_pyenv_folder
-        container_to_host_mount_dict[container_pyenv_path] = host_pyenv_path
+        if container_pyenv_path:
+            container_to_host_mount_dict[container_pyenv_path] = host_pyenv_path
         container_to_host_mount_dict[host_site_packages_path] = host_site_packages_path
 
     # For loop `run options` and append each item to the command line of podman
@@ -265,6 +266,7 @@ def _modify_container_context_impl(
     context.env_vars = try_update_runtime_env_vars(
         context.env_vars, redirected_pyenv_folder
     )
+    
 
     # Append the container_placeholder as a placeholder to the command.
     # This placeholder will be replaced in the `try_update_container_command`
@@ -273,6 +275,295 @@ def _modify_container_context_impl(
     # `try_update_container_command` function, so direct inclusion of `--env` flags here
     # is avoided to ensure proper ordering and dynamic updates.
     container_command.append(runtime_env_constants.CONTAINER_ENV_PLACEHOLDER)
+    
+   
+    if not os.getenv("NVIDIA_VISIBLE_DEVICES"):
+        # CPU mode. Only needs AUDIT_WRITE
+        container_command.append("--cap-add=AUDIT_WRITE")
+    else:
+        # GPU mode
+        # Use glob patterns to discover and mount NVIDIA libraries dynamically
+        logger.info("Mounting gpu devices and drivers")
+        
+        # Use sets to store unique mount destinations
+        volume_mounts: Set[str] = set()
+        device_mounts: Set[str] = set()
+        mount_commands = ["--privileged"]
+
+        # NVIDIA device mounts - validate existence
+        nvidia_devices = [
+            "/dev/nvidiactl",
+            "/dev/nvidia-uvm",
+            "/dev/nvidia-uvm-tools",
+            "/dev/nvidia-modeset"
+        ]
+
+        for device_path in nvidia_devices:
+            if os.path.exists(device_path):
+                volume_mounts.add(f"{device_path}:{device_path}")
+
+        # Discover NVIDIA GPU devices dynamically using glob
+        gpu_device_pattern = "/dev/nvidia[0-9]*"
+        for device_path in glob.glob(gpu_device_pattern):
+            if os.path.exists(device_path):
+                device_mounts.add(device_path)
+
+        # Discover CUDA installations dynamically using glob
+        cuda_patterns = [
+        ]
+
+        for pattern in cuda_patterns:
+            for cuda_path in glob.glob(pattern):
+                if os.path.exists(cuda_path) and os.path.isdir(cuda_path):
+                    volume_mounts.add(f"{cuda_path}:{cuda_path}:ro")
+
+        # Discover NCCL installations dynamically
+        nccl_patterns = [
+            "/usr/local/nccl*"
+        ]
+
+        for pattern in nccl_patterns:
+            for nccl_path in glob.glob(pattern):
+                if os.path.exists(nccl_path) and os.path.isdir(nccl_path):
+                    volume_mounts.add(f"{nccl_path}:{nccl_path}:ro")
+
+        # Vulkan and EGL mounts - validate existence
+        vulkan_egl_paths = [
+            "/etc/vulkan",
+            "/usr/share/egl",
+            "/usr/share/glvnd"
+        ]
+
+        for path in vulkan_egl_paths:
+            if os.path.exists(path) and os.path.isdir(path):
+                volume_mounts.add(f"{path}:{path}:ro")
+
+        # RDMA/InfiniBand mounts - validate existence
+        rdma_paths = [
+            "/usr/lib64/libibverbs",
+            "/usr/lib64/librdmacm",
+            "/sys/class/infiniband",
+            "/dev/infiniband"
+        ]
+
+        for path in rdma_paths:
+            if os.path.exists(path):
+                if os.path.isdir(path):
+                    volume_mounts.add(f"{path}:{path}:ro")
+                else:  # device file
+                    volume_mounts.add(f"{path}:{path}")
+
+        # Shared memory for NCCL - validate existence
+        if os.path.exists("/dev/shm"):
+            volume_mounts.add("/dev/shm:/dev/shm")
+
+        # NVIDIA runtime sockets - validate existence
+        socket_paths = [
+            "/run/nvidia-persistenced/socket",
+            "/run/nvidia-fabricmanager/socket"
+        ]
+
+        for socket_path in socket_paths:
+            if os.path.exists(socket_path):
+                volume_mounts.add(f"{socket_path}:{socket_path}")
+
+        # Additional system mounts - validate existence
+        system_paths = [
+            "/etc/ld.so.conf.d",
+        ]
+
+        for path in system_paths:
+            if os.path.exists(path):
+                volume_mounts.add(f"{path}:{path}:ro")
+
+        # Discover NVIDIA libraries in /usr/lib/x86_64-linux-gnu using glob
+        nvidia_lib_x86_64_patterns = [
+            "/usr/lib/x86_64-linux-gnu/libnvidia-*.so",
+            "/usr/lib/x86_64-linux-gnu/libcuda.so",
+            "/usr/lib/x86_64-linux-gnu/libvdpau_nvidia.so",
+            "/usr/lib/x86_64-linux-gnu/libnvcuvid.so",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-*.so.*",
+            "/usr/lib/x86_64-linux-gnu/libcuda.so.*",
+            "/usr/lib/x86_64-linux-gnu/libvdpau_nvidia.so.*",
+            "/usr/lib/x86_64-linux-gnu/libnvcuvid.so.*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-ml.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-cfg.so*",
+            "/usr/lib/x86_64-linux-gnu/libcudadebugger.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-opencl.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-gpucomp.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-ptxjitcompiler.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-allocator.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-pkcs11.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-pkcs11-openssl3.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-nvvm.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-ngx.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-encode.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-opticalflow.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-eglcore.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-glcore.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-tls.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-glsi.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-fbc.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-rtcore.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvoptix.so*",
+            "/usr/lib/x86_64-linux-gnu/libGLX_nvidia.so*",
+            "/usr/lib/x86_64-linux-gnu/libEGL_nvidia.so*",
+            "/usr/lib/x86_64-linux-gnu/libGLESv2_nvidia.so*",
+            "/usr/lib/x86_64-linux-gnu/libGLESv1_CM_nvidia.so*",
+            "/usr/lib/x86_64-linux-gnu/libnvidia-glvkspirv.so*",
+        ]
+
+        for pattern in nvidia_lib_x86_64_patterns:
+            for lib_path in glob.glob(pattern):
+                if os.path.exists(lib_path):
+                    volume_mounts.add(f"{lib_path}:{lib_path}:ro")
+
+        # Discover NVIDIA libraries in /usr/lib/i386-linux-gnu using glob
+        nvidia_lib_i386_patterns = [
+            "/usr/lib/i386-linux-gnu/libnvidia-*.so",
+            "/usr/lib/i386-linux-gnu/libcuda.so",
+            "/usr/lib/i386-linux-gnu/libvdpau_nvidia.so",
+            "/usr/lib/i386-linux-gnu/libnvcuvid.so",
+            "/usr/lib/i386-linux-gnu/libnvidia-*.so.*",
+            "/usr/lib/i386-linux-gnu/libcuda.so.*",
+            "/usr/lib/i386-linux-gnu/libvdpau_nvidia.so.*",
+            "/usr/lib/i386-linux-gnu/libnvcuvid.so.*",
+            "/usr/lib/i386-linux-gnu/libnvidia-ml.so*",
+            "/usr/lib/i386-linux-gnu/libnvidia-opencl.so*",
+            "/usr/lib/i386-linux-gnu/libnvidia-gpucomp.so*",
+            "/usr/lib/i386-linux-gnu/libnvidia-ptxjitcompiler.so*",
+            "/usr/lib/i386-linux-gnu/libnvidia-allocator.so*",
+            "/usr/lib/i386-linux-gnu/libnvidia-nvvm.so*",
+            "/usr/lib/i386-linux-gnu/libnvidia-encode.so*",
+            "/usr/lib/i386-linux-gnu/libnvidia-opticalflow.so*",
+            "/usr/lib/i386-linux-gnu/libnvidia-eglcore.so*",
+            "/usr/lib/i386-linux-gnu/libnvidia-glcore.so*",
+            "/usr/lib/i386-linux-gnu/libnvidia-tls.so*",
+            "/usr/lib/i386-linux-gnu/libnvidia-glsi.so*",
+            "/usr/lib/i386-linux-gnu/libnvidia-fbc.so*",
+            "/usr/lib/i386-linux-gnu/libGLX_nvidia.so*",
+            "/usr/lib/i386-linux-gnu/libEGL_nvidia.so*",
+            "/usr/lib/i386-linux-gnu/libGLESv2_nvidia.so*",
+            "/usr/lib/i386-linux-gnu/libGLESv1_CM_nvidia.so*",
+            "/usr/lib/i386-linux-gnu/libnvidia-glvkspirv.so*",
+        ]
+
+        for pattern in nvidia_lib_i386_patterns:
+            for lib_path in glob.glob(pattern):
+                if os.path.exists(lib_path):
+                    volume_mounts.add(f"{lib_path}:{lib_path}:ro")
+
+        # Discover NVIDIA libraries in /usr/lib64 using glob
+        nvidia_lib64_patterns = [
+            "/usr/lib64/libnvidia-*.so",
+            "/usr/lib64/libcuda.so",
+            "/usr/lib64/libGLX_nvidia.so",
+            "/usr/lib64/libEGL_nvidia.so",
+            "/usr/lib64/libGLESv*_nvidia.so",
+            "/usr/lib64/libnvidia-*.so.*",
+            "/usr/lib64/libcuda.so.*",
+            "/usr/lib64/libGLX_nvidia.so.*",
+            "/usr/lib64/libEGL_nvidia.so.*",
+            "/usr/lib64/libGLESv*_nvidia.so.*",
+            "/usr/lib64/libnvidia-egl-gbm.so*",
+            "/usr/lib64/libnvidia-egl-wayland.so*",
+        ]
+
+        for pattern in nvidia_lib64_patterns:
+            for lib_path in glob.glob(pattern):
+                if os.path.exists(lib_path):
+                    volume_mounts.add(f"{lib_path}:{lib_path}:ro")
+
+        # Discover NVIDIA libraries in /usr/lib using glob
+        nvidia_lib_patterns = [
+            "/usr/lib/libnvidia-*.so",
+            "/usr/lib/libcuda.so",
+            "/usr/lib/libvdpau_nvidia.so",
+            "/usr/lib/libnvcuvid.so",
+            "/usr/lib/libnvidia-*.so.*",
+            "/usr/lib/libcuda.so.*",
+            "/usr/lib/libvdpau_nvidia.so.*",
+            "/usr/lib/libnvcuvid.so.*",
+        ]
+
+        for pattern in nvidia_lib_patterns:
+            for lib_path in glob.glob(pattern):
+                if os.path.exists(lib_path):
+                    volume_mounts.add(f"{lib_path}:{lib_path}:ro")
+
+        # Discover NVIDIA firmware files using glob
+        firmware_patterns = [
+            "/usr/lib/firmware/nvidia/*/gsp_*.bin",
+            "/usr/share/nvidia/nvoptix.bin",
+        ]
+
+        for pattern in firmware_patterns:
+            for fw_path in glob.glob(pattern):
+                if os.path.exists(fw_path):
+                    volume_mounts.add(f"{fw_path}:{fw_path}:ro")
+
+        # Discover Vulkan and EGL config files using glob
+        vulkan_config_patterns = [
+            "/etc/vulkan/icd.d/nvidia*.json",
+            "/etc/vulkan/implicit_layer.d/nvidia*.json",
+            "/usr/share/egl/egl_external_platform.d/*nvidia*.json",
+            "/usr/share/glvnd/egl_vendor.d/*nvidia*.json"
+        ]
+
+        for pattern in vulkan_config_patterns:
+            for config_path in glob.glob(pattern):
+                if os.path.exists(config_path):
+                    volume_mounts.add(f"{config_path}:{config_path}:ro")
+
+        # Discover NVIDIA binaries using glob
+        nvidia_bin_patterns = [
+            "/usr/bin/nvidia-*",
+            "/usr/bin/nv-fabricmanager",
+            "/usr/bin/nvidia-smi",
+            "/usr/bin/nvidia-debugdump",
+            "/usr/bin/nvidia-persistenced",
+            "/usr/bin/nvidia-cuda-mps-control",
+            "/usr/bin/nvidia-cuda-mps-server",
+        ]
+
+        for pattern in nvidia_bin_patterns:
+            for bin_path in glob.glob(pattern):
+                if os.path.exists(bin_path) and os.path.isfile(bin_path):
+                    volume_mounts.add(f"{bin_path}:{bin_path}:ro")
+
+        # Discover Xorg modules for NVIDIA
+        xorg_patterns = [
+            "/usr/lib64/xorg/modules/drivers/nvidia_drv.so*",
+            "/usr/lib64/xorg/modules/extensions/libglxserver_nvidia.so*",
+        ]
+
+        for pattern in xorg_patterns:
+            for xorg_path in glob.glob(pattern):
+                if os.path.exists(xorg_path):
+                    volume_mounts.add(f"{xorg_path}:{xorg_path}:ro")
+
+        # Additional system libraries that might be needed
+        system_lib_patterns = [
+            "/usr/lib64/libsysconf-alipay.so*",
+            "/usr/local/cuda/compat/",
+        ]
+
+        for pattern in system_lib_patterns:
+            for lib_path in glob.glob(pattern):
+                if os.path.exists(lib_path):
+                    volume_mounts.add(f"{lib_path}:{lib_path}:ro")
+
+        # Add unique volume mounts to container command
+        for mount in volume_mounts:
+            mount_commands.extend(["-v", mount])
+
+        # Add unique device mounts to container command
+        for device in device_mounts:
+            mount_commands.extend(["--device", device])
+
+        container_command.extend(mount_commands)
+
+    
     container_command.append("--entrypoint")
     # Some docker image use conda to run python, it depend on ~/.bashrc.
     # So we need to use bash as container entrypoint.

@@ -1798,7 +1798,7 @@ def try_update_container_command(
     ) > 0 else None
     return container_command
 
-
+# /opt/conda/lib/python3.10/site-packages/ray -> /opt/conda/lib/python3.10/site-packages
 def get_ray_site_packages_path():
     """
     Get ray package site path
@@ -1806,10 +1806,15 @@ def get_ray_site_packages_path():
     ray_path = Path(ray.__path__[0])
     return str(ray_path.parent.absolute())
 
+def get_ray_python_path():
+    """
+    Get ray path in site packages
+    """
+    ray_path = Path(ray.__path__[0])
+    return str(ray_path)
 
 def get_pyenv_path():
-    # Get the pyenv path automatically instead of hard code.
-    return os.environ.get("PYENV_ROOT", ray_constants.RAY_DEFAULT_PYENV_ROOT)
+    return os.environ.get("PYENV_ROOT")
 
 
 def get_current_python_info():

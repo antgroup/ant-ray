@@ -1967,7 +1967,15 @@ TEST_F(ClusterResourceSchedulerTest, LabelSelectorHardNodeAffinityTest) {
   auto local_node_id = scheduling::NodeID(NodeID::FromRandom().Binary());
   instrumented_io_context io_context;
   ClusterResourceScheduler resource_scheduler(
-      io_context, local_node_id, {{"CPU", 0}}, is_node_available_fn_);
+      io_context,
+      local_node_id,
+      {{"CPU", 0}},
+      is_node_available_fn_,
+      nullptr,
+      nullptr,
+      nullptr,
+      {},
+      [](scheduling::NodeID, const SchedulingContext *) { return true; });
 
   auto node_0_id_obj = NodeID::FromRandom();
   auto node_1_id_obj = NodeID::FromRandom();

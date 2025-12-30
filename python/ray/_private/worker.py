@@ -599,7 +599,7 @@ class Worker:
 
     @property
     def current_virtual_cluster_id(self):
-        return os.environ.get(ray_constants.RAY_VIRTUAL_CLUSTER_ID_ENV_VAR, "")
+        return os.environ.get(ray_constants.RAY_VIRTUAL_CLUSTER_ID_ENV_VAR, None)
 
     @property
     def runtime_env(self):

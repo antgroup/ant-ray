@@ -304,6 +304,7 @@ def test_invalid_concurrency_group():
 
     script = """
 import ray
+import time
 
 ray.init()
 
@@ -313,6 +314,7 @@ class A:
         pass
 
 actor = A.remote()
+time.sleep(1)
     """
 
     output = run_string_as_driver(script)

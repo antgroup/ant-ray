@@ -75,7 +75,7 @@ cdef class GlobalStateAccessor:
             cdef optional[c_string] cvirtual_cluster_id
 
         if virtual_cluster_id is not None:
-            cvirtual_cluster_id = c_string(<char*>virtual_cluster_id, len(virtual_cluster_id))
+            cvirtual_cluster_id = virtual_cluster_id.encode('utf-8')
         with nogil:
             items = self.inner.get().GetAllNodeInfo(cvirtual_cluster_id)
         results = []
@@ -143,7 +143,7 @@ cdef class GlobalStateAccessor:
         cdef c_vector[c_string] result
         cdef optional[c_string] cvirtual_cluster_id
         if virtual_cluster_id is not None:
-            cvirtual_cluster_id = c_string(<char*>virtual_cluster_id, len(virtual_cluster_id))
+            cvirtual_cluster_id = virtual_cluster_id.encode('utf-8')
         with nogil:
             result = self.inner.get().GetAllAvailableResources(cvirtual_cluster_id)
         return result
@@ -152,7 +152,7 @@ cdef class GlobalStateAccessor:
         cdef c_vector[c_string] result
         cdef optional[c_string] cvirtual_cluster_id
         if virtual_cluster_id is not None:
-            cvirtual_cluster_id = c_string(<char*>virtual_cluster_id, len(virtual_cluster_id))
+            cvirtual_cluster_id = virtual_cluster_id.encode('utf-8')
         with nogil:
             result = self.inner.get().GetAllTotalResources(cvirtual_cluster_id)
         return result

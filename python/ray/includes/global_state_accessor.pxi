@@ -73,9 +73,14 @@ cdef class GlobalStateAccessor:
             CGcsNodeInfo c_node_info
             unordered_map[c_string, double] c_resources
             cdef optional[c_string] cvirtual_cluster_id
+            cdef c_string c_str
+            cdef bytes encoded
 
         if virtual_cluster_id is not None:
-            cvirtual_cluster_id = virtual_cluster_id.encode('utf-8')
+            encoded = virtual_cluster_id.encode("utf-8")
+            c_str = c_string(encoded)
+            cvirtual_cluster_id = optional[c_string](c_str)
+        
         with nogil:
             items = self.inner.get().GetAllNodeInfo(cvirtual_cluster_id)
         results = []
@@ -142,8 +147,14 @@ cdef class GlobalStateAccessor:
     def get_all_available_resources(self, virtual_cluster_id):
         cdef c_vector[c_string] result
         cdef optional[c_string] cvirtual_cluster_id
+        cdef c_string c_str
+        cdef bytes encoded
+
         if virtual_cluster_id is not None:
-            cvirtual_cluster_id = virtual_cluster_id.encode('utf-8')
+            encoded = virtual_cluster_id.encode("utf-8")
+            c_str = c_string(encoded)
+            cvirtual_cluster_id = optional[c_string](c_str)
+
         with nogil:
             result = self.inner.get().GetAllAvailableResources(cvirtual_cluster_id)
         return result
@@ -151,8 +162,14 @@ cdef class GlobalStateAccessor:
     def get_all_total_resources(self, virtual_cluster_id):
         cdef c_vector[c_string] result
         cdef optional[c_string] cvirtual_cluster_id
+        cdef c_string c_str
+        cdef bytes encoded
+
         if virtual_cluster_id is not None:
-            cvirtual_cluster_id = virtual_cluster_id.encode('utf-8')
+            encoded = virtual_cluster_id.encode("utf-8")
+            c_str = c_string(encoded)
+            cvirtual_cluster_id = optional[c_string](c_str)
+
         with nogil:
             result = self.inner.get().GetAllTotalResources(cvirtual_cluster_id)
         return result

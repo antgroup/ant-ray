@@ -38,6 +38,7 @@
 #include "ray/observability/fake_ray_event_recorder.h"
 #include "ray/pubsub/publisher.h"
 #include "ray/raylet/scheduling/cluster_resource_manager.h"
+#include "ray/raylet_rpc_client/fake_raylet_client.h"
 #include "ray/util/event.h"
 
 namespace ray {
@@ -166,6 +167,10 @@ class GcsActorManagerTest : public ::testing::Test {
     function_manager_ = std::make_unique<gcs::GCSFunctionManager>(*kv_, io_service_);
     auto actor_scheduler = std::make_unique<MockActorScheduler>();
     mock_actor_scheduler_ = actor_scheduler.get();
+    raylet_client_pool_ =
+        std::make_unique<rpc::RayletClientPool>([](const rpc::Address &address) {
+          return std::make_shared<rpc::FakeRayletClient>();
+        });
     worker_client_pool_ = std::make_unique<rpc::CoreWorkerClientPool>(
         [this](const rpc::Address &address) { return worker_client_; });
     cluster_resource_manager_ =
@@ -181,6 +186,7 @@ class GcsActorManagerTest : public ::testing::Test {
         *function_manager_,
         *gcs_virtual_cluster_manager_,
         [](const ActorID &actor_id) {},
+        *raylet_client_pool_,
         *worker_client_pool_,
         /*ray_event_recorder=*/fake_ray_event_recorder_,
         /*session_name=*/"",
@@ -272,6 +278,7 @@ class GcsActorManagerTest : public ::testing::Test {
   // Actor scheduler's ownership lies in actor manager.
   MockActorScheduler *mock_actor_scheduler_ = nullptr;
   std::shared_ptr<MockWorkerClient> worker_client_;
+  std::unique_ptr<rpc::RayletClientPool> raylet_client_pool_;
   std::unique_ptr<rpc::CoreWorkerClientPool> worker_client_pool_;
   absl::flat_hash_map<JobID, std::string> job_namespace_table_;
   std::unique_ptr<gcs::GcsActorManager> gcs_actor_manager_;

@@ -1,4 +1,5 @@
 import argparse
+import inspect
 import os
 from typing import TYPE_CHECKING, AsyncGenerator, Optional, Tuple, Union
 
@@ -26,8 +27,11 @@ from ray.llm._internal.serve.core.configs.openai_api_models import (
     ErrorResponse,
     ScoreRequest,
     ScoreResponse,
+    TranscriptionRequest,
+    TranscriptionResponse,
 )
 from ray.llm._internal.serve.core.engine.protocol import LLMEngine
+from ray.llm._internal.serve.core.protocol import RawRequestInfo
 from ray.llm._internal.serve.engines.vllm.vllm_models import (
     VLLMEngineConfig,
 )
@@ -46,6 +50,7 @@ if TYPE_CHECKING:
     from vllm.entrypoints.openai.serving_embedding import OpenAIServingEmbedding
     from vllm.entrypoints.openai.serving_models import OpenAIServingModels
     from vllm.entrypoints.openai.serving_score import ServingScores
+    from vllm.entrypoints.openai.serving_transcription import OpenAIServingTranscription
 
 vllm = try_import("vllm")
 logger = get_logger(__name__)
@@ -131,8 +136,7 @@ class VLLMEngine(LLMEngine):
             )
         from vllm import envs as vllm_envs
 
-        # TODO (Kourosh): Remove this after a few releases.
-        if not vllm_envs.VLLM_USE_V1:
+        if hasattr(vllm_envs, "VLLM_USE_V1") and not vllm_envs.VLLM_USE_V1:
             logger.error(
                 "vLLM v0 is fully deprecated. As a result in Ray Serve LLM only v1 is supported."
             )
@@ -147,6 +151,7 @@ class VLLMEngine(LLMEngine):
         self._oai_serving_chat: Optional["OpenAIServingChat"] = None
         self._oai_serving_completion: Optional["OpenAIServingCompletion"] = None
         self._oai_serving_embedding: Optional["OpenAIServingEmbedding"] = None
+        self._oai_serving_transcription: Optional["OpenAIServingTranscription"] = None
         self._oai_serving_scores: Optional["ServingScores"] = None
 
     async def start(self) -> None:
@@ -192,22 +197,28 @@ class VLLMEngine(LLMEngine):
         state = State()
         # TODO (Kourosh): There might be some variables that needs protection?
         args = argparse.Namespace(
-            **vllm_frontend_args.__dict__,
-            **vllm_engine_args.__dict__,
+            **(vllm_frontend_args.__dict__ | vllm_engine_args.__dict__)
         )
 
-        await init_app_state(
-            engine_client=self._engine_client,
-            # TODO (ahao): remove vllm_config for vllm v1.12
-            vllm_config=vllm_engine_config,
-            state=state,
-            args=args,
-        )
+        if "vllm_config" in inspect.signature(init_app_state).parameters:
+            await init_app_state(
+                self._engine_client,
+                vllm_config=vllm_engine_config,
+                state=state,
+                args=args,
+            )
+        else:
+            await init_app_state(
+                self._engine_client,
+                state=state,
+                args=args,
+            )
 
         self._oai_models = state.openai_serving_models
         self._oai_serving_chat = state.openai_serving_chat
         self._oai_serving_completion = state.openai_serving_completion
         self._oai_serving_embedding = state.openai_serving_embedding
+        self._oai_serving_transcription = state.openai_serving_transcription
         self._oai_serving_scores = state.openai_serving_scores
 
         self._validate_openai_serving_models()
@@ -240,6 +251,11 @@ class VLLMEngine(LLMEngine):
         assert hasattr(
             self._oai_serving_embedding, "create_embedding"
         ), "oai_serving_embedding must have a create_embedding attribute"
+
+    def _validate_openai_serving_transcription(self):
+        assert hasattr(
+            self._oai_serving_transcription, "create_transcription"
+        ), "oai_serving_transcription must have a create_transcription attribute"
 
     def _validate_openai_serving_scores(self):
         assert hasattr(
@@ -348,42 +364,26 @@ class VLLMEngine(LLMEngine):
         if isinstance(lora_request, VLLMErrorResponse):
             raise ValueError(f"Failed to load lora model: {lora_request.error.message}")
 
-    def _create_raw_request(
-        self,
-        request: Union[
-            CompletionRequest, ChatCompletionRequest, EmbeddingRequest, ScoreRequest
-        ],
-        path: str,
-    ) -> Request:
-        scope = {
-            "type": "http",
-            "method": "POST",
-            "path": path,
-            "headers": [(b"x-request-id", getattr(request, "request_id", "").encode())],
-            "query_string": b"",
-        }
-        return Request(scope)
-
     async def chat(
-        self, request: ChatCompletionRequest
+        self,
+        request: ChatCompletionRequest,
+        raw_request_info: Optional[RawRequestInfo] = None,
     ) -> AsyncGenerator[Union[str, ChatCompletionResponse, ErrorResponse], None]:
         self._validate_openai_serving_chat()
 
-        # TODO (Kourosh): Remove when we upstream request_id attribute to vLLM.
-        # PR: https://github.com/vllm-project/vllm/pull/21009
-        # Create a fake starlette.Request object with the x-request-id header
-        # so that the create_chat_completion API can assign the request_id properly.
-        raw_request = self._create_raw_request(request, "/chat/completions")
-
+        raw_request: Optional[Request] = RawRequestInfo.to_starlette_request_optional(
+            raw_request_info
+        )
         chat_response = await self._oai_serving_chat.create_chat_completion(  # type: ignore[attr-defined]
-            request, raw_request=raw_request
+            request,
+            raw_request=raw_request,
         )
 
         if isinstance(chat_response, AsyncGenerator):
             async for response in chat_response:
                 if not isinstance(response, str):
                     raise ValueError(
-                        f"Expected create_chat_completion to return a stream of strings, got and item with type {type(response)}"
+                        f"Expected create_chat_completion to return a stream of strings, got an item with type {type(response)}"
                     )
                 yield response
         else:
@@ -393,16 +393,15 @@ class VLLMEngine(LLMEngine):
                 yield ChatCompletionResponse(**chat_response.model_dump())
 
     async def completions(
-        self, request: CompletionRequest
+        self,
+        request: CompletionRequest,
+        raw_request_info: Optional[RawRequestInfo] = None,
     ) -> AsyncGenerator[Union[str, CompletionResponse, ErrorResponse], None]:
         self._validate_openai_serving_completion()
 
-        # TODO (Kourosh): Remove when we upstream request_id attribute to vLLM.
-        # PR: https://github.com/vllm-project/vllm/pull/21009
-        # Create a fake starlette.Request object with the x-request-id header
-        # so that the create_completion API can assign the request_id properly.
-        raw_request = self._create_raw_request(request, "/completions")
-
+        raw_request: Optional[Request] = RawRequestInfo.to_starlette_request_optional(
+            raw_request_info
+        )
         completion_response = await self._oai_serving_completion.create_completion(  # type: ignore[attr-defined]
             request,
             raw_request=raw_request,
@@ -412,7 +411,7 @@ class VLLMEngine(LLMEngine):
             async for response in completion_response:
                 if not isinstance(response, str):
                     raise ValueError(
-                        f"Expected create_completion to return a stream of strings, got and item with type {type(response)}"
+                        f"Expected create_completion to return a stream of strings, got an item with type {type(response)}"
                     )
                 yield response
         else:
@@ -424,17 +423,18 @@ class VLLMEngine(LLMEngine):
                 yield CompletionResponse(**completion_response.model_dump())
 
     async def embeddings(
-        self, request: EmbeddingRequest
+        self,
+        request: EmbeddingRequest,
+        raw_request_info: Optional[RawRequestInfo] = None,
     ) -> AsyncGenerator[Union[EmbeddingResponse, ErrorResponse], None]:
         self._validate_openai_serving_embedding()
 
-        # TODO (Kourosh): Remove when upstream is fixed to accept req_id.
-        # Create a fake starlette.Request object with the x-request-id header
-        # so that the create_embedding API can assign the request_id properly.
-        raw_request = self._create_raw_request(request, "/embeddings")
-
+        raw_request: Optional[Request] = RawRequestInfo.to_starlette_request_optional(
+            raw_request_info
+        )
         embedding_response = await self._oai_serving_embedding.create_embedding(  # type: ignore[attr-defined]
-            request, raw_request=raw_request
+            request,
+            raw_request=raw_request,
         )
 
         if isinstance(embedding_response, VLLMErrorResponse):
@@ -444,15 +444,53 @@ class VLLMEngine(LLMEngine):
         else:
             yield EmbeddingResponse(**embedding_response.model_dump())
 
+    async def transcriptions(
+        self,
+        request: TranscriptionRequest,
+        raw_request_info: Optional[RawRequestInfo] = None,
+    ) -> AsyncGenerator[Union[str, TranscriptionResponse, ErrorResponse], None]:
+        self._validate_openai_serving_transcription()
+
+        # Extract audio data from the request file
+        audio_data = await request.file.read()
+
+        raw_request: Optional[Request] = RawRequestInfo.to_starlette_request_optional(
+            raw_request_info
+        )
+        transcription_response = await self._oai_serving_transcription.create_transcription(  # type: ignore[attr-defined]
+            audio_data,
+            request,
+            raw_request=raw_request,
+        )
+
+        if isinstance(transcription_response, AsyncGenerator):
+            async for response in transcription_response:
+                if not isinstance(response, str):
+                    raise ValueError(
+                        f"Expected create_transcription to return a stream of strings, got an item with type {type(response)}"
+                    )
+                yield response
+        else:
+            if isinstance(transcription_response, VLLMErrorResponse):
+                yield ErrorResponse(
+                    error=ErrorInfo(**transcription_response.error.model_dump())
+                )
+            else:
+                yield TranscriptionResponse(**transcription_response.model_dump())
+
     async def score(
-        self, request: ScoreRequest
+        self,
+        request: ScoreRequest,
+        raw_request_info: Optional[RawRequestInfo] = None,
     ) -> AsyncGenerator[Union[ScoreResponse, ErrorResponse], None]:
         self._validate_openai_serving_scores()
 
-        raw_request = self._create_raw_request(request, "/score")
-
+        raw_request: Optional[Request] = RawRequestInfo.to_starlette_request_optional(
+            raw_request_info
+        )
         score_response = await self._oai_serving_scores.create_score(
-            request, raw_request=raw_request
+            request,
+            raw_request=raw_request,
         )
 
         if isinstance(score_response, VLLMErrorResponse):

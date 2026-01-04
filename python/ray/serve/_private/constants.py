@@ -1,3 +1,4 @@
+import os
 from typing import List
 
 from ray.serve._private.constants_utils import (
@@ -122,6 +123,58 @@ MODEL_LOAD_LATENCY_BUCKETS_MS = parse_latency_buckets(
         get_env_str("MODEL_LOAD_LATENCY_BUCKETS_MS", ""),
     ),
     DEFAULT_LATENCY_BUCKET_MS,
+)
+
+#: Histogram buckets for batch execution time in milliseconds.
+BATCH_EXECUTION_TIME_BUCKETS_MS = REQUEST_LATENCY_BUCKETS_MS
+
+#: Histogram buckets for batch wait time in milliseconds.
+BATCH_WAIT_TIME_BUCKETS_MS = REQUEST_LATENCY_BUCKETS_MS
+
+#: Histogram buckets for batch utilization percentage.
+DEFAULT_BATCH_UTILIZATION_BUCKETS_PERCENT = [
+    5,
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    95,
+    99,
+    100,
+]
+BATCH_UTILIZATION_BUCKETS_PERCENT = parse_latency_buckets(
+    get_env_str(
+        "RAY_SERVE_BATCH_UTILIZATION_BUCKETS_PERCENT",
+        "",
+    ),
+    DEFAULT_BATCH_UTILIZATION_BUCKETS_PERCENT,
+)
+
+#: Histogram buckets for actual batch size.
+DEFAULT_BATCH_SIZE_BUCKETS = [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64,
+    128,
+    256,
+    512,
+    1024,
+]
+BATCH_SIZE_BUCKETS = parse_latency_buckets(
+    get_env_str(
+        "RAY_SERVE_BATCH_SIZE_BUCKETS",
+        "",
+    ),
+    DEFAULT_BATCH_SIZE_BUCKETS,
 )
 
 #: Name of deployment health check method implemented by user.
@@ -410,9 +463,15 @@ METRICS_PUSHER_GRACEFUL_SHUTDOWN_TIMEOUT_S = 10
 # Feature flag to set `enable_task_events=True` on Serve-managed actors.
 RAY_SERVE_ENABLE_TASK_EVENTS = get_env_bool("RAY_SERVE_ENABLE_TASK_EVENTS", "0")
 
-# Use compact instead of spread scheduling strategy
+# This is deprecated and will be removed in the future.
 RAY_SERVE_USE_COMPACT_SCHEDULING_STRATEGY = get_env_bool(
     "RAY_SERVE_USE_COMPACT_SCHEDULING_STRATEGY", "0"
+)
+
+# Use pack instead of spread scheduling strategy.
+RAY_SERVE_USE_PACK_SCHEDULING_STRATEGY = get_env_bool(
+    "RAY_SERVE_USE_PACK_SCHEDULING_STRATEGY",
+    os.environ.get("RAY_SERVE_USE_COMPACT_SCHEDULING_STRATEGY", "0"),
 )
 
 # Comma-separated list of custom resources prioritized in scheduling. Sorted from highest to lowest priority.
@@ -501,10 +560,16 @@ HEALTHY_MESSAGE = "success"
 # This should be at the end.
 RAY_SERVE_THROUGHPUT_OPTIMIZED = get_env_bool("RAY_SERVE_THROUGHPUT_OPTIMIZED", "0")
 if RAY_SERVE_THROUGHPUT_OPTIMIZED:
-    RAY_SERVE_RUN_USER_CODE_IN_SEPARATE_THREAD = False
-    RAY_SERVE_REQUEST_PATH_LOG_BUFFER_SIZE = 1000
-    RAY_SERVE_RUN_ROUTER_IN_SEPARATE_LOOP = False
-    RAY_SERVE_LOG_TO_STDERR = False
+    RAY_SERVE_RUN_USER_CODE_IN_SEPARATE_THREAD = get_env_bool(
+        "RAY_SERVE_RUN_USER_CODE_IN_SEPARATE_THREAD", "0"
+    )
+    RAY_SERVE_REQUEST_PATH_LOG_BUFFER_SIZE = get_env_int(
+        "RAY_SERVE_REQUEST_PATH_LOG_BUFFER_SIZE", 1000
+    )
+    RAY_SERVE_RUN_ROUTER_IN_SEPARATE_LOOP = get_env_bool(
+        "RAY_SERVE_RUN_ROUTER_IN_SEPARATE_LOOP", "0"
+    )
+    RAY_SERVE_LOG_TO_STDERR = get_env_bool("RAY_SERVE_LOG_TO_STDERR", "0")
 
 # The maximum allowed RPC latency in milliseconds.
 # This is used to detect and warn about long RPC latencies
@@ -515,3 +580,5 @@ RAY_SERVE_RPC_LATENCY_WARNING_THRESHOLD_MS = 2000
 RAY_SERVE_AGGREGATE_METRICS_AT_CONTROLLER = get_env_bool(
     "RAY_SERVE_AGGREGATE_METRICS_AT_CONTROLLER", "0"
 )
+# Key for the decision counters in default autoscaling policy state
+SERVE_AUTOSCALING_DECISION_COUNTERS_KEY = "__decision_counters"

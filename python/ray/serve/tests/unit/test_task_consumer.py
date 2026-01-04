@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, call
 
 import pytest
 
+from ray.serve.api import deployment
 from ray.serve.schema import (
     CeleryAdapterConfig,
     TaskProcessorAdapter,
@@ -283,6 +284,40 @@ class TestTaskConsumerDecorator:
             @task_consumer
             class MyConsumer:
                 pass
+
+
+def test_default_deployment_name_stays_same_with_task_consumer(config):
+    """Test that the default deployment name is the class name when using task_consumer with serve.deployment."""
+
+    @deployment
+    @task_consumer(task_processor_config=config)
+    class MyTaskConsumer:
+        @task_handler
+        def my_task(self):
+            pass
+
+    # The deployment name should default to the class name
+    assert MyTaskConsumer.name == "MyTaskConsumer"
+
+
+def test_task_consumer_preserves_metadata(config):
+    class OriginalConsumer:
+        """Docstring for a task consumer."""
+
+        value: int
+
+    wrapped_cls = task_consumer(task_processor_config=config)(OriginalConsumer)
+
+    assert wrapped_cls.__name__ == OriginalConsumer.__name__
+    assert wrapped_cls.__qualname__ == OriginalConsumer.__qualname__
+    assert wrapped_cls.__module__ == OriginalConsumer.__module__
+    assert wrapped_cls.__doc__ == OriginalConsumer.__doc__
+    assert (
+        wrapped_cls.__annotations__["value"]
+        == OriginalConsumer.__annotations__["value"]
+    )
+    assert wrapped_cls.__annotations__["_adapter"] is TaskProcessorAdapter
+    assert getattr(wrapped_cls, "__wrapped__", None) is OriginalConsumer
 
 
 if __name__ == "__main__":

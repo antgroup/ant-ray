@@ -24,7 +24,8 @@
 
 #include "absl/synchronization/mutex.h"
 #include "ray/common/asio/instrumented_io_context.h"
-#include "ray/common/asio/postable.h"
+#include "ray/common/metrics.h"
+#include "ray/gcs/postable/postable.h"
 #include "ray/gcs/store_client/redis_context.h"
 #include "ray/gcs/store_client/store_client.h"
 
@@ -294,6 +295,10 @@ class RedisStoreClient : public StoreClient {
 
   // The following context writes everything to the primary shard.
   std::shared_ptr<RedisContext> primary_context_;
+
+  ray::stats::Count redis_operation_count_{ray::GetRedisOperationCountCounterMetric()};
+  ray::stats::Sum redis_operation_data_size_bytes_{
+      ray::GetRedisOperationDataSizeBytesSumMetric()};
 
   absl::Mutex mu_;
 

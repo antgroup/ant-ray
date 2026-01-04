@@ -193,7 +193,7 @@ both in the usual template (layout.html) as well as (index.html). -->
 
 
   <div class="bd-header-announcement container-fluid bd-header-announcement">
-    <div class="bd-header-announcement__content">Join us at Ray Summit 2025 — <a target="_blank" href="https://www.anyscale.com/ray-summit/2025?utm_source=ray_docs&utm_medium=docs&utm_campaign=banner">Register early and save.</a><button type="button" id="close-banner" aria-label="Close banner">&times;</button></div>
+    <div class="bd-header-announcement__content">Try Ray with $100 credit — <a target="_blank" href="https://console.anyscale.com/register/ha?render_flow=ray&utm_source=ray_docs&utm_medium=docs&utm_campaign=banner">Start now</a><button type="button" id="close-banner" aria-label="Close banner">&times;</button></div>
   </div>
 
   
@@ -603,6 +603,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../ray-overview/examples/mcp-ray-serve/05%20%28Optional%29%20Build_docker_image_for_mcp_server.html">Build a Docker image for an MCP server</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../ray-overview/examples/langchain_agent_ray_serve/content/README.html">Build a tool-using agent</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ray-overview/ray-libraries.html">Ecosystem</a></li>
@@ -723,6 +724,8 @@ document.write(`
 <li class="toctree-l2 has-children"><a class="reference internal" href="../ray-core/internals.html">Internals</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-21"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../ray-core/internals/task-lifecycle.html">Task Lifecycle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ray-core/internals/autoscaler-v2.html">Autoscaler v2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ray-core/internals/rpc-fault-tolerance.html">RPC Fault Tolerance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ray-core/internals/metric-exporter.html">Metric Exporter Infrastructure</a></li>
 </ul>
 </li>
 </ul>
@@ -734,8 +737,9 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../data/loading-data.html">Loading Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/inspecting-data.html">Inspecting Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/transforming-data.html">Transforming Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/aggregating-data.html">Aggregating Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/iterating-over-data.html">Iterating over Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../data/joining-data.html">Joining datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/joining-data.html">Joining Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/shuffling-data.html">Shuffling Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/saving-data.html">Saving Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/working-with-images.html">Working with Images</a></li>
@@ -748,7 +752,6 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../data/batch_inference.html">End-to-end: Offline Batch Inference</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/performance-tips.html">Advanced: Performance Tips and Tuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/custom-datasource-example.html">Advanced: Read and Write Custom File Types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../data/aggregations.html">Aggregations</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../data/examples.html">Examples</a></li>
@@ -767,19 +770,24 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../data/api/from_other_data_libs.html">API Guide for Users from Other Data Libraries</a></li>
 </ul>
 </li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../data/contributing/contributing.html">Contributing to Ray Data</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../data/contributing/contributing-guide.html">Contributing Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/contributing/how-to-write-tests.html">How to write tests</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../data/comparisons.html">Comparing Ray Data to other systems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../data/benchmark.html">Ray Data Benchmarks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../data/data-internals.html">Ray Data Internals</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../train/train.html">Ray Train</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../train/train.html">Ray Train</a><input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-26"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../train/overview.html">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../train/getting-started-pytorch.html">PyTorch Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../train/getting-started-pytorch-lightning.html">PyTorch Lightning Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../train/getting-started-transformers.html">Hugging Face Transformers Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../train/getting-started-xgboost.html">XGBoost Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../train/getting-started-jax.html">JAX Guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../train/more-frameworks.html">More Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-26"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../train/more-frameworks.html">More Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-27" name="toctree-checkbox-27" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-27"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../train/huggingface-accelerate.html">Hugging Face Accelerate Guide</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/deepspeed.html">DeepSpeed Guide</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/distributed-tensorflow-keras.html">TensorFlow and Keras Guide</a></li>
@@ -787,9 +795,10 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../train/horovod.html">Horovod Guide</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../train/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-27" name="toctree-checkbox-27" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-27"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../train/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-28" name="toctree-checkbox-28" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-28"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/data-loading-preprocessing.html">Data Loading and Preprocessing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/using-gpus.html">Configuring Scale and GPUs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../train/user-guides/local_mode.html">Local Mode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/persistent-storage.html">Configuring Persistent Storage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/monitoring-logging.html">Monitoring and Logging Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/checkpoints.html">Saving and Loading Checkpoints</a></li>
@@ -797,8 +806,10 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/experiment-tracking.html">Experiment Tracking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/results.html">Inspecting Training Results</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/fault-tolerance.html">Handling Failures and Node Preemption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../train/user-guides/monitor-your-application.html">Ray Train Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/reproducibility.html">Reproducibility</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/hyperparameter-optimization.html">Hyperparameter Optimization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../train/user-guides/scaling-collation-functions.html">Advanced: Scaling out expensive collate functions</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../train/examples.html">Examples</a></li>
@@ -806,10 +817,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../train/api/api.html">Ray Train API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../tune/index.html">Ray Tune</a><input class="toctree-checkbox" id="toctree-checkbox-28" name="toctree-checkbox-28" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-28"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tune/index.html">Ray Tune</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../tune/getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tune/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/tutorials/overview.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/tutorials/overview.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-run.html">Running Basic Experiments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-output.html">Logging and Outputs in Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-resources.html">Setting Trial Resources</a></li>
@@ -821,7 +832,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-metrics.html">Using Callbacks and Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune_get_data_in_and_out.html">Getting Data in and out of Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune_analyze_results.html">Analyzing Tune Experiment Results</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../tune/examples/pbt_guide.html">A Guide to Population Based Training with Tune</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../tune/examples/pbt_guide.html">A Guide to Population Based Training with Tune</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../tune/examples/pbt_visualization/pbt_visualization.html">Visualizing and Understanding PBT</a></li>
 </ul>
 </li>
@@ -830,7 +841,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-scalability.html">Scalability Benchmarks</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune-xgboost.html">XGBoost Example</a></li>
@@ -851,7 +862,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../tune/faq.html">Ray Tune FAQ</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/api/api.html">Ray Tune API</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/api/api.html">Ray Tune API</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tune/api/execution.html">Tune Execution (tune.Tuner)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/api/result_grid.html">Tune Experiment Results (tune.ResultGrid)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/api/trainable.html">Training in Tune (tune.Trainable, tune.report)</a></li>
@@ -871,7 +882,7 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../serve/index.html">Ray Serve</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../serve/index.html">Ray Serve</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../serve/getting_started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../serve/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../serve/develop-and-deploy.html">Develop and Deploy an ML Application</a></li>
@@ -880,12 +891,15 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../serve/model-multiplexing.html">Model Multiplexing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../serve/configure-serve-deployment.html">Configure Ray Serve deployments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../serve/http-guide.html">Set Up FastAPI and HTTP</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../serve/llm/index.html">Serving LLMs</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../serve/llm/index.html">Serving LLMs</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../serve/llm/quick-start.html">Quickstart</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/llm/examples.html">Examples</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../serve/llm/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/model-loading.html">Model loading</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../serve/llm/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/cross-node-parallelism.html">Cross-node parallelism</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/data-parallel-attention.html">Data parallel attention</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/deployment-initialization.html">Deployment Initialization</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/prefill-decode.html">Prefill/decode disaggregation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/kv-cache-offloading.html">KV cache offloading</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/prefix-aware-routing.html">Prefix-aware routing</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/multi-lora.html">Multi-LoRA deployment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/vllm-compatibility.html">vLLM compatibility</a></li>
@@ -893,7 +907,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/observability.html">Observability and monitoring</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../serve/llm/architecture/index.html">Architecture</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../serve/llm/architecture/index.html">Architecture</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/architecture/overview.html">Architecture overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/architecture/core.html">Core components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/architecture/serving-patterns/index.html">Serving patterns</a></li>
@@ -904,7 +918,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../serve/llm/troubleshooting.html">Troubleshooting</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../serve/production-guide/config.html">Serve Config Files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/production-guide/kubernetes.html">Deploy on Kubernetes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/production-guide/docker.html">Custom Docker Images</a></li>
@@ -917,15 +931,17 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../serve/resource-allocation.html">Resource Allocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../serve/autoscaling-guide.html">Ray Serve Autoscaling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../serve/asynchronous-inference.html">Asynchronous Inference</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/app-builder-guide.html">Pass Arguments to Applications</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/advanced-autoscaling.html">Advanced Ray Serve Autoscaling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/asyncio-best-practices.html">Asyncio and concurrency best practices in Ray Serve</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/performance.html">Performance Tuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/dyn-req-batch.html">Dynamic Request Batching</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/inplace-updates.html">Updating Applications In-Place</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/dev-workflow.html">Development Workflow</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/grpc-guide.html">Set Up a gRPC Service</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/replica-ranks.html">Replica ranks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/replica-scheduling.html">Replica scheduling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/managing-java-deployments.html">Experimental Java API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/deploy-vm.html">Deploy on VM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/multi-app-container.html">Run Multiple Applications in Different Containers</a></li>
@@ -938,10 +954,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../serve/api/index.html">Ray Serve API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Ray RLlib</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Ray RLlib</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="key-concepts.html">Key concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="multi-agent-envs.html">Multi-Agent Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="hierarchical-envs.html">Hierarchical Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="external-envs.html">External Environments and Applications</a></li>
@@ -949,14 +965,14 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="algorithm-config.html">AlgorithmConfig API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rllib-algorithms.html">Algorithms</a></li>
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="user-guides.html">User Guides</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="user-guides.html">User Guides</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="rllib-advanced-api.html">Advanced Python APIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="checkpoints.html">Checkpointing</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">MetricsLogger API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="single-agent-episode.html">Episodes</a></li>
 
-<li class="toctree-l3 has-children"><a class="reference internal" href="connector-v2.html">ConnectorV2 and ConnectorV2 pipelines</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="connector-v2.html">ConnectorV2 and ConnectorV2 pipelines</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="env-to-module-connector.html">Env-to-module pipelines</a></li>
 <li class="toctree-l4"><a class="reference internal" href="learner-connector.html">Learner connector pipelines</a></li>
 </ul>
@@ -967,8 +983,6 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="rllib-learner.html">Learner (Alpha)</a></li>
 
 
-
-<li class="toctree-l3"><a class="reference internal" href="rllib-torch2x.html">Using RLlib with torch 2.x compile</a></li>
 
 <li class="toctree-l3"><a class="reference internal" href="rllib-fault-tolerance.html">Fault Tolerance And Elastic Training</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rllib-dev.html">Install RLlib for Development</a></li>
@@ -981,8 +995,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="rllib-examples.html">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="new-api-stack-migration-guide.html">New API stack migration guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
@@ -1004,7 +1018,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
@@ -1023,7 +1037,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.html">ray.rllib.callbacks.callbacks.RLlibCallback</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end</a></li>
@@ -1039,7 +1053,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/env/env_runner.html">EnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/env/single_agent_env_runner.html">SingleAgentEnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/env/single_agent_episode.html">SingleAgentEpisode API</a></li>
@@ -1050,7 +1064,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="package_ref/env/utils.html">Env Utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.build.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.build</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class</a></li>
@@ -1093,7 +1107,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state.html">ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.models.distributions.Distribution.html">ray.rllib.models.distributions.Distribution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.models.distributions.Distribution.from_logits.html">ray.rllib.models.distributions.Distribution.from_logits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.models.distributions.Distribution.sample.html">ray.rllib.models.distributions.Distribution.sample</a></li>
@@ -1102,14 +1116,14 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.models.distributions.Distribution.kl.html">ray.rllib.models.distributions.Distribution.kl</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.html">ray.rllib.core.learner.learner_group.LearnerGroup</a></li>
 </ul>
 </li>
 
-<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners</a></li>
@@ -1132,7 +1146,7 @@ document.write(`
 </li>
 <li class="toctree-l3"><a class="reference internal" href="package_ref/connector-v2.html">ConnectorV2 API</a></li>
 
-<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit.html">ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer.html">ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.html">ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer</a></li>
@@ -1147,7 +1161,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer.html">ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
 <li class="toctree-l4"><a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
@@ -1193,12 +1207,12 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../ray-more-libs/joblib.html">Distributed Scikit-learn / Joblib</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ray-more-libs/multiprocessing.html">Distributed multiprocessing.Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ray-more-libs/ray-collective.html">Ray Collective Communication Lib</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ray-more-libs/doc/ray.util.dask.RayDaskCallback.ray_active.html">ray.util.dask.RayDaskCallback.ray_active</a></li>
 </ul>
 </li>
@@ -1216,20 +1230,21 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../ray-more-libs/data_juicer_distributed_data_processing.html">Distributed Data Processing in Data-Juicer</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../cluster/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/getting-started/kuberay-operator-installation.html">KubeRay Operator Installation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/getting-started/raycluster-quick-start.html">RayCluster Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/getting-started/rayjob-quick-start.html">RayJob Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/getting-started/rayservice-quick-start.html">RayService Quickstart</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/rayservice.html">Deploy Ray Serve Apps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/rayservice-no-ray-serve-replica.html">RayService worker Pods aren’t ready</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/rayservice-high-availability.html">RayService high availability</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/rayservice-incremental-upgrade.html">RayService Zero-Downtime Incremental Upgrades</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/observability.html">KubeRay Observability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/upgrade-guide.html">KubeRay upgrade guide</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/k8s-cluster-setup.html">Managed Kubernetes services</a></li>
@@ -1240,6 +1255,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/storage.html">Best Practices for Storage and Dependencies</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/config.html">RayCluster Configuration</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/configuring-autoscaling.html">KubeRay Autoscaling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/label-based-scheduling.html">KubeRay label-based scheduling</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/kuberay-gcs-ft.html">GCS fault tolerance in KubeRay</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/kuberay-gcs-persistent-ft.html">Tuning Redis for a Persistent Fault Tolerant GCS</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/gke-gcs-bucket.html">Configuring KubeRay to use Google Cloud Storage Buckets in GKE</a></li>
@@ -1258,14 +1274,14 @@ document.write(`
 
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/k8s-autoscaler.html">(Advanced) Understanding the Ray Autoscaler in the Context of Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/kubectl-plugin.html">Use kubectl plugin (beta)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/kuberay-auth.html">Configure Ray clusters with authentication and access control using KubeRay</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/kuberay-auth.html">Configure Ray clusters to use token authentication</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/reduce-image-pull-latency.html">Reducing image pull latency on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/uv.html">Using <code class="docutils literal notranslate"><span class="pre">uv</span></code> for Python package management in KubeRay</a></li>
 
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/kuberay-dashboard.html">Use KubeRay dashboard (experimental)</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/examples/mnist-training-example.html">Train a PyTorch model on Fashion MNIST with CPUs on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/examples/stable-diffusion-rayservice.html">Serve a StableDiffusion text-to-image model on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/examples/tpu-serve-stable-diffusion.html">Serve a Stable Diffusion model on GKE with TPUs</a></li>
@@ -1287,26 +1303,28 @@ document.write(`
 
 
 
+<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/examples/argocd.html">Deploying Ray Clusters via ArgoCD</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/ingress.html">Ingress</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/metrics-references.html">KubeRay metrics references</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/prometheus-grafana.html">Using Prometheus and Grafana</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/pyspy.html">Profiling with py-spy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/kai-scheduler.html">Gang scheduling, queue priority, and GPU sharing for RayClusters using KAI Scheduler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/volcano.html">KubeRay integration with Volcano</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/yunikorn.html">KubeRay integration with Apache YuniKorn</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/kueue.html">Gang scheduling and Priority scheduling for KubeRay CRDs with Kueue</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/kueue.html">Gang scheduling, Priority scheduling, and Autoscaling for KubeRay CRDs with Kueue</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/istio.html">mTLS and L7 observability with Istio</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/scheduler-plugins.html">KubeRay integration with scheduler plugins</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/benchmarks/memory-scalability-benchmark.html">KubeRay memory and scalability benchmark</a></li>
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/troubleshooting/troubleshooting.html">Troubleshooting guide</a></li>
 
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/troubleshooting/rayservice-troubleshooting.html">RayService troubleshooting</a></li>
@@ -1315,9 +1333,9 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../cluster/kubernetes/references.html">API Reference</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../cluster/vms/getting-started.html">Getting Started</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/vms/user-guides/launching-clusters/index.html">Launching Ray Clusters on AWS, GCP, Azure, vSphere, On-Prem</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/vms/user-guides/large-cluster-best-practices.html">Best practices for deploying large clusters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/vms/user-guides/configuring-autoscaling.html">Configuring Autoscaling</a></li>
@@ -1326,11 +1344,11 @@ document.write(`
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/vms/examples/ml-example.html">Ray Train XGBoostTrainer on VMs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/vms/references/ray-cluster-cli.html">Cluster Launcher Commands</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/vms/references/ray-cluster-configuration.html">Cluster YAML Configuration Options</a></li>
 </ul>
@@ -1339,8 +1357,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../cluster/metrics.html">Collecting and monitoring metrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cluster/configure-manage-dashboard.html">Configuring and Managing Ray Dashboard</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/running-applications/job-submission/quickstart.html">Quickstart using the Ray Jobs CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/running-applications/job-submission/sdk.html">Python SDK Overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
@@ -1353,7 +1371,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../cluster/faq.html">FAQ</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-72" name="toctree-checkbox-72" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-72"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../cluster/cli.html">Cluster Management CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cluster/running-applications/job-submission/cli.html">Ray Jobs CLI API Reference</a></li>
@@ -1363,7 +1381,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../cluster/usage-stats.html">Usage Stats Collection</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-72" name="toctree-checkbox-72" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-72"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-73" name="toctree-checkbox-73" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-73"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../virtual-cluster/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../virtual-cluster/design-overview.html">Design Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../virtual-cluster/management.html">Virtual Cluster Management API</a></li>
@@ -1371,15 +1389,15 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../virtual-cluster/examples.html">Examples</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-73" name="toctree-checkbox-73" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-73"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-74" name="toctree-checkbox-74" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-74"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../ray-observability/getting-started.html">Ray Dashboard</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ray-observability/ray-distributed-debugger.html">Ray Distributed Debugger</a></li>
 
 
 
 <li class="toctree-l2"><a class="reference internal" href="../ray-observability/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-74" name="toctree-checkbox-74" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-74"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-75" name="toctree-checkbox-75" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-75"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-75" name="toctree-checkbox-75" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-75"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-76" name="toctree-checkbox-76" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-76"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/general-debugging.html">Common Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/debug-hangs.html">Debugging Hangs</a></li>
@@ -1400,7 +1418,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../ray-observability/user-guides/ray-event-export.html">Ray Event Export</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-76" name="toctree-checkbox-76" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-76"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-77" name="toctree-checkbox-77" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-77"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../ray-observability/reference/api.html">State API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ray-observability/reference/cli.html">State CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ray-observability/reference/system-metrics.html">System Metrics</a></li>
@@ -1408,10 +1426,10 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-77" name="toctree-checkbox-77" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-77"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-78" name="toctree-checkbox-78" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-78"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../ray-contribute/stability.html">API Stability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ray-contribute/api-policy.html">API Policy</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-78" name="toctree-checkbox-78" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-78"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-79" name="toctree-checkbox-79" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-79"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../ray-contribute/development.html">Building Ray from Source</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ray-contribute/ci.html">CI Testing Workflow on PRs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ray-contribute/docs.html">Contributing to the Ray Documentation</a></li>
@@ -1428,7 +1446,10 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ray-references/glossary.html">Glossary</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ray-security/index.html">Security</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-security/index.html">Security</a><input class="toctree-checkbox" id="toctree-checkbox-80" name="toctree-checkbox-80" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-80"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ray-security/token-auth.html">Ray token authentication</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </nav></div>
@@ -1491,52 +1512,37 @@ document.write(`
                   
   <section id="metricslogger-api">
 <span id="rllib-metric-logger-docs"></span><h1>MetricsLogger API<a class="headerlink" href="#metricslogger-api" title="Link to this heading">#</a></h1>
-<p>The RLlib team designed the <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> API
-to unify and make accessible the logging and processing of stats and metrics during
-reinforcement learning (RL) experiments. RLlib’s <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>
-class and all its sub-components each have one <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a>
-instance managing metrics and statistics for this component. When a subcomponent reports back to its
-parent component, it “reduces” the logged results and sends them upstream.</p>
-<p>The RLlib team recommends this API for all your custom code, like in
-<a class="reference internal" href="package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.html#ray.rllib.env.env_runner.EnvRunner" title="ray.rllib.env.env_runner.EnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvRunner</span></code></a>-based <a class="reference internal" href="rllib-callback.html#rllib-callback-docs"><span class="std std-ref">callbacks</span></a>,
-in <a class="reference external" href="https://github.com/ray-project/ray/blob/master/rllib/examples/learners/classes/custom_ppo_loss_fn_learner.py">custom loss functions</a>, or in custom <a class="reference external" href="https://github.com/ray-project/ray/blob/master/rllib/examples/metrics/custom_metrics_in_algorithm_training_step.py">training_step()</a>
-implementations.</p>
-<figure class="align-left" id="id1">
-<a class="reference internal image-reference" href="../_images/metrics_logger_overview.svg"><img alt="../_images/metrics_logger_overview.svg" src="../_images/metrics_logger_overview.svg" width="750" /></a>
-<figcaption>
-<p><span class="caption-text"><strong>RLlib’s MetricsLogger system</strong>: Every subcomponent of an RLlib <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> has-a
-<a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> instance
-and uses it to locally log values. When a component completes a distinct task,
-for example, an <a class="reference internal" href="package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.html#ray.rllib.env.env_runner.EnvRunner" title="ray.rllib.env.env_runner.EnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvRunner</span></code></a> finishing a sampling request, the local metrics of the subcomponent
-(<code class="docutils literal notranslate"><span class="pre">EnvRunner</span></code>) are “reduced”, and sent upstream to the containing parent component (<code class="docutils literal notranslate"><span class="pre">Algorithm</span></code>).
-The parent component merges the received results into its own <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> and,
-at the end of its own task cycle, “reduces” as well for final reporting to the user or to Ray Tune.</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
-</figcaption>
+<p><a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> let’s RLlib experiments keep track of metrics.
+Most components (example: <a class="reference internal" href="package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.html#ray.rllib.env.env_runner.EnvRunner" title="ray.rllib.env.env_runner.EnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvRunner</span></code></a>, <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a>) in RLlib keep an instance of MetricsLogger that can be logged to.
+Any logged metrics are aggregated towards to the root MetricsLogger which lives inside the <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> object and is used to report metrics to the user or to Ray Tune.
+When a subcomponent reports metrics down the hierarchy, it “reduces” the logged results before sending them. For example, when reducing by summation, subcomponents calculate sums before sending them to the parent component.</p>
+<p>We recommend using this API for any metrics that you want RLlib to report, especially if they should be reported to Ray Tune or WandB.
+To quickly see how RLlib uses MetricsLogger, check out <a class="reference internal" href="package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.html#ray.rllib.env.env_runner.EnvRunner" title="ray.rllib.env.env_runner.EnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvRunner</span></code></a>-based <a class="reference internal" href="rllib-callback.html#rllib-callback-docs"><span class="std std-ref">callbacks</span></a>,
+a <a class="reference external" href="https://github.com/ray-project/ray/blob/master/rllib/examples/learners/classes/custom_ppo_loss_fn_learner.py">custom loss function</a>, or a custom
+<a class="reference external" href="https://github.com/ray-project/ray/blob/master/rllib/examples/metrics/custom_metrics_in_algorithm_training_step.py">training_step</a> implementation.</p>
+<p>If your goal is to communicate data between RLlib components (for example, communicate a loss from Learners to EnvRunners), we recommend passing such values around through callbacks or by overriding RLlib components’ attributes.
+This is mainly because MetricsLogger is designed to aggregate metrics, but not to make them available everywhere and at any time so queryig logged metrics from it can lead to unexpected results.</p>
+<figure class="align-left">
+<a class="reference internal image-reference" href="../_images/metrics_logger_hierarchy.svg"><img alt="../_images/metrics_logger_hierarchy.svg" src="../_images/metrics_logger_hierarchy.svg" width="750" /></a>
 </figure>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>So far, RLlib components owning a <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a>
-instance are <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>, <a class="reference internal" href="package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.html#ray.rllib.env.env_runner.EnvRunner" title="ray.rllib.env.env_runner.EnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvRunner</span></code></a>,
-<a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a>, all <a class="reference internal" href="package_ref/connector-v2.html#ray.rllib.connectors.connector_v2.ConnectorV2" title="ray.rllib.connectors.connector_v2.ConnectorV2"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConnectorV2</span></code></a> classes,
-and all <code class="docutils literal notranslate"><span class="pre">~ray.rllib.utils.replay_buffers.EpisodeReplayBuffer</span></code> classes.
-The Ray team is considering expanding access to this API on other components as well.</p>
-</div>
+<p><strong>RLlib’s MetricsLogger aggregation overview</strong>: The diagram illustrates how metrics that are logged in parallel components are aggregated towards the root MetricsLogger.
+Parallel subcomponents of <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> have their own <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> instance and use it to locally log values.
+When a component completes a distinct task, for example, an <a class="reference internal" href="package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.html#ray.rllib.env.env_runner.EnvRunner" title="ray.rllib.env.env_runner.EnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvRunner</span></code></a> finishing a sampling request, the local metrics of the subcomponent
+(<code class="docutils literal notranslate"><span class="pre">EnvRunner</span></code> or <code class="docutils literal notranslate"><span class="pre">Learner</span></code>) are “reduced”, and sent downstream towards the root component (<code class="docutils literal notranslate"><span class="pre">Algorithm</span></code>).
+The parent component merges the received results into its own <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a>.
+Once <code class="docutils literal notranslate"><span class="pre">Algorithm</span></code> has completed its own cycle (<a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.step.html#ray.rllib.algorithms.algorithm.Algorithm.step" title="ray.rllib.algorithms.algorithm.Algorithm.step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">step()</span></code></a> returns), it “reduces” as well for final reporting to the user or to Ray Tune.</p>
 <section id="features-of-metricslogger">
 <h2>Features of MetricsLogger<a class="headerlink" href="#features-of-metricslogger" title="Link to this heading">#</a></h2>
 <p>The <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> API offers the following functionalities:</p>
 <ul class="simple">
 <li><p>Log scalar values over time, such as losses, individual rewards, or episode returns.</p></li>
-<li><p>Configure different reduction types, in particular <code class="docutils literal notranslate"><span class="pre">mean</span></code>, <code class="docutils literal notranslate"><span class="pre">min</span></code>, <code class="docutils literal notranslate"><span class="pre">max</span></code>, or <code class="docutils literal notranslate"><span class="pre">sum</span></code>. Also, users can choose to not
-reduce at all through the <code class="docutils literal notranslate"><span class="pre">reduce=None</span></code> setting, leaving the logged values untouched.
-A separate <code class="docutils literal notranslate"><span class="pre">clear_on_reduce=True</span></code> setting allows for automatically clearing all logged values on each <code class="docutils literal notranslate"><span class="pre">reduce</span></code> event.</p></li>
+<li><p>Configure different reduction types, in particular <code class="docutils literal notranslate"><span class="pre">ema</span></code>, <code class="docutils literal notranslate"><span class="pre">mean</span></code>, <code class="docutils literal notranslate"><span class="pre">min</span></code>, <code class="docutils literal notranslate"><span class="pre">max</span></code>, or <code class="docutils literal notranslate"><span class="pre">sum</span></code>. Also, users can choose to not
+reduce at all by using <code class="docutils literal notranslate"><span class="pre">item</span></code> or <code class="docutils literal notranslate"><span class="pre">item_series</span></code>, leaving the logged values untouched.</p></li>
 <li><p>Specify sliding windows, over which reductions take place, for example <code class="docutils literal notranslate"><span class="pre">window=100</span></code> to average over the
-last 100 logged values, or specify exponential moving average (EMA) coefficients, through which the weight of older values
-in the computed mean should decay over time.</p></li>
-<li><p>Merge <code class="docutils literal notranslate"><span class="pre">n</span></code> result dicts from <code class="docutils literal notranslate"><span class="pre">n</span></code> parallel subcomponents into the local <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a>.
-Each of these <code class="docutils literal notranslate"><span class="pre">n</span></code> dicts is the result of a <code class="docutils literal notranslate"><span class="pre">reduce</span></code> operation on each subcomponent’s own <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a>
-instance.</p></li>
-<li><p>Log execution times for distinct code blocks through convenient <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">...</span></code> blocks.</p></li>
-<li><p>Add up lifetime counts and automatically compute the corresponding throughput metrics per second along the way.</p></li>
+last 100 logged values per parallel component. Alternatively, specify exponential moving average (EMA) coefficients</p></li>
+<li><p>Log execution times for distinct code blocks through convenient <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">MetricsLogger.log_time(...)</span></code> blocks.</p></li>
+<li><p>Add up lifetime sums by setting <code class="docutils literal notranslate"><span class="pre">reduce=&quot;lifetime_sum&quot;</span></code> when logging values.</p></li>
+<li><p>For sums and lifetime sums, you can also compute the corresponding throughput metrics per second along the way.</p></li>
 </ul>
 </section>
 <section id="built-in-usages-of-metricslogger">
@@ -1546,20 +1552,32 @@ existing code-base. The following is an overview of a typical information flow r
 <ol class="arabic simple">
 <li><p>The <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> sends parallel sample requests to its <code class="docutils literal notranslate"><span class="pre">n</span></code> <a class="reference internal" href="package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.html#ray.rllib.env.env_runner.EnvRunner" title="ray.rllib.env.env_runner.EnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvRunner</span></code></a> actors.</p></li>
 <li><p>Each <a class="reference internal" href="package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.html#ray.rllib.env.env_runner.EnvRunner" title="ray.rllib.env.env_runner.EnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvRunner</span></code></a> collects training data by stepping through its <a class="reference internal" href="key-concepts.html#rllib-key-concepts-environments"><span class="std std-ref">RL environment</span></a> and logs standard stats to its <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a>, such as episode return or episode length.</p></li>
-<li><p>Each <a class="reference internal" href="package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.html#ray.rllib.env.env_runner.EnvRunner" title="ray.rllib.env.env_runner.EnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvRunner</span></code></a> calls <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce()</span></code></a> on its own <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> instance and returns the resulting stats dict.</p></li>
-<li><p>The <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> merges the <code class="docutils literal notranslate"><span class="pre">n</span></code> received stats dicts into its own <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> instance under the top-level key “env_runners”, thereby keeping all log-settings chosen by the <a class="reference internal" href="package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.html#ray.rllib.env.env_runner.EnvRunner" title="ray.rllib.env.env_runner.EnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvRunner</span></code></a> actors.</p></li>
+<li><p>Each <a class="reference internal" href="package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.html#ray.rllib.env.env_runner.EnvRunner" title="ray.rllib.env.env_runner.EnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvRunner</span></code></a> reduces all collected metrics and returns them to the Algorithm.</p></li>
+<li><p>The <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> aggregates the <code class="docutils literal notranslate"><span class="pre">n</span></code> chunks of metrics from the EnvRunners (this depends on the reduce method chosen, an example is averaging if reduce=”mean”).</p></li>
 <li><p>The <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> sends parallel update requests to its <code class="docutils literal notranslate"><span class="pre">m</span></code> <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> actors.</p></li>
-<li><p>Each <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> performs a model update through computing losses and gradients and logs standard stats to its <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a>, such as total loss or mean gradients.</p></li>
-<li><p>Each <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> calls <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce()</span></code></a> on its own <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> instance and returns the resulting stats dict.</p></li>
-<li><p>The <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> merges the <code class="docutils literal notranslate"><span class="pre">m</span></code> received stats dicts into its own <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> instance under the top-level key “learners”, thereby keeping all log-settings chosen by the <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> actors.</p></li>
-<li><p>The <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> may add standard stats to its own <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> instance, for example the average time of a parallel sample request.</p></li>
-<li><p>The <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> calls <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce()</span></code></a> on its own <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> instance, compiling and returning a complete and final stats dict to the user or Ray Tune.</p></li>
+<li><p>Each <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> performs a model update while logging metrics to its <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a>, such as total loss or mean gradients.</p></li>
+<li><p>Each <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> reduces all collected metrics and returns them to the Algorithm.</p></li>
+<li><p>The <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> aggregates the <code class="docutils literal notranslate"><span class="pre">m</span></code> chunks of metrics from the Learners (this again depends on the reduce method chosen, an example is summing if reduce=”sum”).</p></li>
+<li><p>The <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> may add standard metrics to its own <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> instance, for example the average time of a parallel sample request.</p></li>
+<li><p>The <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> reduces all collected metrics and returns them to the user or Ray Tune.</p></li>
 </ol>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Don’t call the reduce() method yourself</strong>
+Anytime RLlib reduces metrics, it does so by calling <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce()</span></code></a> on the MetricsLogger instance.
+Doing so clears metrics from the MetricsLogger instance. This is why <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce()</span></code></a> should not be called by your custom code.</p>
+</div>
 </section>
 <section id="the-metricslogger-apis-in-detail">
 <h2>The MetricsLogger APIs in detail<a class="headerlink" href="#the-metricslogger-apis-in-detail" title="Link to this heading">#</a></h2>
-<p>Before you can use <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> in your custom code, familiarize
-yourself with how to actually use its APIs.</p>
+<figure class="align-left">
+<a class="reference internal image-reference" href="../_images/metrics_logger_api.svg"><img alt="../_images/metrics_logger_api.svg" src="../_images/metrics_logger_api.svg" width="750" /></a>
+</figure>
+<p><strong>RLlib’s MetricsLogger API</strong>: This is how RLlib uses the MetricsLogger API to log and aggregate metrics.
+We use the methods <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time"><code class="xref py py-meth docutils literal notranslate"><span class="pre">log_time()</span></code></a> and <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">log_value()</span></code></a> to log metrics.
+Metrics then get reduced with the method <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce()</span></code></a>.
+Reduced metrics get aggregated with the method <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">aggregate()</span></code></a>.
+All metrics are finally reduced to be reported to the user or Ray Tune by the <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> object.</p>
 <section id="logging-scalar-values">
 <h3>Logging scalar values<a class="headerlink" href="#logging-scalar-values" title="Link to this heading">#</a></h3>
 <p>To log a scalar value under some string key in your <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a>,
@@ -1573,15 +1591,22 @@ use the <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metr
 <span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>By default, <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> reduces values through averaging them (<code class="docutils literal notranslate"><span class="pre">reduce=&quot;mean&quot;</span></code>).
-Other available reduce types are <code class="docutils literal notranslate"><span class="pre">reduce=&quot;min&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">reduce=&quot;max&quot;</span></code>, and <code class="docutils literal notranslate"><span class="pre">reduce=&quot;sum&quot;</span></code>.</p>
+<p>By default, <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> reduces values through averaging them (<code class="docutils literal notranslate"><span class="pre">reduce=&quot;mean&quot;</span></code>).</p>
+<p>Other available reduction methods can be found in the dictionary <code class="docutils literal notranslate"><span class="pre">ray.rllib.utils.metrics.metrics_logger.DEFAULT_STATS_CLS_LOOKUP</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can also provide your own reduction methods by extending <code class="docutils literal notranslate"><span class="pre">ray.rllib.utils.metrics.metrics_logger.DEFAULT_STATS_CLS_LOOKUP</span></code>
+and passing it to <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.reporting.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.reporting" title="ray.rllib.algorithms.algorithm_config.AlgorithmConfig.reporting"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reporting()</span></code></a>.
+These new reduction methods will then be available by their key when logging values during runtime. For example,
+you can use <code class="docutils literal notranslate"><span class="pre">reduce=&quot;my_custom_reduce_method&quot;</span></code> when when extending the dictionary with a key <code class="docutils literal notranslate"><span class="pre">&quot;my_custom_reduce_method&quot;</span></code>
+and passing it to <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.reporting.html#ray.rllib.algorithms.algorithm_config.AlgorithmConfig.reporting" title="ray.rllib.algorithms.algorithm_config.AlgorithmConfig.reporting"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reporting()</span></code></a>.</p>
+</div>
 <p>Specifying a <code class="docutils literal notranslate"><span class="pre">window</span></code> causes the reduction to take place over the last <code class="docutils literal notranslate"><span class="pre">window</span></code> logged values.
 For example, you can continue logging new values under the <code class="docutils literal notranslate"><span class="pre">loss</span></code> key:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">)</span>  <span class="c1"># don&#39;t have to repeat `reduce` or `window` args,</span>
-                                <span class="c1"># because the key already exists.</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">)</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">)</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Because you specified a window of 2, <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> only uses the last 2 values to compute the reduced result.
@@ -1597,14 +1622,9 @@ check the current underlying reduced result for some key, without actually havin
 <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce()</span></code></a>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><strong>Don’t call the reduce() method yourself</strong> on any
-<a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> from your custom code.
-The only time RLlib invokes this API is at the end of a task cycle.
-RLlib controls all of these “hand over” points entirely, so unless you write your own subcomponent that reports to a parent component, such as
-<a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>, refrain from calling the
-<a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.reduce"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reduce()</span></code></a> method.</p>
-<p>To get the current reduced results, use the <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek"><code class="xref py py-meth docutils literal notranslate"><span class="pre">peek()</span></code></a> method instead,
-which doesn’t alter any underlying values.</p>
+<p>A limitation of peeking metrics is that you can often not meaningfully peek metrics if they are aggregated downstream.
+For example, if you log the number of steps you trained on each call to <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.update.html#ray.rllib.core.learner.learner.Learner.update" title="ray.rllib.core.learner.learner.Learner.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code></a>, these will be reduced and aggregated
+by the Algorithm’s MetricsLogger and peeking them inside <a class="reference internal" href="package_ref/doc/ray.rllib.core.learner.learner.Learner.html#ray.rllib.core.learner.learner.Learner" title="ray.rllib.core.learner.learner.Learner"><code class="xref py py-class docutils literal notranslate"><span class="pre">Learner</span></code></a> will not give you the aggregated result.</p>
 </div>
 <p>Instead of providing a flat key, you can also log a value under some nested key through passing in a tuple:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Log a value under a deeper nested key.</span>
@@ -1618,9 +1638,7 @@ which doesn’t alter any underlying values.</p>
 <span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;max_value&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;max&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Because you didn’t specify a <code class="docutils literal notranslate"><span class="pre">window</span></code> and are using <code class="docutils literal notranslate"><span class="pre">reduce=&quot;max&quot;</span></code>, RLlib uses the infinite window,
-meaning <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> reports the lifetime maximum value,
-whenever reduction takes place or you peek at the current value:</p>
+<p>The maximum value will be reset after each <code class="docutils literal notranslate"><span class="pre">reduce()</span></code> operation.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;max_value&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
 
@@ -1628,82 +1646,63 @@ whenever reduction takes place or you peek at the current value:</p>
 </pre></div>
 </div>
 <p>You can also choose to not reduce at all, but to simply collect individual values, for example a set of images you receive
-from your environment over time and for which it doesn’t make sense to reduce them in any way.</p>
-<p>Use the <code class="docutils literal notranslate"><span class="pre">reduce=None</span></code> argument for achieving this. However, it’s strongly advised that you should also
-set the <code class="docutils literal notranslate"><span class="pre">clear_on_reduce=True</span></code> flag, because this setting may cause memory leaks otherwise.
-This flag assures that <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> clears out the underlying list of values after every
-<code class="docutils literal notranslate"><span class="pre">reduce()</span></code> handover operation, for example from <a class="reference internal" href="package_ref/env/doc/ray.rllib.env.env_runner.EnvRunner.html#ray.rllib.env.env_runner.EnvRunner" title="ray.rllib.env.env_runner.EnvRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvRunner</span></code></a>
-to <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;some_items&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clear_on_reduce</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;some_items&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clear_on_reduce</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;some_items&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clear_on_reduce</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;some_items&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clear_on_reduce</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+from your environment over time and for which it doesn’t make sense to reduce them in any way.
+Use the <code class="docutils literal notranslate"><span class="pre">reduce=&quot;item&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">reduce=&quot;item_series&quot;</span></code> argument for achieving this.
+However, use your best judgement for what you are logging because RLlib will report all logged values unless you clean them up yourself.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;some_items&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;item_series&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;some_items&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;item_series&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;an_item&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;item&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;an_item&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;item&quot;</span><span class="p">)</span>
 
-<span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="s2">&quot;some_items&quot;</span><span class="p">)</span>  <span class="c1"># expect a list: [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;]</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="s2">&quot;some_items&quot;</span><span class="p">)</span>  <span class="c1"># expect a list: [&quot;a&quot;, &quot;b&quot;]</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="s2">&quot;an_item&quot;</span><span class="p">)</span>  <span class="c1"># expect a string: &quot;d&quot;</span>
 
 <span class="n">logger</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="s2">&quot;some_items&quot;</span><span class="p">)</span>  <span class="c1"># expect an empty list: []</span>
-</pre></div>
-</div>
-<p>You should pass additional arguments like <code class="docutils literal notranslate"><span class="pre">reduce=None</span></code> and <code class="docutils literal notranslate"><span class="pre">clear_on_reduce=True</span></code> to the
-<a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">log_value()</span></code></a> method on each call.
-Otherwise, MetricsLogger will emit warnings to ensure that its behavior is always as expected.</p>
-</section>
-<section id="logging-a-set-of-nested-scalar-values">
-<h3>Logging a set of nested scalar values<a class="headerlink" href="#logging-a-set-of-nested-scalar-values" title="Link to this heading">#</a></h3>
-<p>If you’re logging a nested structure of values, for example
-<code class="docutils literal notranslate"><span class="pre">{&quot;time_s&quot;:</span> <span class="pre">0.1,</span> <span class="pre">&quot;lives&quot;:</span> <span class="pre">5,</span> <span class="pre">&quot;rounds_played&quot;:</span> <span class="pre">{&quot;player1&quot;:</span> <span class="pre">10,</span> <span class="pre">&quot;player2&quot;:</span> <span class="pre">4}}</span></code> and all values have the exact same log settings
-in terms of the <code class="docutils literal notranslate"><span class="pre">reduce</span></code>, <code class="docutils literal notranslate"><span class="pre">clear_on_reduce</span></code>, <code class="docutils literal notranslate"><span class="pre">window</span></code>, etc arguments, you can also call the shortcut
-<a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">log_dict()</span></code></a> method to do so:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.metrics_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsLogger</span>
-
-<span class="n">logger</span> <span class="o">=</span> <span class="n">MetricsLogger</span><span class="p">()</span>
-
-<span class="c1"># Log a bunch of scalar values within a nested dict.</span>
-<span class="n">stats</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;player1&quot;</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span> <span class="s2">&quot;player2&quot;</span><span class="p">:</span> <span class="mf">105.0</span><span class="p">}</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;mean_scores&quot;</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-
-<span class="c1"># Later, do the same again.</span>
-<span class="n">stats</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;player1&quot;</span><span class="p">:</span> <span class="mf">150.0</span><span class="p">,</span> <span class="s2">&quot;player2&quot;</span><span class="p">:</span> <span class="mf">110.0</span><span class="p">}</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">log_dict</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;mean_scores&quot;</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">((</span><span class="s2">&quot;mean_scores&quot;</span><span class="p">,</span> <span class="s2">&quot;player1&quot;</span><span class="p">)))</span>  <span class="c1"># &lt;- expect 125.0</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="s2">&quot;an_item&quot;</span><span class="p">)</span>  <span class="c1"># expect None: []</span>
 </pre></div>
 </div>
 </section>
 <section id="logging-non-scalar-data">
 <h3>Logging non-scalar data<a class="headerlink" href="#logging-non-scalar-data" title="Link to this heading">#</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>You may be tempted to use MetricsLogger as a vehicle to get data from one place in RLlib to another.
+For example to store data between EnvRunner callbacks, or to move videos captured from the environment from EnvRunners to the Algorithm object.
+These cases are to be handled with a lot of caution and we generally advise to find other solutions.
+For example, callbacks can create custom attributes on EnvRunners and you probably don’t want your videos to be treated like metrics.
+MetricsLogger is designed and treated by RLlib as a vehicle to collect metrics from parallel components and aggregate them.
+It is supposed to handle metrics and these are supposed to flow in one direction - from the parallel components to the root component.
+If your use-case does not fit this pattern, consider finding another way than using MetricsLogger.</p>
+</div>
 <p><a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> isn’t limited to scalar values.
-You can also use it to log images, videos, or any other complex data.</p>
-<p>Normally, you would choose the previously described <code class="docutils literal notranslate"><span class="pre">reduce=None</span></code> argument. For example, to
-log three consecutive image frames from a <code class="docutils literal notranslate"><span class="pre">CartPole</span></code> environment, do the following:</p>
+If you decide that you still want to use MetricsLogger to get data from one place in RLlib to another, you use it to log images, videos, or any other complex data.</p>
+<p>For example, to log three consecutive image frames from a <code class="docutils literal notranslate"><span class="pre">CartPole</span></code> environment, use the <code class="docutils literal notranslate"><span class="pre">reduce=&quot;item_series&quot;</span></code> argument:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
 
 <span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;CartPole-v1&quot;</span><span class="p">)</span>
 
 <span class="c1"># Log three consecutive render frames from the env.</span>
-<span class="c1"># Make sure to set ``clear_on_reduce=True`` to avoid memory leaks.</span>
 <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;some_images&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">reduce</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clear_on_reduce</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;some_images&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;item_series&quot;</span><span class="p">)</span>
 <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;some_images&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">reduce</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clear_on_reduce</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;some_images&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;item_series&quot;</span><span class="p">)</span>
 <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;some_images&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">reduce</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clear_on_reduce</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;some_images&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;item_series&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="timers">
 <h3>Timers<a class="headerlink" href="#timers" title="Link to this heading">#</a></h3>
-<p><a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> is context capable and offers the following
-simple API to log timer results.
-Notice that you can now time all your code blocks of interest inside your custom code through a single <code class="docutils literal notranslate"><span class="pre">with-</span></code> line:</p>
+<p>You can use <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsLogger</span></code></a> as a context manager to log timer results.
+You can time all your code blocks inside your custom code through a single <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">MetricsLogger.log_time(...)</span></code> line:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.metrics_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsLogger</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">MetricsLogger</span><span class="p">()</span>
 
 <span class="c1"># First delta measurement:</span>
-<span class="k">with</span> <span class="n">logger</span><span class="o">.</span><span class="n">log_time</span><span class="p">(</span><span class="s2">&quot;my_block_to_be_timed&quot;</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="n">ema_coeff</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+<span class="k">with</span> <span class="n">logger</span><span class="o">.</span><span class="n">log_time</span><span class="p">(</span><span class="s2">&quot;my_block_to_be_timed&quot;</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;ema&quot;</span><span class="p">,</span> <span class="n">ema_coeff</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
 
 <span class="c1"># EMA should be ~1sec.</span>
@@ -1717,90 +1716,47 @@ Notice that you can now time all your code blocks of interest inside your custom
 <span class="k">assert</span> <span class="mf">1.15</span> <span class="o">&gt;</span> <span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="s2">&quot;my_block_to_be_timed&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.05</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The default logging behavior is through exponential mean averaging (EMA), with a default coefficient of 0.01.
-This default is usually a good choice for averaging timer results over the course of the experiment.</p>
-</div>
 </section>
 <section id="counters">
 <h3>Counters<a class="headerlink" href="#counters" title="Link to this heading">#</a></h3>
 <p>In case you want to count things, for example the number of environment steps taken in a sample phase, and add up those
-counts either over the lifetime or over some particular phase, use the <code class="docutils literal notranslate"><span class="pre">reduce=&quot;sum&quot;</span></code> argument in the call to
+counts either over the lifetime or over some particular phase, use the <code class="docutils literal notranslate"><span class="pre">reduce=&quot;sum&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">reduce=&quot;lifetime_sum&quot;</span></code> argument in the call to
 <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">log_value()</span></code></a>.</p>
-<p>Combine this with <code class="docutils literal notranslate"><span class="pre">clear_on_reduce=True</span></code>, if you want the count to only accumulate until the next “reduce” event.
-Set <code class="docutils literal notranslate"><span class="pre">clear_on_reduce=False</span></code>, which is the default, if you want the count to accumulate over the lifetime.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.metrics_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsLogger</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">MetricsLogger</span><span class="p">()</span>
 
-<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;my_counter&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;my_counter&quot;</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="s2">&quot;my_counter&quot;</span><span class="p">)</span>  <span class="c1"># expect: 75</span>
-
-<span class="c1"># Even if your logger gets &quot;reduced&quot; from time to time, the counter keeps increasing</span>
-<span class="c1"># because we set clear_on_reduce=False (default behavior):</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="s2">&quot;my_counter&quot;</span><span class="p">)</span>  <span class="c1"># still expect: 75</span>
-
-<span class="c1"># To clear the sum after each &quot;reduce&quot; event, set `clear_on_reduce=True`:</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;my_temp_counter&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clear_on_reduce</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;my_temp_counter&quot;</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clear_on_reduce</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;my_counter&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;my_counter&quot;</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="s2">&quot;my_counter&quot;</span><span class="p">)</span>  <span class="c1"># expect: 75</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="s2">&quot;my_counter&quot;</span><span class="p">)</span>  <span class="c1"># expect: 0 (upon reduction, all values are cleared)</span>
 </pre></div>
 </div>
-<section id="automatic-throughput-measurements">
-<h4>Automatic throughput measurements<a class="headerlink" href="#automatic-throughput-measurements" title="Link to this heading">#</a></h4>
-<p>A metrics logged with the settings <code class="docutils literal notranslate"><span class="pre">reduce=&quot;sum&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">clear_on_reduce=False</span></code> is considered
-a <code class="docutils literal notranslate"><span class="pre">lifetime</span></code> counter, accumulating counts over the entire course of the experiment without ever resetting
-the value back to 0. If you also add the <code class="docutils literal notranslate"><span class="pre">with_throughput=True</span></code> flag, the underlying metric automatically computes the throughput per second
-on each <code class="docutils literal notranslate"><span class="pre">reduce()</span></code> operation.</p>
-<p>The <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html#ray.rllib.algorithms.algorithm.Algorithm" title="ray.rllib.algorithms.algorithm.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a> automatically compiles an extra key for each such metric, adding the suffix <code class="docutils literal notranslate"><span class="pre">_throughput</span></code>
-to the original key and assigning it the value for the throughput per second.</p>
+<p>If you log lifetime metrics with <code class="docutils literal notranslate"><span class="pre">reduce=&quot;lifetime_sum&quot;</span></code>, these will get summed up over the lifetime of the experiment and even after resuming from a checkpoint.
+Note that you can not meaningfully peek <code class="docutils literal notranslate"><span class="pre">lifetime_sum</span></code> values outside of the root MetricsLogger. Also note that the lifetime sum is summed up at the root MetricsLogger
+whereas we only keep the most recent values in parallel components which are cleared each time we reduce.</p>
+<section id="throughput-measurements">
+<h4>Throughput measurements<a class="headerlink" href="#throughput-measurements" title="Link to this heading">#</a></h4>
+<p>A metrics logged with the settings <code class="docutils literal notranslate"><span class="pre">reduce=&quot;sum&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">reduce=&quot;lifetime_sum&quot;</span></code> can also measure throughput.
+The throughput is calculated once per metrics reporting cycle.
+This means that the throughput is always relative to the speed of the metrics reduction cycle.</p>
 <p>You can use the <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek"><code class="xref py py-meth docutils literal notranslate"><span class="pre">peek()</span></code></a> method to access the throughput value by passing the <code class="docutils literal notranslate"><span class="pre">throughput=True</span></code> flag.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.metrics_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsLogger</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">MetricsLogger</span><span class="p">()</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">MetricsLogger</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;lifetime_count&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="n">with_throughput</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;lifetime_sum&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="n">with_throughput</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="c1"># RLlib triggers a new throughput computation at each `reduce()` call</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
 
-    <span class="c1"># Expect the first call to return NaN because we don&#39;t have a proper start time for the time delta.</span>
-    <span class="c1"># From the second call on, expect a value of roughly 5/sec.</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="s2">&quot;lifetime_count&quot;</span><span class="p">,</span> <span class="n">throughput</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-
-    <span class="n">logger</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;lifetime_count&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="n">with_throughput</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="c1"># Expect the throughput to be roughly 10/sec now.</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="s2">&quot;lifetime_count&quot;</span><span class="p">,</span> <span class="n">throughput</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-
-    <span class="c1"># You can also get a dict of all throughputs at once:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="n">throughput</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="c1"># Expect the throughput to be roughly 15/sec.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="s2">&quot;lifetime_sum&quot;</span><span class="p">,</span> <span class="n">throughput</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 </pre></div>
 </div>
 </section>
-</section>
-<section id="measuring-throughputs-with-metricslogger-log-time">
-<h3>Measuring throughputs with MetricsLogger.log_time()<a class="headerlink" href="#measuring-throughputs-with-metricslogger-log-time" title="Link to this heading">#</a></h3>
-<p>You can also use the <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_time"><code class="xref py py-meth docutils literal notranslate"><span class="pre">log_time()</span></code></a> method to measure throughputs.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ray.rllib.utils.metrics.metrics_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">MetricsLogger</span>
-
-<span class="n">logger</span> <span class="o">=</span> <span class="n">MetricsLogger</span><span class="p">()</span>
-
-<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-    <span class="k">with</span> <span class="n">logger</span><span class="o">.</span><span class="n">log_time</span><span class="p">(</span><span class="s2">&quot;my_block_to_be_timed&quot;</span><span class="p">,</span> <span class="n">with_throughput</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
-
-<span class="c1"># Expect the throughput to be roughly 1.0/sec.</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="s2">&quot;my_block_to_be_timed&quot;</span><span class="p">,</span> <span class="n">throughput</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-</pre></div>
-</div>
 </section>
 </section>
 <section id="example-1-how-to-use-metricslogger-in-envrunner-callbacks">
@@ -1865,13 +1821,7 @@ only the <a class="reference internal" href="package_ref/doc/ray.rllib.utils.met
 </section>
 <section id="example-2-how-to-use-metricslogger-in-a-custom-loss-function">
 <h2>Example 2: How to use MetricsLogger in a custom loss function<a class="headerlink" href="#example-2-how-to-use-metricslogger-in-a-custom-loss-function" title="Link to this heading">#</a></h2>
-<p>You can log metrics inside your custom loss functions. Use the Learner’s <code class="docutils literal notranslate"><span class="pre">self.metrics</span></code> attribute for this.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>When logging loss values, the RLlib team recommends to use <code class="docutils literal notranslate"><span class="pre">window=1</span></code> to always report the exact
-current loss value, rather than a smoothened result over time. This way, you notice strange spikes or unstable
-behavior in your loss math right away and can pinpoint problems to a particular iteration.</p>
-</div>
+<p>You can log metrics inside your custom loss functions. Use the Learner’s own <code class="docutils literal notranslate"><span class="pre">Learner.metrics</span></code> attribute for this.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@override</span><span class="p">(</span><span class="n">TorchLearner</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_loss_for_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">module_id</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">fwd_out</span><span class="p">):</span>
     <span class="o">...</span>
@@ -1879,7 +1829,8 @@ behavior in your loss math right away and can pinpoint problems to a particular 
     <span class="n">loss_xyz</span> <span class="o">=</span> <span class="o">...</span>
 
     <span class="c1"># Log a specific loss term.</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;special_loss_term&quot;</span><span class="p">,</span> <span class="n">loss_xyz</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Each learner will sum up the loss_xyz value and send it to the root MetricsLogger.</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;special_loss_term&quot;</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">loss_xyz</span><span class="p">)</span>
 
     <span class="n">total_loss</span> <span class="o">=</span> <span class="n">loss_abc</span> <span class="o">+</span> <span class="n">loss_xyz</span>
 
@@ -1892,13 +1843,13 @@ behavior in your loss math right away and can pinpoint problems to a particular 
 <section id="example-3-how-to-use-metricslogger-in-a-custom-algorithm">
 <h2>Example 3: How to use MetricsLogger in a custom Algorithm<a class="headerlink" href="#example-3-how-to-use-metricslogger-in-a-custom-algorithm" title="Link to this heading">#</a></h2>
 <p>You can log metrics inside your custom Algorithm <a class="reference internal" href="package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.training_step.html#ray.rllib.algorithms.algorithm.Algorithm.training_step" title="ray.rllib.algorithms.algorithm.Algorithm.training_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">training_step()</span></code></a> method.
-Use the Algorithm’s own <code class="docutils literal notranslate"><span class="pre">self.metrics</span></code> attribute for this.</p>
+Use the Algorithm’s own <code class="docutils literal notranslate"><span class="pre">Algorithm.metrics</span></code> attribute for this.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@override</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="o">...</span>
 
     <span class="c1"># Log some value.</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;some_mean_result&quot;</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="s2">&quot;some_mean_result&quot;</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 
     <span class="o">...</span>
 
@@ -1908,6 +1859,23 @@ Use the Algorithm’s own <code class="docutils literal notranslate"><span class
 </div>
 <p>See this running
 <a class="reference external" href="https://github.com/ray-project/ray/blob/master/rllib/examples/metrics/custom_metrics_in_algorithm_training_step.py">end-to-end example for logging inside training_step()</a>.</p>
+</section>
+<section id="migrating-to-ray-2-53">
+<h2>Migrating to Ray 2.53<a class="headerlink" href="#migrating-to-ray-2-53" title="Link to this heading">#</a></h2>
+<p>If you have been using the MetricsLogger API before Ray 2.52, the following needs your attention:</p>
+<p>Most importantly:
+- <strong>Metrics are now cleared once per MetricsLogger.reduce() call. Peeking them thereafter returns the zero-element for the respective reduce type (np.nan, None or an empty list).</strong>
+- Control flow should be based on other variables, rather than peeking metrics.</p>
+<p>For MetricsLogger’s logging methods (log_value, log_time, etc.):
+- The <code class="docutils literal notranslate"><span class="pre">clear_on_reduce</span></code> argument is deprecated. (see point above)
+- Using <code class="docutils literal notranslate"><span class="pre">reduce=&quot;sum&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">clear_on_reduce=False</span></code> is now equivalent to <code class="docutils literal notranslate"><span class="pre">reduce=&quot;lifetime_sum&quot;</span></code>.
+- The <code class="docutils literal notranslate"><span class="pre">throughput_ema_coeff</span></code> is deprecated (we don’t use EMA for throughputs anymore).
+- The <code class="docutils literal notranslate"><span class="pre">reduce_per_index_on_aggregate</span></code> argument is deprecated. All metrics are now aggregated over all values collected from leafs of any reduction cycle.</p>
+<p>Other changes:
+- Many metrics look more noisy after upgrading to 2.52. This is mostly because they are not smoothed anymore. Smoothing should happen downstream if desired.
+- <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.aggregate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">aggregate()</span></code></a> is now the only way to aggregate metrics.
+- You can now pass a custom stats class to (AlgorithmConfig.reporting(custom_stats_cls_lookup={…})). This enables you to write your own stats class with its own reduction logic. If your own stats class constitutes a fix or a valuable addition to RLlib, please consider contributing it to the project through a PR.
+- When aggregating metrics, we can now peek only the onces that were merged in the most recent reduction cycle with the <code class="docutils literal notranslate"><span class="pre">latest_merged_only=True</span></code> argument in <a class="reference internal" href="package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html#ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek" title="ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek"><code class="xref py py-meth docutils literal notranslate"><span class="pre">peek()</span></code></a>.</p>
 </section>
 </section>
 
@@ -1958,19 +1926,18 @@ Use the Algorithm’s own <code class="docutils literal notranslate"><span class
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#built-in-usages-of-metricslogger">Built-in usages of MetricsLogger</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-metricslogger-apis-in-detail">The MetricsLogger APIs in detail</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logging-scalar-values">Logging scalar values</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logging-a-set-of-nested-scalar-values">Logging a set of nested scalar values</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#logging-non-scalar-data">Logging non-scalar data</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#timers">Timers</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#counters">Counters</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#automatic-throughput-measurements">Automatic throughput measurements</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#throughput-measurements">Throughput measurements</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-throughputs-with-metricslogger-log-time">Measuring throughputs with MetricsLogger.log_time()</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-1-how-to-use-metricslogger-in-envrunner-callbacks">Example 1: How to use MetricsLogger in EnvRunner callbacks</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-2-how-to-use-metricslogger-in-a-custom-loss-function">Example 2: How to use MetricsLogger in a custom loss function</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-3-how-to-use-metricslogger-in-a-custom-algorithm">Example 3: How to use MetricsLogger in a custom Algorithm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#migrating-to-ray-2-53">Migrating to Ray 2.53</a></li>
 </ul>
   </nav></div>
 
@@ -2038,7 +2005,7 @@ Use the Algorithm’s own <code class="docutils literal notranslate"><span class
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2025, The Ray Team.
+      © Copyright 2026, The Ray Team.
       <br/>
     
   </p>

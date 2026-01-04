@@ -72,7 +72,7 @@
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="next" title="What’s Ray Core?" href="../ray-core/walkthrough.html" />
-    <link rel="prev" title="Build a Docker image for an MCP server" href="examples/mcp-ray-serve/05%20%28Optional%29%20Build_docker_image_for_mcp_server.html" /><!-- Extra header to include at the top of each template.
+    <link rel="prev" title="Build a tool-using agent" href="examples/langchain_agent_ray_serve/content/README.html" /><!-- Extra header to include at the top of each template.
 Kept separately so that it can easily be included in any templates
 that need to be overridden for individual pages; e.g. included
 both in the usual template (layout.html) as well as (index.html). -->
@@ -194,7 +194,7 @@ both in the usual template (layout.html) as well as (index.html). -->
 
 
   <div class="bd-header-announcement container-fluid bd-header-announcement">
-    <div class="bd-header-announcement__content">Join us at Ray Summit 2025 — <a target="_blank" href="https://www.anyscale.com/ray-summit/2025?utm_source=ray_docs&utm_medium=docs&utm_campaign=banner">Register early and save.</a><button type="button" id="close-banner" aria-label="Close banner">&times;</button></div>
+    <div class="bd-header-announcement__content">Try Ray with $100 credit — <a target="_blank" href="https://console.anyscale.com/register/ha?render_flow=ray&utm_source=ray_docs&utm_medium=docs&utm_campaign=banner">Start now</a><button type="button" id="close-banner" aria-label="Close banner">&times;</button></div>
   </div>
 
   
@@ -604,6 +604,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="examples/mcp-ray-serve/05%20%28Optional%29%20Build_docker_image_for_mcp_server.html">Build a Docker image for an MCP server</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="examples/langchain_agent_ray_serve/content/README.html">Build a tool-using agent</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Ecosystem</a></li>
@@ -724,6 +725,8 @@ document.write(`
 <li class="toctree-l2 has-children"><a class="reference internal" href="../ray-core/internals.html">Internals</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-21"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../ray-core/internals/task-lifecycle.html">Task Lifecycle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ray-core/internals/autoscaler-v2.html">Autoscaler v2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ray-core/internals/rpc-fault-tolerance.html">RPC Fault Tolerance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ray-core/internals/metric-exporter.html">Metric Exporter Infrastructure</a></li>
 </ul>
 </li>
 </ul>
@@ -735,8 +738,9 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../data/loading-data.html">Loading Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/inspecting-data.html">Inspecting Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/transforming-data.html">Transforming Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/aggregating-data.html">Aggregating Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/iterating-over-data.html">Iterating over Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../data/joining-data.html">Joining datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/joining-data.html">Joining Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/shuffling-data.html">Shuffling Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/saving-data.html">Saving Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/working-with-images.html">Working with Images</a></li>
@@ -749,7 +753,6 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../data/batch_inference.html">End-to-end: Offline Batch Inference</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/performance-tips.html">Advanced: Performance Tips and Tuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../data/custom-datasource-example.html">Advanced: Read and Write Custom File Types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../data/aggregations.html">Aggregations</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../data/examples.html">Examples</a></li>
@@ -768,19 +771,24 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../data/api/from_other_data_libs.html">API Guide for Users from Other Data Libraries</a></li>
 </ul>
 </li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../data/contributing/contributing.html">Contributing to Ray Data</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../data/contributing/contributing-guide.html">Contributing Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/contributing/how-to-write-tests.html">How to write tests</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../data/comparisons.html">Comparing Ray Data to other systems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../data/benchmark.html">Ray Data Benchmarks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../data/data-internals.html">Ray Data Internals</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../train/train.html">Ray Train</a><input class="toctree-checkbox" id="toctree-checkbox-25" name="toctree-checkbox-25" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-25"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../train/train.html">Ray Train</a><input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-26"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../train/overview.html">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../train/getting-started-pytorch.html">PyTorch Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../train/getting-started-pytorch-lightning.html">PyTorch Lightning Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../train/getting-started-transformers.html">Hugging Face Transformers Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../train/getting-started-xgboost.html">XGBoost Guide</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../train/getting-started-jax.html">JAX Guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../train/more-frameworks.html">More Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-26" name="toctree-checkbox-26" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-26"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../train/more-frameworks.html">More Frameworks</a><input class="toctree-checkbox" id="toctree-checkbox-27" name="toctree-checkbox-27" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-27"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../train/huggingface-accelerate.html">Hugging Face Accelerate Guide</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/deepspeed.html">DeepSpeed Guide</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/distributed-tensorflow-keras.html">TensorFlow and Keras Guide</a></li>
@@ -788,9 +796,10 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../train/horovod.html">Horovod Guide</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../train/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-27" name="toctree-checkbox-27" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-27"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../train/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-28" name="toctree-checkbox-28" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-28"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/data-loading-preprocessing.html">Data Loading and Preprocessing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/using-gpus.html">Configuring Scale and GPUs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../train/user-guides/local_mode.html">Local Mode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/persistent-storage.html">Configuring Persistent Storage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/monitoring-logging.html">Monitoring and Logging Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/checkpoints.html">Saving and Loading Checkpoints</a></li>
@@ -798,8 +807,10 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/experiment-tracking.html">Experiment Tracking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/results.html">Inspecting Training Results</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/fault-tolerance.html">Handling Failures and Node Preemption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../train/user-guides/monitor-your-application.html">Ray Train Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/reproducibility.html">Reproducibility</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../train/user-guides/hyperparameter-optimization.html">Hyperparameter Optimization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../train/user-guides/scaling-collation-functions.html">Advanced: Scaling out expensive collate functions</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../train/examples.html">Examples</a></li>
@@ -807,10 +818,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../train/api/api.html">Ray Train API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../tune/index.html">Ray Tune</a><input class="toctree-checkbox" id="toctree-checkbox-28" name="toctree-checkbox-28" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-28"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tune/index.html">Ray Tune</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../tune/getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tune/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/tutorials/overview.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-29" name="toctree-checkbox-29" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-29"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/tutorials/overview.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-run.html">Running Basic Experiments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-output.html">Logging and Outputs in Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-resources.html">Setting Trial Resources</a></li>
@@ -822,7 +833,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-metrics.html">Using Callbacks and Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune_get_data_in_and_out.html">Getting Data in and out of Tune</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune_analyze_results.html">Analyzing Tune Experiment Results</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../tune/examples/pbt_guide.html">A Guide to Population Based Training with Tune</a><input class="toctree-checkbox" id="toctree-checkbox-30" name="toctree-checkbox-30" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-30"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../tune/examples/pbt_guide.html">A Guide to Population Based Training with Tune</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../tune/examples/pbt_visualization/pbt_visualization.html">Visualizing and Understanding PBT</a></li>
 </ul>
 </li>
@@ -831,7 +842,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../tune/tutorials/tune-scalability.html">Scalability Benchmarks</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-31" name="toctree-checkbox-31" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-31"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/examples/index.html">Ray Tune Examples</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune-pytorch-cifar.html">PyTorch Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune-pytorch-lightning.html">PyTorch Lightning Example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/examples/tune-xgboost.html">XGBoost Example</a></li>
@@ -852,7 +863,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../tune/faq.html">Ray Tune FAQ</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/api/api.html">Ray Tune API</a><input class="toctree-checkbox" id="toctree-checkbox-32" name="toctree-checkbox-32" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-32"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tune/api/api.html">Ray Tune API</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tune/api/execution.html">Tune Execution (tune.Tuner)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/api/result_grid.html">Tune Experiment Results (tune.ResultGrid)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tune/api/trainable.html">Training in Tune (tune.Trainable, tune.report)</a></li>
@@ -872,7 +883,7 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../serve/index.html">Ray Serve</a><input class="toctree-checkbox" id="toctree-checkbox-33" name="toctree-checkbox-33" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-33"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../serve/index.html">Ray Serve</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../serve/getting_started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../serve/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../serve/develop-and-deploy.html">Develop and Deploy an ML Application</a></li>
@@ -881,12 +892,15 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../serve/model-multiplexing.html">Model Multiplexing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../serve/configure-serve-deployment.html">Configure Ray Serve deployments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../serve/http-guide.html">Set Up FastAPI and HTTP</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../serve/llm/index.html">Serving LLMs</a><input class="toctree-checkbox" id="toctree-checkbox-34" name="toctree-checkbox-34" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-34"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../serve/llm/index.html">Serving LLMs</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../serve/llm/quick-start.html">Quickstart</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/llm/examples.html">Examples</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../serve/llm/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-35" name="toctree-checkbox-35" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-35"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/model-loading.html">Model loading</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../serve/llm/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/cross-node-parallelism.html">Cross-node parallelism</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/data-parallel-attention.html">Data parallel attention</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/deployment-initialization.html">Deployment Initialization</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/prefill-decode.html">Prefill/decode disaggregation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/kv-cache-offloading.html">KV cache offloading</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/prefix-aware-routing.html">Prefix-aware routing</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/multi-lora.html">Multi-LoRA deployment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/vllm-compatibility.html">vLLM compatibility</a></li>
@@ -894,7 +908,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/user-guides/observability.html">Observability and monitoring</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../serve/llm/architecture/index.html">Architecture</a><input class="toctree-checkbox" id="toctree-checkbox-36" name="toctree-checkbox-36" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-36"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../serve/llm/architecture/index.html">Architecture</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/architecture/overview.html">Architecture overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/architecture/core.html">Core components</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serve/llm/architecture/serving-patterns/index.html">Serving patterns</a></li>
@@ -905,7 +919,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../serve/llm/troubleshooting.html">Troubleshooting</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-37" name="toctree-checkbox-37" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-37"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../serve/production-guide/index.html">Production Guide</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../serve/production-guide/config.html">Serve Config Files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/production-guide/kubernetes.html">Deploy on Kubernetes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/production-guide/docker.html">Custom Docker Images</a></li>
@@ -918,15 +932,17 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../serve/resource-allocation.html">Resource Allocation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../serve/autoscaling-guide.html">Ray Serve Autoscaling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../serve/asynchronous-inference.html">Asynchronous Inference</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-38" name="toctree-checkbox-38" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-38"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../serve/advanced-guides/index.html">Advanced Guides</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/app-builder-guide.html">Pass Arguments to Applications</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/advanced-autoscaling.html">Advanced Ray Serve Autoscaling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/asyncio-best-practices.html">Asyncio and concurrency best practices in Ray Serve</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/performance.html">Performance Tuning</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/dyn-req-batch.html">Dynamic Request Batching</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/inplace-updates.html">Updating Applications In-Place</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/dev-workflow.html">Development Workflow</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/grpc-guide.html">Set Up a gRPC Service</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/replica-ranks.html">Replica ranks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/replica-scheduling.html">Replica scheduling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/managing-java-deployments.html">Experimental Java API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/deploy-vm.html">Deploy on VM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../serve/advanced-guides/multi-app-container.html">Run Multiple Applications in Different Containers</a></li>
@@ -939,10 +955,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../serve/api/index.html">Ray Serve API</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-39" name="toctree-checkbox-39" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-39"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../rllib/index.html">Ray RLlib</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../rllib/getting-started.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../rllib/key-concepts.html">Key concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-40" name="toctree-checkbox-40" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-40"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../rllib/rllib-env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../rllib/multi-agent-envs.html">Multi-Agent Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib/hierarchical-envs.html">Hierarchical Environments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib/external-envs.html">External Environments and Applications</a></li>
@@ -950,14 +966,14 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../rllib/algorithm-config.html">AlgorithmConfig API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../rllib/rllib-algorithms.html">Algorithms</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-41" name="toctree-checkbox-41" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-41"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../rllib/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../rllib/rllib-advanced-api.html">Advanced Python APIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib/rllib-callback.html">Callbacks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib/checkpoints.html">Checkpointing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib/metrics-logger.html">MetricsLogger API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib/single-agent-episode.html">Episodes</a></li>
 
-<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/connector-v2.html">ConnectorV2 and ConnectorV2 pipelines</a><input class="toctree-checkbox" id="toctree-checkbox-42" name="toctree-checkbox-42" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-42"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/connector-v2.html">ConnectorV2 and ConnectorV2 pipelines</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/env-to-module-connector.html">Env-to-module pipelines</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/learner-connector.html">Learner connector pipelines</a></li>
 </ul>
@@ -968,8 +984,6 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../rllib/rllib-learner.html">Learner (Alpha)</a></li>
 
 
-
-<li class="toctree-l3"><a class="reference internal" href="../rllib/rllib-torch2x.html">Using RLlib with torch 2.x compile</a></li>
 
 <li class="toctree-l3"><a class="reference internal" href="../rllib/rllib-fault-tolerance.html">Fault Tolerance And Elastic Training</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib/rllib-dev.html">Install RLlib for Development</a></li>
@@ -982,8 +996,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../rllib/rllib-examples.html">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../rllib/new-api-stack-migration-guide.html">New API stack migration guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-43" name="toctree-checkbox-43" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-43"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../rllib/package_ref/index.html">Ray RLlib API</a><input class="toctree-checkbox" id="toctree-checkbox-44" name="toctree-checkbox-44" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-44"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/algorithm-config.html">Algorithm Configuration API</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_algo</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
@@ -1005,7 +1019,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.freeze</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-45" name="toctree-checkbox-45" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-45"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/algorithm.html">Algorithms</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.html">ray.rllib.algorithms.algorithm.Algorithm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.setup.html">ray.rllib.algorithms.algorithm.Algorithm.setup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.get_default_config.html">ray.rllib.algorithms.algorithm.Algorithm.get_default_config</a></li>
@@ -1024,7 +1038,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm.Algorithm.remove_policy.html">ray.rllib.algorithms.algorithm.Algorithm.remove_policy</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-46" name="toctree-checkbox-46" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-46"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/callback.html">Callback APIs</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.html">ray.rllib.callbacks.callbacks.RLlibCallback</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_algorithm_init</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_sample_end</a></li>
@@ -1040,7 +1054,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end.html">ray.rllib.callbacks.callbacks.RLlibCallback.on_episode_end</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-47" name="toctree-checkbox-47" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-47"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/env.html">Environments</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/env/env_runner.html">EnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/env/single_agent_env_runner.html">SingleAgentEnvRunner API</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/env/single_agent_episode.html">SingleAgentEpisode API</a></li>
@@ -1051,7 +1065,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/env/utils.html">Env Utils</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-48" name="toctree-checkbox-48" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-48"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/rl_modules.html">RLModule APIs</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.build.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.build</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class.html">ray.rllib.core.rl_module.rl_module.RLModuleSpec.module_class</a></li>
@@ -1094,7 +1108,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state.html">ray.rllib.core.rl_module.multi_rl_module.MultiRLModule.set_state</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-49" name="toctree-checkbox-49" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-49"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/distributions.html">Distribution API</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.html">ray.rllib.models.distributions.Distribution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.from_logits.html">ray.rllib.models.distributions.Distribution.from_logits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.sample.html">ray.rllib.models.distributions.Distribution.sample</a></li>
@@ -1103,14 +1117,14 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.models.distributions.Distribution.kl.html">ray.rllib.models.distributions.Distribution.kl</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-50" name="toctree-checkbox-50" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-50"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/learner.html">LearnerGroup API</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.build_learner_group</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.core.learner.learner_group.LearnerGroup.html">ray.rllib.core.learner.learner_group.LearnerGroup</a></li>
 </ul>
 </li>
 
-<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-51" name="toctree-checkbox-51" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-51"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/offline.html">Offline RL API</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.offline_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.learners</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners.html">ray.rllib.algorithms.algorithm_config.AlgorithmConfig.env_runners</a></li>
@@ -1133,7 +1147,7 @@ document.write(`
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../rllib/package_ref/connector-v2.html">ConnectorV2 API</a></li>
 
-<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-52" name="toctree-checkbox-52" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-52"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/replay-buffers.html">Replay Buffer API</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit.html">ray.rllib.utils.replay_buffers.replay_buffer.StorageUnit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer.html">ray.rllib.utils.replay_buffers.replay_buffer.ReplayBuffer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer.html">ray.rllib.utils.replay_buffers.prioritized_replay_buffer.PrioritizedReplayBuffer</a></li>
@@ -1148,7 +1162,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer.html">ray.rllib.utils.replay_buffers.utils.sample_min_n_steps_from_buffer</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-53" name="toctree-checkbox-53" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-53"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../rllib/package_ref/utils.html">RLlib Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.peek</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rllib/package_ref/doc/ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value.html">ray.rllib.utils.metrics.metrics_logger.MetricsLogger.log_value</a></li>
@@ -1194,12 +1208,12 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-54" name="toctree-checkbox-54" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-54"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-more-libs/index.html">More Libraries</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../ray-more-libs/joblib.html">Distributed Scikit-learn / Joblib</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ray-more-libs/multiprocessing.html">Distributed multiprocessing.Pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ray-more-libs/ray-collective.html">Ray Collective Communication Lib</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-55" name="toctree-checkbox-55" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-55"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-more-libs/dask-on-ray.html">Using Dask on Ray</a><input class="toctree-checkbox" id="toctree-checkbox-56" name="toctree-checkbox-56" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-56"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-more-libs/doc/ray.util.dask.RayDaskCallback.html">ray.util.dask.RayDaskCallback</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ray-more-libs/doc/ray.util.dask.RayDaskCallback.ray_active.html">ray.util.dask.RayDaskCallback.ray_active</a></li>
 </ul>
 </li>
@@ -1217,20 +1231,21 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../ray-more-libs/data_juicer_distributed_data_processing.html">Distributed Data Processing in Data-Juicer</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-57" name="toctree-checkbox-57" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-57"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../cluster/getting-started.html">Ray Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../cluster/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-58" name="toctree-checkbox-58" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-58"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/kubernetes/index.html">Deploying on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-59" name="toctree-checkbox-59" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-59"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/getting-started.html">Getting Started with KubeRay</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/getting-started/kuberay-operator-installation.html">KubeRay Operator Installation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/getting-started/raycluster-quick-start.html">RayCluster Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/getting-started/rayjob-quick-start.html">RayJob Quickstart</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/getting-started/rayservice-quick-start.html">RayService Quickstart</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-60" name="toctree-checkbox-60" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-60"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/user-guides.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/rayservice.html">Deploy Ray Serve Apps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/rayservice-no-ray-serve-replica.html">RayService worker Pods aren’t ready</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/rayservice-high-availability.html">RayService high availability</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/rayservice-incremental-upgrade.html">RayService Zero-Downtime Incremental Upgrades</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/observability.html">KubeRay Observability</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/upgrade-guide.html">KubeRay upgrade guide</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/k8s-cluster-setup.html">Managed Kubernetes services</a></li>
@@ -1241,6 +1256,7 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/storage.html">Best Practices for Storage and Dependencies</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/config.html">RayCluster Configuration</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/configuring-autoscaling.html">KubeRay Autoscaling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/label-based-scheduling.html">KubeRay label-based scheduling</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/kuberay-gcs-ft.html">GCS fault tolerance in KubeRay</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/kuberay-gcs-persistent-ft.html">Tuning Redis for a Persistent Fault Tolerant GCS</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/gke-gcs-bucket.html">Configuring KubeRay to use Google Cloud Storage Buckets in GKE</a></li>
@@ -1259,14 +1275,14 @@ document.write(`
 
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/k8s-autoscaler.html">(Advanced) Understanding the Ray Autoscaler in the Context of Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/kubectl-plugin.html">Use kubectl plugin (beta)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/kuberay-auth.html">Configure Ray clusters with authentication and access control using KubeRay</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/kuberay-auth.html">Configure Ray clusters to use token authentication</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/reduce-image-pull-latency.html">Reducing image pull latency on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/uv.html">Using <code class="docutils literal notranslate"><span class="pre">uv</span></code> for Python package management in KubeRay</a></li>
 
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/user-guides/kuberay-dashboard.html">Use KubeRay dashboard (experimental)</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-61" name="toctree-checkbox-61" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-61"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/examples/mnist-training-example.html">Train a PyTorch model on Fashion MNIST with CPUs on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/examples/stable-diffusion-rayservice.html">Serve a StableDiffusion text-to-image model on Kubernetes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/examples/tpu-serve-stable-diffusion.html">Serve a Stable Diffusion model on GKE with TPUs</a></li>
@@ -1288,26 +1304,28 @@ document.write(`
 
 
 
+<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/examples/argocd.html">Deploying Ray Clusters via ArgoCD</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-62" name="toctree-checkbox-62" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-62"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem.html">KubeRay Ecosystem</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/ingress.html">Ingress</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/metrics-references.html">KubeRay metrics references</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/prometheus-grafana.html">Using Prometheus and Grafana</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/pyspy.html">Profiling with py-spy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/kai-scheduler.html">Gang scheduling, queue priority, and GPU sharing for RayClusters using KAI Scheduler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/volcano.html">KubeRay integration with Volcano</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/yunikorn.html">KubeRay integration with Apache YuniKorn</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/kueue.html">Gang scheduling and Priority scheduling for KubeRay CRDs with Kueue</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/kueue.html">Gang scheduling, Priority scheduling, and Autoscaling for KubeRay CRDs with Kueue</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/istio.html">mTLS and L7 observability with Istio</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/k8s-ecosystem/scheduler-plugins.html">KubeRay integration with scheduler plugins</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-63" name="toctree-checkbox-63" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-63"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/benchmarks.html">KubeRay Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/benchmarks/memory-scalability-benchmark.html">KubeRay memory and scalability benchmark</a></li>
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-64" name="toctree-checkbox-64" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-64"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/kubernetes/troubleshooting.html">KubeRay Troubleshooting</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/troubleshooting/troubleshooting.html">Troubleshooting guide</a></li>
 
 <li class="toctree-l4"><a class="reference internal" href="../cluster/kubernetes/troubleshooting/rayservice-troubleshooting.html">RayService troubleshooting</a></li>
@@ -1316,9 +1334,9 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../cluster/kubernetes/references.html">API Reference</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-65" name="toctree-checkbox-65" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-65"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/vms/index.html">Deploying on VMs</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../cluster/vms/getting-started.html">Getting Started</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-66" name="toctree-checkbox-66" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-66"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/vms/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/vms/user-guides/launching-clusters/index.html">Launching Ray Clusters on AWS, GCP, Azure, vSphere, On-Prem</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/vms/user-guides/large-cluster-best-practices.html">Best practices for deploying large clusters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/vms/user-guides/configuring-autoscaling.html">Configuring Autoscaling</a></li>
@@ -1327,11 +1345,11 @@ document.write(`
 
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-67" name="toctree-checkbox-67" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-67"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/vms/examples/index.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/vms/examples/ml-example.html">Ray Train XGBoostTrainer on VMs</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-68" name="toctree-checkbox-68" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-68"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/vms/references/index.html">API References</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/vms/references/ray-cluster-cli.html">Cluster Launcher Commands</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/vms/references/ray-cluster-configuration.html">Cluster YAML Configuration Options</a></li>
 </ul>
@@ -1340,8 +1358,8 @@ document.write(`
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../cluster/metrics.html">Collecting and monitoring metrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cluster/configure-manage-dashboard.html">Configuring and Managing Ray Dashboard</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-69" name="toctree-checkbox-69" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-69"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/running-applications/index.html">Applications Guide</a><input class="toctree-checkbox" id="toctree-checkbox-70" name="toctree-checkbox-70" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-70"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../cluster/running-applications/job-submission/index.html">Ray Jobs Overview</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/running-applications/job-submission/quickstart.html">Quickstart using the Ray Jobs CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/running-applications/job-submission/sdk.html">Python SDK Overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
@@ -1354,7 +1372,7 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../cluster/faq.html">FAQ</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-71" name="toctree-checkbox-71" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-71"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../cluster/package-overview.html">Ray Cluster Management API</a><input class="toctree-checkbox" id="toctree-checkbox-72" name="toctree-checkbox-72" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-72"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../cluster/cli.html">Cluster Management CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cluster/running-applications/job-submission/jobs-package-ref.html">Python SDK API Reference</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../cluster/running-applications/job-submission/cli.html">Ray Jobs CLI API Reference</a></li>
@@ -1364,7 +1382,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../cluster/usage-stats.html">Usage Stats Collection</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-72" name="toctree-checkbox-72" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-72"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../virtual-cluster/getting-started.html">Ray Virtual Clusters</a><input class="toctree-checkbox" id="toctree-checkbox-73" name="toctree-checkbox-73" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-73"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../virtual-cluster/key-concepts.html">Key Concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../virtual-cluster/design-overview.html">Design Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../virtual-cluster/management.html">Virtual Cluster Management API</a></li>
@@ -1372,15 +1390,15 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../virtual-cluster/examples.html">Examples</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-73" name="toctree-checkbox-73" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-73"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-observability/index.html">Monitoring and Debugging</a><input class="toctree-checkbox" id="toctree-checkbox-74" name="toctree-checkbox-74" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-74"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../ray-observability/getting-started.html">Ray Dashboard</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ray-observability/ray-distributed-debugger.html">Ray Distributed Debugger</a></li>
 
 
 
 <li class="toctree-l2"><a class="reference internal" href="../ray-observability/key-concepts.html">Key Concepts</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-74" name="toctree-checkbox-74" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-74"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-75" name="toctree-checkbox-75" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-75"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-observability/user-guides/index.html">User Guides</a><input class="toctree-checkbox" id="toctree-checkbox-75" name="toctree-checkbox-75" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-75"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/index.html">Debugging Applications</a><input class="toctree-checkbox" id="toctree-checkbox-76" name="toctree-checkbox-76" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-76"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/general-debugging.html">Common Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/debug-memory.html">Debugging Memory Issues</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ray-observability/user-guides/debug-apps/debug-hangs.html">Debugging Hangs</a></li>
@@ -1401,7 +1419,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="../ray-observability/user-guides/ray-event-export.html">Ray Event Export</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-76" name="toctree-checkbox-76" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-76"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-observability/reference/index.html">Reference</a><input class="toctree-checkbox" id="toctree-checkbox-77" name="toctree-checkbox-77" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-77"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../ray-observability/reference/api.html">State API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ray-observability/reference/cli.html">State CLI</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ray-observability/reference/system-metrics.html">System Metrics</a></li>
@@ -1409,10 +1427,10 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-77" name="toctree-checkbox-77" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-77"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-contribute/index.html">Developer Guides</a><input class="toctree-checkbox" id="toctree-checkbox-78" name="toctree-checkbox-78" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-78"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../ray-contribute/stability.html">API Stability</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ray-contribute/api-policy.html">API Policy</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-78" name="toctree-checkbox-78" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-78"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ray-contribute/getting-involved.html">Getting Involved / Contributing</a><input class="toctree-checkbox" id="toctree-checkbox-79" name="toctree-checkbox-79" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-79"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../ray-contribute/development.html">Building Ray from Source</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ray-contribute/ci.html">CI Testing Workflow on PRs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ray-contribute/docs.html">Contributing to the Ray Documentation</a></li>
@@ -1429,7 +1447,10 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ray-references/glossary.html">Glossary</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ray-security/index.html">Security</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ray-security/index.html">Security</a><input class="toctree-checkbox" id="toctree-checkbox-80" name="toctree-checkbox-80" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-80"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ray-security/token-auth.html">Ray token authentication</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </nav></div>
@@ -1507,10 +1528,26 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
 <div class="sd-card-body docutils">
 <figure class="align-default">
+<img alt="../_images/rayai_logo.png" class="card-figure" src="../_images/rayai_logo.png" />
+</figure>
+<div class="docutils">
+<a class="reference external image-reference" href="https://github.com/rayai-labs/agentic-ray"><img alt="https://img.shields.io/github/stars/rayai-labs/agentic-ray?style=social)]" src="https://img.shields.io/github/stars/rayai-labs/agentic-ray?style=social)]" /></a>
+<p class="sd-card-text">Agentic-Ray enables agents built with any framework to use Ray as their runtime, distribute tool calls across a cluster, and provision sandbox environments for executing AI-generated code.</p>
+</div>
+</div>
+<div class="sd-card-footer docutils">
+<p class="sd-card-text"><span class="sd-d-grid"><a class="sd-sphinx-override sd-btn sd-text-wrap sd-btn-outline-primary reference external" href="https://rayai.com"><span>Agentic-Ray Integration</span></a></span></p>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<figure class="align-default">
 <img alt="../_images/airflow_logo_full.png" class="card-figure" src="../_images/airflow_logo_full.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/astronomer/astro-provider-ray"><img alt="https://img.shields.io/github/stars/astronomer/astro-provider-ray?style=social)]" src="https://img.shields.io/github/stars/astronomer/astro-provider-ray?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/astronomer/astro-provider-ray"><img alt="https://img.shields.io/github/stars/astronomer/astro-provider-ray?style=social" src="https://img.shields.io/github/stars/astronomer/astro-provider-ray?style=social" /></a>
 <p class="sd-card-text">Apache Airflow® is an open-source platform that enables users to programmatically author, schedule, and monitor workflows using directed acyclic graphs (DAGs). With the Ray provider, users can seamlessly orchestrate Ray jobs within Airflow DAGs.</p>
 </div>
 </div>
@@ -1526,7 +1563,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/buildflow.png" class="card-figure" src="../_images/buildflow.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/launchflow/buildflow"><img alt="https://img.shields.io/github/stars/launchflow/buildflow?style=social)]" src="https://img.shields.io/github/stars/launchflow/buildflow?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/launchflow/buildflow"><img alt="https://img.shields.io/github/stars/launchflow/buildflow?style=social" src="https://img.shields.io/github/stars/launchflow/buildflow?style=social" /></a>
 <p class="sd-card-text">BuildFlow is a backend framework that allows you to build and manage complex cloud infrastructure using pure python. With BuildFlow’s decorator pattern you can turn any function into a component of your backend system.</p>
 </div>
 </div>
@@ -1542,7 +1579,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/classyvision.png" class="card-figure" src="../_images/classyvision.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/facebookresearch/ClassyVision"><img alt="https://img.shields.io/github/stars/facebookresearch/ClassyVision?style=social)]" src="https://img.shields.io/github/stars/facebookresearch/ClassyVision?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/facebookresearch/ClassyVision"><img alt="https://img.shields.io/github/stars/facebookresearch/ClassyVision?style=social" src="https://img.shields.io/github/stars/facebookresearch/ClassyVision?style=social" /></a>
 <p class="sd-card-text">Classy Vision is a new end-to-end, PyTorch-based framework for large-scale training of state-of-the-art image and video classification models. The library features a modular, flexible design that allows anyone to train machine learning models on top of PyTorch using very simple abstractions.</p>
 </div>
 </div>
@@ -1555,15 +1592,15 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
 <div class="sd-card-body docutils">
 <figure class="align-default">
-<img alt="../_images/daft.webp" class="card-figure" src="../_images/daft.webp" />
+<img alt="../_images/daft.png" class="card-figure" src="../_images/daft.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/Eventual-Inc/Daft"><img alt="https://img.shields.io/github/stars/daft/daft?style=social)]" src="https://img.shields.io/github/stars/daft/daft?style=social)]" /></a>
-<p class="sd-card-text">Daft is a data engine that supports SQL and Python DataFrames for data processing and analytics natively on your Ray clusters.</p>
+<a class="reference external image-reference" href="https://github.com/Eventual-Inc/Daft"><img alt="https://img.shields.io/github/stars/Eventual-Inc/Daft?style=social" src="https://img.shields.io/github/stars/Eventual-Inc/Daft?style=social" /></a>
+<p class="sd-card-text">Daft is a high-performance multimodal data engine that provides simple and reliable data processing for any modality - from structured tables to images, audio, video, and embeddings. Built with Python and Rust for modern AI workflows, Daft offers seamless scaling from local to <a class="reference external" href="https://www.daft.ai/cloud">distributed clusters</a>, enabling efficient batch inference, document processing, and multimodal ETL pipelines at scale.</p>
 </div>
 </div>
 <div class="sd-card-footer docutils">
-<p class="sd-card-text"><span class="sd-d-grid"><a class="sd-sphinx-override sd-btn sd-text-wrap sd-btn-outline-primary reference external" href="https://www.getdaft.io"><span>Daft Integration</span></a></span></p>
+<p class="sd-card-text"><span class="sd-d-grid"><a class="sd-sphinx-override sd-btn sd-text-wrap sd-btn-outline-primary reference external" href="https://docs.daft.ai/en/stable/distributed/ray/"><span>Daft Integration</span></a></span></p>
 </div>
 </div>
 </div>
@@ -1574,7 +1611,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/dask.png" class="card-figure" src="../_images/dask.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/dask/dask"><img alt="https://img.shields.io/github/stars/dask/dask?style=social)]" src="https://img.shields.io/github/stars/dask/dask?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/dask/dask"><img alt="https://img.shields.io/github/stars/dask/dask?style=social" src="https://img.shields.io/github/stars/dask/dask?style=social" /></a>
 <p class="sd-card-text">Dask provides advanced parallelism for analytics, enabling performance at scale for the tools you love. Dask uses existing Python APIs and data structures to make it easy to switch between Numpy, Pandas, Scikit-learn to their Dask-powered equivalents.</p>
 </div>
 </div>
@@ -1590,7 +1627,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/data_juicer.png" class="card-figure" src="../_images/data_juicer.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/modelscope/data-juicer"><img alt="https://img.shields.io/github/stars/modelscope/data-juicer?style=social)]" src="https://img.shields.io/github/stars/modelscope/data-juicer?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/modelscope/data-juicer"><img alt="https://img.shields.io/github/stars/modelscope/data-juicer?style=social" src="https://img.shields.io/github/stars/modelscope/data-juicer?style=social" /></a>
 <p class="sd-card-text">Data-Juicer is a one-stop multimodal data processing system to make data higher-quality, juicier, and more digestible for foundation models. It integrates with Ray for distributed data processing on large-scale datasets with over 100 multimodal operators and supports TB-size dataset deduplication.</p>
 </div>
 </div>
@@ -1606,7 +1643,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/flambe.png" class="card-figure" src="../_images/flambe.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/asappresearch/flambe"><img alt="https://img.shields.io/github/stars/asappresearch/flambe?style=social)]" src="https://img.shields.io/github/stars/asappresearch/flambe?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/asappresearch/flambe"><img alt="https://img.shields.io/github/stars/asappresearch/flambe?style=social" src="https://img.shields.io/github/stars/asappresearch/flambe?style=social" /></a>
 <p class="sd-card-text">Flambé is a machine learning experimentation framework built to accelerate the entire research life cycle. Flambé’s main objective is to provide a unified interface for prototyping models, running experiments containing complex pipelines, monitoring those experiments in real-time, reporting results, and deploying a final model for inference.</p>
 </div>
 </div>
@@ -1622,7 +1659,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/flowdapt.png" class="card-figure" src="../_images/flowdapt.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/emergentmethods/flowdapt"><img alt="https://img.shields.io/github/stars/emergentmethods/flowdapt?style=social)]" src="https://img.shields.io/github/stars/emergentmethods/flowdapt?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/emergentmethods/flowdapt"><img alt="https://img.shields.io/github/stars/emergentmethods/flowdapt?style=social" src="https://img.shields.io/github/stars/emergentmethods/flowdapt?style=social" /></a>
 <p class="sd-card-text">Flowdapt is a platform designed to help developers configure, debug, schedule, trigger, deploy and serve adaptive and reactive Artificial Intelligence workflows at large-scale.</p>
 </div>
 </div>
@@ -1638,7 +1675,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/flyte.png" class="card-figure" src="../_images/flyte.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/flyteorg/flyte"><img alt="https://img.shields.io/github/stars/flyteorg/flyte?style=social)]" src="https://img.shields.io/github/stars/flyteorg/flyte?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/flyteorg/flyte"><img alt="https://img.shields.io/github/stars/flyteorg/flyte?style=social" src="https://img.shields.io/github/stars/flyteorg/flyte?style=social" /></a>
 <p class="sd-card-text">Flyte is a Kubernetes-native workflow automation platform for complex, mission-critical data and ML processes at scale. It has been battle-tested at Lyft, Spotify, Freenome, and others and is truly open-source.</p>
 </div>
 </div>
@@ -1654,7 +1691,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/horovod.png" class="card-figure" src="../_images/horovod.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/horovod/horovod"><img alt="https://img.shields.io/github/stars/horovod/horovod?style=social)]" src="https://img.shields.io/github/stars/horovod/horovod?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/horovod/horovod"><img alt="https://img.shields.io/github/stars/horovod/horovod?style=social" src="https://img.shields.io/github/stars/horovod/horovod?style=social" /></a>
 <p class="sd-card-text">Horovod is a distributed deep learning training framework for TensorFlow, Keras, PyTorch, and Apache MXNet. The goal of Horovod is to make distributed deep learning fast and easy to use.</p>
 </div>
 </div>
@@ -1670,7 +1707,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/hugging.png" class="card-figure" src="../_images/hugging.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/huggingface/transformers"><img alt="https://img.shields.io/github/stars/huggingface/transformers?style=social)]" src="https://img.shields.io/github/stars/huggingface/transformers?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/huggingface/transformers"><img alt="https://img.shields.io/github/stars/huggingface/transformers?style=social" src="https://img.shields.io/github/stars/huggingface/transformers?style=social" /></a>
 <p class="sd-card-text">State-of-the-art Natural Language Processing for Pytorch and TensorFlow 2.0. It integrates with Ray for distributed hyperparameter tuning of transformer models.</p>
 </div>
 </div>
@@ -1686,7 +1723,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/zoo.png" class="card-figure" src="../_images/zoo.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/intel-analytics/analytics-zoo"><img alt="https://img.shields.io/github/stars/intel-analytics/analytics-zoo?style=social)]" src="https://img.shields.io/github/stars/intel-analytics/analytics-zoo?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/intel-analytics/analytics-zoo"><img alt="https://img.shields.io/github/stars/intel-analytics/analytics-zoo?style=social" src="https://img.shields.io/github/stars/intel-analytics/analytics-zoo?style=social" /></a>
 <p class="sd-card-text">Analytics Zoo seamlessly scales TensorFlow, Keras and PyTorch to distributed big data (using Spark, Flink &amp; Ray).</p>
 </div>
 </div>
@@ -1702,7 +1739,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/nlu.png" class="card-figure" src="../_images/nlu.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/JohnSnowLabs/nlu"><img alt="https://img.shields.io/github/stars/JohnSnowLabs/nlu?style=social)]" src="https://img.shields.io/github/stars/JohnSnowLabs/nlu?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/JohnSnowLabs/nlu"><img alt="https://img.shields.io/github/stars/JohnSnowLabs/nlu?style=social" src="https://img.shields.io/github/stars/JohnSnowLabs/nlu?style=social" /></a>
 <p class="sd-card-text">The power of 350+ pre-trained NLP models, 100+ Word Embeddings, 50+ Sentence Embeddings, and 50+ Classifiers in 46 languages with 1 line of Python code.</p>
 </div>
 </div>
@@ -1718,7 +1755,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/ludwig.png" class="card-figure" src="../_images/ludwig.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/ludwig-ai/ludwig"><img alt="https://img.shields.io/github/stars/ludwig-ai/ludwig?style=social)]" src="https://img.shields.io/github/stars/ludwig-ai/ludwig?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/ludwig-ai/ludwig"><img alt="https://img.shields.io/github/stars/ludwig-ai/ludwig?style=social" src="https://img.shields.io/github/stars/ludwig-ai/ludwig?style=social" /></a>
 <p class="sd-card-text">Ludwig is a toolbox that allows users to train and test deep learning models without the need to write code. With Ludwig, you can train a deep learning model on Ray in zero lines of code, automatically leveraging Dask on Ray for data preprocessing, Horovod on Ray for distributed training, and Ray Tune for hyperparameter optimization.</p>
 </div>
 </div>
@@ -1734,7 +1771,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/mars.png" class="card-figure" src="../_images/mars.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/mars-project/mars"><img alt="https://img.shields.io/github/stars/mars-project/mars?style=social)]" src="https://img.shields.io/github/stars/mars-project/mars?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/mars-project/mars"><img alt="https://img.shields.io/github/stars/mars-project/mars?style=social" src="https://img.shields.io/github/stars/mars-project/mars?style=social" /></a>
 <p class="sd-card-text">Mars is a tensor-based unified framework for large-scale data computation which scales Numpy, Pandas and Scikit-learn. Mars can scale in to a single machine, and scale out to a cluster with thousands of machines.</p>
 </div>
 </div>
@@ -1750,7 +1787,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/modin.png" class="card-figure" src="../_images/modin.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/modin-project/modin"><img alt="https://img.shields.io/github/stars/modin-project/modin?style=social)]" src="https://img.shields.io/github/stars/modin-project/modin?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/modin-project/modin"><img alt="https://img.shields.io/github/stars/modin-project/modin?style=social" src="https://img.shields.io/github/stars/modin-project/modin?style=social" /></a>
 <p class="sd-card-text">Scale your pandas workflows by changing one line of code. Modin transparently distributes the data and computation so that all you need to do is continue using the pandas API as you were before installing Modin.</p>
 </div>
 </div>
@@ -1766,7 +1803,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/prefect.png" class="card-figure" src="../_images/prefect.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/PrefectHQ/prefect-ray"><img alt="https://img.shields.io/github/stars/PrefectHQ/prefect-ray?style=social)]" src="https://img.shields.io/github/stars/PrefectHQ/prefect-ray?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/PrefectHQ/prefect-ray"><img alt="https://img.shields.io/github/stars/PrefectHQ/prefect-ray?style=social" src="https://img.shields.io/github/stars/PrefectHQ/prefect-ray?style=social" /></a>
 <p class="sd-card-text">Prefect is an open source workflow orchestration platform in Python. It allows you to easily define, track and schedule workflows in Python. This integration makes it easy to run a Prefect workflow on a Ray cluster in a distributed way.</p>
 </div>
 </div>
@@ -1782,7 +1819,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/pycaret.png" class="card-figure" src="../_images/pycaret.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/pycaret/pycaret"><img alt="https://img.shields.io/github/stars/pycaret/pycaret?style=social)]" src="https://img.shields.io/github/stars/pycaret/pycaret?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/pycaret/pycaret"><img alt="https://img.shields.io/github/stars/pycaret/pycaret?style=social" src="https://img.shields.io/github/stars/pycaret/pycaret?style=social" /></a>
 <p class="sd-card-text">PyCaret is an open source low-code machine learning library in Python that aims to reduce the hypothesis to insights cycle time in a ML experiment. It enables data scientists to perform end-to-end experiments quickly and efficiently.</p>
 </div>
 </div>
@@ -1798,7 +1835,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/intel.png" class="card-figure" src="../_images/intel.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/Intel-bigdata/oap-raydp"><img alt="https://img.shields.io/github/stars/Intel-bigdata/oap-raydp?style=social)]" src="https://img.shields.io/github/stars/Intel-bigdata/oap-raydp?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/Intel-bigdata/oap-raydp"><img alt="https://img.shields.io/github/stars/Intel-bigdata/oap-raydp?style=social" src="https://img.shields.io/github/stars/Intel-bigdata/oap-raydp?style=social" /></a>
 <p class="sd-card-text">RayDP (“Spark on Ray”) enables you to easily use Spark inside a Ray program. You can use Spark to read the input data, process the data using SQL, Spark DataFrame, or Pandas (via Koalas) API, extract and transform features using Spark MLLib, and use RayDP Estimator API for distributed training on the preprocessed dataset.</p>
 </div>
 </div>
@@ -1811,10 +1848,26 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
 <div class="sd-card-body docutils">
 <figure class="align-default">
+<img alt="../_images/raylight.png" class="card-figure" src="../_images/raylight.png" />
+</figure>
+<div class="docutils">
+<a class="reference external image-reference" href="https://github.com/komikndr/raylight"><img alt="https://img.shields.io/github/stars/komikndr/raylight?style=social)]" src="https://img.shields.io/github/stars/komikndr/raylight?style=social)]" /></a>
+<p class="sd-card-text">Raylight is an extension for ComfyUI that enables true multi-GPU capability using XDiT XFuser, and FSDP managed by Ray. It is designed to scale diffusion models efficiently across multiple GPUs. Raylight provides sequence parallelism, and optimized VRAM utilization, making it ideal for large video and image generation models.</p>
+</div>
+</div>
+<div class="sd-card-footer docutils">
+<p class="sd-card-text"><span class="sd-d-grid"><a class="sd-sphinx-override sd-btn sd-text-wrap sd-btn-outline-primary reference external" href="https://github.com/komikndr/raylight"><span>Raylight Integration</span></a></span></p>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<figure class="align-default">
 <img alt="../_images/scikit.png" class="card-figure" src="../_images/scikit.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/scikit-learn/scikit-learn"><img alt="https://img.shields.io/github/stars/scikit-learn/scikit-learn?style=social)]" src="https://img.shields.io/github/stars/scikit-learn/scikit-learn?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/scikit-learn/scikit-learn"><img alt="https://img.shields.io/github/stars/scikit-learn/scikit-learn?style=social" src="https://img.shields.io/github/stars/scikit-learn/scikit-learn?style=social" /></a>
 <p class="sd-card-text">Scikit-learn is a free software machine learning library for the Python programming language. It features various classification, regression and clustering algorithms including support vector machines, random forests, gradient boosting, k-means and DBSCAN, and is designed to interoperate with the Python numerical and scientific libraries NumPy and SciPy.</p>
 </div>
 </div>
@@ -1830,7 +1883,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/seldon.png" class="card-figure" src="../_images/seldon.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/SeldonIO/alibi"><img alt="https://img.shields.io/github/stars/SeldonIO/alibi?style=social)]" src="https://img.shields.io/github/stars/SeldonIO/alibi?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/SeldonIO/alibi"><img alt="https://img.shields.io/github/stars/SeldonIO/alibi?style=social" src="https://img.shields.io/github/stars/SeldonIO/alibi?style=social" /></a>
 <p class="sd-card-text">Alibi is an open source Python library aimed at machine learning model inspection and interpretation. The focus of the library is to provide high-quality implementations of black-box, white-box, local and global explanation methods for classification and regression models.</p>
 </div>
 </div>
@@ -1846,7 +1899,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/sematic.png" class="card-figure" src="../_images/sematic.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/sematic-ai/sematic"><img alt="https://img.shields.io/github/stars/sematic-ai/sematic?style=social)]" src="https://img.shields.io/github/stars/sematic-ai/sematic?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/sematic-ai/sematic"><img alt="https://img.shields.io/github/stars/sematic-ai/sematic?style=social" src="https://img.shields.io/github/stars/sematic-ai/sematic?style=social" /></a>
 <p class="sd-card-text">Sematic is an open-source ML pipelining tool written in Python. It enables users to write end-to-end pipelines that can seamlessly transition between your laptop and the cloud, with rich visualizations, traceability, reproducibility, and usability as first-class citizens. This integration enables dynamic allocation of Ray clusters within Sematic pipelines.</p>
 </div>
 </div>
@@ -1862,7 +1915,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/spacy.png" class="card-figure" src="../_images/spacy.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/explosion/spacy-ray"><img alt="https://img.shields.io/github/stars/explosion/spacy-ray?style=social)]" src="https://img.shields.io/github/stars/explosion/spacy-ray?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/explosion/spacy-ray"><img alt="https://img.shields.io/github/stars/explosion/spacy-ray?style=social" src="https://img.shields.io/github/stars/explosion/spacy-ray?style=social" /></a>
 <p class="sd-card-text">spaCy is a library for advanced Natural Language Processing in Python and Cython. It’s built on the very latest research, and was designed from day one to be used in real products.</p>
 </div>
 </div>
@@ -1878,7 +1931,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/xgboost_logo.png" class="card-figure" src="../_images/xgboost_logo.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/ray-project/xgboost_ray"><img alt="https://img.shields.io/github/stars/ray-project/xgboost_ray?style=social)]" src="https://img.shields.io/github/stars/ray-project/xgboost_ray?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/ray-project/xgboost_ray"><img alt="https://img.shields.io/github/stars/ray-project/xgboost_ray?style=social" src="https://img.shields.io/github/stars/ray-project/xgboost_ray?style=social" /></a>
 <p class="sd-card-text">XGBoost is a popular gradient boosting library for classification and regression. It is one of the most popular tools in data science and workhorse of many top-performing Kaggle kernels.</p>
 </div>
 </div>
@@ -1894,7 +1947,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/lightgbm_logo.png" class="card-figure" src="../_images/lightgbm_logo.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/ray-project/lightgbm_ray"><img alt="https://img.shields.io/github/stars/ray-project/lightgbm_ray?style=social)]" src="https://img.shields.io/github/stars/ray-project/lightgbm_ray?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/ray-project/lightgbm_ray"><img alt="https://img.shields.io/github/stars/ray-project/lightgbm_ray?style=social" src="https://img.shields.io/github/stars/ray-project/lightgbm_ray?style=social" /></a>
 <p class="sd-card-text">LightGBM is a high-performance gradient boosting library for classification and regression. It is designed to be distributed and efficient.</p>
 </div>
 </div>
@@ -1910,7 +1963,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
 <img alt="../_images/volcano.png" class="card-figure" src="../_images/volcano.png" />
 </figure>
 <div class="docutils">
-<a class="reference external image-reference" href="https://github.com/volcano-sh/volcano/"><img alt="https://img.shields.io/github/stars/volcano-sh/volcano?style=social)]" src="https://img.shields.io/github/stars/volcano-sh/volcano?style=social)]" /></a>
+<a class="reference external image-reference" href="https://github.com/volcano-sh/volcano/"><img alt="https://img.shields.io/github/stars/volcano-sh/volcano?style=social" src="https://img.shields.io/github/stars/volcano-sh/volcano?style=social" /></a>
 <p class="sd-card-text">Volcano is system for running high-performance workloads on Kubernetes. It features powerful batch scheduling capabilities required by ML and other data-intensive workloads.</p>
 </div>
 </div>
@@ -1934,12 +1987,12 @@ Adding Your Integration<div class="sd-summary-down docutils">
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="examples/mcp-ray-serve/05%20%28Optional%29%20Build_docker_image_for_mcp_server.html"
+       href="examples/langchain_agent_ray_serve/content/README.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Build a Docker image for an MCP server</p>
+        <p class="prev-next-title">Build a tool-using agent</p>
       </div>
     </a>
     <a class="right-next"
@@ -2024,7 +2077,7 @@ Adding Your Integration<div class="sd-summary-down docutils">
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2025, The Ray Team.
+      © Copyright 2026, The Ray Team.
       <br/>
     
   </p>

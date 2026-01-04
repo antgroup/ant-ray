@@ -23,7 +23,6 @@ from typing import (
     List,
     Mapping,
     Optional,
-    Sequence,
     Tuple,
     Union,
 )
@@ -1020,42 +1019,6 @@ def validate_namespace(namespace: str):
         raise ValueError(
             '"" is not a valid namespace. ' "Pass None to not specify a namespace."
         )
-
-
-def init_grpc_channel(
-    address: str,
-    options: Optional[Sequence[Tuple[str, Any]]] = None,
-    asynchronous: bool = False,
-):
-    import grpc
-    from grpc import aio as aiogrpc
-
-    from ray._private.tls_utils import load_certs_from_env
-
-    grpc_module = aiogrpc if asynchronous else grpc
-
-    options = options or []
-    options_dict = dict(options)
-    options_dict["grpc.keepalive_time_ms"] = options_dict.get(
-        "grpc.keepalive_time_ms", ray._config.grpc_client_keepalive_time_ms()
-    )
-    options_dict["grpc.keepalive_timeout_ms"] = options_dict.get(
-        "grpc.keepalive_timeout_ms", ray._config.grpc_client_keepalive_timeout_ms()
-    )
-    options = options_dict.items()
-
-    if os.environ.get("RAY_USE_TLS", "0").lower() in ("1", "true"):
-        server_cert_chain, private_key, ca_cert = load_certs_from_env()
-        credentials = grpc.ssl_channel_credentials(
-            certificate_chain=server_cert_chain,
-            private_key=private_key,
-            root_certificates=ca_cert,
-        )
-        channel = grpc_module.secure_channel(address, credentials, options=options)
-    else:
-        channel = grpc_module.insecure_channel(address, options=options)
-
-    return channel
 
 
 def get_dashboard_dependency_error() -> Optional[ImportError]:

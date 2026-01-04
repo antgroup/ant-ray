@@ -64,7 +64,7 @@ void VirtualClusterInfoAccessor::AsyncGetAll(
       });
 }
 
-Status VirtualClusterInfoAccessor::AsyncSubscribeAll(
+void VirtualClusterInfoAccessor::AsyncSubscribeAll(
     const SubscribeCallback<VirtualClusterID, rpc::VirtualClusterTableData> &subscribe,
     const StatusCallback &done) {
   RAY_CHECK(subscribe != nullptr);
@@ -126,10 +126,10 @@ Status VirtualClusterInfoAccessor::AsyncSubscribeAll(
         callback);
   };
   subscribe_operation_ = [this, updated_subscribe](const StatusCallback &done_callback) {
-    return client_impl_->GetGcsSubscriber().SubscribeAllVirtualClusters(updated_subscribe,
-                                                                        done_callback);
+    client_impl_->GetGcsSubscriber().SubscribeAllVirtualClusters(updated_subscribe,
+                                                                 done_callback);
   };
-  return subscribe_operation_(
+  subscribe_operation_(
       [this, done](const Status &status) { fetch_all_data_operation_(done); });
 }
 
@@ -142,9 +142,9 @@ void VirtualClusterInfoAccessor::AsyncResubscribe() {
   };
 
   if (subscribe_operation_ != nullptr) {
-    RAY_CHECK_OK(subscribe_operation_([this, fetch_all_done](const Status &status) {
+    subscribe_operation_([this, fetch_all_done](const Status &status) {
       fetch_all_data_operation_(fetch_all_done);
-    }));
+    });
   }
 }
 

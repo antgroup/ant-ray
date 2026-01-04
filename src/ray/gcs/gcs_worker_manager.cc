@@ -19,7 +19,6 @@
 #include <string>
 #include <utility>
 
-#include "ray/stats/metric_defs.h"
 #include "ray/util/time.h"
 
 namespace ray {

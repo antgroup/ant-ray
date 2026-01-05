@@ -2394,8 +2394,9 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">gpu_object_manager</span><span class="o">.</span><span class="n">put_object</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">tensor_transport</span><span class="p">,</span> <span class="n">tensors</span><span class="p">)</span>
 
         <span class="kn">from</span><span class="w"> </span><span class="nn">ray.util.insight</span><span class="w"> </span><span class="kn">import</span> <span class="n">record_object_put</span>
+
         <span class="n">record_object_put</span><span class="p">(</span><span class="n">ret</span><span class="o">.</span><span class="n">hex</span><span class="p">(),</span> <span class="n">serialized_value</span><span class="o">.</span><span class="n">total_bytes</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">ret</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">raise_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">serialized_objects</span><span class="p">,</span> <span class="n">object_refs</span><span class="p">):</span>

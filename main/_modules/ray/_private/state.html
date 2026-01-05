@@ -2258,7 +2258,9 @@ document.write(`
         <span class="n">accessor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connect_and_get_accessor</span><span class="p">()</span>
         <span class="n">available_resources_by_id</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="n">all_available_resources</span> <span class="o">=</span> <span class="n">accessor</span><span class="o">.</span><span class="n">get_all_available_resources</span><span class="p">(</span><span class="n">virtual_cluster_id</span><span class="p">)</span>
+        <span class="n">all_available_resources</span> <span class="o">=</span> <span class="n">accessor</span><span class="o">.</span><span class="n">get_all_available_resources</span><span class="p">(</span>
+            <span class="n">virtual_cluster_id</span>
+        <span class="p">)</span>
         <span class="k">for</span> <span class="n">available_resource</span> <span class="ow">in</span> <span class="n">all_available_resources</span><span class="p">:</span>
             <span class="n">message</span> <span class="o">=</span> <span class="n">gcs_pb2</span><span class="o">.</span><span class="n">AvailableResources</span><span class="o">.</span><span class="n">FromString</span><span class="p">(</span><span class="n">available_resource</span><span class="p">)</span>
             <span class="c1"># Calculate available resources for this node.</span>
@@ -2272,7 +2274,9 @@ document.write(`
         <span class="k">return</span> <span class="n">available_resources_by_id</span>
 
     <span class="c1"># returns a dict that maps node_id(hex string) to a dict of {resource_id: capacity}</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">total_resources_per_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">total_resources_per_node</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">virtual_cluster_id</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
         <span class="n">accessor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connect_and_get_accessor</span><span class="p">()</span>
         <span class="n">total_resources_by_node</span> <span class="o">=</span> <span class="p">{}</span>
 

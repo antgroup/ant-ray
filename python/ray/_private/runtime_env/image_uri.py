@@ -84,8 +84,11 @@ with open('/shared/worker_path.txt', 'w') as f:
     if output_filter:
         worker_path = await _apply_output_filter(logger, worker_path, output_filter)
         worker_path = worker_path.strip()
-    logger.info(f"Inferred worker path in image after filter {image_uri}: {worker_path}")
+    logger.info(
+        f"Inferred worker path in image after filter {image_uri}: {worker_path}"
+    )
     return worker_path
+
 
 async def _apply_output_filter(logger, worker_path, output_filter):
     safe_worker_path = shlex.quote(worker_path)
@@ -93,6 +96,7 @@ async def _apply_output_filter(logger, worker_path, output_filter):
     filtered_path = await check_output_cmd(filter_cmd, logger=logger)
     worker_path = filtered_path
     return worker_path
+
 
 def _modify_container_context_impl(
     runtime_env: "RuntimeEnv",  # noqa: F821
@@ -212,9 +216,9 @@ def _modify_container_context_impl(
 
     redirected_pyenv_folder = None
     if container_install_ray or container_pip_packages:
-        container_to_host_mount_dict[container_dependencies_installer_path] = (
-            get_dependencies_installer_path()
-        )
+        container_to_host_mount_dict[
+            container_dependencies_installer_path
+        ] = get_dependencies_installer_path()
         if runtime_env_constants.RAY_PODMAN_UES_WHL_PACKAGE:
             container_to_host_mount_dict[get_ray_whl_dir()] = get_ray_whl_dir()
 

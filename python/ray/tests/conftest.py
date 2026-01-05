@@ -1526,6 +1526,7 @@ def set_ray_unpackable_file_suffixs(request):
     yield ray_unpackable_file_suffixs
     os.environ.pop("RAY_UNPACKABLE_FILE_SUFFIXS", None)
 
+
 # Clean up Ray address file before the test run starts, since sometimes bazel test times out
 # and kill the test process, without cleaning up the Ray address file.
 def pytest_sessionstart(session):

@@ -891,8 +891,9 @@ class Worker:
             self.gpu_object_manager.put_object(ret, tensor_transport, tensors)
 
         from ray.util.insight import record_object_put
+
         record_object_put(ret.hex(), serialized_value.total_bytes)
-        
+
         return ret
 
     def raise_errors(self, serialized_objects, object_refs):

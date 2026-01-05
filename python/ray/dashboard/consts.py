@@ -67,7 +67,14 @@ DASHBOARD_METRIC_PORT = env_integer("DASHBOARD_METRIC_PORT", 44227)
 
 # We use RayNodeType to mark head/worker nodes. IsHeadNode is retained
 # for backward compatibility for user-customized dashboards that might rely on it
-NODE_TAG_KEYS = ["ip", "Version", "SessionName", "IsHeadNode", "RayNodeType", "StorageNamespace"]
+NODE_TAG_KEYS = [
+    "ip",
+    "Version",
+    "SessionName",
+    "IsHeadNode",
+    "RayNodeType",
+    "StorageNamespace",
+]
 GPU_TAG_KEYS = NODE_TAG_KEYS + ["GpuDeviceName", "GpuIndex"]
 
 # TpuDeviceName and TpuIndex are expected to be equal to the number of TPU
@@ -75,7 +82,14 @@ GPU_TAG_KEYS = NODE_TAG_KEYS + ["GpuDeviceName", "GpuIndex"]
 # of node pools.
 TPU_TAG_KEYS = NODE_TAG_KEYS + ["TpuDeviceName", "TpuIndex", "TpuType", "TpuTopology"]
 CLUSTER_TAG_KEYS = ["node_type", "Version", "SessionName", "StorageNamespace"]
-COMPONENT_METRICS_TAG_KEYS = ["ip", "pid", "Version", "Component", "SessionName", "StorageNamespace"]
+COMPONENT_METRICS_TAG_KEYS = [
+    "ip",
+    "pid",
+    "Version",
+    "Component",
+    "SessionName",
+    "StorageNamespace",
+]
 COMPONENT_GPU_TAG_KEYS = GPU_TAG_KEYS + COMPONENT_METRICS_TAG_KEYS
 
 # Dashboard metrics are tracked separately at the dashboard. TODO(sang): Support GCS.

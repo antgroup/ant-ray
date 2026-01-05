@@ -393,6 +393,7 @@ class RemoteFunction:
         name = task_options["name"]
 
         from ray.util.insight import record_control_flow
+
         record_name = name
         if record_name is None or record_name == "":
             record_name = self._function_name.split(".")[-1]

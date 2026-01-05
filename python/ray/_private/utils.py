@@ -1672,7 +1672,7 @@ def try_update_ld_library_path(
         def get_ray_native_library_dir():
             """Return a directory where all ray-related native libraries and
             their dependencies are located."""
-            current_dir = RAY_PATH
+            current_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
             native_library_dir = os.path.abspath(os.path.join(current_dir, "cpp/lib"))
             if not os.path.exists(native_library_dir):
                 raise RuntimeError(

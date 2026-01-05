@@ -46,6 +46,7 @@
 #include "ray/raylet/local_object_manager_interface.h"
 #include "ray/raylet/scheduling/cluster_lease_manager.h"
 #include "ray/raylet/tests/util.h"
+#include "ray/raylet/virtual_cluster_manager.h"
 #include "ray/raylet_rpc_client/fake_raylet_client.h"
 #include "ray/rpc/utils.h"
 
@@ -348,6 +349,18 @@ class NodeManagerTest : public ::testing::Test {
     lease_dependency_manager_ = std::make_unique<LeaseDependencyManager>(
         *mock_object_manager_, fake_task_by_state_counter_);
 
+    virtual_cluster_manager_ = std::make_unique<VirtualClusterManager>(
+        raylet_node_id_, /*local_node_cleanup_fn=*/[&]() {
+          auto timer = std::make_shared<boost::asio::deadline_timer>(
+              io_service_,
+              boost::posix_time::milliseconds(
+                  RayConfig::instance().local_node_cleanup_delay_interval_ms()));
+          timer->async_wait([&, timer](const boost::system::error_code e) mutable {
+            node_manager_->CancelMismatchedLocalTasks(
+                virtual_cluster_manager_->GetLocalVirtualClusterID());
+          });
+        });
+
     cluster_resource_scheduler_ = std::make_unique<ClusterResourceScheduler>(
         io_service_,
         ray::scheduling::NodeID(raylet_node_id_.Binary()),
@@ -377,7 +390,20 @@ class NodeManagerTest : public ::testing::Test {
         [&]() { return mock_object_manager_->PullManagerHasPullsQueued(); },
         [](const ray::rpc::NodeDeathInfo &node_death_info) {},
         /*labels*/
-        node_manager_config.labels);
+        node_manager_config.labels,
+        /*is_node_schedulable_fn=*/
+        [&](ray::scheduling::NodeID schedule_node_id,
+            const ray::raylet_scheduling_policy::SchedulingContext *context) {
+          if (virtual_cluster_manager_ == nullptr) {
+            return true;
+          }
+          if (context->virtual_cluster_id.empty()) {
+            return true;
+          }
+          auto node_instance_id = ray::NodeID::FromBinary(schedule_node_id.Binary());
+          return virtual_cluster_manager_->ContainsNodeInstance(
+              context->virtual_cluster_id, node_instance_id);
+        });
 
     auto get_node_info_func = [&](const NodeID &node_id) {
       return mock_gcs_client_->Nodes().GetNodeAddressAndLiveness(node_id);
@@ -428,6 +454,7 @@ class NodeManagerTest : public ::testing::Test {
         worker_rpc_pool_,
         raylet_client_pool_,
         *core_worker_subscriber_,
+        *virtual_cluster_manager_,
         *cluster_resource_scheduler_,
         *local_lease_manager_,
         *cluster_lease_manager_,
@@ -457,6 +484,7 @@ class NodeManagerTest : public ::testing::Test {
 
   NodeID raylet_node_id_;
   std::unique_ptr<pubsub::FakeSubscriber> core_worker_subscriber_;
+  std::unique_ptr<VirtualClusterManager> virtual_cluster_manager_;
   std::unique_ptr<ClusterResourceScheduler> cluster_resource_scheduler_;
   std::unique_ptr<LocalLeaseManager> local_lease_manager_;
   std::unique_ptr<ClusterLeaseManager> cluster_lease_manager_;

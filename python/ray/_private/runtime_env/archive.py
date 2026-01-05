@@ -3,6 +3,7 @@ import os
 import json
 from typing import Dict, List, Optional
 
+from ray._common.utils import try_to_create_directory
 from ray._private.runtime_env.context import RuntimeEnvContext
 from ray._private.runtime_env.packaging import (
     delete_package,
@@ -10,7 +11,7 @@ from ray._private.runtime_env.packaging import (
     get_local_dir_from_uri,
 )
 from ray._private.runtime_env.plugin import RuntimeEnvPlugin
-from ray._private.utils import get_directory_size_bytes, try_to_create_directory
+from ray._private.utils import get_directory_size_bytes
 
 default_logger = logging.getLogger(__name__)
 

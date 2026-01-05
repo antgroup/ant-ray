@@ -126,8 +126,8 @@ void VirtualClusterInfoAccessor::AsyncSubscribeAll(
         callback);
   };
   subscribe_operation_ = [this, updated_subscribe](const StatusCallback &done_callback) {
-    client_impl_->GetGcsSubscriber().SubscribeAllVirtualClusters(updated_subscribe,
-                                                                 done_callback);
+    RAY_UNUSED(client_impl_->GetGcsSubscriber().SubscribeAllVirtualClusters(
+        updated_subscribe, done_callback));
   };
   subscribe_operation_(
       [this, done](const Status &status) { fetch_all_data_operation_(done); });

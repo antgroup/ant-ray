@@ -259,6 +259,7 @@ std::shared_ptr<ClusterResourceScheduler> CreateSingleNodeScheduler(
   absl::flat_hash_map<std::string, double> local_node_resources;
   local_node_resources[ray::kCPU_ResourceLabel] = num_cpus;
   static instrumented_io_context io_context;
+  const absl::flat_hash_map<std::string, std::string> &local_node_labels = {};
   auto scheduler = std::make_shared<ClusterResourceScheduler>(
       io_context,
       scheduling::NodeID(id),
@@ -267,7 +268,13 @@ std::shared_ptr<ClusterResourceScheduler> CreateSingleNodeScheduler(
       [&gcs_client](scheduling::NodeID node_id) {
         return gcs_client.Nodes().IsNodeAlive(NodeID::FromBinary(node_id.Binary()));
       },
-      resource_usage_gauge);
+      resource_usage_gauge,
+      /*get_used_object_store_memory*/ nullptr,
+      /*get_pull_manager_at_capacity*/ nullptr,
+      /*shutdown_raylet_gracefully*/ nullptr,
+      /*local_node_labels*/ local_node_labels,
+      /*is_node_schedulable_fn*/
+      [](scheduling::NodeID, const SchedulingContext *) { return true; });
 
   return scheduler;
 }

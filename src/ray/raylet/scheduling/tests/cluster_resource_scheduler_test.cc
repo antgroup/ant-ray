@@ -2035,7 +2035,16 @@ TEST_F(ClusterResourceSchedulerTest, LabelSelectorHardNodeAffinityTest) {
   auto local_node_id = scheduling::NodeID(NodeID::FromRandom().Binary());
   instrumented_io_context io_context;
   ClusterResourceScheduler resource_scheduler(
-      io_context, local_node_id, {{"CPU", 0}}, is_node_available_fn_, fake_gauge_);
+      io_context,
+      local_node_id,
+      {{"CPU", 0}},
+      is_node_available_fn_,
+      fake_gauge_,
+      nullptr,
+      nullptr,
+      nullptr,
+      {},
+      [](scheduling::NodeID, const SchedulingContext *) { return true; });
 
   auto node_0_id_obj = NodeID::FromRandom();
   auto node_1_id_obj = NodeID::FromRandom();
@@ -2131,7 +2140,16 @@ TEST_F(ClusterResourceSchedulerTest, ScheduleWithFallbackStrategyTest) {
   auto local_node_id = scheduling::NodeID(NodeID::FromRandom().Binary());
   instrumented_io_context io_context;
   ClusterResourceScheduler resource_scheduler(
-      io_context, local_node_id, {{"CPU", 1}}, is_node_available_fn_, fake_gauge_);
+      io_context,
+      local_node_id,
+      {{"CPU", 1}},
+      is_node_available_fn_,
+      fake_gauge_,
+      nullptr,
+      nullptr,
+      nullptr,
+      {},
+      [](scheduling::NodeID, const SchedulingContext *) { return true; });
 
   absl::flat_hash_map<std::string, double> resources({{"CPU", 1}});
 
@@ -2218,8 +2236,16 @@ TEST_F(ClusterResourceSchedulerTest, FallbackStrategyWithUnavailableNodesTest) {
   auto local_node_id = scheduling::NodeID(NodeID::FromRandom().Binary());
   instrumented_io_context io_context;
   ClusterResourceScheduler resource_scheduler(
-      io_context, local_node_id, {{"CPU", 1}}, is_node_available_fn_, fake_gauge_);
-
+      io_context,
+      local_node_id,
+      {{"CPU", 1}},
+      is_node_available_fn_,
+      fake_gauge_,
+      nullptr,
+      nullptr,
+      nullptr,
+      {},
+      [](scheduling::NodeID, const SchedulingContext *) { return true; });
   auto node_A100 = scheduling::NodeID(NodeID::FromRandom().Binary());
   auto node_TPU = scheduling::NodeID(NodeID::FromRandom().Binary());
 
@@ -2302,7 +2328,16 @@ TEST_F(ClusterResourceSchedulerTest,
   auto local_node_id = scheduling::NodeID(NodeID::FromRandom().Binary());
   instrumented_io_context io_context;
   ClusterResourceScheduler resource_scheduler(
-      io_context, local_node_id, {{"CPU", 1}}, is_node_available_fn_, fake_gauge_);
+      io_context,
+      local_node_id,
+      {{"CPU", 1}},
+      is_node_available_fn_,
+      fake_gauge_,
+      nullptr,
+      nullptr,
+      nullptr,
+      {},
+      [](scheduling::NodeID, const SchedulingContext *) { return true; });
 
   absl::flat_hash_map<std::string, double> unavailable_resources({{"CPU", 0}});
   absl::flat_hash_map<std::string, double> available_resources({{"CPU", 1}});
@@ -2378,7 +2413,16 @@ TEST_F(ClusterResourceSchedulerTest, FallbackWaitsOnUnavailableHighestPriority) 
   auto local_node_id = scheduling::NodeID(NodeID::FromRandom().Binary());
   instrumented_io_context io_context;
   ClusterResourceScheduler resource_scheduler(
-      io_context, local_node_id, {{"CPU", 1}}, is_node_available_fn_, fake_gauge_);
+      io_context,
+      local_node_id,
+      {{"CPU", 1}},
+      is_node_available_fn_,
+      fake_gauge_,
+      nullptr,
+      nullptr,
+      nullptr,
+      {},
+      [](scheduling::NodeID, const SchedulingContext *) { return true; });
 
   absl::flat_hash_map<std::string, double> total_resources({{"CPU", 1}});
   absl::flat_hash_map<std::string, double> unavailable_resources({{"CPU", 0}});
@@ -2456,12 +2500,14 @@ TEST_F(ClusterResourceSchedulerTest, FallbackReturnsNilForGCSIfAllNodesUnavailab
   NodeResources local_node_resources = CreateNodeResources(local_res_map);
   auto local_node_id = scheduling::NodeID(NodeID::FromRandom().Binary());
   instrumented_io_context io_context;
-  ClusterResourceScheduler resource_scheduler(io_context,
-                                              local_node_id,
-                                              local_node_resources,
-                                              is_node_available_fn_,
-                                              fake_gauge_,
-                                              /*is_local_node_with_raylet=*/false);
+  ClusterResourceScheduler resource_scheduler(
+      io_context,
+      local_node_id,
+      local_node_resources,
+      is_node_available_fn_,
+      fake_gauge_,
+      /*is_local_node_with_raylet=*/false,
+      [](scheduling::NodeID, const SchedulingContext *) { return true; });
 
   absl::flat_hash_map<std::string, double> total_resources({{"CPU", 1}});
   absl::flat_hash_map<std::string, double> unavailable_resources({{"CPU", 0}});

@@ -13,10 +13,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 def find_first_matching_wheel(whl_dir: str, whl_file_name: str) -> str:
     dir_path = Path(whl_dir)
     matches = list(dir_path.glob(whl_file_name))
     return str(matches[0]) if matches else ""
+
 
 def install_ray_package(ray_version, whl_dir):
     pip_install_command = [sys.executable, "-m", "pip", "install", "-U"]
@@ -27,7 +29,7 @@ def install_ray_package(ray_version, whl_dir):
             f"ant_ray-*cp{sys.version_info.major}{sys.version_info.minor}*.whl"
         )
 
-        # got the first matched wheel file 
+        # got the first matched wheel file
         whl_file_path = find_first_matching_wheel(whl_dir, whl_file_name)
         if not whl_file_path:
             raise RuntimeError("Failed to find valid wheel: ", whl_file_name)

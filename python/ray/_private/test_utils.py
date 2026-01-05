@@ -2097,6 +2097,7 @@ def _execute_command_on_node(command: str, node_ip: str):
         print("Exit code:", e.returncode)
         print("Stderr:", e.stderr)
 
+
 def check_logs_by_keyword(keyword, log_file_pattern):
     command = f'grep "{keyword}" -r ' f"/tmp/ray/session_latest/logs/{log_file_pattern}"
     try:
@@ -2105,6 +2106,7 @@ def check_logs_by_keyword(keyword, log_file_pattern):
         return result.returncode == 0
     except Exception:
         return False
+
 
 RPC_FAILURE_MAP = {
     "request": "100:0:0",

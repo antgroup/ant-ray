@@ -140,9 +140,7 @@ class InsightHead(SubprocessModule):
 
     async def run(self):
         await super().run()
-        coros = [
-            self._refresh_client()
-        ]
+        coros = [self._refresh_client()]
         for coro in coros:
             task = self._loop.create_task(coro)
             self._background_tasks.add(task)

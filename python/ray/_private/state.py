@@ -755,7 +755,9 @@ class GlobalState:
         accessor = self._connect_and_get_accessor()
         available_resources_by_id = {}
 
-        all_available_resources = accessor.get_all_available_resources(virtual_cluster_id)
+        all_available_resources = accessor.get_all_available_resources(
+            virtual_cluster_id
+        )
         for available_resource in all_available_resources:
             message = gcs_pb2.AvailableResources.FromString(available_resource)
             # Calculate available resources for this node.
@@ -769,7 +771,9 @@ class GlobalState:
         return available_resources_by_id
 
     # returns a dict that maps node_id(hex string) to a dict of {resource_id: capacity}
-    def total_resources_per_node(self, virtual_cluster_id=None) -> Dict[str, Dict[str, int]]:
+    def total_resources_per_node(
+        self, virtual_cluster_id=None
+    ) -> Dict[str, Dict[str, int]]:
         accessor = self._connect_and_get_accessor()
         total_resources_by_node = {}
 

@@ -66,6 +66,7 @@ from flow_insight import (
     NodeMemoryInfo,
     MetaInfoRegisterEvent,
 )
+
 logger = logging.getLogger(__name__)
 
 
@@ -223,7 +224,6 @@ class NodeHead(SubprocessModule):
         else:
             return ServiceState.UNKNOWN
 
-
     @async_loop_forever(10)
     async def _emit_node_physical_stats(self):
         insight_server_address = await self.gcs_client.async_internal_kv_get(
@@ -335,7 +335,8 @@ class NodeHead(SubprocessModule):
                                     "dirty": 0,
                                 },
                             )
-                            memory_info.update({
+                            memory_info.update(
+                                {
                                     "rss": memory_info.get("rss", 0),
                                     "vms": memory_info.get("vms", 0),
                                     "shared": memory_info.get("shared", 0),
@@ -388,7 +389,6 @@ class NodeHead(SubprocessModule):
                     timestamp=int(time.time() * 1000),
                 )
             )
-
 
     async def _subscribe_for_node_updates(self) -> AsyncGenerator[dict, None]:
         """

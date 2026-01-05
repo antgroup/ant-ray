@@ -1245,7 +1245,9 @@ def start(
                             )
                             rc = getattr(process, "returncode", None)
                             rc_str = format_returncode(rc)
-                            lines_for_file.append(f"  {process_type} [exit code={rc_str}]")
+                            lines_for_file.append(
+                                f"  {process_type} [exit code={rc_str}]"
+                            )
                     try:
                         file_msg = (
                             "Some Ray subprocesses exited unexpectedly:\n"
@@ -1261,6 +1263,7 @@ def start(
                     # will not exit with errors.
                     node.kill_all_processes(check_alive=False, allow_graceful=False)
                     os._exit(1)
+
 
 # not-reachable
 

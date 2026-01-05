@@ -1864,8 +1864,8 @@ You can also see the traffic weights directly on the <code class="docutils liter
 <section id="calculating-maxsurgepercent">
 <h3>Calculating maxSurgePercent<a class="headerlink" href="#calculating-maxsurgepercent" title="Link to this heading">#</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">maxSurgePercent</span></code> determines the maximum percentage of additional resources that can be provisioned during the upgrade. To calculate the minimum safe value:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-038c6dee-2f4a-49b1-87f5-45ed6be82524">
-<span class="eqno">(1)<a class="headerlink" href="#equation-038c6dee-2f4a-49b1-87f5-45ed6be82524" title="Permalink to this equation">#</a></span>\[\begin{equation}
+<div class="amsmath math notranslate nohighlight" id="equation-2aabb74a-eb2b-422c-92cc-4a740343e99c">
+<span class="eqno">(1)<a class="headerlink" href="#equation-2aabb74a-eb2b-422c-92cc-4a740343e99c" title="Permalink to this equation">#</a></span>\[\begin{equation}
 \text{maxSurgePercent} = \frac{\text{resources per pod}}{\text{total cluster resources}} \times 100
 \end{equation}\]</div>
 <section id="example">
@@ -1877,8 +1877,8 @@ You can also see the traffic weights directly on the <code class="docutils liter
 <li><p>5 worker pods, each with 1 GPU (total: 5 GPUs)</p></li>
 </ul>
 <p>For this cluster:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-04fc6d53-057a-4fca-8115-16057308eb92">
-<span class="eqno">(2)<a class="headerlink" href="#equation-04fc6d53-057a-4fca-8115-16057308eb92" title="Permalink to this equation">#</a></span>\[\begin{equation}
+<div class="amsmath math notranslate nohighlight" id="equation-d1675c11-d4db-48c7-bef4-c094cf5dbe5d">
+<span class="eqno">(2)<a class="headerlink" href="#equation-d1675c11-d4db-48c7-bef4-c094cf5dbe5d" title="Permalink to this equation">#</a></span>\[\begin{equation}
 \text{maxSurgePercent} = \frac{1 \text{ GPU}}{5 \text{ GPUs}} \times 100 = 20\%
 \end{equation}\]</div>
 <p>With <code class="docutils literal notranslate"><span class="pre">maxSurgePercent:</span> <span class="pre">20</span></code>, the upgrade process ensures:</p>

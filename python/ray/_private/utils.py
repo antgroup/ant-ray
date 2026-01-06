@@ -26,7 +26,10 @@ from typing import (
     Sequence,
     Tuple,
     Union,
+    Set,
+    Collection
 )
+import glob
 
 from google.protobuf import json_format
 
@@ -1798,7 +1801,6 @@ def try_update_container_command(
     ) > 0 else None
     return container_command
 
-
 def get_ray_site_packages_path():
     """
     Get ray package site path
@@ -1806,11 +1808,70 @@ def get_ray_site_packages_path():
     ray_path = Path(ray.__path__[0])
     return str(ray_path.parent.absolute())
 
+# Return only ray path. 
+def get_ray_python_path():
+    """
+    Get ray path in site packages
+    """
+    ray_path = Path(ray.__path__[0])
+    return str(ray_path)
 
 def get_pyenv_path():
-    # Get the pyenv path automatically instead of hard code.
-    return os.environ.get("PYENV_ROOT", ray_constants.RAY_DEFAULT_PYENV_ROOT)
+    return os.environ.get("PYENV_ROOT")
 
+
+def discover_files_by_patterns(
+    patterns: Collection[str],
+    volume_mounts: Set[str],
+    mount_mode: str = "ro",
+    file_only: bool = False,
+    logger: Optional[logging.Logger] = logger,
+) -> None:
+    """
+    Discover files using glob patterns and add them to volume mounts.
+    
+    This is a utility function to reduce code duplication in GPU support detection.
+    It handles the common pattern of:
+    1. Taking a list of glob patterns
+    2. Finding matching files/directories
+    3. Validating their existence
+    4. Adding them to volume mounts with appropriate mount options
+    
+    Args:
+        patterns: Collection of glob patterns to search for
+        volume_mounts: Set to add discovered mount points to
+        mount_mode: Mount mode ("ro" for read-only, "" for read-write)
+        file_only: If True, only add regular files (not directories)
+        logger: Logger instance for debug messages
+    """
+    for pattern in patterns:
+        try:
+            matches = glob.glob(pattern)
+            if not matches and logger:
+                logger.debug(f"No matches found for pattern: {pattern}")
+                
+            for path in matches:
+                if not os.path.exists(path):
+                    if logger:
+                        logger.debug(f"Path does not exist: {path}")
+                    continue
+                    
+                if file_only and not os.path.isfile(path):
+                    if logger:
+                        logger.debug(f"Skipping non-file: {path}")
+                    continue
+                
+                mount_spec = f"{path}:{path}"
+                if mount_mode:
+                    mount_spec += f":{mount_mode}"
+                
+                volume_mounts.add(mount_spec)
+                if logger:
+                    logger.debug(f"Added mount: {mount_spec}")
+                    
+        except Exception as e:
+            if logger:
+                logger.warning(f"Error processing pattern '{pattern}': {e}")
 
 def get_current_python_info():
     """

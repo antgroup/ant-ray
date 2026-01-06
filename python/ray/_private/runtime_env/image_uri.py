@@ -3,14 +3,16 @@ import logging
 import os
 import tempfile
 import shlex
-from typing import List, Optional
+import glob
+from typing import List, Optional, Set
 import ray._private.runtime_env.constants as runtime_env_constants
 from ray._private.runtime_env.context import RuntimeEnvContext
 from ray._private.runtime_env.plugin import RuntimeEnvPlugin
 from ray._private.ray_constants import RAY_NODE_LOGS_DIR
 
 from ray._private.utils import (
-    get_ray_site_packages_path,
+    discover_files_by_patterns,
+    get_ray_python_path,
     get_pyenv_path,
     try_parse_default_mount_points,
     try_parse_container_run_options,
@@ -208,7 +210,6 @@ def _modify_container_context_impl(
         container_command.append(context.working_dir)
     else:
         container_command.append(os.getcwd())
-    container_command.append("--cap-add=AUDIT_WRITE")
 
     redirected_pyenv_folder = None
     if container_install_ray or container_pip_packages:
@@ -219,8 +220,9 @@ def _modify_container_context_impl(
             container_to_host_mount_dict[get_ray_whl_dir()] = get_ray_whl_dir()
 
     if not container_install_ray:
-        # mount ray package site path
-        host_site_packages_path = get_ray_site_packages_path()
+        # Mount only ray package path. 
+        # Do not overwrite podmans' site packages because it may include necessary packages.
+        host_site_packages_path = get_ray_python_path()
 
         # If the user specifies a `py_executable` in the container
         # and it starts with the ${PYENV_ROOT} environment variable (indicating a PYENV-managed executable),
@@ -228,17 +230,18 @@ def _modify_container_context_impl(
         # This ensures that all .pyenv-related paths are redirected
         # to avoid overwriting the container's internal PYENV environment
         # (which defaults to `/home/admin/.pyenv`).
-        if py_executable and py_executable.startswith(get_pyenv_path()):
+        host_pyenv_path = get_pyenv_path()
+        if py_executable and host_pyenv_path and py_executable.startswith(host_pyenv_path):
             redirected_pyenv_folder = "ray/.pyenv"
 
-        host_pyenv_path = get_pyenv_path()
         container_pyenv_path = host_pyenv_path
         if redirected_pyenv_folder:
             container_pyenv_path = host_pyenv_path.replace(
                 ".pyenv", redirected_pyenv_folder
             )
             context.container[redirected_pyenv_folder] = redirected_pyenv_folder
-        container_to_host_mount_dict[container_pyenv_path] = host_pyenv_path
+        if container_pyenv_path:
+            container_to_host_mount_dict[container_pyenv_path] = host_pyenv_path
         container_to_host_mount_dict[host_site_packages_path] = host_site_packages_path
 
     # For loop `run options` and append each item to the command line of podman
@@ -273,6 +276,113 @@ def _modify_container_context_impl(
     # `try_update_container_command` function, so direct inclusion of `--env` flags here
     # is avoided to ensure proper ordering and dynamic updates.
     container_command.append(runtime_env_constants.CONTAINER_ENV_PLACEHOLDER)
+    
+   
+    if not runtime_env_constants.VGPU_DEVICES:
+        # CPU mode. Only needs AUDIT_WRITE
+        container_command.append("--cap-add=AUDIT_WRITE")
+    else:
+        # GPU mode
+        # Use glob patterns to discover and mount NVIDIA libraries dynamically
+        logger.info("Mounting gpu devices and drivers")
+        
+        # Use sets to store unique mount destinations
+        volume_mounts: Set[str] = set()
+        device_mounts: Set[str] = set()
+        mount_commands = ["--privileged"]
+
+        # NVIDIA device mounts - validate existence
+        nvidia_devices = [
+            "/dev/nvidiactl",
+            "/dev/nvidia-uvm",
+            "/dev/nvidia-uvm-tools",
+            "/dev/nvidia-modeset"
+        ]
+
+        for device_path in nvidia_devices:
+            if os.path.exists(device_path):
+                volume_mounts.add(f"{device_path}:{device_path}")
+
+        # Discover NVIDIA GPU devices dynamically using glob
+        gpu_device_pattern = "/dev/nvidia[0-9]*"
+        for device_path in glob.glob(gpu_device_pattern):
+            if os.path.exists(device_path):
+                device_mounts.add(device_path)
+        
+
+        # Discover NCCL installations dynamically
+        nccl_patterns = [
+            "/usr/local/nccl*"
+        ]
+
+        for pattern in nccl_patterns:
+            for nccl_path in glob.glob(pattern):
+                if os.path.exists(nccl_path) and os.path.isdir(nccl_path):
+                    volume_mounts.add(f"{nccl_path}:{nccl_path}:ro")
+
+        # Vulkan and EGL mounts - validate existence
+        vulkan_egl_paths = [
+            "/etc/vulkan",
+            "/usr/share/egl",
+            "/usr/share/glvnd"
+        ]
+
+        for path in vulkan_egl_paths:
+            if os.path.exists(path) and os.path.isdir(path):
+                volume_mounts.add(f"{path}:{path}:ro")
+
+        # RDMA/InfiniBand mounts - validate existence
+        rdma_paths = [
+            "/usr/lib64/libibverbs",
+            "/usr/lib64/librdmacm",
+            "/sys/class/infiniband",
+            "/dev/infiniband"
+        ]
+
+        for path in rdma_paths:
+            if os.path.exists(path):
+                if os.path.isdir(path):
+                    volume_mounts.add(f"{path}:{path}:ro")
+                else:  # device file
+                    volume_mounts.add(f"{path}:{path}")
+
+        # Shared memory for NCCL - validate existence
+        if os.path.exists("/dev/shm"):
+            volume_mounts.add("/dev/shm:/dev/shm")
+
+        # NVIDIA runtime sockets - validate existence
+        socket_paths = [
+            "/run/nvidia-persistenced/socket",
+            "/run/nvidia-fabricmanager/socket"
+        ]
+
+        for socket_path in socket_paths:
+            if os.path.exists(socket_path):
+                volume_mounts.add(f"{socket_path}:{socket_path}")
+
+        # Additional system mounts - validate existence
+        system_paths = [
+            "/etc/ld.so.conf.d",
+        ]
+
+        for path in system_paths:
+            if os.path.exists(path):
+                volume_mounts.add(f"{path}:{path}:ro")
+
+        # Define all NVIDIA library and file patterns
+        discover_files_by_patterns(runtime_env_constants.NVIDIA_PATTERNS, volume_mounts, mount_mode="ro", file_only=False)
+
+        # Add unique volume mounts to container command
+        for mount in volume_mounts:
+            mount_commands.extend(["-v", mount])
+
+        # Add unique device mounts to container command
+        for device in device_mounts:
+            mount_commands.extend(["--device", device])
+
+        container_command.extend(mount_commands)
+
+    
     container_command.append("--entrypoint")
     # Some docker image use conda to run python, it depend on ~/.bashrc.
     # So we need to use bash as container entrypoint.

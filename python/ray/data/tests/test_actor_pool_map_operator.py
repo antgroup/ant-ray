@@ -13,8 +13,8 @@ import pytest
 from freezegun import freeze_time
 
 import ray
-from ray._common.test_utils import wait_for_condition
 from ray._private.ray_constants import ID_SIZE
+from ray._private.test_utils import wait_for_condition
 from ray.actor import ActorHandle
 from ray.data._internal.actor_autoscaler import ActorPoolScalingRequest
 from ray.data._internal.compute import ActorPoolStrategy
@@ -1173,7 +1173,235 @@ def test_actor_pool_map_operator_num_active_tasks_and_completed(shutdown_only):
     assert op.has_completed()
 
 
+def test_actor_pool_with_default_removal_strategy(ray_start_regular_shared):
+    """Test that _ActorPool uses the default actor removal strategy."""
+    from ray.data._internal.execution.operators.actor_removal_strategy import (
+        DefaultActorRemovalStrategy,
+    )
+
+    test_case = TestActorPool()
+
+    # Create an actor pool with the default removal strategy.
+    pool = test_case._create_actor_pool(
+        min_size=1,
+        max_size=4,
+        initial_size=2,
+    )
+
+    # Verify that the default strategy is being used.
+    assert isinstance(pool._actor_removal_strategy, DefaultActorRemovalStrategy)
+
+    # Add multiple actors
+    test_case._add_ready_actor(pool, node_id="node1")
+    test_case._add_ready_actor(pool, node_id="node2")
+
+    # Verify that shrink works normally
+    killed = pool._remove_inactive_actor()
+    assert killed
+    assert pool.current_size() == 1
+
+
+def test_actor_pool_with_node_aware_removal_strategy(ray_start_regular_shared):
+    """Test that _ActorPool uses the node-aware actor removal strategy."""
+    from ray.data._internal.execution.operators.actor_removal_strategy import (
+        NodeAwareActorRemovalStrategy,
+    )
+
+    test_case = TestActorPool()
+
+    # Create an actor pool with the node-aware removal strategy.
+    strategy = NodeAwareActorRemovalStrategy()
+    pool = _ActorPool(
+        min_size=1,
+        max_size=6,
+        initial_size=1,
+        max_actor_concurrency=1,
+        max_tasks_in_flight_per_actor=4,
+        create_actor_fn=test_case._create_actor_fn,
+        per_actor_resource_usage=ExecutionResources(cpu=1),
+        actor_removal_strategy=strategy,
+    )
+
+    # Verify that NodeAwareActorRemovalStrategy is being used.
+    assert isinstance(
+        pool._actor_removal_strategy,
+        NodeAwareActorRemovalStrategy,
+    )
+
+    # Add 3 actors on node1
+    actors_node1 = []
+    for _ in range(3):
+        actor = test_case._add_ready_actor(pool, node_id="node1")
+        actors_node1.append(actor)
+
+    # Add 1 actor on node2
+    test_case._add_ready_actor(pool, node_id="node2")
+
+    # Verify all actors are added
+    assert pool.current_size() == 4
+    assert pool.num_running_actors() == 4
+
+    # Shrink one actor - should remove from node1 (it has more idle actors)
+    killed = pool._remove_inactive_actor()
+    assert killed
+    assert pool.current_size() == 3
+
+    # Verify that the actor on node2 still exists
+    test_case._pick_actor(pool)
+
+
+def test_node_aware_strategy_prioritizes_node_with_most_idle_actors(
+    ray_start_regular_shared,
+):
+    """Test that the node-aware strategy prioritizes the node with the most idle actors."""
+    from ray.data._internal.execution.operators.actor_removal_strategy import (
+        NodeAwareActorRemovalStrategy,
+    )
+
+    test_case = TestActorPool()
+
+    strategy = NodeAwareActorRemovalStrategy()
+    pool = _ActorPool(
+        min_size=1,
+        max_size=10,
+        initial_size=1,
+        max_actor_concurrency=1,
+        max_tasks_in_flight_per_actor=4,
+        create_actor_fn=test_case._create_actor_fn,
+        per_actor_resource_usage=ExecutionResources(cpu=1),
+        actor_removal_strategy=strategy,
+    )
+
+    # Add 4 actors on node1
+    for _ in range(4):
+        test_case._add_ready_actor(pool, node_id="node1")
+
+    # Add 2 actors on node2
+    for _ in range(2):
+        test_case._add_ready_actor(pool, node_id="node2")
+
+    assert pool.current_size() == 6
+
+    # Record the number of actors on node1 and node2
+    node1_actors = sum(
+        1 for state in pool._running_actors.values() if state.actor_location == "node1"
+    )
+    node2_actors = sum(
+        1 for state in pool._running_actors.values() if state.actor_location == "node2"
+    )
+
+    assert node1_actors == 4
+    assert node2_actors == 2
+
+    # Shrink 3 times - should prioritize removing from node1
+    for _ in range(3):
+        killed = pool._remove_inactive_actor()
+        assert killed
+
+    assert pool.current_size() == 3
+
+    # Verify that the actors on node1 were removed first
+    remaining_node1_actors = sum(
+        1 for state in pool._running_actors.values() if state.actor_location == "node1"
+    )
+    remaining_node2_actors = sum(
+        1 for state in pool._running_actors.values() if state.actor_location == "node2"
+    )
+
+    # node1 should have 1 actor remaining, node2 should have 2 actors
+    assert remaining_node1_actors == 1
+    assert remaining_node2_actors == 2
+
+
+def test_node_aware_strategy_with_active_actors(ray_start_regular_shared):
+    """Test that the node-aware strategy does not remove active actors."""
+    from ray.data._internal.execution.operators.actor_removal_strategy import (
+        NodeAwareActorRemovalStrategy,
+    )
+
+    test_case = TestActorPool()
+
+    strategy = NodeAwareActorRemovalStrategy()
+    pool = _ActorPool(
+        min_size=1,
+        max_size=6,
+        initial_size=1,
+        max_actor_concurrency=1,
+        max_tasks_in_flight_per_actor=4,
+        create_actor_fn=test_case._create_actor_fn,
+        per_actor_resource_usage=ExecutionResources(cpu=1),
+        actor_removal_strategy=strategy,
+    )
+
+    # Add 3 actors on node1
+    actors_node1 = []
+    for _ in range(3):
+        actor = test_case._add_ready_actor(pool, node_id="node1")
+        actors_node1.append(actor)
+
+    # Add 1 actor on node2
+    test_case._add_ready_actor(pool, node_id="node2")
+
+    # Make all actors on node1 active
+    for actor in actors_node1:
+        test_case._pick_actor(pool)
+
+    # Verify node1's actors are active
+    assert pool.num_active_actors() == 3
+    assert pool.num_idle_actors() == 1  # Only node2's actor is idle
+
+    # Try to shrink - should remove the idle actor from node2
+    killed = pool._remove_inactive_actor()
+    assert killed
+    assert pool.current_size() == 3
+
+    # Verify that the actors on node1 still exist
+    remaining_node1_actors = sum(
+        1 for state in pool._running_actors.values() if state.actor_location == "node1"
+    )
+    assert remaining_node1_actors == 3
+
+
+def test_actor_pool_removal_strategy_integration_with_scaling(ray_start_regular_shared):
+    """Test actor removal strategy integration with scaling."""
+    from ray.data._internal.execution.operators.actor_removal_strategy import (
+        NodeAwareActorRemovalStrategy,
+    )
+
+    # Create test instance directly, without calling setup_class()
+    test_case = TestActorPool()
+
+    strategy = NodeAwareActorRemovalStrategy()
+    pool = _ActorPool(
+        min_size=2,
+        max_size=8,
+        initial_size=2,
+        max_actor_concurrency=1,
+        max_tasks_in_flight_per_actor=4,
+        create_actor_fn=test_case._create_actor_fn,
+        per_actor_resource_usage=ExecutionResources(cpu=1),
+        actor_removal_strategy=strategy,
+    )
+
+    # Expand to 6 actors
+    pool.scale(ActorPoolScalingRequest(delta=4, reason="scale up"))
+
+    # Wait for actors to be ready
+    for ready_ref in pool.get_pending_actor_refs():
+        test_case._wait_for_actor_ready(pool, ready_ref)
+
+    assert pool.current_size() == 4
+
+    # Shrink 3 actors
+    pool.scale(ActorPoolScalingRequest(delta=-3, reason="scale down", force=True))
+
+    # Verify shrink success
+    assert pool.current_size() == 1
+
+
 if __name__ == "__main__":
     import sys
+
+    import pytest
 
     sys.exit(pytest.main(["-v", __file__]))

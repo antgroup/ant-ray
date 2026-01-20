@@ -5,6 +5,7 @@ import sys
 import threading
 import time
 import traceback
+import types
 from datetime import datetime, timedelta
 
 import pytest
@@ -316,6 +317,69 @@ def test_worker_pids_reported(enable_test_module, ray_start_with_dashboard):
 
     wait_for_condition(_check_worker_pids, timeout=20)
 
+
+@pytest.mark.asyncio
+async def test_node_head_get_nodes_logical_resources_autoscaler_v2_smoke(monkeypatch):
+    """Smoke test autoscaler v2 branch for NameError regressions (e.g. parse_usage)."""
+    from ray.dashboard.modules.node.node_head import NodeHead
+    from ray.dashboard.subprocesses.module import SubprocessModuleConfig
+
+    # Force autoscaler v2 branch.
+    import ray.autoscaler.v2.utils as autoscaler_v2_utils
+
+    monkeypatch.setattr(autoscaler_v2_utils, "is_autoscaler_v2", lambda: True)
+
+    # Stub parser to avoid depending on real reply schema.
+    import ray.autoscaler.v2.sdk as autoscaler_v2_sdk
+
+    class _Usage:
+        def __init__(self, resource_name, used, total):
+            self.resource_name = resource_name
+            self.used = used
+            self.total = total
+
+    class _Node:
+        def __init__(self, node_id):
+            self.node_id = node_id
+            self.resource_usage = types.SimpleNamespace(
+                usage=[_Usage("CPU", 1.0, 4.0)]
+            )
+
+    dummy_status = types.SimpleNamespace(active_nodes=[_Node("n1")], idle_nodes=[])
+    monkeypatch.setattr(
+        autoscaler_v2_sdk.ClusterStatusParser,
+        "from_get_cluster_status_reply",
+        staticmethod(lambda reply, stats=None: dummy_status),
+    )
+
+    # Ensure parse_usage exists and returns an iterable of strings.
+    import ray.autoscaler._private.util as autoscaler_util
+
+    monkeypatch.setattr(autoscaler_util, "parse_usage", lambda d, verbose=True: ["ok"])
+
+    class _StubGcsClient:
+        async def async_get_cluster_status(self):
+            return object()
+
+    config = SubprocessModuleConfig(
+        cluster_id_hex="00" * 28,
+        gcs_address="127.0.0.1:6379",
+        session_name="session",
+        temp_dir="/tmp",
+        session_dir="/tmp/session",
+        logging_level="INFO",
+        logging_format="%(message)s",
+        log_dir="/tmp",
+        logging_filename="dashboard.log",
+        logging_rotate_bytes=1024 * 1024,
+        logging_rotate_backup_count=1,
+        socket_dir="/tmp",
+    )
+    head = NodeHead(config)
+    head._gcs_client = _StubGcsClient()
+
+    result = await head.get_nodes_logical_resources()
+    assert result == {"n1": "ok"}
 
 if __name__ == "__main__":
     sys.exit(pytest.main(["-v", __file__]))

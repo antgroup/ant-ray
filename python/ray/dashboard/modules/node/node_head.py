@@ -27,11 +27,6 @@ from ray._private.ray_constants import (
     DEBUG_AUTOSCALING_STATUS,
     env_integer,
 )
-from ray.autoscaler._private.util import (
-    LoadMetricsSummary,
-    get_per_node_breakdown_as_dict,
-    parse_usage,
-)
 from ray.core.generated import gcs_pb2, node_manager_pb2, node_manager_pb2_grpc
 from ray.dashboard.consts import (
     DASHBOARD_AGENT_ADDR_IP_PREFIX,
@@ -44,28 +39,6 @@ from ray.dashboard.modules.reporter.reporter_models import StatsPayload
 from ray.dashboard.subprocesses.module import SubprocessModule
 from ray.dashboard.subprocesses.routes import SubprocessRouteTable as routes
 from ray.dashboard.utils import async_loop_forever
-
-from ray.util.insight import (
-    create_http_insight_client,
-)
-from ray._private.test_utils import get_resource_usage
-from ray.dashboard.modules.insight.insight_prompt import PROMPT_TEMPLATE
-from flow_insight import (
-    BatchNodePhysicalStatsEvent,
-    BatchNodePhysicalStats,
-    NodePhysicalStats,
-    NodeResourceUsage,
-    DeviceInfo,
-    BatchServicePhysicalStatsEvent,
-    ServicePhysicalStats,
-    ServiceState,
-    MemoryInfo,
-    DeviceType,
-    Service,
-    ServicePhysicalStatsRecord,
-    NodeMemoryInfo,
-    MetaInfoRegisterEvent,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -210,20 +183,6 @@ class NodeHead(SubprocessModule):
             "module_lifetime_s": time.time() - self._module_start_time,
         }
 
-    def _to_service_state(self, state: str) -> ServiceState:
-        if state == "ALIVE":
-            return ServiceState.RUNNING
-        elif (
-            state == "DEPENDENCIES_UNREADY"
-            or state == "PENDING_CREATION"
-            or state == "RESTARTING"
-        ):
-            return ServiceState.WAITING
-        elif state == "DEAD":
-            return ServiceState.TERMINATED
-        else:
-            return ServiceState.UNKNOWN
-
     @async_loop_forever(10)
     async def _emit_node_physical_stats(self):
         insight_server_address = await self.gcs_client.async_internal_kv_get(
@@ -233,6 +192,46 @@ class NodeHead(SubprocessModule):
         )
         if insight_server_address is None:
             return
+
+        # flow/insight is optional; only import heavy deps if actually enabled.
+        from ray.util.insight import create_http_insight_client, is_flow_insight_enabled
+
+        if not is_flow_insight_enabled():
+            return
+
+        from ray._private.test_utils import get_resource_usage
+        from ray.dashboard.modules.insight.insight_prompt import PROMPT_TEMPLATE
+
+        from flow_insight import (
+            BatchNodePhysicalStats,
+            BatchNodePhysicalStatsEvent,
+            BatchServicePhysicalStatsEvent,
+            DeviceInfo,
+            DeviceType,
+            MemoryInfo,
+            MetaInfoRegisterEvent,
+            NodeMemoryInfo,
+            NodePhysicalStats,
+            NodeResourceUsage,
+            Service,
+            ServicePhysicalStats,
+            ServicePhysicalStatsRecord,
+            ServiceState,
+        )
+
+        def to_service_state(state: str):
+            if state == "ALIVE":
+                return ServiceState.RUNNING
+            elif (
+                state == "DEPENDENCIES_UNREADY"
+                or state == "PENDING_CREATION"
+                or state == "RESTARTING"
+            ):
+                return ServiceState.WAITING
+            elif state == "DEAD":
+                return ServiceState.TERMINATED
+            else:
+                return ServiceState.UNKNOWN
         self._insight_server_address = insight_server_address.decode()
 
         if self._insight_client is None:
@@ -308,7 +307,7 @@ class NodeHead(SubprocessModule):
                 service_stats = ServicePhysicalStats(
                     node_id=node_id,
                     pid=actor_pid,
-                    state=self._to_service_state(actor_info.get("state", "UNKNOWN")),
+                    state=to_service_state(actor_info.get("state", "UNKNOWN")),
                     required_resources=actor_info.get("requiredResources", {}),
                     placement_id=actor_info.get("placementGroupId", None),
                     cpu_percent=0,
@@ -532,6 +531,7 @@ class NodeHead(SubprocessModule):
         if is_autoscaler_v2():
             from ray.autoscaler.v2.schema import Stats
             from ray.autoscaler.v2.sdk import ClusterStatusParser
+            from ray.autoscaler._private.util import parse_usage
 
             try:
                 # here we have a sync request
@@ -580,11 +580,21 @@ class NodeHead(SubprocessModule):
             return {}
         status_dict = json.loads(status_string)
 
-        lm_summary_dict = status_dict.get("load_metrics_report")
-        if lm_summary_dict:
-            lm_summary = LoadMetricsSummary(**lm_summary_dict)
+        # Legacy autoscaler load metrics parsing is relatively heavy; import only
+        # when needed (this code path is hit only for the legacy autoscaler).
+        from ray.autoscaler._private.util import (
+            LoadMetricsSummary,
+            get_per_node_breakdown_as_dict,
+        )
 
-        node_logical_resources = get_per_node_breakdown_as_dict(lm_summary)
+        lm_summary_dict = status_dict.get("load_metrics_report")
+        lm_summary = LoadMetricsSummary(**lm_summary_dict) if lm_summary_dict else None
+
+        node_logical_resources = (
+            get_per_node_breakdown_as_dict(lm_summary)
+            if lm_summary and lm_summary.usage_by_node
+            else {}
+        )
         return node_logical_resources if error is None else {}
 
     @routes.get("/nodes")

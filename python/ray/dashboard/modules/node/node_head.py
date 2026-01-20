@@ -590,7 +590,11 @@ class NodeHead(SubprocessModule):
         lm_summary_dict = status_dict.get("load_metrics_report")
         lm_summary = LoadMetricsSummary(**lm_summary_dict) if lm_summary_dict else None
 
-        node_logical_resources = get_per_node_breakdown_as_dict(lm_summary)
+        node_logical_resources = (
+            get_per_node_breakdown_as_dict(lm_summary)
+            if lm_summary and lm_summary.usage_by_node
+            else {}
+        )
         return node_logical_resources if error is None else {}
 
     @routes.get("/nodes")

@@ -220,6 +220,10 @@ DEFAULT_ENABLE_PER_NODE_METRICS = bool(
     int(os.environ.get("RAY_DATA_PER_NODE_METRICS", "0"))
 )
 
+DEFAULT_ACTOR_MAX_TASKS_IN_FLIGHT_TO_MAX_CONCURRENCY_FACTOR = env_integer(
+    "RAY_DATA_ACTOR_DEFAULT_MAX_TASKS_IN_FLIGHT_TO_MAX_CONCURRENCY_FACTOR", 2
+)
+
 DEFAULT_MIN_HASH_SHUFFLE_AGGREGATOR_WAIT_TIME_IN_S = env_integer(
     "RAY_DATA_MIN_HASH_SHUFFLE_AGGREGATOR_WAIT_TIME_IN_S", 300
 )
@@ -497,6 +501,11 @@ class DataContext:
     actor_prefetcher_enabled: bool = DEFAULT_ACTOR_PREFETCHER_ENABLED
 
     autoscaling_config: AutoscalingConfig = field(default_factory=AutoscalingConfig)
+
+    # Enable node-aware actor removal strategy
+    enable_node_aware_actor_removal: bool = False
+    # Enable resource-based autoscaling for actor pools
+    enable_resource_based_autoscaling: bool = False
 
     ################################################################
     # Sort-based shuffling configuration

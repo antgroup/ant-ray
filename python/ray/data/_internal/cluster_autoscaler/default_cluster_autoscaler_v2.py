@@ -185,6 +185,7 @@ class DefaultClusterAutoscalerV2(ClusterAutoscaler):
             return
 
         util = self._resource_utilization_calculator.get()
+        logger.info(f"Cluster utilization, cpu: {util.cpu}, gpu: {util.gpu}, mem: {util.object_store_memory}")
         if (
             util.cpu < self._cluster_scaling_up_util_threshold
             and util.gpu < self._cluster_scaling_up_util_threshold

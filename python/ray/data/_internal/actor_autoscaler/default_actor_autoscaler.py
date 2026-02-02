@@ -124,6 +124,7 @@ class DefaultActorAutoscaler(ActorAutoscaler):
 
         # Determine whether to scale up based on the actor pool utilization.
         util = self._compute_utilization(actor_pool)
+        logger.info(f"Operator={op.name}, Actor pool utilization: {util}")
 
         if util >= self._actor_pool_scaling_up_threshold:
             average_num_inputs_per_task = op.metrics.average_num_inputs_per_task or 1

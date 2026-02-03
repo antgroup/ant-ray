@@ -22,6 +22,7 @@ from ray.data.expressions import (
     StarExpr,
     UDFExpr,
     UnaryExpr,
+    Operation,
 )
 from ray.data.preprocessor import Preprocessor
 
@@ -462,24 +463,30 @@ class Project(AbstractMap, LogicalOperatorSupportsPredicatePassThrough):
             if left_type is None or right_type is None:
                 return None
 
-            op = expr.op.value
-            if op == "div":
+            op = expr.op
+            if op == Operation.DIV:
                 return pa.float64()
-            if op in ["add", "sub", "mul", "floordiv", "mod"]:
+            if op in [
+                Operation.ADD,
+                Operation.SUB,
+                Operation.MUL,
+                Operation.FLOORDIV,
+                Operation.MOD,
+            ]:
                 if pa.types.is_integer(left_type) and pa.types.is_integer(right_type):
                     return pa.int64()
                 return pa.float64()
             elif op in [
-                "eq",
-                "ne",
-                "lt",
-                "le",
-                "gt",
-                "ge",
-                "and",
-                "or",
-                "in",
-                "not_in",
+                Operation.EQ,
+                Operation.NE,
+                Operation.LT,
+                Operation.LE,
+                Operation.GT,
+                Operation.GE,
+                Operation.AND,
+                Operation.OR,
+                Operation.IN,
+                Operation.NOT_IN,
             ]:
                 return pa.bool_()
 

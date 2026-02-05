@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Set, Tuple
 
 from ray._raylet import GcsClient
-from ray._private.utils import binary_to_hex
+from ray._common.utils import binary_to_hex
 from ray.autoscaler._private.constants import PRIMARY_CLUSTER_ID
 from ray.autoscaler.v2.instance_manager.common import InstanceUtil
 from ray.autoscaler.v2.instance_manager.config import (

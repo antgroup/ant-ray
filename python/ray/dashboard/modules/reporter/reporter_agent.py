@@ -6,7 +6,7 @@ import os
 import socket
 import sys
 import traceback
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Optional, Tuple
 
@@ -950,9 +950,8 @@ class ReporterAgent(
     def _get_disk_usage():
         if IN_KUBERNETES_POD and not ENABLE_K8S_DISK_USAGE:
             # If in a K8s pod, disable disk display by passing in dummy values.
-            return {
-                "/": psutil._common.sdiskusage(total=1, used=0, free=1, percent=0.0)
-            }
+            sdiskusage = namedtuple("sdiskusage", ["total", "used", "free", "percent"])
+            return {"/": sdiskusage(total=1, used=0, free=1, percent=0.0)}
         if sys.platform == "win32":
             root = psutil.disk_partitions()[0].mountpoint
         else:

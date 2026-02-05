@@ -23,7 +23,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_PYTHONS = [(3, 9), (3, 10), (3, 11), (3, 12), (3, 13)]
+SUPPORTED_PYTHONS = [(3, 9), (3, 10)]
 # When the bazel version is updated, make sure to update it
 # in WORKSPACE file as well.
 
@@ -94,7 +94,7 @@ class SetupSpec:
         elif build_type == BuildType.NIGHTLY:
             version_postfix = datetime.today().strftime("%Y%m%d")
             version = re.sub(r"dev\d*", f"dev{version_postfix}", version)
-            self.version: str = version + ".b3"
+            self.version: str = version + ".b4"
             self.name = f"{self.name}-nightly"
         elif build_type == BuildType.DEPS_ONLY:
             self.version: str = DEPS_ONLY_VERSION

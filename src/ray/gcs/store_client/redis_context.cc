@@ -619,6 +619,8 @@ Status RedisContext::Connect(const std::string &address,
     RAY_CHECK(redisInitiateSSLWithContext(context_.get(), ssl_context_) == REDIS_OK)
         << "Failed to setup encrypted redis: " << context_->errstr;
   }
+  RAY_CHECK(redisEnableKeepAlive(context_.get()) == REDIS_OK)
+      << "Failed to enable keep alive for sync redis context: " << context_->errstr;
   RAY_CHECK_OK(AuthenticateRedis(context_.get(), username, password));
 
   // Connect to async context
@@ -634,6 +636,8 @@ Status RedisContext::Connect(const std::string &address,
     RAY_CHECK(redisInitiateSSLWithContext(&async_context->c, ssl_context_) == REDIS_OK)
         << "Failed to setup encrypted redis: " << async_context->errstr;
   }
+  RAY_CHECK(redisEnableKeepAlive(&async_context->c) == REDIS_OK)
+      << "Failed to enable keep alive for async redis context: " << async_context->errstr;
   RAY_CHECK_OK(AuthenticateRedis(async_context.get(), username, password));
   redis_async_context_.reset(
       new RedisAsyncContext(io_service_, std::move(async_context)));

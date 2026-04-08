@@ -1,0 +1,54 @@
+version: "2.0"
+
+stages:
+  - 发布到测试库
+  - 发布正式库前检查
+  - 发布正式库
+
+jobs:
+  发布制品:
+    stage: 发布到测试库
+    id: upload
+    component: pypi-artifact-uploader
+    inputs:
+      buildImage: reg.antgroup-inc.cn/antray/ant-ray-ci:79304b0ec7b1b078fc255d29373a06f6b383df96
+      buildTool: null
+      buildCmd: |
+        sudo chown -R admin:admin .
+        ray_version=$(grep -E "^version = " python/ray/_version.py | awk "{print \$3}")
+        ray_version=${ray_version:1:${#ray_version}-2}
+        platform_version=arm64
+        for py_version in cp39 cp310 cp311 cp312; do
+          ray_wheel_name="ant_ray-${ray_version}-${py_version}-${py_version}-macosx_14_0_${platform_version}.whl"
+          ray_cpp_wheel_name="ant_ray_cpp-${ray_version}-${py_version}-${py_version}-macosx_14_0_${platform_version}.whl"
+          for name in ${ray_wheel_name} ${ray_cpp_wheel_name}; do
+            wget http://antsys-ray-prod.cn-shanghai-ant-office.oss-alipay.aliyuncs.com/moshi/ant-ray-ci/mac-os-wheel/${ray_version}/${name} -P ./python/dist/
+          done
+        done
+      workdir: null
+      registry: "https://artifacts.antgroup-inc.cn/artifact/repositories/simple-dev/"
+      outDir: ./python/dist
+  
+  选择迁移制品:
+    id: check
+    stage: 发布正式库前检查
+    component: artifact-transfer-check
+    inputs: 
+      artifactsConfigs:
+        - artifacts: ${{jobs.upload.outputs.artifacts}}
+          antArtifactRepo: simple
+  
+  同步至正式库:
+    stage: 发布正式库
+    component: ant-artifact-transfer
+    inputs:
+      transferArtifacts: ${{jobs.check.outputs.transferArtifacts}}
+    config:
+      beforeExecute:
+        isAutoSkip: ${{jobs.check.outputs.selectedCount}} = 0
+        confirm: 
+          buttonName: 确认发布正式库
+          approvers:
+            - qiuzihao.qzh
+            - fengbin.ffb
+            - lwq462262

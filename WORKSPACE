@@ -77,6 +77,11 @@ pip_parse(
     name = "py_deps_buildkite",
     python_interpreter_target = python39,
     requirements_lock = "//release:requirements_buildkite.txt",
+    extra_pip_args = [
+        "-i", "https://pypi.org/simple",
+        "--extra-index-url", "http://yum.tbsite.net/pypi/simple/",
+        "--trusted-host", "yum.tbsite.net",
+    ],
 )
 
 # For CI scripts use only; not for ray testing.
@@ -84,6 +89,11 @@ pip_parse(
     name = "py_deps_py310",
     python_interpreter_target = python310,
     requirements_lock = "//release:requirements_py310.txt",
+    extra_pip_args = [
+        "-i", "https://pypi.org/simple",
+        "--extra-index-url", "http://yum.tbsite.net/pypi/simple/",
+        "--trusted-host", "yum.tbsite.net",
+    ],
 )
 
 load("@py_deps_buildkite//:requirements.bzl", install_py_deps_buildkite = "install_deps")

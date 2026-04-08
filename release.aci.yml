@@ -1,0 +1,3018 @@
+version: "2.0"
+
+stages:
+  - code-lint
+  - image-build
+  - python-tests
+  - java-tests
+  - cpp-tests
+  - ray-data-tests
+  - wheel-build
+  - pypi-release-dev
+  - pypi-release-check
+  - pypi-release-prod
+  - 集成测试
+
+workflow:
+  stages:
+    image-build:
+      requires: 
+        - code-lint
+    python-tests:
+      requires:
+        - image-build
+    java-tests:
+      requires:
+        - image-build
+    cpp-tests:
+      requires:
+        - image-build
+    ray-data-tests:
+      requires:
+        - image-build
+    集成测试:
+      requires:
+        - image-build
+    wheel-build:
+      requires: 
+        - code-lint
+    pypi-release-dev:
+      requires:
+        - wheel-build
+    pypi-release-check:
+      requires:
+        - pypi-release-dev
+    pypi-release-prod:
+      requires:
+        - pypi-release-check
+
+
+jobs:
+  code-format:
+    id: lint
+    stage: code-lint
+    component: ant-code-build
+    inputs:
+      name: code-sast
+      environment:
+        type: LINUX_CONTAINER
+        image: reg.antgroup-inc.cn/antray/ant-ray-ci:79304b0ec7b1b078fc255d29373a06f6b383df96
+      caches: 
+      resources: null
+      buildTasks:
+        - name: format-code
+          commands: |
+            cd code-repo
+            pip install -c python/requirements_compiled.txt -r python/requirements/lint-requirements.txt
+            wget -q http://ray-streaming.oss-cn-hangzhou-zmf.aliyuncs.com/util%2Fgoogle-java-format-1.7-all-deps.jar -O /tmp/google-java-format-1.7-all-deps.jar
+            export PATH=/home/admin/jdk-21.0.9/bin:$PATH
+            FORMAT_SH_PRINT_DIFF=1 bash ci/lint/format.sh --all || exit $?
+      timeout: 900
+
+  alios_x86_64:
+    stage: image-build
+    id: build
+    component: docker-image-build
+    inputs:
+      imageName: reg.antgroup-inc.cn/antray/ant-ray-ci
+      imageTag: ut-${{vcs.commitSha}}
+      dockerfile: ./ci/docker/internal.build_wheel_remote.Dockerfile
+      contextDir: ./
+      buildArgs: null 
+      registryUsername: ${{secrets.RAY_DOCKERHUB_USERNAME}}
+      registryPassword: ${{secrets.RAY_DOCKERHUB_PASSWORD}}
+      skipWhenImageExists: true
+      errWhenImageExists: true
+      beforeScript: null
+      beforeScriptImage: null
+      afterScript: null
+      afterScriptImage: null
+      nydusSwitch: true
+      cacheStrategy: always
+      extraTags: null
+      timeoutInSec: 21600
+    config:
+      execute:
+        isAllowSkip: true
+  
+
+  manylinux_x86_64:
+    stage: wheel-build
+    id: wheel
+    component: docker-image-build
+    config:
+      execute:
+        isAllowSkip: true
+    inputs:
+      imageName: reg.antgroup-inc.cn/antray/ant-ray-ci
+      imageTag: wheel-${{vcs.commitSha}}
+      computeType: xlarge
+      dockerfile: ./ci/docker/internal.build_wheel.Dockerfile
+      contextDir: ./
+      buildArgs: null 
+      registryUsername: ${{secrets.RAY_DOCKERHUB_USERNAME}}
+      registryPassword: ${{secrets.RAY_DOCKERHUB_PASSWORD}}
+      skipWhenImageExists: true
+      errWhenImageExists: true
+      beforeScript: null
+      beforeScriptImage: null
+      afterScript: null
+      afterScriptImage: null
+      nydusSwitch: true
+      cacheStrategy: always
+      extraTags: null
+      timeoutInSec: 21600
+
+
+  pypi-release-dev:
+    stage: pypi-release-dev
+    id: upload
+    component: pypi-artifact-uploader
+    inputs:
+      buildImage: ${{jobs.wheel.outputs.image}}
+      buildTool: null
+      buildCmd: >
+        echo "admin" | sudo -S chown -R admin:admin .
+        && mv /home/admin/code/python/wheelhouse ./python/dist
+      workdir: null
+      registry: "https://artifacts.antgroup-inc.cn/artifact/repositories/simple-dev/"
+      outDir: ./python/dist
+  
+  pypi-release-check:
+    id: check
+    stage: pypi-release-check
+    component: artifact-transfer-check
+    inputs: 
+      artifactsConfigs:
+        - artifacts: ${{jobs.upload.outputs.artifacts}}
+          antArtifactRepo: simple
+  
+  pypi-release-prod:
+    stage: pypi-release-prod
+    component: ant-artifact-transfer
+    inputs:
+      transferArtifacts: ${{jobs.check.outputs.transferArtifacts}}
+    config:
+      beforeExecute:
+        isAutoSkip: ${{jobs.check.outputs.selectedCount}} = 0
+        confirm: 
+          buttonName: 确认发布正式库
+          approvers:
+            - qiuzihao.qzh
+            - fengbin.ffb
+            - lwq462262
+  
+  ray_data_ut:
+    stage: ray-data-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/data/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio pyarrow pandas
+            export COVERAGE_FILE=./python/ray/data/tests/pytest_report/.coverage
+            export PYTHONPATH="/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/data/tests\
+              --junit-xml=./python/ray/data/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/data/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/data/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/data/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+
+  cpp_ut:
+    stage: cpp-tests
+    component: cpp-ut
+    config:
+      execute:
+        isAllowSkip: true
+    inputs:
+      appName: ant-ray
+      executeAgent:
+        resourceClass: "XL"
+      coverageCollectConfig:
+        enable: true      
+        coverDatDir: "./bazel-testlogs/"
+        covXmlPath: "./coverage.xml"
+      customTestConfig:
+        dockerImage:  ${{jobs.build.outputs.image}}
+        testScript:  |
+          chown -R admin:admin .  
+          set -x
+          echo "==== start prepare environment, user is: `whoami` ===="
+          echo "rewrite (storage.googleapis.com)/(.*) antsys-ray-prod.cn-shanghai-ant-office.oss-alipay.aliyuncs.com/moshi/\$2" >> /home/admin/.bazel_downloader.cfg
+          wget -qO- https://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/ci/yumrepo/install_ant_yum_repo.sh | bash
+          sudo yum install -y vim vsar redis jemalloc
+          yum install -y http://jarvis-storage-file-test.cn-hangzhou.alipay-pub.aliyun-inc.com/leran/util/lcov-2.0-1.noarch.rpm
+          echo "/usr/local/openssl/lib" | sudo tee /etc/ld.so.conf.d/openssl.conf
+          sudo ldconfig
+          sudo -u admin bash -c 'set +e && source ~/.bashrc && pip install --upgrade pip && echo "Bashrc loaded successfully" && env | grep -E "PATH|HOME|USER" && cd /home/jenkins/agent/aci/codeWorkspace && mkdir -p /home/jenkins/agent/aci/codeWorkspace/testresult/gtest && ./ci/ci.sh test_cpp'
+          /home/jenkins/agent/aci/codeWorkspace/ci/codeCoverage.sh
+          sudo -u admin bash -c 'set +e && source ~/.bashrc && cd /home/jenkins/agent/aci/codeWorkspace && lcov_cobertura /home/jenkins/agent/aci/codeWorkspace/bazel-out/_coverage/_coverage_report.dat --output coverage.xml'
+        caseReportPath: "./testresult/gtest/TEST-*.xml"
+        coverageReportPath: "./coverage.xml"
+
+  java_ut1:
+    stage: java-tests
+    component: common-ut
+    inputs:
+      image: ${{jobs.build.outputs.image}}
+      resourceClass: L
+      script: |
+        whoami
+        sudo mkdir -p /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output
+        sudo chown -R admin:admin /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output
+        sudo -u admin bash -l <<'EOF'
+        cd /home/admin/
+        wget http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/java_coverage_report.sh
+        # Download jacoco jar and modify authority
+        curl http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/ci/jacoco/jacoco-0.8.11.zip -o /home/admin/jacoco.zip
+        unzip /home/admin/jacoco.zip -d /home/admin/jacoco
+        chmod 777 /home/admin/jacoco/lib/*.jar
+        
+        # Setting the environment variables of the jacoagent JVM parameters
+        mkdir -p ci/java
+        wget http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/testng_ut1.xml -O ci/java/testng_ut1.xml
+        export JACOCO_AGENT="-javaagent:/home/admin/jacoco/lib/jacocoagent.jar=dumponexit=true,destfile=/home/admin/jacoco_cluster.exec,includes=io.ray.*"
+        java -version
+        java "${JACOCO_AGENT}" -cp bazel-bin/java/all_tests_shaded.jar org.testng.TestNG -d /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output ci/java/testng_ut1.xml > ut.log
+
+        wget "http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/rewrite_junit_xml_0319.py" -O rewrite_junit_xml.py
+        cp -r /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/junitreports /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/processedReports
+        find /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/processedReports/TEST-*.xml | xargs -I {} python rewrite_junit_xml.py {}
+        cp /home/admin/jacoco_cluster.exec /tmp/
+        cd /home/admin/
+        sh java_coverage_report.sh
+        ls -al /home/admin/javaCoverage/jacoco.xml
+        cp /home/admin/javaCoverage/jacoco.xml /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/jacoco_coverage.xml
+        EOF
+      caseReportPath: "./ray_java_test_output/processedReports/TEST-*.xml"
+      coverageReportPath: "./ray_java_test_output/jacoco_coverage.xml"
+      enableArtifacts: true
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+        - ${{outputs.caseFailCount}} <= 0
+  
+  java_ut2:
+    stage: java-tests
+    component: common-ut
+    inputs:
+      image: ${{jobs.build.outputs.image}}
+      resourceClass: L
+      script: |
+        whoami
+        sudo mkdir -p /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output
+        sudo chown -R admin:admin /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output
+        sudo -u admin bash -l <<'EOF'
+        cd /home/admin/
+        wget http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/java_coverage_report.sh
+        # Download jacoco jar and modify authority
+        curl http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/ci/jacoco/jacoco-0.8.11.zip -o /home/admin/jacoco.zip
+        unzip /home/admin/jacoco.zip -d /home/admin/jacoco
+        chmod 777 /home/admin/jacoco/lib/*.jar
+        
+        # Setting the environment variables of the jacoagent JVM parameters
+        mkdir -p ci/java
+        wget http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/testng_ut2.xml -O ci/java/testng_ut2.xml
+        export JACOCO_AGENT="-javaagent:/home/admin/jacoco/lib/jacocoagent.jar=dumponexit=true,destfile=/home/admin/jacoco_cluster.exec,includes=io.ray.*"
+        java -version
+        java "${JACOCO_AGENT}" -cp bazel-bin/java/all_tests_shaded.jar org.testng.TestNG -d /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output ci/java/testng_ut2.xml > ut.log
+
+        wget "http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/rewrite_junit_xml_0319.py" -O rewrite_junit_xml.py
+        cp -r /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/junitreports /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/processedReports
+        find /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/processedReports/TEST-*.xml | xargs -I {} python rewrite_junit_xml.py {}
+        cp /home/admin/jacoco_cluster.exec /tmp/
+        cd /home/admin/
+        sh java_coverage_report.sh
+        ls -al /home/admin/javaCoverage/jacoco.xml
+        cp /home/admin/javaCoverage/jacoco.xml /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/jacoco_coverage.xml
+        EOF
+      caseReportPath: "./ray_java_test_output/processedReports/TEST-*.xml"
+      coverageReportPath: "./ray_java_test_output/jacoco_coverage.xml"
+      enableArtifacts: true
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+        - ${{outputs.caseFailCount}} <= 0
+  
+  java_ut3:
+    stage: java-tests
+    component: common-ut
+    inputs:
+      image: ${{jobs.build.outputs.image}}
+      resourceClass: L
+      script: |
+        whoami
+        sudo mkdir -p /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output
+        sudo chown -R admin:admin /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output
+        sudo -u admin bash -l <<'EOF'
+        cd /home/admin/
+        wget http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/java_coverage_report.sh
+        # Download jacoco jar and modify authority
+        curl http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/ci/jacoco/jacoco-0.8.11.zip -o /home/admin/jacoco.zip
+        unzip /home/admin/jacoco.zip -d /home/admin/jacoco
+        chmod 777 /home/admin/jacoco/lib/*.jar
+        
+        # Setting the environment variables of the jacoagent JVM parameters
+        mkdir -p ci/java
+        wget http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/testng_ut3.xml -O ci/java/testng_ut3.xml
+        export JACOCO_AGENT="-javaagent:/home/admin/jacoco/lib/jacocoagent.jar=dumponexit=true,destfile=/home/admin/jacoco_cluster.exec,includes=io.ray.*"
+        java -version
+        java "${JACOCO_AGENT}" -cp bazel-bin/java/all_tests_shaded.jar org.testng.TestNG -d /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output ci/java/testng_ut3.xml > ut.log
+
+        wget "http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/rewrite_junit_xml_0319.py" -O rewrite_junit_xml.py
+        cp -r /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/junitreports /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/processedReports
+        find /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/processedReports/TEST-*.xml | xargs -I {} python rewrite_junit_xml.py {}
+        cp /home/admin/jacoco_cluster.exec /tmp/
+        cd /home/admin/
+        sh java_coverage_report.sh
+        ls -al /home/admin/javaCoverage/jacoco.xml
+        cp /home/admin/javaCoverage/jacoco.xml /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/jacoco_coverage.xml
+        EOF
+      caseReportPath: "./ray_java_test_output/processedReports/TEST-*.xml" 
+      coverageReportPath: "./ray_java_test_output/jacoco_coverage.xml" 
+      enableArtifacts: true  
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+        - ${{outputs.caseFailCount}} <= 0
+  
+  java_ut4:
+    stage: java-tests
+    component: common-ut
+    inputs:
+      image: ${{jobs.build.outputs.image}}
+      resourceClass: L
+      script: |
+        whoami
+        sudo mkdir -p /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output
+        sudo chown -R admin:admin /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output
+        sudo -u admin bash -l <<'EOF'
+        cd /home/admin/
+        wget http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/java_coverage_report.sh
+        # Download jacoco jar and modify authority
+        curl http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/ci/jacoco/jacoco-0.8.11.zip -o /home/admin/jacoco.zip
+        unzip /home/admin/jacoco.zip -d /home/admin/jacoco
+        chmod 777 /home/admin/jacoco/lib/*.jar
+        
+        # Setting the environment variables of the jacoagent JVM parameters
+        mkdir -p ci/java
+        wget http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/testng_ut4.xml -O ci/java/testng_ut4.xml
+        export JACOCO_AGENT="-javaagent:/home/admin/jacoco/lib/jacocoagent.jar=dumponexit=true,destfile=/home/admin/jacoco_cluster.exec,includes=io.ray.*"
+        java -version
+        java "${JACOCO_AGENT}" -cp bazel-bin/java/all_tests_shaded.jar org.testng.TestNG -d /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output ci/java/testng_ut4.xml > ut.log
+
+        wget "http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/rewrite_junit_xml_0319.py" -O rewrite_junit_xml.py
+        cp -r /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/junitreports /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/processedReports
+        find /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/processedReports/TEST-*.xml | xargs -I {} python rewrite_junit_xml.py {}
+        cp /home/admin/jacoco_cluster.exec /tmp/
+        cd /home/admin/
+        sh java_coverage_report.sh
+        ls -al /home/admin/javaCoverage/jacoco.xml
+        cp /home/admin/javaCoverage/jacoco.xml /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/jacoco_coverage.xml
+        EOF
+      caseReportPath: "./ray_java_test_output/processedReports/TEST-*.xml" 
+      coverageReportPath: "./ray_java_test_output/jacoco_coverage.xml" 
+      enableArtifacts: true  
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+        - ${{outputs.caseFailCount}} <= 0
+  
+  java_ut5:
+    stage: java-tests
+    component: common-ut
+    inputs:
+      image: ${{jobs.build.outputs.image}}
+      resourceClass: L
+      script: |
+        whoami
+        sudo mkdir -p /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output
+        sudo chown -R admin:admin /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output
+        sudo -u admin bash -l <<'EOF'
+        cd /home/admin/
+        wget http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/java_coverage_report.sh
+        # Download jacoco jar and modify authority
+        curl http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/ci/jacoco/jacoco-0.8.11.zip -o /home/admin/jacoco.zip
+        unzip /home/admin/jacoco.zip -d /home/admin/jacoco
+        chmod 777 /home/admin/jacoco/lib/*.jar
+        
+        # Setting the environment variables of the jacoagent JVM parameters
+        mkdir -p ci/java
+        wget http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/testng_ut5.xml -O ci/java/testng_ut5.xml
+        export JACOCO_AGENT="-javaagent:/home/admin/jacoco/lib/jacocoagent.jar=dumponexit=true,destfile=/home/admin/jacoco_cluster.exec,includes=io.ray.*"
+        java -version
+        java "${JACOCO_AGENT}" -cp bazel-bin/java/all_tests_shaded.jar org.testng.TestNG -d /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output ci/java/testng_ut5.xml > ut.log
+
+        wget "http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/rewrite_junit_xml_0319.py" -O rewrite_junit_xml.py
+        cp -r /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/junitreports /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/processedReports
+        find /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/processedReports/TEST-*.xml | xargs -I {} python rewrite_junit_xml.py {}
+        cp /home/admin/jacoco_cluster.exec /tmp/
+        cd /home/admin/
+        sh java_coverage_report.sh
+        ls -al /home/admin/javaCoverage/jacoco.xml
+        cp /home/admin/javaCoverage/jacoco.xml /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/jacoco_coverage.xml
+        EOF
+      caseReportPath: "./ray_java_test_output/processedReports/TEST-*.xml" 
+      coverageReportPath: "./ray_java_test_output/jacoco_coverage.xml"
+      enableArtifacts: true 
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+        - ${{outputs.caseFailCount}} <= 0
+  
+  java_ut6:
+    stage: java-tests
+    component: common-ut
+    inputs:
+      image: ${{jobs.build.outputs.image}}
+      resourceClass: L
+      script: |
+        whoami
+        sudo mkdir -p /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output
+        sudo chown -R admin:admin /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output
+        sudo -u admin bash -l <<'EOF'
+        cd /home/admin/
+        wget http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/java_coverage_report.sh
+        # Download jacoco jar and modify authority
+        curl http://raylet.cn-hangzhou-alipay-b.oss-cdn.aliyun-inc.com/ci/jacoco/jacoco-0.8.11.zip -o /home/admin/jacoco.zip
+        unzip /home/admin/jacoco.zip -d /home/admin/jacoco
+        chmod 777 /home/admin/jacoco/lib/*.jar
+        
+        # Setting the environment variables of the jacoagent JVM parameters
+        mkdir -p ci/java
+        wget http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/testng_ut6.xml -O ci/java/testng_ut6.xml
+        export JACOCO_AGENT="-javaagent:/home/admin/jacoco/lib/jacocoagent.jar=dumponexit=true,destfile=/home/admin/jacoco_cluster.exec,includes=io.ray.*"
+        java -version
+        java "${JACOCO_AGENT}" -cp bazel-bin/java/all_tests_shaded.jar org.testng.TestNG -d /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output ci/java/testng_ut6.xml > ut.log
+
+        wget "http://alipay-kepler-resource.cn-hangzhou.alipay.aliyun-inc.com/changhuai/ut/rewrite_junit_xml_0319.py" -O rewrite_junit_xml.py
+        cp -r /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/junitreports /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/processedReports
+        find /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/processedReports/TEST-*.xml | xargs -I {} python rewrite_junit_xml.py {}
+        cp /home/admin/jacoco_cluster.exec /tmp/
+        cd /home/admin/
+        sh java_coverage_report.sh
+        ls -al /home/admin/javaCoverage/jacoco.xml
+        cp /home/admin/javaCoverage/jacoco.xml /home/jenkins/agent/aci/codeWorkspace/ray_java_test_output/jacoco_coverage.xml
+        EOF
+      caseReportPath: "./ray_java_test_output/processedReports/TEST-*.xml" 
+      coverageReportPath: "./ray_java_test_output/jacoco_coverage.xml"
+      enableArtifacts: true 
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+        - ${{outputs.caseFailCount}} <= 0
+
+  minimal && basic_test && small:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_basic_3.py \
+              ./python/ray/tests/test_label_utils.py \
+              ./python/ray/tests/test_utils.py \
+              -k "not test_many_fractional_resources" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  minimal && basic_test && medium:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_basic_2.py \
+              ./python/ray/tests/test_basic_4.py \
+              ./python/ray/tests/test_basic_5.py \
+              -k "not test_site_flag_inherited" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  minimal && basic_test && large:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov proxy.py
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_basic.py \
+              -k "not test_worker_thread_count" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+
+  minimal && no_basic_test && medium:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_bundle_label_selector.py \
+              ./python/ray/tests/test_label_scheduling.py \
+              ./python/ray/tests/test_minimal_install.py \
+              ./python/ray/tests/test_path_utils.py \
+              ./python/ray/tests/test_runtime_env_ray_minimal.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  minimal && no_basic_test && large:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_output.py \
+              -k "not test_output_on_driver_shutdown" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+
+  medium_size_python_tests_a_to_j && 1 && a:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_actor_cancel.py \
+              ./python/ray/tests/test_actor_group.py \
+              ./python/ray/tests/test_actor_lifetime.py \
+              ./python/ray/tests/test_actor_pool.py \
+              ./python/ray/tests/test_async.py \
+              ./python/ray/tests/test_asyncio.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_a_to_j && 1 && b:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_global_state.py \
+              ./python/ray/tests/test_multiprocessing.py \
+              ./python/ray/tests/test_multiprocessing_standalone.py \
+              -k "not test_callbacks" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_a_to_j && 1 && c:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_advanced_6.py::test_local_mode_gpus \
+              ./python/ray/tests/test_advanced_6.py::test_max_call_set_for_gpu_tasks \
+              ./python/ray/tests/test_advanced_9.py::test_demands_when_driver_exits \
+              ./python/ray/tests/test_exit_observability.py::test_worker_exit_intended_system_exit_and_user_error \
+              ./python/ray/tests/test_node_label_scheduling_strategy.py::test_node_not_available \
+              ./python/ray/tests/test_object_spilling_2.py::test_release_resource \
+              ./python/ray/tests/test_reference_counting_2.py::test_recursively_pass_returned_object_ref[False-True] \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_a_to_j && 1 && d:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install pytest pytest-cov torch==2.3.0
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_experimental_collective.py \
+              -k "not test_send_recv \
+                  and not test_send_recv_exceptions" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_a_to_j && 1 && e:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install pytest pytest-cov pytest-asyncio==0.17.2 pytest-httpserver==1.1.3 torch==2.3.0 \
+              pandas==1.5.3 threadpoolctl==3.1.0 numexpr==2.8.4 numpy==1.26.4 memray==1.19.1
+            export RAY_DASHBOARD_ENABLE_K8S_DISK_USAGE=1
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_component_failures_2.py \
+              ./python/ray/tests/test_component_failures_3.py \
+              ./python/ray/tests/test_dashboard_profiler.py \
+              ./python/ray/tests/test_exit_observability.py \
+              ./python/ray/tests/test_failure_3.py \
+              ./python/ray/tests/test_gcs_utils.py \
+              ./python/ray/tests/test_get_locations.py \
+              ./python/ray/tests/test_healthcheck.py \
+              ./python/ray/tests/test_metric_cardinality.py \
+              ./python/ray/tests/test_metrics_agent.py \
+              ./python/ray/tests/test_metrics_head.py \
+              ./python/ray/tests/test_node_label_scheduling_strategy.py \
+              ./python/ray/tests/test_object_spilling_2.py \
+              ./python/ray/tests/test_reference_counting_2.py \
+              ./python/ray/tests/test_reference_counting_standalone.py \
+              ./python/ray/tests/test_runtime_env_agent.py \
+              ./python/ray/tests/test_util_helpers.py \
+              -k "not test_worker_exit_intended_system_exit_and_user_error \
+                  and not test_node_not_available \
+                  and not test_release_resource \
+                  and not test_metrics_export_end_to_end \
+                  and not test_recursively_pass_returned_object_ref[False-True]" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_a_to_j && 1 && f:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install pytest pytest-cov pytest-asyncio==0.17.2 pytest-httpserver==1.1.3 torch==2.3.0 \
+              pandas==1.5.3 threadpoolctl==3.1.0 numexpr==2.8.4 numpy==1.26.4 memray==1.19.1
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_advanced.py \
+              ./python/ray/tests/test_advanced_2.py \
+              ./python/ray/tests/test_advanced_3.py \
+              ./python/ray/tests/test_advanced_4.py \
+              ./python/ray/tests/test_advanced_5.py \
+              ./python/ray/tests/test_advanced_6.py \
+              ./python/ray/tests/test_advanced_7.py \
+              ./python/ray/tests/test_advanced_8.py \
+              ./python/ray/tests/test_advanced_9.py \
+              -k "not test_local_mode_gpus \
+                  and not test_max_call_set_for_gpu_tasks \
+                  and not test_demands_when_driver_exits" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_a_to_j && 2:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov tqdm
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_actor_resources.py \
+              ./python/ray/tests/test_autoscaler_drain_node_api.py \
+              ./python/ray/tests/test_dataclient_disconnect.py \
+              ./python/ray/tests/test_iter.py \
+              ./python/ray/tests/test_placement_group.py \
+              ./python/ray/tests/test_ray_get.py \
+              ./python/ray/tests/test_state_api_2.py \
+              ./python/ray/tests/test_task_events.py \
+              ./python/ray/tests/test_unavailable_actors.py \
+              -k "not test_failed_task_runtime_env_setup \
+                  and not test_state_api_scale_smoke \
+                  and not test_failed_task_failed_due_to_node_failure" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_a_to_j && 3:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_runtime_env_failure.py \
+              ./python/ray/tests/test_runtime_env_profiler.py \
+              -k "not test_nsight_basic \
+                  and not test_nsight_custom_option \
+                  and not test_nsight_multiple_tasks" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_a_to_j && 4:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_runtime_env_working_dir_2.py \
+              ./python/ray/tests/test_runtime_env_working_dir_3.py \
+              ./python/ray/tests/test_runtime_env.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_a_to_j && no_windows:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov ipython
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_global_gc.py \
+              ./python/ray/tests/test_job.py \
+              ./python/ray/tests/test_kill_subprocesses.py \
+              ./python/ray/tests/test_memstat.py \
+              -k "not test_removed_internal_flags \
+                  and not test_entrypoint_field" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+
+  medium_size_python_tests_a_to_j && test_joblib:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install pytest pytest-cov joblib scikit-learn
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_joblib.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_k_to_z && a:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio pexpect
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/accelerators/test_hpu.py \
+              ./python/ray/tests/accelerators/test_neuron.py \
+              ./python/ray/tests/test_actor_bounded_threads.py \
+              ./python/ray/tests/test_actor_retry_1.py \
+              ./python/ray/tests/test_actor_retry_2.py \
+              ./python/ray/tests/test_actor_state_metrics.py \
+              ./python/ray/tests/test_autoscaler_fake_scaledown.py \
+              ./python/ray/tests/test_draining.py \
+              ./python/ray/tests/test_logging.py \
+              ./python/ray/tests/test_logging_2.py \
+              ./python/ray/tests/test_multi_node_2.py \
+              ./python/ray/tests/test_multi_tenancy.py \
+              ./python/ray/tests/test_multinode_failures.py \
+              ./python/ray/tests/test_namespace.py \
+              ./python/ray/tests/test_nested_task.py \
+              ./python/ray/tests/test_node_labels.py \
+              ./python/ray/tests/test_node_manager.py \
+              ./python/ray/tests/test_object_assign_owner.py \
+              -k "not test_no_scaledown_with_spilled_objects \
+                  and not test_destroy_actors_from_driver" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_k_to_z && b:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio tqdm
+            export RAY_UNPACKABLE_FILE_SUFFIXS=".whl,.jar,.tar.gz,.tar.bz2,.tar.xz,.tar"
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_object_store_metrics.py \
+              ./python/ray/tests/test_ray_init.py \
+              ./python/ray/tests/test_runtime_env_packaging.py \
+              ./python/ray/tests/test_shuffle.py \
+              -k "not test_download_and_unpack_package_with_https_uri \
+                  and not test_download_and_unpack_package_with_s3_uri \
+                  and not test_download_and_unpack_package_with_file_uri" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_k_to_z && c:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio tqdm
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_task_metrics.py \
+              ./python/ray/tests/test_metrics.py \
+              ./python/ray/tests/test_ray_shutdown.py \
+              ./python/ray/tests/test_streaming_generator.py \
+              ./python/ray/tests/test_streaming_generator_2.py \
+              ./python/ray/tests/test_streaming_generator_3.py \
+              ./python/ray/tests/test_streaming_generator_4.py \
+              ./python/ray/tests/test_streaming_generator_backpressure.py \
+              -k "not test_task_fetch_args \
+                  and not test_stale_view_cleanup_when_job_exits \
+                  and not test_opentelemetry_conflict \
+                  and not test_driver_dead \
+                  and not test_task_failure \
+                  and not test_generator_wait_e2e" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_k_to_z && d:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio tqdm
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_ray_init_2.py \
+              ./python/ray/tests/test_state_api_log.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_k_to_z && e:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio pexpect
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_placement_group_2.py \
+              ./python/ray/tests/test_placement_group_4.py \
+              ./python/ray/tests/test_placement_group_failover.py \
+              ./python/ray/tests/test_ray_debugger.py \
+              ./python/ray/tests/test_runtime_context.py \
+              ./python/ray/tests/test_runtime_env_env_vars.py \
+              ./python/ray/tests/test_runtime_env_plugin.py \
+              ./python/ray/tests/test_runtime_env_setup_func.py \
+              ./python/ray/tests/test_runtime_env_strong_type.py \
+              ./python/ray/tests/test_scheduling.py \
+              ./python/ray/tests/test_serialization.py \
+              ./python/ray/tests/test_tempdir.py \
+              ./python/ray/tests/test_tls_auth.py \
+              ./python/ray/tests/test_traceback.py \
+              ./python/ray/tests/test_worker_capping.py \
+              ./python/ray/tests/test_worker_state.py \
+              -k "not test_no_scaledown_with_spilled_objects \
+                  and not test_async_actor_task_id \
+                  and not test_job_submission_not_allowed_for_callable \
+                  and not test_zero_cpu_scheduling" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_k_to_z && no_windows:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_multi_node_3.py \
+              ./python/ray/tests/test_object_manager.py \
+              ./python/ray/tests/test_resource_demand_scheduler.py \
+              ./python/ray/tests/test_stress.py \
+              ./python/ray/tests/test_stress_sharded.py \
+              -k "not test_backlog_queue_impact_on_binpacking_time" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_k_to_z && no_main:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_memory_deadlock.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  medium_size_python_tests_k_to_z && needs_java && custom_setup:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_logging_java.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  ray_client && custom_setup && 1:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_client.py \
+              ./python/ray/tests/test_client_reconnect.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  ray_client && custom_setup && 2:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_client_references.py \
+              ./python/ray/tests/test_client_builder.py \
+              ./python/ray/tests/test_client_multi.py \
+              ./python/ray/tests/test_client_proxy.py \
+              ./python/ray/tests/test_client_warnings.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+
+  ray_client && custom_setup && 3 && a:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio proxy.py
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            export RAY_CLIENT_MODE=1
+            export RAY_PROFILING=1
+            pytest -v \
+              ./python/ray/tests/test_actor.py \
+              ./python/ray/tests/test_advanced.py \
+              ./python/ray/tests/test_asyncio.py \
+              ./python/ray/tests/test_basic.py \
+              ./python/ray/tests/test_basic_2.py \
+              ./python/ray/tests/test_basic_3.py \
+              ./python/ray/tests/test_basic_4.py \
+              ./python/ray/tests/test_basic_5.py \
+              ./python/ray/tests/test_list_actors.py \
+              ./python/ray/tests/test_list_actors_2.py \
+              ./python/ray/tests/test_list_actors_3.py \
+              ./python/ray/tests/test_list_actors_4.py \
+              ./python/ray/tests/test_multiprocessing.py \
+              -k "not test_site_flag_inherited \
+                  and not test_actor_killing \
+                  and not test_worker_thread_count \
+                  and not test_many_fractional_resources" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  ray_client && custom_setup && 3 && b:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio proxy.py
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            export RAY_CLIENT_MODE=1
+            export RAY_PROFILING=1
+            pytest -v \
+              ./python/ray/tests/test_scheduling.py \
+              ./python/ray/tests/test_placement_group_2.py \
+              ./python/ray/tests/test_placement_group_3.py \
+              ./python/ray/tests/test_placement_group_4.py \
+              ./python/ray/tests/test_placement_group_5.py \
+              ./python/ray/tests/test_placement_group.py \
+              ./python/ray/tests/test_wait.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  ray_client && custom_setup && 4 && a:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            export RAY_CLIENT_MODE=1
+            pytest -v \
+              ./python/ray/tests/test_runtime_env.py \
+              ./python/ray/tests/test_runtime_env_env_vars.py \
+              ./python/ray/tests/test_runtime_env_working_dir_uri.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  ray_client && custom_setup && 4 && b:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            export RAY_CLIENT_MODE=1
+            pytest -v \
+              ./python/ray/tests/test_runtime_env_failure.py \
+              ./python/ray/tests/test_runtime_env_working_dir.py \
+              -k "not test_exclusion[working_dir]" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  ray_client && no_windows && custom_setup:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_client_init.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  ray_client && post_wheel_build && custom_setup:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov uv aiohttp
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            export UV_INDEX_URL="https://pypi.antfin-inc.com/simple/"
+            export RAY_CLIENT_MODE=1
+            pytest -v \
+              ./python/ray/tests/test_runtime_env_conda_and_pip.py \
+              ./python/ray/tests/test_runtime_env_uv_run.py \
+              -k "not test_requirements_files[conda] \
+                  and not test_job_level_gc[python_object-conda] \
+                  and not test_detached_actor_gc[python_object-conda] \
+                  and not test_runtime_env_conda_not_exists_not_hang \
+                  and not test_working_dir_applies_for_conda_creation \
+                  and not test_uv_run_pyproject \
+                  and not test_uv_run_editable \
+                  and not test_uv_run_runtime_env_hook_e2e" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  small_size_python_tests && 1 && a:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          yum install tmux -y
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install pytest pytest-cov pytest-asyncio==0.17.2 numba==0.59.1 memray==1.19.1
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/accelerators/test_accelerators.py \
+              ./python/ray/tests/accelerators/test_amd_gpu.py \
+              ./python/ray/tests/accelerators/test_intel_gpu.py \
+              ./python/ray/tests/accelerators/test_nvidia_gpu.py \
+              ./python/ray/tests/accelerators/test_rbln.py \
+              ./python/ray/tests/accelerators/test_tpu.py \
+              ./python/ray/tests/test_actor_lineage_reconstruction.py \
+              ./python/ray/tests/test_actor_out_of_order.py \
+              ./python/ray/tests/test_annotations.py \
+              ./python/ray/tests/test_args.py \
+              ./python/ray/tests/test_async_compat.py \
+              ./python/ray/tests/test_asyncio_cluster.py \
+              ./python/ray/tests/test_autoscaling_policy.py \
+              ./python/ray/tests/test_baseexceptionandgroup.py \
+              ./python/ray/tests/test_bounded_unix_sockets.py \
+              ./python/ray/tests/test_component_failures.py \
+              ./python/ray/tests/test_concurrency_group.py \
+              ./python/ray/tests/test_core_worker_io_thread_stack_size.py \
+              ./python/ray/tests/test_cross_language.py \
+              ./python/ray/tests/test_debug_tools.py \
+              ./python/ray/tests/test_grpc_client_credentials.py \
+              ./python/ray/tests/test_ids.py \
+              ./python/ray/tests/test_list_actors.py \
+              ./python/ray/tests/test_list_actors_2.py \
+              ./python/ray/tests/test_list_actors_3.py \
+              ./python/ray/tests/test_list_actors_4.py \
+              ./python/ray/tests/test_memory_scheduling.py \
+              ./python/ray/tests/test_metrics_agent_2.py \
+              ./python/ray/tests/test_microbenchmarks.py \
+              ./python/ray/tests/test_mini.py \
+              ./python/ray/tests/test_multinode_failures_2.py \
+              ./python/ray/tests/test_node_death.py \
+              ./python/ray/tests/test_numba.py \
+              ./python/ray/tests/test_object_spilling_no_asan.py \
+              ./python/ray/tests/test_open_telemetry_metric_recorder.py \
+              ./python/ray/tests/test_placement_group_metrics.py \
+              ./python/ray/tests/test_protobuf_compatibility.py \
+              ./python/ray/tests/test_queue.py \
+              ./python/ray/tests/test_raylet_output.py \
+              ./python/ray/tests/test_reconstruction_stress.py \
+              ./python/ray/tests/test_reconstruction_stress_spill.py \
+              ./python/ray/tests/test_reference_counting.py \
+              ./python/ray/tests/test_runtime_env_fork_process.py \
+              ./python/ray/tests/test_runtime_env_get_wheel_names.py \
+              ./python/ray/tests/test_runtime_env_py_executable.py \
+              ./python/ray/tests/test_state_api_summary.py \
+              ./python/ray/tests/test_streaming_generator_regression.py \
+              ./python/ray/tests/test_system_metrics.py \
+              ./python/ray/tests/test_task_events_3.py \
+              ./python/ray/tests/test_top_level_api.py \
+              ./python/ray/tests/test_unhandled_error.py \
+              ./python/ray/tests/test_widgets.py \
+              ./python/ray/tests/test_worker_graceful_shutdown.py \
+              -k "not test_tasks_have_bounded_num_of_sockets \
+                  and not test_actors_have_bounded_num_of_sockets \
+                  and not test_invalid_concurrency_group \
+                  and not test_ray_get_during_graceful_shutdown[asyncio]" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  small_size_python_tests && 1 && b:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          yum install tmux -y
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_environ.py \
+              ./python/ray/tests/test_gcs_pubsub.py \
+              ./python/ray/tests/test_wait.py \
+              ./python/ray/tests/test_kill_raylet_signal_log.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  small_size_python_tests && 1 && c:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          yum install tmux -y
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_log_dedup.py \
+              ./python/ray/tests/test_task_metrics_reconstruction.py \
+              ./python/ray/tests/test_error_ray_not_initialized.py \
+              ./python/ray/tests/test_get_or_create_actor.py \
+              ./python/ray/tests/accelerators/test_npu.py \
+              ./python/ray/tests/test_distributed_sort.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+    
+  small_size_python_tests && 1 && d:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          yum install tmux -y
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov tqdm
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_tqdm.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  small_size_python_tests && 2:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_redis_tls.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  small_size_python_tests && 3:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov jsonpatch
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/kuberay/test_autoscaling_config.py \
+              ./python/ray/tests/kuberay/test_kuberay_node_provider.py \
+              ./python/ray/tests/test_cli_logger.py \
+              ./python/ray/tests/test_client_metadata.py \
+              ./python/ray/tests/test_client_terminate.py \
+              ./python/ray/tests/test_coordinator_server.py \
+              ./python/ray/tests/test_monitor.py \
+              ./python/ray/tests/test_node_provider_availability_tracker.py \
+              ./python/ray/tests/test_response_cache.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  small_size_python_tests && 4:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_collections_utils.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  small_size_python_tests && 5:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/autoscaler/test_providers.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  small_size_python_tests && no_windows && 1:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_autoscaler.py \
+              ./python/ray/tests/test_symmetric_run.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+
+  small_size_python_tests && no_windows && 2:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_batch_node_provider_integration.py \
+              ./python/ray/tests/test_batch_node_provider_unit.py \
+              ./python/ray/tests/test_command_runner.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  small_size_python_tests && no_windows && 3:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov kubernetes
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/vsphere/test_cluster_operator.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  small_size_python_tests && no_windows && 4:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov kubernetes
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/vsphere/test_vmray_node_provider.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  large_size_python_tests_shard_0 && a:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_actor.py \
+              ./python/ray/tests/test_actor_failures.py \
+              ./python/ray/tests/test_cancel.py \
+              ./python/ray/tests/test_core_worker_fault_tolerance.py \
+              ./python/ray/tests/test_failure.py \
+              ./python/ray/tests/test_failure_2.py \
+              ./python/ray/tests/test_multi_node.py \
+              ./python/ray/tests/test_object_manager_fault_tolerance.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  large_size_python_tests_shard_0 && b:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_generators.py \
+              -k "not test_generator_oom" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  large_size_python_tests_shard_0 && c:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_placement_group_3.py \
+              ./python/ray/tests/test_placement_group_5.py \
+              ./python/ray/tests/test_raylet_fault_tolerance.py \
+              ./python/ray/tests/test_reconstruction.py \
+              ./python/ray/tests/test_reconstruction_2.py \
+              ./python/ray/tests/test_runtime_env_working_dir_uri.py \
+              ./python/ray/tests/test_state_api.py \
+              ./python/ray/tests/test_task_events_2.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  large_size_python_tests_shard_0 && no_windows && 1:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov aiohttp redis
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_actor_advanced.py \
+              ./python/ray/tests/test_gcs_fault_tolerance.py \
+              -k "not test_get_actor_when_gcs_is_down[ray_start_regular_with_external_redis0] \
+                  and not test_redis_data_loss_no_leak[ray_start_regular_with_external_redis0]" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  large_size_python_tests_shard_0 && no_windows && 2:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov moto testfixtures
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_cli.py \
+              -k "not test_ray_up \
+                  and not test_ray_up_docker \
+                  and not test_ray_up_record \
+                  and not test_ray_attach \
+                  and not test_ray_dashboard \
+                  and not test_ray_exec \
+                  and not test_ray_submit \
+                  and not test_ray_cluster_dump" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+
+  large_size_python_tests_shard_1 && 1 && a:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          sed -i \
+          -e 's#https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_plugins.zip#http://antsys-ray-prod.cn-shanghai-ant-office.oss-alipay.aliyuncs.com/moshi/test_internal_plugins.zip#g' \
+          -e 's#https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_plugins_2.zip#http://antsys-ray-prod.cn-shanghai-ant-office.oss-alipay.aliyuncs.com/moshi/test_internal_plugins_2.zip#g' \
+          -e 's#https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_native_libraries.tar#http://antsys-ray-prod.cn-shanghai-ant-office.oss-alipay.aliyuncs.com/moshi/test_internal_native_libraries.tar#g' \
+          ./python/ray/tests/test_runtime_env_internal_plugins.py
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_failure_4.py \
+              ./python/ray/tests/test_object_spilling.py \
+              ./python/ray/tests/test_placement_group_mini_integration.py \
+              ./python/ray/tests/test_scheduling_2.py \
+              ./python/ray/tests/test_runtime_env_internal_plugins.py \
+              -k "not test_task_failure_when_driver_local_raylet_dies \
+                  and not test_load_balancing_under_constrained_memory" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  large_size_python_tests_shard_1 && 1 && b:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          sed -i \
+          -e 's#https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_plugins.zip#http://antsys-ray-prod.cn-shanghai-ant-office.oss-alipay.aliyuncs.com/moshi/test_internal_plugins.zip#g' \
+          -e 's#https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_plugins_2.zip#http://antsys-ray-prod.cn-shanghai-ant-office.oss-alipay.aliyuncs.com/moshi/test_internal_plugins_2.zip#g' \
+          -e 's#https://github.com/antgroup/ant-ray/raw/refs/heads/ci_deps/runtime_env/test_internal_native_libraries.tar#http://antsys-ray-prod.cn-shanghai-ant-office.oss-alipay.aliyuncs.com/moshi/test_internal_native_libraries.tar#g' \
+          ./python/ray/tests/test_runtime_env_internal_plugins.py
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_object_spilling_3.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+    
+  large_size_python_tests_shard_1 && 2:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_implicit_resource.py \
+              ./python/ray/tests/test_plasma_unlimited.py \
+              ./python/ray/tests/test_threaded_actor.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  large_size_python_tests_shard_2:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-lazy-fixtures pytest-asyncio
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_runtime_env_standalone.py \
+              ./python/ray/tests/test_runtime_env_working_dir.py \
+              ./python/ray/tests/test_runtime_env_working_dir_4.py \
+              -k "not test_runtime_env_no_spurious_resource_deadlock_msg \
+                  and not test_exclusion[working_dir]" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+    
+  tmpfs && custom_setup:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_out_of_disk_space.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+
+  post_wheel_build && custom_setup && a:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest_virtualenv uv aiohttp
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            export UV_INDEX_URL="https://pypi.antfin-inc.com/simple/"
+            pytest -v \
+              ./python/ray/tests/test_runtime_env_complicated.py \
+              ./python/ray/tests/test_runtime_env_conda_and_pip.py \
+              ./python/ray/tests/test_runtime_env_conda_and_pip_2.py \
+              ./python/ray/tests/test_runtime_env_conda_and_pip_3.py \
+              ./python/ray/tests/test_runtime_env_conda_and_pip_4.py \
+              ./python/ray/tests/test_runtime_env_uv.py \
+              ./python/ray/tests/test_runtime_env_uv_run.py \
+              -k "not test_conda_create_ray_client\
+                  and not test_conda_pip_extras_ray_default[conda] \
+                  and not test_client_working_dir_filepath \
+                  and not test_conda_pip_filepaths_remote \
+                  and not test_ray_init_install_failure[conda] \
+                  and not test_install_failure_logging[conda] \
+                  and not test_actor_level_gc \
+                  and not test_task_level_gc \
+                  and not test_requirements_files[conda] \
+                  and not test_job_level_gc[python_object-conda] \
+                  and not test_detached_actor_gc[python_object-conda] \
+                  and not test_runtime_env_conda_not_exists_not_hang \
+                  and not test_working_dir_applies_for_conda_creation \
+                  and not test_uv_run_pyproject \
+                  and not test_uv_run_editable \
+                  and not test_uv_run_runtime_env_hook_e2e" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  post_wheel_build && custom_setup && b:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest_virtualenv
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_runtime_env_conda_and_pip_5.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+
+  runtime_env_container && custom_setup:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-docker-tools
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_runtime_env_container.py \
+              -k "not test_put_get \
+                  and not test_shared_memory \
+                  and not test_log_file_exists \
+                  and not test_ray_env_vars \
+                  and not test_container_with_env_vars \
+                  and not test_worker_exit_intended_system_exit_and_user_error \
+                  and not test_serve_basic \
+                  and not test_job \
+                  and not test_serve_telemetry" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  compiled_graphs && no_windows && 1:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install pytest pytest-cov torch==2.3.0
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_channel_serialization.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  compiled_graphs && no_windows && 2:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install pytest pytest-cov torch==2.3.0
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_channel.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  gpu_objects && no_windows:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install pytest pytest-cov torch==2.3.0 tensordict
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/gpu_objects/test_gpu_objects_gloo.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  # gpu_objects && no_windows && multi_gpu && custom_setup:
+  #   stage: python-tests
+  #   component: python-ut
+  #   inputs:
+  #     customTestConfig:
+  #       dockerImage: ${{jobs.build.outputs.image}}
+  #       testScript: |
+  #         chown -R admin:admin .
+  #         path=$(pwd)
+  #         su - admin << EOF
+  #           cd ${path}
+  #           mkdir -p ./python/ray/tests/pytest_report
+  #           pip install -c python/requirements_compiled.txt pytest pytest-cov torch
+  #           export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+  #           export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+  #           pytest -v \
+  #             ./python/ray/tests/gpu_objects/test_gpu_objects_nccl.py \
+  #             ./python/ray/tests/gpu_objects/test_gpu_objects_nixl.py \
+  #             --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+  #             --cov=./python/ray \
+  #             --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+  #         EOF
+  #       caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+  #       coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+  #   config:
+  #     afterExecute:
+  #       checkRule:
+  #         - ${{outputs.caseFailCount}} = 0
+  
+  # ha_integration && custom_setup:
+  #   stage: python-tests
+  #   component: python-ut
+  #   inputs:
+  #     customTestConfig:
+  #       dockerImage: ${{jobs.build.outputs.image}}
+  #       testScript: |
+  #         chown -R admin:admin .
+  #         path=$(pwd)
+  #         su - admin << EOF
+  #           cd ${path}
+  #           mkdir -p ./python/ray/tests/pytest_report
+  #           pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-docker-tools
+  #           export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+  #           export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+  #           pytest -v \
+  #             ./python/ray/tests/test_gcs_ha_e2e.py \
+  #             ./python/ray/tests/test_gcs_ha_e2e_2.py \
+  #             --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+  #             --cov=./python/ray \
+  #             --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+  #         EOF
+  #       caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+  #       coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+  #   config:
+  #     afterExecute:
+  #       checkRule:
+  #         - ${{outputs.caseFailCount}} = 0
+  
+  # ha_integration && no_windows && custom_setup:
+  #   stage: python-tests
+  #   component: python-ut
+  #   inputs:
+  #     customTestConfig:
+  #       dockerImage: ${{jobs.build.outputs.image}}
+  #       testScript: |
+  #         chown -R admin:admin .
+  #         path=$(pwd)
+  #         su - admin << EOF
+  #           cd ${path}
+  #           mkdir -p ./python/ray/tests/pytest_report
+  #           pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-docker-tools
+  #           export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+  #           export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+  #           pytest -v \
+  #             ./python/ray/tests/test_network_failure_e2e.py \
+  #             --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+  #             --cov=./python/ray \
+  #             --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+  #         EOF
+  #       caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+  #       coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+  #   config:
+  #     afterExecute:
+  #       checkRule:
+  #         - ${{outputs.caseFailCount}} = 0
+  
+  mem_pressure && custom_setup:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_memory_pressure.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  asan_tests && custom_setup:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov pytest-asyncio
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_object_spilling.py \
+              ./python/ray/tests/test_object_spilling_2.py \
+              ./python/ray/tests/test_scheduling.py \
+              ./python/ray/tests/test_scheduling_2.py \
+              -k "not test_load_balancing_under_constrained_memory \
+                  and not test_fusion_objects[fs_only_object_spilling_config0]" \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  manual:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install -c python/requirements_compiled.txt pytest pytest-cov
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            pytest -v \
+              ./python/ray/tests/test_dashboard.py \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  flaky_tests && a:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            pip install pytest pytest-cov pytest-asyncio==0.17.2 torch==2.3.0 uv==0.8.9
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="${path}/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            export UV_INDEX_URL="https://pypi.antfin-inc.com/simple/"
+            pytest -v \
+              ./python/ray/tests/test_actor_state_metrics.py::test_destroy_actors_from_driver \
+              ./python/ray/tests/test_basic_5.py::test_actor_killing \
+              ./python/ray/tests/test_bounded_unix_sockets.py::test_actors_have_bounded_num_of_sockets \
+              ./python/ray/tests/test_bounded_unix_sockets.py::test_tasks_have_bounded_num_of_sockets \
+              ./python/ray/tests/test_concurrency_group.py::test_invalid_concurrency_group \
+              ./python/ray/tests/test_experimental_collective.py::test_send_recv \
+              ./python/ray/tests/test_experimental_collective.py::test_send_recv_exceptions \
+              ./python/ray/tests/test_failure_4.py::test_task_failure_when_driver_local_raylet_dies \
+              ./python/ray/tests/test_gcs_fault_tolerance.py::test_get_actor_when_gcs_is_down[ray_start_regular_with_external_redis0] \
+              ./python/ray/tests/test_gcs_fault_tolerance.py::test_redis_data_loss_no_leak[ray_start_regular_with_external_redis0] \
+              ./python/ray/tests/test_multiprocessing.py::test_callbacks \
+              ./python/ray/tests/test_nccl_channel.py \
+              ./python/ray/tests/test_object_spilling_2.py::test_fusion_objects[fs_only_object_spilling_config0] \
+              --junit-xml=./python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:./python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  flaky_tests && b:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            cd /home/admin
+            pip install -c python/requirements_compiled.txt pytest pytest-cov uv aiohttp
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="/home/admin/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            export UV_INDEX_URL="https://pypi.antfin-inc.com/simple/"
+            pytest -v \
+              ./python/ray/tests/test_basic_5.py::test_site_flag_inherited \
+              ./python/ray/tests/test_resource_demand_scheduler.py::test_backlog_queue_impact_on_binpacking_time \
+              ./python/ray/tests/test_generators.py::test_generator_oom \
+              ./python/ray/tests/test_metrics.py::test_opentelemetry_conflict \
+              ./python/ray/tests/test_runtime_env_uv_run.py::test_uv_run_pyproject \
+              ./python/ray/tests/test_runtime_env_uv_run.py::test_uv_run_runtime_env_hook_e2e \
+              ./python/ray/tests/test_runtime_env_uv_run.py::test_uv_run_editable \
+              --junit-xml=${path}/python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:${path}/python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  flaky_tests && c:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            cd /home/admin
+            pip install pytest pytest-cov pytest-asyncio==0.17.2 torch==2.3.0 uv==0.8.9
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="/home/admin/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            export UV_INDEX_URL="https://pypi.antfin-inc.com/simple/"
+            export RAY_DASHBOARD_ENABLE_K8S_DISK_USAGE=1
+            pytest -v \
+              ./python/ray/tests/test_metrics_agent.py::test_metrics_export_end_to_end \
+              ./python/ray/tests/test_basic.py::test_worker_thread_count \
+              ./python/ray/tests/test_basic_3.py::test_many_fractional_resources \
+              ./python/ray/tests/test_job.py::test_entrypoint_field \
+              ./python/ray/tests/test_job.py::test_removed_internal_flags \
+              ./python/ray/tests/test_runtime_env_packaging.py::TestDownloadAndUnpackPackage::test_download_and_unpack_package_with_https_uri \
+              ./python/ray/tests/test_runtime_env_packaging.py::TestDownloadAndUnpackPackage::test_download_and_unpack_package_with_s3_uri \
+              ./python/ray/tests/test_runtime_env_packaging.py::TestDownloadAndUnpackPackage::test_download_and_unpack_package_with_file_uri \
+              ./python/ray/tests/test_runtime_context.py::test_async_actor_task_id \
+              ./python/ray/tests/test_runtime_env_standalone.py::test_runtime_env_no_spurious_resource_deadlock_msg \
+              ./python/ray/tests/test_runtime_env_working_dir.py::test_exclusion[working_dir] \
+              ./python/ray/tests/test_scheduling_2.py::test_load_balancing_under_constrained_memory \
+              ./python/ray/tests/test_streaming_generator_3.py::test_generator_wait_e2e \
+              ./python/ray/tests/test_task_events.py::test_failed_task_failed_due_to_node_failure \
+              ./python/ray/tests/test_task_metrics.py::test_stale_view_cleanup_when_job_exits \
+              ./python/ray/tests/test_task_metrics.py::test_task_fetch_args \
+              --junit-xml=${path}/python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:${path}/python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+  
+  flaky_tests && d:
+    stage: python-tests
+    component: python-ut
+    inputs:
+      customTestConfig:
+        dockerImage: ${{jobs.build.outputs.image}}
+        testScript: |
+          chown -R admin:admin .
+          path=$(pwd)
+          su - admin << EOF
+            cd ${path}
+            mkdir -p ./python/ray/tests/pytest_report
+            cd /home/admin
+            pip install pytest pytest-cov pytest-asyncio==0.17.2 torch==2.3.0 uv==0.8.9 tqdm==4.67.1
+            export COVERAGE_FILE=./python/ray/tests/pytest_report/.coverage
+            export PYTHONPATH="/home/admin/python/ray/tests:/home/admin/python:${PYTHONPATH:-}"
+            export UV_INDEX_URL="https://pypi.antfin-inc.com/simple/"
+            pytest -v \
+              ./python/ray/tests/test_output.py::test_output_on_driver_shutdown \
+              ./python/ray/tests/test_ray_shutdown.py::test_driver_dead \
+              ./python/ray/tests/test_runtime_env_setup_func.py::test_job_submission_not_allowed_for_callable \
+              ./python/ray/tests/test_state_api_2.py::test_state_api_scale_smoke \
+              ./python/ray/tests/test_task_metrics.py::test_task_failure \
+              ./python/ray/tests/test_worker_capping.py::test_zero_cpu_scheduling \
+              ./python/ray/tests/test_worker_graceful_shutdown.py::test_ray_get_during_graceful_shutdown[asyncio] \
+              --junit-xml=${path}/python/ray/tests/pytest_report/TEST-junit.xml \
+              --cov=./python/ray \
+              --cov-report=xml:${path}/python/ray/tests/pytest_report/TEST-cov.xml
+          EOF
+        caseReportPath: "./python/ray/tests/pytest_report/TEST-junit.xml"
+        coverageReportPath: "./python/ray/tests/pytest_report/TEST-cov.xml"
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule:
+          - ${{outputs.caseFailCount}} = 0
+
+  集成测试:
+    stage: 集成测试
+    id: ant-ray-it
+    displayName: java_integration_test@it
+    component: linkq-ut
+    inputs:
+      gitRepo: https://code.alipay.com/mrd_group/ant-ray-testcase.git
+      gitBranch: master
+      gitCommitId: 12144e71b9c577a0bcc36794e2e097d3e78b37a1
+      accurate: true #是否启用精准测试
+      ciConfig:
+        jdkVersion: "1.8" #jdk版本 1.6 1.7 1.8 11
+        mvnVersion: "3.9.8" #maven版本  2.2.1 3.0.3 3.2.5 3.5.4 3.5.4 3.6.1
+        encoding: "UTF-8" #文件编码 UTF-8 GBK
+        mvnArgs: "-Dak=${{secrets.RAY_STUDIO_AK}} -Dsk=${{secrets.RAY_STUDIO_SK}} -DrayImage=${{jobs.build.outputs.image}}"  #mvn参数 -D形式
+        parallelCount: "1" #分组数，将所有测试类分到N台机器运行
+        autoPom: "true" #是否自动修改pom true false
+    config:
+      execute:
+        isAllowSkip: true
+      afterExecute:
+        checkRule: # 质量规则校验策略，outputs的数值在0-100之间
+          - ${{outputs.casePassRate}} >= 100 #通过率
+        allowFailure: true

@@ -18,7 +18,9 @@ class TorchPredictor:
 
     def predict_probabilities(self, batch, device="cuda"):
         self.model.to(device)
-        predicted_probabilities = self.model.predict_probabilities(collate_fn(batch, device=device))
+        predicted_probabilities = self.model.predict_probabilities(
+            collate_fn(batch, device=device)
+        )
         batch["probabilities"] = [
             {
                 self.preprocessor.label_to_class[i]: float(prob)

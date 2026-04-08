@@ -1578,13 +1578,15 @@ void WorkerPool::PrestartWorkersInternal(const LeaseSpecification &lease_spec,
     }
 
     // Prestart worker with runtime env.
+    auto worker_id = WorkerID::FromRandom();
     GetOrCreateRuntimeEnv(
         lease_spec.SerializedRuntimeEnv(),
         lease_spec.RuntimeEnvConfig(),
         lease_spec.JobId(),
-        [this, lease_spec = lease_spec](bool successful,
-                                        const std::string &serialized_runtime_env_context,
-                                        const std::string &setup_error_message) {
+        [this, lease_spec = lease_spec, worker_id](
+            bool successful,
+            const std::string &serialized_runtime_env_context,
+            const std::string &setup_error_message) {
           if (!successful) {
             RAY_LOG(ERROR) << "Fails to create or get runtime env "
                            << setup_error_message;
@@ -1598,8 +1600,12 @@ void WorkerPool::PrestartWorkersInternal(const LeaseSpecification &lease_spec,
                              /*dynamic_options=*/{},
                              lease_spec.GetRuntimeEnvHash(),
                              serialized_runtime_env_context,
-                             lease_spec.RuntimeEnvInfo());
-        });
+                             lease_spec.RuntimeEnvInfo(),
+                             /*worker_startup_keep_alive_duration=*/std::nullopt,
+                             worker_id,
+                             /*serialized_allocated_instances=*/"{}");
+        },
+        worker_id);
   }
 }
 

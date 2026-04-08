@@ -704,11 +704,15 @@ class ActorMethod:
         return callee_class, callee_func
 
     def remote(self, *args, **kwargs):
-        from ray.util.insight import record_control_flow
+        from ray.util.insight import is_flow_insight_enabled
 
-        callee_class, callee_func = self._get_callee_info()
-        # report the call info to the insight monitor
-        record_control_flow(callee_class, callee_func)
+        # Only get callee info if flow-insight is enabled to avoid unnecessary GCS access
+        if is_flow_insight_enabled():
+            callee_class, callee_func = self._get_callee_info()
+            from ray.util.insight import record_control_flow
+
+            # report the call info to the insight monitor
+            record_control_flow(callee_class, callee_func)
         return self._remote(args, kwargs)
 
     def options(self, **options):
@@ -1894,11 +1898,15 @@ class ActorClass(Generic[T]):
             allow_out_of_order_execution=allow_out_of_order_execution,
         )
 
-        callee_class, callee_func = self._get_callee_info(actor_handle)
-        from ray.util.insight import record_control_flow
+        # Only get callee info if flow-insight is enabled to avoid unnecessary GCS access
+        from ray.util.insight import is_flow_insight_enabled
 
-        # report the call info to the insight monitor
-        record_control_flow(callee_class, callee_func)
+        if is_flow_insight_enabled():
+            callee_class, callee_func = self._get_callee_info(actor_handle)
+            from ray.util.insight import record_control_flow
+
+            # report the call info to the insight monitor
+            record_control_flow(callee_class, callee_func)
 
         return actor_handle
 

@@ -9,26 +9,62 @@ from contextlib import contextmanager
 import ray._private
 from ray.experimental import internal_kv
 import ray.dashboard.consts as dashboard_consts
-from flow_insight import (
-    UsageModel,
-    StorageType,
-    InsightClient,
-    FastAPIInsightServer,
-    CallSubmitEvent,
-    CallBeginEvent,
-    CallEndEvent,
-    ObjectGetEvent,
-    ObjectPutEvent,
-    ContextEvent,
-    ResourceUsageEvent,
-    DebuggerInfoEvent,
-)
+
+# Lazy import for flow_insight to avoid import errors when not enabled
+# or when there are dependency conflicts (e.g., pydantic version)
+_flow_insight_module = None
+
+
+def _get_flow_insight():
+    """
+    Lazily import flow_insight module.
+    This avoids import errors when flow_insight is not installed
+    or when there are dependency conflicts.
+    """
+    global _flow_insight_module
+    if _flow_insight_module is None:
+        from flow_insight import (
+            UsageModel,
+            StorageType,
+            InsightClient,
+            FastAPIInsightServer,
+            CallSubmitEvent,
+            CallBeginEvent,
+            CallEndEvent,
+            ObjectGetEvent,
+            ObjectPutEvent,
+            ContextEvent,
+            ResourceUsageEvent,
+            DebuggerInfoEvent,
+        )
+
+        _flow_insight_module = type(
+            "FlowInsight",
+            (),
+            {
+                "UsageModel": UsageModel,
+                "StorageType": StorageType,
+                "InsightClient": InsightClient,
+                "FastAPIInsightServer": FastAPIInsightServer,
+                "CallSubmitEvent": CallSubmitEvent,
+                "CallBeginEvent": CallBeginEvent,
+                "CallEndEvent": CallEndEvent,
+                "ObjectGetEvent": ObjectGetEvent,
+                "ObjectPutEvent": ObjectPutEvent,
+                "ContextEvent": ContextEvent,
+                "ResourceUsageEvent": ResourceUsageEvent,
+                "DebuggerInfoEvent": DebuggerInfoEvent,
+            },
+        )()
+    return _flow_insight_module
+
 
 _insight_client = None
 
 
 def create_http_insight_client(insight_server_address: str):
-    return InsightClient(
+    fi = _get_flow_insight()
+    return fi.InsightClient(
         server_url=f"http://{insight_server_address}",
     )
 
@@ -87,12 +123,13 @@ def create_insight_monitor_actor():
 @ray.remote(max_restarts=-1)
 class _ray_internal_insight_monitor:
     def __init__(self):
+        fi = _get_flow_insight()
         self.node_ip_address = ray._private.services.get_node_ip_address()
         self.port = self._get_free_port()
         print(f"Starting insight monitor on {self.node_ip_address}:{self.port}")
         session_id = ray._private.worker._global_node.session_name
-        self.server = FastAPIInsightServer(
-            snapshot_storage_type=StorageType.MEMORY,
+        self.server = fi.FastAPIInsightServer(
+            snapshot_storage_type=fi.StorageType.MEMORY,
             snapshot_duration_s=600,
             storage_dir=os.path.join(
                 ray._private.utils.get_ray_temp_dir(), session_id, "flowinsight"
@@ -212,6 +249,7 @@ def record_control_flow(callee_class, callee_func):
         return
 
     try:
+        fi = _get_flow_insight()
         caller_class = _get_caller_class()
         caller_func = _get_current_task_name()
         current_task_id = get_current_task_id()
@@ -220,7 +258,7 @@ def record_control_flow(callee_class, callee_func):
         job_id = get_current_job_id()
 
         get_insight_client().emit_event(
-            CallSubmitEvent(
+            fi.CallSubmitEvent(
                 flow_id=job_id,
                 source_service=caller_class[0],
                 source_instance_id=caller_class[1],
@@ -252,6 +290,7 @@ def record_object_arg_get(object_id):
         return
 
     try:
+        fi = _get_flow_insight()
         caller_class = _get_caller_class()
 
         if not need_record(caller_class):
@@ -262,7 +301,7 @@ def record_object_arg_get(object_id):
         job_id = get_current_job_id()
 
         get_insight_client().emit_event(
-            ObjectGetEvent(
+            fi.ObjectGetEvent(
                 flow_id=job_id,
                 object_id=object_id,
                 receiver_service=caller_class[0],
@@ -292,6 +331,7 @@ def record_object_put(object_id, size):
         return
 
     try:
+        fi = _get_flow_insight()
         caller_class = _get_caller_class()
         caller_func = _get_current_task_name()
 
@@ -302,7 +342,7 @@ def record_object_put(object_id, size):
         job_id = get_current_job_id()
 
         get_insight_client().emit_event(
-            ObjectPutEvent(
+            fi.ObjectPutEvent(
                 flow_id=job_id,
                 object_id=object_id,
                 object_size=size,
@@ -336,6 +376,7 @@ def record_object_arg_put(object_id, argpos, size, callee):
         return
 
     try:
+        fi = _get_flow_insight()
         callee_class = None
         callee_info = callee.split(".")
         if len(callee_info) == 2:
@@ -352,7 +393,7 @@ def record_object_arg_put(object_id, argpos, size, callee):
         job_id = get_current_job_id()
 
         get_insight_client().emit_event(
-            ObjectPutEvent(
+            fi.ObjectPutEvent(
                 flow_id=job_id,
                 object_id=object_id,
                 object_size=size,
@@ -387,6 +428,7 @@ def record_object_return_put(object_id, size):
         return
 
     try:
+        fi = _get_flow_insight()
         caller_class = _get_caller_class()
 
         if not need_record(caller_class):
@@ -397,7 +439,7 @@ def record_object_return_put(object_id, size):
         job_id = get_current_job_id()
 
         get_insight_client().emit_event(
-            ObjectPutEvent(
+            fi.ObjectPutEvent(
                 flow_id=job_id,
                 object_id=object_id,
                 object_size=size,
@@ -431,6 +473,7 @@ def record_object_get(object_id, task_id):
         return
 
     try:
+        fi = _get_flow_insight()
         # Get the task name from the runtime context
         # if there is no task name, it should be the driver
         recv_func = _get_current_task_name()
@@ -442,7 +485,7 @@ def record_object_get(object_id, task_id):
             return
 
         get_insight_client().emit_event(
-            ObjectGetEvent(
+            fi.ObjectGetEvent(
                 flow_id=job_id,
                 object_id=object_id,
                 receiver_service=caller_class[0],
@@ -466,6 +509,7 @@ def report_resource_usage(usage: dict):
         return
 
     try:
+        fi = _get_flow_insight()
         current_class = _get_caller_class()
         if current_class is None:
             return
@@ -476,13 +520,13 @@ def report_resource_usage(usage: dict):
             return
 
         for key, value in usage.items():
-            usage[key] = UsageModel(
+            usage[key] = fi.UsageModel(
                 used=value["used"],
                 base=value["base"],
             )
 
         get_insight_client().emit_event(
-            ResourceUsageEvent(
+            fi.ResourceUsageEvent(
                 flow_id=job_id,
                 service_name=current_class[0],
                 instance_id=current_class[1],
@@ -504,6 +548,7 @@ def register_current_context(context_data: dict):
         return
 
     try:
+        fi = _get_flow_insight()
         current_class = _get_caller_class()
         if current_class is None:
             return
@@ -514,7 +559,7 @@ def register_current_context(context_data: dict):
             return
 
         get_insight_client().emit_event(
-            ContextEvent(
+            fi.ContextEvent(
                 flow_id=job_id,
                 service_name=current_class[0],
                 instance_id=current_class[1],
@@ -569,6 +614,7 @@ def record_task_duration(duration):
         return
 
     try:
+        fi = _get_flow_insight()
         caller_class = _get_caller_class()
         caller_func = _get_current_task_name()
 
@@ -580,7 +626,7 @@ def record_task_duration(duration):
         job_id = get_current_job_id()
 
         get_insight_client().emit_event(
-            CallEndEvent(
+            fi.CallEndEvent(
                 flow_id=job_id,
                 target_service=caller_class[0],
                 target_instance_id=caller_class[1],
@@ -626,6 +672,7 @@ class profile:
         if not need_record(caller_class):
             return
 
+        fi = _get_flow_insight()
         job_id = get_current_job_id()
         self.job_id = job_id
         span_id = str(uuid.uuid4())
@@ -633,7 +680,7 @@ class profile:
 
         self.start_time = time.time()
         get_insight_client().emit_event(
-            CallSubmitEvent(
+            fi.CallSubmitEvent(
                 flow_id=job_id,
                 source_service=caller_class[0],
                 source_instance_id=caller_class[1],
@@ -647,7 +694,7 @@ class profile:
         )
 
         get_insight_client().emit_event(
-            CallBeginEvent(
+            fi.CallBeginEvent(
                 flow_id=job_id,
                 source_service=None if caller_class is None else caller_class[0],
                 source_instance_id=None if caller_class is None else caller_class[1],
@@ -668,8 +715,9 @@ class profile:
         ray._private.worker.global_worker._insight_call_stack.append(frame)
 
     def end(self):
+        fi = _get_flow_insight()
         get_insight_client().emit_event(
-            CallEndEvent(
+            fi.CallEndEvent(
                 flow_id=self.job_id,
                 target_service=None,
                 target_instance_id=None,
@@ -736,9 +784,10 @@ def report_trace_info(caller_info):
     job_id = get_current_job_id()
 
     try:
+        fi = _get_flow_insight()
 
         get_insight_client().emit_event(
-            CallBeginEvent(
+            fi.CallBeginEvent(
                 flow_id=job_id,
                 source_service=caller_info.get("caller_class", (None, None))[0],
                 source_instance_id=caller_info.get("caller_class", (None, None))[1],
@@ -754,7 +803,7 @@ def report_trace_info(caller_info):
 
         if is_visual_rdb_enabled():
             get_insight_client().emit_event(
-                DebuggerInfoEvent(
+                fi.DebuggerInfoEvent(
                     flow_id=job_id,
                     service_name=current_class[0],
                     instance_id=current_class[1],

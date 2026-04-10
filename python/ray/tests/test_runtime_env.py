@@ -6,6 +6,7 @@ put the test in `test_runtime_env_standalone.py`.
 import os
 import re
 import sys
+import json
 
 import pytest
 

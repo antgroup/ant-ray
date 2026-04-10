@@ -11,7 +11,7 @@ from ray.util.scheduling_strategies import NodeAffinitySchedulingStrategy
 
 # This package contains a subdirectory called `test_module`.
 # Calling `test_module.one()` should return `2`.
-HTTPS_PACKAGE_URI = "https://github.com/shrekris-anyscale/test_module/archive/a885b80879665a49d5cd4c3ebd33bb6f865644e5.zip"
+HTTPS_PACKAGE_URI = "http://antsys-ray-prod.cn-shanghai-ant-office.oss-alipay.aliyuncs.com/moshi/test_module-a885b80879665a49d5cd4c3ebd33bb6f865644e5.zip"
 S3_PACKAGE_URI = "s3://runtime-env-test/test_runtime_env.zip"
 S3_WHL_PACKAGE_URI = "s3://runtime-env-test/test_module-0.0.1-py3-none-any.whl"
 
@@ -82,6 +82,9 @@ def test_remote_package_uri_multi_node(
     start_cluster_shared_two_nodes, option, remote_uri, per_task_actor
 ):
     """Test the case where we lazily import inside a task/actor."""
+    if remote_uri == S3_PACKAGE_URI or remote_uri == S3_WHL_PACKAGE_URI:
+        pytest.skip("S3 URI tests not supported.")
+
     cluster, address = start_cluster_shared_two_nodes
 
     if option == "working_dir":

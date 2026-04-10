@@ -23,10 +23,25 @@ WAIT_TIMEOUT = 20
 def get_all_ray_worker_processes():
     processes = psutil.process_iter(attrs=["pid", "name", "cmdline", "status"])
     result = []
+    ray_processes = []  # Track all ray-related processes for debugging
     for p in processes:
         cmdline = p.info["cmdline"]
-        if cmdline is not None and len(cmdline) > 0 and "ray::" in cmdline[0]:
-            result.append(p)
+        if cmdline is not None and len(cmdline) > 0:
+            # Check for any ray-related process
+            if any("ray" in str(arg).lower() for arg in cmdline):
+                ray_processes.append(
+                    {
+                        "pid": p.info["pid"],
+                        "name": p.info["name"],
+                        "cmdline": " ".join(cmdline),
+                        "status": p.info["status"],
+                    }
+                )
+            # Check for worker processes specifically
+            if "ray::" in cmdline[0]:
+                result.append(p)
+
+    print(f"DEBUG: All ray-related processes found: {ray_processes}")
     print(f"all ray worker processes: {result}")
     return result
 
@@ -164,24 +179,54 @@ def f():
     import time
     time.sleep(10)
 
-num_cpus = int(ray.available_resources()["CPU"])
+num_cpus = int(ray.available_resources().get("CPU", 1))
+if num_cpus == 0:
+    num_cpus = 1
 tasks = [f.remote() for _ in range(num_cpus)]
 """
 
     p = run_string_as_driver_nonblocking(driver)
-    # Make sure the driver is running.
-    time.sleep(1)
-    assert p.poll() is None
-    wait_for_condition(lambda: len(get_all_ray_worker_processes()) > 0)
+    try:
+        # Make sure the driver is running.
+        time.sleep(5)  # Increased from 2 to 5 seconds to give more startup time
+        assert p.poll() is None
 
-    # Kill the driver process.
-    p.kill()
-    p.wait()
-    time.sleep(0.1)
+        # Add retry mechanism for worker process detection
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                print(f"Attempt {attempt + 1}: Checking for worker processes...")
+                wait_for_condition(
+                    lambda: len(get_all_ray_worker_processes()) > 0, timeout=20
+                )
+                break  # Success, exit retry loop
+            except RuntimeError as e:
+                if attempt < max_retries - 1:
+                    print(
+                        f"Attempt {attempt + 1} failed: {e}. Retrying in 5 seconds..."
+                    )
+                    time.sleep(5)
+                else:
+                    print(
+                        f"All {max_retries} attempts failed. Raising final exception."
+                    )
+                    raise
 
-    wait_for_condition(
-        lambda: len(get_all_ray_worker_processes()) == 0, timeout=WAIT_TIMEOUT
-    )
+        # Continue with test logic if we found worker processes
+
+        # Kill the driver process.
+        p.kill()
+        p.wait()
+        time.sleep(0.1)
+
+        wait_for_condition(
+            lambda: len(get_all_ray_worker_processes()) == 0, timeout=WAIT_TIMEOUT
+        )
+    finally:
+        # Ensure the driver process is terminated even if test fails
+        if p.poll() is None:
+            p.kill()
+            p.wait()
 
 
 @pytest.mark.skipif(platform.system() == "Windows", reason="Hang on Windows.")

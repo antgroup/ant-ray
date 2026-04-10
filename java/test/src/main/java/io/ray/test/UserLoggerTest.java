@@ -59,7 +59,9 @@ public class UserLoggerTest extends BaseTest {
                     .replace("%i", indexStr)
                     .replace("%p", String.valueOf(pid))
                     .replace("%j", Ray.getRuntimeContext().getCurrentJobId().toString()));
-    Assert.assertTrue(userLoggerFile.exists());
+
+    boolean fileExists = TestUtils.waitForCondition(() -> userLoggerFile.exists(), 60 * 1000);
+    Assert.assertTrue(fileExists);
     BufferedReader reader = new BufferedReader(new FileReader(userLoggerFile));
     String context = reader.readLine();
     Assert.assertTrue(context.endsWith(LOG_CONTEXT + indexStr));

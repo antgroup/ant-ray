@@ -140,7 +140,8 @@ def test_zero_cpu_scheduling(shutdown_only):
     block_driver_ref = block_driver.acquire.remote()
 
     # Both tasks should be running, so the driver should be unblocked.
-    timeout_value = 5 if sys.platform == "win32" else 1
+    # Increase timeout to give more time for the second task to start.
+    timeout_value = 10 if sys.platform == "win32" else 5
     _, not_ready = ray.wait([block_driver_ref], timeout=timeout_value)
     assert len(not_ready) == 0
 

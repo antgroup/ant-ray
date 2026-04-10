@@ -569,4 +569,3 @@ class StreamingRepartition(AbstractMap):
             return None
 
         return self._input_dependencies[0].infer_schema()
-

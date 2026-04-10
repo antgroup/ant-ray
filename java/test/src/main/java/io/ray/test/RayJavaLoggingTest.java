@@ -61,7 +61,7 @@ public class RayJavaLoggingTest extends BaseTest {
               }
               return true;
             },
-            10 * 1000);
+            60 * 1000);
     Assert.assertTrue(rotated);
   }
 }

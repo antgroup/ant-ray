@@ -1146,7 +1146,18 @@ class ReporterAgent(
         mem = psutil.virtual_memory()
         if not hasattr(mem, "shared"):
             return None
-        return mem.shared
+        if mem.shared > 0:
+            return mem.shared
+
+        # Fallback to /dev/shm if psutil returns 0
+        try:
+            stat = os.statvfs("/dev/shm")
+            total = stat.f_frsize * stat.f_blocks
+            free = stat.f_frsize * stat.f_bavail
+            used = total - free
+            return used
+        except (OSError, FileNotFoundError):
+            return None
 
     async def _async_collect_stats(self):
         now = dashboard_utils.to_posix_time(datetime.datetime.utcnow())

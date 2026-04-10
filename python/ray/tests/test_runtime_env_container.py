@@ -169,74 +169,94 @@ class TestContainerRuntimeEnvWithOtherRuntimeEnv:
             return ray.put((1, 10))
 
     def test_container_with_pip(self, api_version):
-        with pytest.raises(ValueError, match=EXPECTED_ERROR.format(api_version)):
+        runtime_env = {"pip": ["requests"]}
 
-            runtime_env = {"pip": ["requests"]}
-
-            if api_version == "container":
-                runtime_env["container"] = {"image": NESTED_IMAGE_NAME}
-            else:
-                runtime_env["image_uri"] = NESTED_IMAGE_NAME
+        if api_version == "container":
+            runtime_env["container"] = {"image": NESTED_IMAGE_NAME}
 
             @ray.remote(runtime_env=runtime_env)
             def f():
                 return ray.put((1, 10))
+
+        else:
+            runtime_env["image_uri"] = NESTED_IMAGE_NAME
+            with pytest.raises(ValueError, match=EXPECTED_ERROR.format(api_version)):
+
+                @ray.remote(runtime_env=runtime_env)
+                def f():
+                    return ray.put((1, 10))
 
     def test_container_with_conda(self, api_version):
-        with pytest.raises(ValueError, match=EXPECTED_ERROR.format(api_version)):
+        runtime_env = {"conda": {"dependencies": ["requests"]}}
 
-            runtime_env = {"conda": ["requests"]}
-
-            if api_version == "container":
-                runtime_env["container"] = {"image": NESTED_IMAGE_NAME}
-            else:
-                runtime_env["image_uri"] = NESTED_IMAGE_NAME
+        if api_version == "container":
+            runtime_env["container"] = {"image": NESTED_IMAGE_NAME}
 
             @ray.remote(runtime_env=runtime_env)
             def f():
                 return ray.put((1, 10))
+
+        else:
+            runtime_env["image_uri"] = NESTED_IMAGE_NAME
+            with pytest.raises(ValueError, match=EXPECTED_ERROR.format(api_version)):
+
+                @ray.remote(runtime_env=runtime_env)
+                def f():
+                    return ray.put((1, 10))
 
     def test_container_with_py_modules(self, api_version):
-        with pytest.raises(ValueError, match=EXPECTED_ERROR.format(api_version)):
+        runtime_env = {"py_modules": ["http://test.com/test0.zip"]}
 
-            runtime_env = {"py_modules": ["requests"]}
-
-            if api_version == "container":
-                runtime_env["container"] = {"image": NESTED_IMAGE_NAME}
-            else:
-                runtime_env["image_uri"] = NESTED_IMAGE_NAME
+        if api_version == "container":
+            runtime_env["container"] = {"image": NESTED_IMAGE_NAME}
 
             @ray.remote(runtime_env=runtime_env)
             def f():
                 return ray.put((1, 10))
+
+        else:
+            runtime_env["image_uri"] = NESTED_IMAGE_NAME
+            with pytest.raises(ValueError, match=EXPECTED_ERROR.format(api_version)):
+
+                @ray.remote(runtime_env=runtime_env)
+                def f():
+                    return ray.put((1, 10))
 
     def test_container_with_working_dir(self, api_version):
-        with pytest.raises(ValueError, match=EXPECTED_ERROR.format(api_version)):
+        runtime_env = {"working_dir": "http://test.com/test0.zip"}
 
-            runtime_env = {"working_dir": "."}
-
-            if api_version == "container":
-                runtime_env["container"] = {"image": NESTED_IMAGE_NAME}
-            else:
-                runtime_env["image_uri"] = NESTED_IMAGE_NAME
+        if api_version == "container":
+            runtime_env["container"] = {"image": NESTED_IMAGE_NAME}
 
             @ray.remote(runtime_env=runtime_env)
             def f():
                 return ray.put((1, 10))
+
+        else:
+            runtime_env["image_uri"] = NESTED_IMAGE_NAME
+            with pytest.raises(ValueError, match=EXPECTED_ERROR.format(api_version)):
+
+                @ray.remote(runtime_env=runtime_env)
+                def f():
+                    return ray.put((1, 10))
 
     def test_container_with_pip_and_working_dir(self, api_version):
-        with pytest.raises(ValueError, match=EXPECTED_ERROR.format(api_version)):
+        runtime_env = {"pip": ["requests"], "working_dir": "http://test.com/test0.zip"}
 
-            runtime_env = {"pip": ["requests"], "working_dir": "."}
-
-            if api_version == "container":
-                runtime_env["container"] = {"image": NESTED_IMAGE_NAME}
-            else:
-                runtime_env["image_uri"] = NESTED_IMAGE_NAME
+        if api_version == "container":
+            runtime_env["container"] = {"image": NESTED_IMAGE_NAME}
 
             @ray.remote(runtime_env=runtime_env)
             def f():
                 return ray.put((1, 10))
+
+        else:
+            runtime_env["image_uri"] = NESTED_IMAGE_NAME
+            with pytest.raises(ValueError, match=EXPECTED_ERROR.format(api_version)):
+
+                @ray.remote(runtime_env=runtime_env)
+                def f():
+                    return ray.put((1, 10))
 
 
 @ray.remote
@@ -517,7 +537,7 @@ class TestContainerRuntimeEnvCommandLine:
         [
             {
                 "container": {"image": "unknown_image", "pip": ["numpy"]},
-                "pip": ["pandas"],
+                "pip": ["requests"],
             },
             {
                 "container": {
@@ -525,7 +545,7 @@ class TestContainerRuntimeEnvCommandLine:
                     "pip": ["numpy"],
                     "install_ray": True,
                 },
-                "pip": ["pandas"],
+                "pip": ["requests"],
             },
         ],
     )

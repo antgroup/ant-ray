@@ -67,7 +67,7 @@ public class KillActorTest extends BaseTest {
     try {
       // Sleep 1s here to make sure the driver has received the actor notification
       // (of state RESTARTING or DEAD).
-      Thread.sleep(1000);
+      Thread.sleep(5000);
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }

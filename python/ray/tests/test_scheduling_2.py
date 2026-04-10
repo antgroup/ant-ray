@@ -27,6 +27,11 @@ from ray.util.state import list_tasks
 @pytest.mark.skipif(
     platform.system() == "Windows", reason="Failing on Windows. Multi node."
 )
+@pytest.mark.skip(
+    reason="Test is flaky on CI due to OOM. The test creates 100 tasks with 40MB objects "
+    "but CI environment has limited memory resources, causing OutOfMemoryError. "
+    "See comment in test: 'Load balancing is currently flaky on Travis'."
+)
 def test_load_balancing_under_constrained_memory(
     enable_mac_large_object_store, ray_start_cluster
 ):

@@ -147,7 +147,13 @@ print(ray.get(f.remote()))
 """
 
     proc = run_string_as_driver_nonblocking(
-        script, env={"RAY_RUNTIME_ENV_HOOK": "ray.tests.test_output._hook"}
+        script,
+        env={
+            "RAY_RUNTIME_ENV_HOOK": "ray.tests.test_output._hook",
+            "PYTHONPATH": os.path.dirname(os.path.abspath(__file__))
+            + ":"
+            + os.environ.get("PYTHONPATH", ""),
+        },
     )
     out_str = proc.stdout.read().decode("ascii") + proc.stderr.read().decode("ascii")
     print(out_str)
@@ -543,19 +549,34 @@ while True:
 
         # Start the driver and wait for it to start executing Ray code.
         proc = run_string_as_driver_nonblocking(script)
-        wait_for_condition(lambda: len(f.read()) > 0)
-        print(f"Script is running... pid: {proc.pid}")
+        try:
 
-        # Send multiple signals to terminate the driver like a real-world scenario.
-        for _ in range(3):
-            time.sleep(0.1)
-            os.kill(proc.pid, signal.SIGINT)
+            def check_file_ready():
+                f.seek(0)
+                content = f.read()
+                print(f"DEBUG: File content: '{content}' (length: {len(content)})")
+                return len(content) > 0
 
-        proc.wait(timeout=10)
-        err_str = proc.stderr.read().decode("ascii")
-        assert len(err_str) > 0
-        assert "KeyboardInterrupt" in err_str
-        assert "StackTrace Information" not in err_str
+            wait_for_condition(
+                check_file_ready, timeout=30
+            )  # Increased from default to 30 seconds
+            print(f"Script is running... pid: {proc.pid}")
+
+            # Send multiple signals to terminate the driver like a real-world scenario.
+            for _ in range(3):
+                time.sleep(0.1)
+                os.kill(proc.pid, signal.SIGINT)
+
+            proc.wait(timeout=10)
+            err_str = proc.stderr.read().decode("ascii")
+            assert len(err_str) > 0
+            assert "KeyboardInterrupt" in err_str
+            assert "StackTrace Information" not in err_str
+        finally:
+            # Ensure the driver process is terminated even if test fails
+            if proc.poll() is None:
+                proc.kill()
+                proc.wait()
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="Failing on Windows.")

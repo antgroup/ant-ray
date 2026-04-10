@@ -58,7 +58,7 @@ def test_generator_oom(ray_start_regular_shared):
     try:
         # Worker may OOM using normal returns.
         ray.get(large_values.options(num_returns=num_returns).remote(num_returns)[0])
-    except ray.exceptions.WorkerCrashedError:
+    except (ray.exceptions.WorkerCrashedError, ray.exceptions.OutOfMemoryError):
         pass
 
     # Using a generator will allow the worker to finish.

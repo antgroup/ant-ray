@@ -67,18 +67,22 @@ def test_pip_ray_is_overwritten(ray_start_regular_shared):
         import pip_install_test  # noqa: F401
 
     # Test an unconstrained "ray" dependency (should work).
-    ray.get(f.options(runtime_env={"pip": ["pip-install-test==0.5", "ray"]}).remote())
+    ray.get(
+        f.options(runtime_env={"pip": ["pip-install-test==0.5", "ant-ray"]}).remote()
+    )
 
     # Test a constrained "ray" dependency that matches the env (should work).
     ray.get(
-        f.options(runtime_env={"pip": ["pip-install-test==0.5", "ray>=2.0"]}).remote()
+        f.options(
+            runtime_env={"pip": ["pip-install-test==0.5", "ant-ray>=2.0"]}
+        ).remote()
     )
 
     # Test a constrained "ray" dependency that doesn't match the env (shouldn't work).
     with pytest.raises(Exception):
         ray.get(
             f.options(
-                runtime_env={"pip": ["pip-install-test==0.5", "ray<2.0"]}
+                runtime_env={"pip": ["pip-install-test==0.5", "ant-ray<2.0"]}
             ).remote()
         )
 

@@ -69,13 +69,13 @@ public class PlacementGroupWithResourcesTest extends BaseTest {
     ActorHandle<Counter> actor =
         Ray.actor(Counter::new, 1).setPlacementGroup(placementGroup, 0).remote();
     Assert.assertNotEquals(actor.getId(), ActorId.NIL);
-    Assert.assertEquals(actor.task(Counter::getValue).remote().get(3000), Integer.valueOf(1));
+    Assert.assertEquals(actor.task(Counter::getValue).remote().get(15000), Integer.valueOf(1));
 
     Assert.assertEquals(
         Ray.task(PlacementGroupWithResourcesTest::simpleFunction)
             .setPlacementGroup(placementGroup, 0)
             .remote()
-            .get(3000),
+            .get(15000),
         Integer.valueOf(1));
   }
 }

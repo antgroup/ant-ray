@@ -590,7 +590,7 @@ def test_pip_task(shutdown_only, pip_as_str, tmp_path):
 def test_conda_pip_extras_ray_default(shutdown_only, option):
     """Tests that ray[extras] can be included as a conda/pip dependency."""
     ray.init()
-    pip = ["pip-install-test==0.5", "ray[default]"]
+    pip = ["pip-install-test==0.5", "ant-ray[default]"]
     if option == "conda":
         runtime_env = {"conda": {"dependencies": ["pip", {"pip": pip}]}}
     elif option == "pip":

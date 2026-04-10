@@ -80,8 +80,18 @@ def test_uv_run_editable(shutdown_only, tmp_working_dir):
     tmp_dir = tmp_working_dir
 
     subprocess.run(
-        ["git", "clone", "https://github.com/carpedm20/emoji/", "emoji_copy"],
+        [
+            "wget",
+            "http://antsys-ray-prod.cn-shanghai-ant-office.oss-alipay.aliyuncs.com/moshi/emoji_copy.tar.gz",
+        ],
         cwd=tmp_dir,
+        check=True,
+    )
+
+    subprocess.run(
+        ["tar", "-xzf", "emoji_copy.tar.gz"],
+        cwd=tmp_dir,
+        check=True,
     )
 
     subprocess.run(

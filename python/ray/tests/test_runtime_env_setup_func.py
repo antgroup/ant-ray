@@ -8,9 +8,12 @@ import threading
 import pytest
 
 import ray
+import ray._private.ray_constants as ray_constants
 from ray._common.test_utils import wait_for_condition
 from ray._private.test_utils import format_web_url
+from ray.dashboard import consts as dashboard_consts
 from ray.job_submission import JobStatus, JobSubmissionClient
+from ray._common.network_utils import find_free_port
 
 
 def _hook():
@@ -183,8 +186,35 @@ def test_setup_hook_module_failure(shutdown_only):
     assert "Failed to execute the setup hook method" in str(e.value)
 
 
+def _wait_for_dashboard_agent_ready(timeout=30):
+    """Wait for the dashboard agent to register its info in internal KV.
+
+    This is the proper way to wait for agent readiness, as the agent
+    must register its info in KV before JobSubmissionClient can work.
+    """
+    for node in ray.nodes():
+        node_id = node["NodeID"]
+        key = f"{dashboard_consts.DASHBOARD_AGENT_ADDR_NODE_ID_PREFIX}{node_id}"
+
+        def get_addr():
+            return ray.experimental.internal_kv._internal_kv_get(
+                key, namespace=ray_constants.KV_NAMESPACE_DASHBOARD
+            )
+
+        wait_for_condition(lambda: get_addr() is not None, timeout=timeout)
+
+
 @pytest.mark.skipif(platform.system() == "Windows", reason="Doesn't support Windows.")
-def test_job_submission_not_allowed_for_callable(shutdown_only):
+def test_job_submission_not_allowed_for_callable(ray_start_cluster):
+    """Test that validates job submission with worker process setup hooks."""
+    cluster = ray_start_cluster
+    # Add head node with explicit dashboard agent port to avoid port conflicts
+    cluster.add_node(num_cpus=1, dashboard_agent_listen_port=find_free_port())
+    ray.init(address=cluster.address)
+
+    # Wait for the dashboard agent to be fully ready (registered in KV)
+    _wait_for_dashboard_agent_ready(timeout=60)
+
     temp_dir = None
     file_path = None
 
@@ -215,8 +245,8 @@ ray.get(f.remote())
 
         # Get the absolute path
         absolute_path = os.path.abspath(file_path)
-        # Create a cluster.
-        ray.init()
+
+        # Get the dashboard URL
         address = ray._private.worker._global_node.webui_url
         address = format_web_url(address)
         client = JobSubmissionClient(address)

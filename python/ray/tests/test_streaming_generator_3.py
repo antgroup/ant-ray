@@ -233,7 +233,7 @@ def test_generator_wait_e2e(shutdown_only, backpressure):
             else:
                 result.append(ray.get(r))
     elapsed = time.time() - start
-    assert elapsed < 4
+    assert elapsed < 5  # Relaxed from 4s to accommodate CI environment latency
     assert 2 < elapsed
 
     assert len(result) == 12

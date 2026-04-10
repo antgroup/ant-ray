@@ -188,7 +188,7 @@ def test_grpc_message_size(shutdown_only):
     ray.get(bar.remote(*[f() for _ in range(200)]))
 
 
-def test_default_worker_import_dependency(shutdown_only):
+def test_default_worker_import_dependency():
     """
     Test ray's python worker import doesn't import the not-allowed dependencies.
     """
@@ -203,35 +203,59 @@ def test_default_worker_import_dependency(shutdown_only):
     # https://github.com/ray-project/ray/issues/41338
     blocked_deps += ["pydantic"]
 
-    # Remove the ray module and the blocked deps from sys.modules.
-    sys.modules.pop("ray", None)
-    assert "ray" not in sys.modules
-    for dep in blocked_deps:
-        sys.modules.pop(dep, None)
-        assert dep not in sys.modules
+    # Save original ray modules to restore after the test.
+    # This is necessary because removing ray from sys.modules and re-importing
+    # creates a new ray module object that doesn't have the proper bindings to
+    # the C extension modules. When Python exits, atexit callbacks try to call
+    # ray.shutdown(), which fails because ray._raylet and ray.actor are missing.
+    original_ray_modules = {k: v for k, v in sys.modules.items() if k.startswith("ray")}
 
-    # This imports the python worker.
-    import ray._private.workers.default_worker  # noqa: F401
+    try:
+        # Remove the ray module and the blocked deps from sys.modules.
+        sys.modules.pop("ray", None)
+        assert "ray" not in sys.modules
+        for dep in blocked_deps:
+            sys.modules.pop(dep, None)
+            assert dep not in sys.modules
 
-    # Check that the ray module is imported.
-    assert "ray" in sys.modules
+        # This imports the python worker.
+        import ray._private.workers.default_worker  # noqa: F401
 
-    # Check that the blocked deps are not imported.
-    for dep in blocked_deps:
-        assert dep not in sys.modules
-
-    # Test starting a ray workers should not see unwanted deps loaded eagerly.
-    ray.init()
-
-    @ray.remote
-    def f():
-        import ray  # noqa: F401
-
+        # Check that the ray module is imported.
         assert "ray" in sys.modules
-        for x in blocked_deps:
-            assert x not in sys.modules
 
-    ray.get(f.remote())
+        # Check that the blocked deps are not imported.
+        for dep in blocked_deps:
+            assert dep not in sys.modules
+
+        # Test starting ray workers should not see unwanted deps loaded eagerly.
+        # Use a subprocess to avoid issues with C extension module reloading.
+        script = """
+import ray
+
+ray.init()
+
+@ray.remote
+def f():
+    import sys
+    blocked_deps = ["numpy", "pydantic"]
+    for x in blocked_deps:
+        assert x not in sys.modules, f"{x} should not be imported"
+
+result = ray.get(f.remote())
+assert result is None
+ray.shutdown()
+"""
+        run_string_as_driver(script)
+
+    finally:
+        # Restore original ray modules to avoid atexit callback errors.
+        # Clear any new ray modules first.
+        new_ray_modules = [k for k in list(sys.modules.keys()) if k.startswith("ray")]
+        for m in new_ray_modules:
+            sys.modules.pop(m, None)
+        # Restore original modules.
+        sys.modules.update(original_ray_modules)
 
 
 @pytest.mark.skipif(

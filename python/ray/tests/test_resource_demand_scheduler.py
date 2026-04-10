@@ -1129,7 +1129,7 @@ def test_backlog_queue_impact_on_binpacking_time():
     # demand requires another 1000 nodes.
     to_launch = test_backlog_queue_impact_on_binpacking_time_aux(
         num_available_nodes=500,
-        time_to_assert=10,  # real time 1.32s.
+        time_to_assert=30,  # real time 1.32s on i9, ~21s on CI.
         demand_request_shape=[{"GPU": 8}, {"CPU": 64}],
     )
     assert to_launch == {"m4.16xlarge": 500, "p2.8xlarge": 500}

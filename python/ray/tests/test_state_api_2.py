@@ -1,8 +1,10 @@
 import asyncio
 import json
 import os
+import subprocess
 import sys
 import tempfile
+import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -346,14 +348,36 @@ def test_actor_task_with_repr_name(ray_start_with_dashboard):
     sys.platform == "win32", reason="Release test not expected to work on non-linux."
 )
 def test_state_api_scale_smoke(shutdown_only):
-    ray.init()
-    release_test_file_path = (
-        "../../release/nightly_tests/stress_tests/test_state_api_scale.py"
-    )
-    full_path = Path(ray.__file__).parents[0] / release_test_file_path
-    assert full_path.exists()
+    # Increase dashboard agent wait timeout for stable agent connection
+    os.environ["RAY_DASHBOARD_AGENT_WAIT_TIMEOUT"] = "60"
+    os.environ["RAY_GCS_RPC_TIMEOUT_SECONDS"] = "30"
+    # Also set environment variable to prevent agent env var override on zero GPUs
+    os.environ["RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO"] = "0"
 
-    check_call_subprocess(["python", str(full_path), "--smoke-test"])
+    ray.init(_system_config={"gcs_rpc_server_reconnect_timeout_s": 60})
+
+    # Wait for agent to be fully ready
+    time.sleep(5)
+
+    # Add retry mechanism for state API operations
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            release_test_file_path = (
+                "../../release/nightly_tests/stress_tests/test_state_api_scale.py"
+            )
+            full_path = Path(ray.__file__).parents[0] / release_test_file_path
+            assert full_path.exists()
+
+            check_call_subprocess(["python", str(full_path), "--smoke-test"])
+            break  # Success, exit retry loop
+        except subprocess.CalledProcessError as e:
+            if attempt < max_retries - 1:
+                print(f"Attempt {attempt + 1} failed: {e}. Retrying in 5 seconds...")
+                time.sleep(5)
+            else:
+                print(f"All {max_retries} attempts failed. Raising final exception.")
+                raise
 
 
 def test_ray_timeline(shutdown_only):

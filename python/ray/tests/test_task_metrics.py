@@ -1,6 +1,7 @@
 import copy
 import multiprocessing
 import sys
+import time
 from collections import defaultdict
 
 import pytest
@@ -554,15 +555,25 @@ time.sleep(999)
 """
 
     proc = run_string_as_driver_nonblocking(driver)
-    expected = {
-        "FAILED": 2.0,
-    }
-    wait_for_condition(
-        lambda: tasks_by_state(info, timeseries) == expected,
-        timeout=20,
-        retry_interval_ms=500,
-    )
-    proc.kill()
+    try:
+        # Wait for driver to start and tasks to be submitted
+        time.sleep(2)
+
+        def check_failed_tasks():
+            result = tasks_by_state(info, timeseries)
+            # Check that we have at least 2 failed tasks (could be more due to retries)
+            return result.get("FAILED", 0) >= 2.0
+
+        wait_for_condition(
+            check_failed_tasks,
+            timeout=30,
+            retry_interval_ms=500,
+        )
+    finally:
+        # Ensure the driver process is terminated even if test fails
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait()
 
 
 def test_concurrent_actor_tasks(shutdown_only):

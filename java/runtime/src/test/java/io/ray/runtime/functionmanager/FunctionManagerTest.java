@@ -8,6 +8,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -180,6 +181,18 @@ public class FunctionManagerTest {
     JobFunctionTable functionTable = new JobFunctionTable(getClass().getClassLoader());
     Map<Pair<String, String>, Pair<RayFunction, Boolean>> res =
         functionTable.loadFunctionsForClass(ChildClass.class.getName());
+
+    // Filter out synthetic methods (e.g., $jacocoInit injected by JaCoCo in CI environments)
+    Iterator<Map.Entry<Pair<String, String>, Pair<RayFunction, Boolean>>> iterator =
+        res.entrySet().iterator();
+    while (iterator.hasNext()) {
+      Map.Entry<Pair<String, String>, Pair<RayFunction, Boolean>> entry = iterator.next();
+      String methodName = entry.getKey().getLeft();
+      if (methodName.startsWith("$jacoco")) {
+        iterator.remove();
+      }
+    }
+
     // The result should be 5 entries:
     //   1, the constructor with signature
     //   2, the constructor without signature
